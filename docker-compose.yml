@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  geo-vue-app:
+    image: geo-vue
+    volumes:
+      - ./dist:/app/dist
