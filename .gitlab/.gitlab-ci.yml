@@ -28,7 +28,7 @@ deploy-test_job:
   <<: *ssh_setup
   stage: deploy-test
   script:
-    - ssh $SSH_USER@$SSH_HOST "clear-geo-vue-test.sh"
+    - ssh $SSH_USER@$SSH_HOST "/root/clear-geo-vue-test.sh"
     - scp -r dist/* $SSH_USER@$SSH_HOST:$SSH_PATH
   rules:
     - if: $CI_COMMIT_BRANCH == "dev"
@@ -37,7 +37,7 @@ deploy-prod_job:
   <<: *ssh_setup
   stage: deploy-prod
   script:
-    - ssh $SSH_USER@$SSH_HOST "clear-geo-vue-prod.sh"
+    - ssh $SSH_USER@$SSH_HOST "/root/clear-geo-vue-prod.sh"
     - scp -r dist/* $SSH_USER@$SSH_HOST:$SSH_PATH
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
