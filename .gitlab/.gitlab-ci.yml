@@ -1,0 +1,35 @@
+image: "node:16-alpine"
+
+stages:
+  - build
+  - ssh
+  - deploy
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist
+
+.ssh-setup: &ssh_setup
+  image: ubuntu:latest
+  stage: ssh
+  before_script:
+    - apt-get -yq update
+    - apt-get -yqq install ssh
+    - install -m 600 -D /dev/null ~/.ssh/id_rsa
+    - echo "$SSH_KEY" | base64 -d > ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+
+deploy:
+  <<: *ssh_setup
+  stage: deploy
+  script:
+    - scp -r dist/* $SSH_USER@$SSH_HOST:$SSH_PATH
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
