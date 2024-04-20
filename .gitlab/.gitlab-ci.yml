@@ -1,11 +1,11 @@
-image: "node:16-alpine"
-
 stages:
   - build
   - ssh
-  - deploy
+  - deploy-test
+  - deploy-prod
 
-build:
+build_job:
+  image: "node:16-alpine"
   stage: build
   script:
     - npm install
@@ -24,10 +24,20 @@ build:
     - echo "$SSH_KEY" | base64 -d > ~/.ssh/id_rsa
     - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
 
-deploy:
+deploy-test_job:
   <<: *ssh_setup
-  stage: deploy
+  stage: deploy-test
   script:
+    - ssh $SSH_USER@$SSH_HOST "clear-geo-vue-test.sh"
+    - scp -r dist/* $SSH_USER@$SSH_HOST:$SSH_PATH
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+
+deploy-prod_job:
+  <<: *ssh_setup
+  stage: deploy-prod
+  script:
+    - ssh $SSH_USER@$SSH_HOST "clear-geo-vue-prod.sh"
     - scp -r dist/* $SSH_USER@$SSH_HOST:$SSH_PATH
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
