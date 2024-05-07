@@ -45,10 +45,11 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { onBeforeMount, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
 import { validators } from '../../services/utils'
+import { useAuthStore } from '../../stores/modules/auth.module'
 
 const { validate } = useForm('form')
 const { push } = useRouter()
@@ -60,10 +61,26 @@ const formData = reactive({
   keepLoggedIn: false,
 })
 
-const submit = () => {
+const store = useAuthStore()
+
+const submit = async () => {
   if (validate()) {
-    init({ message: "You've successfully logged in", color: 'success' })
-    push({ name: 'dashboard' })
+    store
+      .login(formData.email, formData.password)
+      .then(() => {
+        init({ message: "You've successfully logged in", color: 'success' })
+        push({ name: 'dashboard' })
+      })
+      .catch((error: any) => {
+        init({ message: error, color: 'danger' })
+      })
   }
 }
+
+onBeforeMount(() => {
+  if (store.isAuthenticated) {
+    push({ name: 'dashboard' })
+    init({ message: 'You are already logged in', color: 'success' })
+  }
+})
 </script>

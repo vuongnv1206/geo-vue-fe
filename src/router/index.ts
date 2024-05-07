@@ -19,6 +19,9 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: 'dashboard',
         path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+        },
         component: () => import('../pages/admin/dashboard/Dashboard.vue'),
       },
       {
@@ -77,25 +80,40 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: 'login',
         path: 'login',
+        meta: {
+          requiresAuth: false,
+        },
         component: () => import('../pages/auth/Login.vue'),
       },
       {
         name: 'signup',
         path: 'signup',
+        meta: {
+          requiresAuth: false,
+        },
         component: () => import('../pages/auth/Signup.vue'),
       },
       {
         name: 'recover-password',
         path: 'recover-password',
+        meta: {
+          requiresAuth: false,
+        },
         component: () => import('../pages/auth/RecoverPassword.vue'),
       },
       {
         name: 'recover-password-email',
         path: 'recover-password-email',
+        meta: {
+          requiresAuth: false,
+        },
         component: () => import('../pages/auth/CheckTheEmail.vue'),
       },
       {
         path: '',
+        meta: {
+          requiresAuth: false,
+        },
         redirect: { name: 'login' },
       },
     ],

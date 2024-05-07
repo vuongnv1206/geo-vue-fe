@@ -25,6 +25,7 @@
     "@storybook/test": "^8.0.8",
     "@vuestic/tailwind": "^0.1.3",
     "@vueuse/core": "^10.6.1",
+    "axios": "^1.6.8",
     "chart.js": "^4.4.1",
     "chartjs-chart-geo": "^4.2.8",
     "epic-spinners": "^2.0.0",
