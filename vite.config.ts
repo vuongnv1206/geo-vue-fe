@@ -15,4 +15,24 @@ export default defineConfig({
       include: resolve(dirname(fileURLToPath(import.meta.url)), './src/i18n/locales/**'),
     }),
   ],
+  resolve: {
+    alias: [
+      {
+        find: '@',
+        replacement: resolve(dirname(fileURLToPath(import.meta.url)), './src'),
+      },
+      {
+        find: '@stores',
+        replacement: resolve(dirname(fileURLToPath(import.meta.url)), './src/stores'),
+      },
+      {
+        find: '@modules',
+        replacement: resolve(dirname(fileURLToPath(import.meta.url)), './src/stores/modules'),
+      },
+      {
+        find: '@services',
+        replacement: resolve(dirname(fileURLToPath(import.meta.url)), './src/services'),
+      },
+    ],
+  },
 })

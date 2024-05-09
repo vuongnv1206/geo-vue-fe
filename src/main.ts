@@ -5,9 +5,9 @@ import { createGtm } from '@gtm-support/vue-gtm'
 
 import stores from './stores'
 import router from './router'
-import vuesticGlobalConfig from './services/vuestic-ui/global-config'
+import vuesticGlobalConfig from '@services/vuestic-ui/global-config'
 import App from './App.vue'
-import { useAuthStore } from './stores/modules/auth.module'
+import { useAuthStore } from '@modules/auth.module'
 
 const app = createApp(App)
 
