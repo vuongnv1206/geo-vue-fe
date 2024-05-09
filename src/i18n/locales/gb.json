@@ -54,7 +54,11 @@
     "404": "404",
     "faq": "FAQ",
     "users": "Users",
-    "projects": "Projects"
+    "projects": "Projects",
+
+    "questions": "Questions",
+    "question-folder": "Question folder",
+    "question-bank": "Question bank"
   },
   "messages": {
     "all": "See all messages",

@@ -8,6 +8,35 @@ export type User = {
   emailaddress: string
   phone: string
   tenant: string
+  permission?: string[]
+}
+
+export const Action = {
+  View: 'View',
+  Search: 'Search',
+  Create: 'Create',
+  Update: 'Update',
+  Delete: 'Delete',
+  Export: 'Export',
+  Generate: 'Generate',
+  Clean: 'Clean',
+  UpgradeSubscription: 'UpgradeSubscription',
+}
+
+export const Resource = {
+  Tenants: 'Tenants',
+  Dashboard: 'Dashboard',
+  Hangfire: 'Hangfire',
+  Users: 'Users',
+  UserRoles: 'UserRoles',
+  Roles: 'Roles',
+  RoleClaims: 'RoleClaims',
+  Products: 'Products',
+  Brands: 'Brands',
+  Classes: 'Classes',
+  GroupClasses: 'GroupClasses',
+  QuestionFolders: 'QuestionFolders',
+  GroupTeachers: 'GroupTeachers',
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -40,6 +69,7 @@ export const useAuthStore = defineStore('auth', {
               emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
               phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
               tenant: userParse.tenant,
+              permission: userParse.permission,
             }
           } else {
             this.isAuthenticated = false
@@ -52,6 +82,27 @@ export const useAuthStore = defineStore('auth', {
           this.user = null
           return Promise.reject(error)
         })
+    },
+    logout() {
+      this.isAuthenticated = false
+      this.user = null
+      jwtService.destroyToken()
+    },
+    mustHavePermission(action: string, resource: string): boolean {
+      if (!this.user) {
+        return false
+      }
+      if (!this.user.permission) {
+        return false
+      }
+      return this.user.permission.some((p) => p === `Permissions.${resource}.${action}`)
+    },
+    hasAccess(permission: string): boolean {
+      const splitPermission = permission.split('.')
+      if (splitPermission.length !== 2) {
+        return false
+      }
+      return this.mustHavePermission(splitPermission[1], splitPermission[0])
     },
   },
 })

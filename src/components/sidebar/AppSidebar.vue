@@ -1,7 +1,7 @@
 <template>
   <VaSidebar v-model="writableVisible" :width="sidebarWidth" :color="color" minimized-width="0">
     <VaAccordion v-model="value" multiple>
-      <VaCollapse v-for="(route, index) in navigationRoutes.routes" :key="index">
+      <VaCollapse v-for="(route, index) in navigationRoutesCanAccess" :key="index">
         <template #header="{ value: isCollapsed }">
           <VaSidebarItem
             :to="route.children ? undefined : { name: route.name }"
@@ -49,6 +49,7 @@
     </VaAccordion>
   </VaSidebar>
 </template>
+
 <script lang="ts">
 import { defineComponent, watch, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -57,6 +58,8 @@ import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
 
 import navigationRoutes, { type INavigationRoute } from './NavigationRoutes'
+
+import { useAuthStore } from '../../stores/modules/auth.module.ts'
 
 export default defineComponent({
   name: 'Sidebar',
@@ -69,6 +72,7 @@ export default defineComponent({
   setup: (props, { emit }) => {
     const { getColor, colorToRgba } = useColors()
     const route = useRoute()
+    const authStore = useAuthStore()
     const { t } = useI18n()
 
     const value = ref<boolean[]>([])
@@ -88,12 +92,35 @@ export default defineComponent({
       return section.children.some(({ name }) => route.path.endsWith(`${name}`))
     }
 
+    const hasAccess = (route: INavigationRoute) => {
+      if (!route.meta) {
+        return true
+      }
+      if (route.meta.permission) {
+        return authStore.hasAccess(route.meta.permission)
+      }
+      return true
+    }
+
     const setActiveExpand = () =>
       (value.value = navigationRoutes.routes.map((route: INavigationRoute) => routeHasActiveChild(route)))
 
     const sidebarWidth = computed(() => (props.mobile ? '100vw' : '280px'))
     const color = computed(() => getColor('background-secondary'))
     const activeColor = computed(() => colorToRgba(getColor('focus'), 0.1))
+    const navigationRoutesCanAccess = computed(() => {
+      return navigationRoutes.routes.filter((route: INavigationRoute) => {
+        if (!hasAccess(route)) {
+          return false
+        }
+        if (route.children) {
+          route.children = route.children.filter((child: INavigationRoute) => hasAccess(child))
+          // If there are no children left, don't show the parent
+          return route.children.length > 0
+        }
+        return true
+      })
+    })
 
     const iconColor = (route: INavigationRoute) => (routeHasActiveChild(route) ? 'primary' : 'secondary')
     const textColor = (route: INavigationRoute) => (routeHasActiveChild(route) ? 'primary' : 'textPrimary')
@@ -108,7 +135,9 @@ export default defineComponent({
       color,
       activeColor,
       navigationRoutes,
+      navigationRoutesCanAccess,
       routeHasActiveChild,
+      hasAccess,
       isActiveChildRoute,
       t,
       iconColor,

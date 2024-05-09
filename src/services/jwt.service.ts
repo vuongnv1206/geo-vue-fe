@@ -36,6 +36,11 @@ class JwtService {
   getUser(): any {
     const user = window.localStorage.getItem(this.USER)
     if (!user) {
+      // try to get user from the token
+      const token = this.getToken()
+      if (token) {
+        return this.parseToken(token)
+      }
       return null
     }
     return JSON.parse(user)
