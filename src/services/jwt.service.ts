@@ -46,6 +46,10 @@ class JwtService {
     return JSON.parse(user)
   }
 
+  destroyUser() {
+    window.localStorage.removeItem(this.USER)
+  }
+
   saveTenant(tenant: string): void {
     window.localStorage.setItem(this.TENANT, tenant)
   }

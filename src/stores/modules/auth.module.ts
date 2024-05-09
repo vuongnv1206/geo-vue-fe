@@ -98,6 +98,7 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = false
       this.user = null
       jwtService.destroyToken()
+      jwtService.destroyUser()
     },
     mustHavePermission(action: string, resource: string): boolean {
       if (!this.user) {

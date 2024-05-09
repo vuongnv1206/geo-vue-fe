@@ -109,7 +109,10 @@ export default defineComponent({
     const color = computed(() => getColor('background-secondary'))
     const activeColor = computed(() => colorToRgba(getColor('focus'), 0.1))
     const navigationRoutesCanAccess = computed(() => {
-      return navigationRoutes.routes.filter((route: INavigationRoute) => {
+      const clonedNavigationRoutes = navigationRoutes.routes.map((route) => {
+        return { ...route }
+      })
+      return clonedNavigationRoutes.filter((route: INavigationRoute) => {
         if (!hasAccess(route)) {
           return false
         }

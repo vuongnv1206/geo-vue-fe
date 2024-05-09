@@ -37,6 +37,8 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
+import { useAuthStore } from '@/stores/modules/auth.module'
+import { useRouter } from 'vue-router'
 
 const { colors, setHSLAColor } = useColors()
 const hoverColor = computed(() => setHSLAColor(colors.focus, { a: 0.1 }))
@@ -47,6 +49,7 @@ type ProfileListItem = {
   name: string
   to?: string
   href?: string
+  action?: string
   icon: string
 }
 
@@ -55,6 +58,9 @@ type ProfileOptions = {
   separator: boolean
   list: ProfileListItem[]
 }
+
+const { logout } = useAuthStore()
+const { push } = useRouter()
 
 withDefaults(
   defineProps<{
@@ -68,23 +74,7 @@ withDefaults(
         list: [
           {
             name: 'profile',
-            to: 'preferences',
             icon: 'mso-account_circle',
-          },
-          {
-            name: 'settings',
-            to: 'settings',
-            icon: 'mso-settings',
-          },
-          {
-            name: 'billing',
-            to: 'billing',
-            icon: 'mso-receipt_long',
-          },
-          {
-            name: 'projects',
-            to: 'projects',
-            icon: 'mso-favorite',
           },
         ],
       },
@@ -92,11 +82,6 @@ withDefaults(
         name: 'explore',
         separator: true,
         list: [
-          {
-            name: 'faq',
-            to: 'faq',
-            icon: 'mso-quiz',
-          },
           {
             name: 'helpAndSupport',
             href: 'https://discord.gg/u7fQdqQt8c',
@@ -110,8 +95,8 @@ withDefaults(
         list: [
           {
             name: 'logout',
-            to: 'login',
             icon: 'mso-logout',
+            action: 'logoutAction',
           },
         ],
       },
@@ -122,7 +107,20 @@ withDefaults(
 const isShown = ref(false)
 
 const resolveLinkAttribute = (item: ProfileListItem) => {
-  return item.to ? { to: { name: item.to } } : item.href ? { href: item.href, target: '_blank' } : {}
+  return item.to
+    ? { to: { name: item.to } }
+    : item.href
+      ? { href: item.href, target: '_blank' }
+      : item.action
+        ? {
+            onClick: () => {
+              if (item.action === 'logoutAction') {
+                logout()
+                push({ name: 'login' })
+              }
+            },
+          }
+        : {}
 }
 </script>
 
