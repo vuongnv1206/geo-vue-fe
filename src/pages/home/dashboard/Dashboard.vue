@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { useAuthStore } from '../../../stores/modules/auth.module'
+import { useAuthStore } from '@modules/auth.module'
 
 const authStore = useAuthStore()
 const isTeacher = computed(() => authStore?.musHaveRole('Admin')) // just for testing

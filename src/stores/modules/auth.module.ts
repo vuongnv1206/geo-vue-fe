@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import authService from '../../services/auth.service'
-import jwtService from '../../services/jwt.service'
+import authService from '@services/auth.service'
+import jwtService from '@services/jwt.service'
 
 export type User = {
   id: string

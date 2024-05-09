@@ -49,7 +49,7 @@ import { onBeforeMount, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
 import { validators } from '../../services/utils'
-import { useAuthStore } from '../../stores/modules/auth.module'
+import { useAuthStore } from '@modules/auth.module'
 
 const { validate } = useForm('form')
 const { push } = useRouter()

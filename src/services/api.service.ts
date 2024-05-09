@@ -1,5 +1,5 @@
 import axios from 'axios'
-import JwtService from './jwt.service'
+import JwtService from '@services/jwt.service'
 
 JwtService.saveTenant('root')
 

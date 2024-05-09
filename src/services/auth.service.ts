@@ -1,5 +1,5 @@
-import apiService from './api.service'
-import jwtService from './jwt.service'
+import apiService from '@services/api.service'
+import jwtService from '@services/jwt.service'
 
 class AuthService {
   async login(email: string, password: string): Promise<any> {
