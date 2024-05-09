@@ -33,6 +33,6 @@ export default defineConfig({
         find: '@services',
         replacement: resolve(dirname(fileURLToPath(import.meta.url)), './src/services'),
       },
-    ]
+    ],
   },
 })
