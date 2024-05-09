@@ -8,6 +8,7 @@ export type User = {
   emailaddress: string
   phone: string
   tenant: string
+  roles: string
   permission?: string[]
 }
 
@@ -50,7 +51,16 @@ export const useAuthStore = defineStore('auth', {
     checkAuth() {
       if (jwtService.getToken()) {
         this.isAuthenticated = true
-        this.user = jwtService.getUser()
+        const userParse = jwtService.getUser()
+        this.user = {
+          id: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
+          fullName: userParse.fullName,
+          emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+          phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
+          roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+          tenant: userParse.tenant,
+          permission: userParse.permission,
+        }
       } else {
         this.isAuthenticated = false
         this.user = null
@@ -68,6 +78,7 @@ export const useAuthStore = defineStore('auth', {
               fullName: userParse.fullName,
               emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
               phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
+              roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
               tenant: userParse.tenant,
               permission: userParse.permission,
             }
@@ -96,6 +107,13 @@ export const useAuthStore = defineStore('auth', {
         return false
       }
       return this.user.permission.some((p) => p === `Permissions.${resource}.${action}`)
+    },
+    musHaveRole(role: string): boolean {
+      if (!this.user) {
+        return false
+      }
+      const roles = this.user.roles.split(',')
+      return roles.some((r) => r === role)
     },
     hasAccess(permission: string): boolean {
       const splitPermission = permission.split('.')
