@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
     redirect: { name: 'dashboard' },
   },
   {
-    name: 'admin',
+    name: 'home',
     path: '/',
     component: AppLayout,
     redirect: { name: 'dashboard' },
@@ -22,54 +22,27 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
         },
-        component: () => import('../pages/admin/dashboard/Dashboard.vue'),
+        component: () => import('../pages/home/dashboard/Dashboard.vue'),
       },
       {
-        name: 'settings',
-        path: 'settings',
-        component: () => import('../pages/settings/Settings.vue'),
-      },
-      {
-        name: 'preferences',
-        path: 'preferences',
-        component: () => import('../pages/preferences/Preferences.vue'),
-      },
-      {
-        name: 'users',
-        path: 'users',
-        component: () => import('../pages/users/UsersPage.vue'),
-      },
-      {
-        name: 'projects',
-        path: 'projects',
-        component: () => import('../pages/projects/ProjectsPage.vue'),
-      },
-      {
-        name: 'payments',
-        path: '/payments',
+        name: 'questions',
+        path: 'questions',
+        meta: {
+          requiresAuth: true,
+        },
         component: RouteViewComponent,
         children: [
           {
-            name: 'payment-methods',
-            path: 'payment-methods',
-            component: () => import('../pages/payments/PaymentsPage.vue'),
+            name: 'question-folder',
+            path: 'question-folder',
+            component: () => import('../pages/question/QuestionFolder.vue'),
           },
           {
-            name: 'billing',
-            path: 'billing',
-            component: () => import('../pages/billing/BillingPage.vue'),
-          },
-          {
-            name: 'pricing-plans',
-            path: 'pricing-plans',
-            component: () => import('../pages/pricing-plans/PricingPlans.vue'),
+            name: 'question-bank',
+            path: 'question-bank',
+            component: () => import('../pages/question/QuestionBank.vue'),
           },
         ],
-      },
-      {
-        name: 'faq',
-        path: '/faq',
-        component: () => import('../pages/faq/FaqPage.vue'),
       },
     ],
   },
