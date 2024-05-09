@@ -59,7 +59,7 @@ import { useColors } from 'vuestic-ui'
 
 import navigationRoutes, { type INavigationRoute } from './NavigationRoutes'
 
-import { useAuthStore } from '../../stores/modules/auth.module.ts'
+import { useAuthStore } from '../../stores/modules/auth.module'
 
 export default defineComponent({
   name: 'Sidebar',

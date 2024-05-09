@@ -1,7 +1,10 @@
 export interface INavigationRoute {
   name: string
   displayName: string
-  meta: { icon: string }
+  meta: {
+    icon: string
+    permission?: string
+  }
   children?: INavigationRoute[]
 }
 
