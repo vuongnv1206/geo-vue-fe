@@ -10,7 +10,11 @@ export default defineConfig({
     sourcemap: true,
   },
   plugins: [
-    vue(),
+    vue({
+      script: {
+        defineModel: true,
+      },
+    }),
     VueI18nPlugin({
       include: resolve(dirname(fileURLToPath(import.meta.url)), './src/i18n/locales/**'),
     }),
@@ -33,6 +37,17 @@ export default defineConfig({
         find: '@services',
         replacement: resolve(dirname(fileURLToPath(import.meta.url)), './src/services'),
       },
+      {
+        find: '@components',
+        replacement: resolve(dirname(fileURLToPath(import.meta.url)), './src/components'),
+      },
+      {
+        find: '@pages',
+        replacement: resolve(dirname(fileURLToPath(import.meta.url)), './src/pages'),
+      },
     ],
+  },
+  define: {
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
   },
 })
