@@ -38,27 +38,28 @@
         <VaIcon class="" name="more_vert" />
       </VaListItemSection>
     </VaListItem>
-    <!-- <VaListItem v-for="(contact, index) in contacts" :key="index" class="list__item mb-2">
+    <VaListItem v-for="teacher in teacherTeams" :key="teacher.id" class="list__item mb-2">
       <VaListItemSection avatar class="justify-center">
         <VaAvatar size="small">
-          <img :src="contact.img" :alt="contact.name" />
+          <img src="" :alt="teacher.teacherName" />
         </VaAvatar>
       </VaListItemSection>
 
       <VaListItemSection>
         <VaListItemLabel>
-          {{ contact.name }}
-          <VaIcon class="mr-2" name="no_accounts" />
+          {{ teacher.teacherName }}
+          <VaIcon v-if="teacher.teacherId === '00000000-0000-0000-0000-000000000000'" class="mr-2" name="no_accounts" />
         </VaListItemLabel>
         <VaListItemLabel caption>
-          {{ contact.address }}
+          {{ teacher.email }}
+          {{ teacher.phone }}
         </VaListItemLabel>
       </VaListItemSection>
 
       <VaListItemSection icon style="cursor: pointer">
         <VaIcon name="more_vert" color="black" />
       </VaListItemSection>
-    </VaListItem> -->
+    </VaListItem>
   </VaList>
 </template>
 
@@ -66,7 +67,7 @@
 // const loading = ref(true)
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { ref, onMounted } from 'vue'
-import { GroupTeacher } from './types'
+import { GroupTeacher, TeacherTeam } from './types'
 const dataFilter = {
   keyword: '',
   pageNumber: 0,
@@ -76,10 +77,14 @@ const dataFilter = {
 const stores = useGroupTeacherStore()
 
 const groupTeachers = ref<GroupTeacher[]>([])
+const teacherTeams = ref<TeacherTeam[]>([])
 
 const getTeacherGroups = () => {
   stores.getGroupTeachers(dataFilter).then((res) => {
     groupTeachers.value = res.data
+  })
+  stores.getTeacherTeams(dataFilter).then((res) => {
+    teacherTeams.value = res.data
   })
 }
 onMounted(() => {
