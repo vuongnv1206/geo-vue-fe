@@ -23,14 +23,14 @@
     <VaDivider />
   </div>
   <VaList>
-    <VaListItem v-for="(contact, index) in contacts" :key="index" class="list__item mb-2">
+    <VaListItem v-for="group in groupTeachers" :key="group.id" class="list__item mb-2">
       <VaListItemSection avatar class="justify-center">
         <VaIcon name="group" color="black" />
       </VaListItemSection>
 
       <VaListItemSection>
         <VaListItemLabel>
-          {{ contact.name }}
+          {{ group.name }}
         </VaListItemLabel>
       </VaListItemSection>
 
@@ -38,7 +38,7 @@
         <VaIcon class="" name="more_vert" />
       </VaListItemSection>
     </VaListItem>
-    <VaListItem v-for="(contact, index) in contacts" :key="index" class="list__item mb-2">
+    <!-- <VaListItem v-for="(contact, index) in contacts" :key="index" class="list__item mb-2">
       <VaListItemSection avatar class="justify-center">
         <VaAvatar size="small">
           <img :src="contact.img" :alt="contact.name" />
@@ -58,37 +58,31 @@
       <VaListItemSection icon style="cursor: pointer">
         <VaIcon name="more_vert" color="black" />
       </VaListItemSection>
-    </VaListItem>
+    </VaListItem> -->
   </VaList>
 </template>
 
-<script lang="ts">
-export default {
-  data() {
-    return {
-      contacts: [
-        {
-          name: 'Audrey Clay',
-          address: '644 Vermont Court,',
-          img: 'https://randomuser.me/api/portraits/women/5.jpg',
-        },
-        {
-          name: 'Aguirre Klein',
-          address: '626 Carroll Street',
-          img: 'https://randomuser.me/api/portraits/men/1.jpg',
-        },
-        {
-          name: 'Tucker Kaufman',
-          address: '887 Winthrop Street',
-          img: 'https://randomuser.me/api/portraits/men/3.jpg',
-        },
-        {
-          name: 'Herbert Keller',
-          address: '286 NW. Shore St',
-          img: 'https://randomuser.me/api/portraits/men/5.jpg',
-        },
-      ],
-    }
-  },
+<script lang="ts" setup>
+// const loading = ref(true)
+import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
+import { ref, onMounted } from 'vue'
+import { GroupTeacher } from './types'
+const dataFilter = {
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 10,
+  orderBy: ['id'],
 }
+const stores = useGroupTeacherStore()
+
+const groupTeachers = ref<GroupTeacher[]>([])
+
+const getTeacherGroups = () => {
+  stores.getGroupTeachers(dataFilter).then((res) => {
+    groupTeachers.value = res.data
+  })
+}
+onMounted(() => {
+  getTeacherGroups()
+})
 </script>
