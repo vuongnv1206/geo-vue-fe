@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col md:flex-row">
-    <div class="p-3 rounded mr-1" style="background-color: #fff">
+    <div class="p-3 rounded mr-1 ml-1 mb-2" style="background-color: #fff">
       <TeacherGroupList />
     </div>
     <div style="width: 100%">
