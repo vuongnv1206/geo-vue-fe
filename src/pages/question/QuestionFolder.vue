@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed } from 'vue'
-import { QuestionTree } from './types'
+import { QuestionTree, QuestionTreeEmpty } from './types'
 import QuestionFolder from './widgets/QuestionFolder.vue'
+import EditQuestionTreeForm from './widgets/EditQuestionTreeForm.vue'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
+import { useModal, useToast } from 'vuestic-ui'
 
 const loading = ref(true)
 const currentShowFolderId = ref<string>('')
@@ -11,15 +13,6 @@ const stores = useQuestionFolderStore()
 
 const questionTreeMain = ref<QuestionTree>()
 const questionTrees = ref<QuestionTree[]>([])
-
-const getQuestionFolders = () => {
-  loading.value = true
-  stores.getQuestionFolders(currentShowFolderId.value).then((res) => {
-    questionTreeMain.value = res
-    getCurrentShowFolder(res)
-    loading.value = false
-  })
-}
 
 const getCurrentShowFolder = (questionTree: QuestionTree) => {
   if (questionTree.currentShow) {
@@ -31,11 +24,6 @@ const getCurrentShowFolder = (questionTree: QuestionTree) => {
     })
   }
   return questionTree
-}
-
-const selectedFolder = (questionTree: QuestionTree) => {
-  currentShowFolderId.value = questionTree.id
-  getQuestionFolders()
 }
 
 const QuestionFolderBreadcrumb = computed(() => {
@@ -76,16 +64,121 @@ const editQuestionTree = (questionTree: QuestionTree) => {
 
 const deleteQuestionTree = (questionTree: QuestionTree) => {
   console.log('deleteQuestionTree', questionTree)
+  stores
+    .deleteQuestionFolder(questionTree.id)
+    .then(() => {
+      notify({
+        message: 'Question Folder deleted',
+        color: 'success',
+      })
+      getQuestionFolders()
+    })
+    .catch((err) => {
+      notify({
+        message: 'Failed to delete question folder\n' + err.message,
+        color: 'error',
+      })
+    })
 }
 
 const createNewQuestionFolder = () => {
-  console.log('createNewQuestionFolder')
+  QuestionTreeToEdit.value = null
+  doShowQuestionTreeFormModal.value = true
 }
 
 const selectedItemsEmitted = ref<QuestionTree[]>([])
 
 const deleteSelectedFolder = () => {
-  console.log('deleteSelectedFolder', selectedItemsEmitted.value)
+  selectedItemsEmitted.value.forEach((questionTree) => {
+    deleteQuestionTree(questionTree)
+  })
+}
+
+const getQuestionFolders = () => {
+  loading.value = true
+  stores
+    .getQuestionFolders(currentShowFolderId.value)
+    .then((res) => {
+      questionTreeMain.value = res
+      getCurrentShowFolder(res)
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+      notify({
+        message: 'Failed to get question folders',
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      selectedItemsEmitted.value = []
+    })
+}
+
+const selectedFolder = (questionTree: QuestionTree) => {
+  currentShowFolderId.value = questionTree.id
+  getQuestionFolders()
+}
+
+const editFormRef = ref()
+const { confirm } = useModal()
+const { init: notify } = useToast()
+
+const beforeEditFormModalClose = async (hide: () => unknown) => {
+  if (editFormRef.value.isFormHasUnsavedChanges) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: 'Form has unsaved changes. Are you sure you want to close it?',
+      size: 'small',
+    })
+    if (agreed) {
+      hide()
+    }
+  } else {
+    hide()
+  }
+}
+
+const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
+  doShowQuestionTreeFormModal.value = false
+  if (qFolder.id != '') {
+    stores
+      .updateQuestionFolder(qFolder.id, qFolder as QuestionTreeEmpty)
+      .then(() => {
+        notify({
+          message: 'Question Folder updated',
+          color: 'success',
+        })
+        getQuestionFolders()
+      })
+      .catch((err) => {
+        notify({
+          message: 'Failed to update question folder\n' + err.message,
+          color: 'error',
+        })
+      })
+  } else {
+    if (currentShowFolderId.value != '') {
+      qFolder.parentId = currentShowFolderId.value
+    } else {
+      qFolder.parentId = ''
+    }
+    stores
+      .createQuestionFolder(qFolder as QuestionTreeEmpty)
+      .then(() => {
+        notify({
+          message: 'Question Folder created',
+          color: 'success',
+        })
+        getQuestionFolders()
+      })
+      .catch((err) => {
+        notify({
+          message: 'Failed to create question folder\n' + err.message,
+          color: 'error',
+        })
+      })
+  }
 }
 
 onMounted(() => {
@@ -132,4 +225,30 @@ onMounted(() => {
       />
     </VaCardContent>
   </VaCard>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowQuestionTreeFormModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    stateful
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+  >
+    <h1 v-if="QuestionTreeToEdit === null" class="va-h5 mb-4">Add folder</h1>
+    <h1 v-else class="va-h5 mb-4">Edit folder</h1>
+    <EditQuestionTreeForm
+      ref="editFormRef"
+      :question-tree="QuestionTreeToEdit"
+      :save-button-label="QuestionTreeToEdit === null ? 'Add' : 'Save'"
+      @close="cancel"
+      @save="
+        (questionTree: QuestionTree) => {
+          onQuestionnFolderSaved(questionTree)
+          ok()
+        }
+      "
+    />
+  </VaModal>
 </template>

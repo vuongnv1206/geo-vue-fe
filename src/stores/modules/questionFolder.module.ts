@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import questionFolderService from '@/services/questionFolder.service'
-import { QuestionTree } from '@pages/question/types'
+import { QuestionTree, QuestionTreeEmpty } from '@pages/question/types'
 
 export const useQuestionFolderStore = defineStore('questionFolder', {
   state: () => ({}),
@@ -8,6 +8,36 @@ export const useQuestionFolderStore = defineStore('questionFolder', {
     async getQuestionFolders(parentId: string): Promise<QuestionTree> {
       return questionFolderService
         .getQuestionFolders(parentId)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async createQuestionFolder(data: QuestionTreeEmpty): Promise<any> {
+      return questionFolderService
+        .createQuestionFolder(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async updateQuestionFolder(id: string, data: QuestionTreeEmpty): Promise<any> {
+      return questionFolderService
+        .updateQuestionFolder(id, data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async deleteQuestionFolder(id: string): Promise<any> {
+      return questionFolderService
+        .deleteQuestionFolder(id)
         .then((response) => {
           return Promise.resolve(response)
         })

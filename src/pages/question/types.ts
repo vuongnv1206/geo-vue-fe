@@ -15,6 +15,16 @@ export type QuestionTree = {
   owner: UserDetail | null
 }
 
+export type QuestionTreeEmpty = {
+  id: string | null
+  name: string
+  parentId: string | null
+}
+
+export type QuestionTreeOnlyName = {
+  name: string
+}
+
 export type QuestionFolderPermission = {
   id: string
   userId: string
