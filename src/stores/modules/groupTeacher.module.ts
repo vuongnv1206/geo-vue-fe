@@ -45,5 +45,25 @@ export const useGroupTeacherStore = defineStore('groupTeacher', {
           return Promise.reject(error)
         })
     },
+    async deleteGroupTeacher(id: string): Promise<any> {
+      return groupTeacherService
+        .deleteGroupTeacher(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async deleteTeacherInTeam(id: string): Promise<any> {
+      return groupTeacherService
+        .deleteTeacherInTeam(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })

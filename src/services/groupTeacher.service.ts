@@ -44,6 +44,28 @@ class GroupTeacherService {
         return Promise.reject(error)
       })
   }
+
+  async deleteGroupTeacher(id: string): Promise<any> {
+    return apiService
+      .delete(`v1/groupteachers/${id}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async deleteTeacherInTeam(id: string): Promise<any> {
+    return apiService
+      .delete(`v1/teacherteams/${id}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new GroupTeacherService()

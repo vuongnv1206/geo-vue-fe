@@ -130,6 +130,70 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
     hide()
   }
 }
+const showEditGroupModal = (group: GroupTeacher) => {
+  modalToGroupEdit.value = group
+  doShowGroupEditModal.value = true
+  titleModal.value = 'Group'
+}
+
+const showEditTeacherModal = (teacher: TeacherTeam) => {
+  modalToTeacherEdit.value = teacher
+  doShowTeacherEditModal.value = true
+  titleModal.value = 'Teacher'
+}
+
+const confirmDeleteGroupModal = async (groupId: string, groupName: string) => {
+  const result = await confirm({
+    message: `Are you sure want to delete "${groupName}"?`,
+    title: 'Delete Group',
+    okText: 'Confirm',
+    size: 'small',
+  })
+
+  if (result) {
+    stores
+      .deleteGroupTeacher(groupId)
+      .then(() => {
+        notify({
+          message: `Delete ${groupName} successfully`,
+          color: 'success',
+        })
+        getTeacherGroups()
+      })
+      .catch((error) => {
+        notify({
+          message: `Failed to delete \n ${error}`,
+          color: 'danger',
+        })
+      })
+  }
+}
+const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string) => {
+  const result = await confirm({
+    message: `Are you sure want to delete "${teacherName}"?`,
+    title: 'Delete Teacher',
+    okText: 'Confirm',
+    size: 'small',
+  })
+
+  if (result) {
+    stores
+      .deleteTeacherInTeam(teacherId)
+      .then(() => {
+        notify({
+          message: `Delete ${teacherName} successfully`,
+          color: 'success',
+        })
+        getTeacherGroups()
+      })
+      .catch((error) => {
+        notify({
+          message: `Failed to delete \n ${error}`,
+          color: 'danger',
+        })
+      })
+  }
+}
 
 onMounted(() => {
   getTeacherGroups()
@@ -181,6 +245,7 @@ onMounted(() => {
       <h3 class="va-text-bold">{{ modalToGroupEdit ? 'Edit ' : 'Add ' }} {{ titleModal }}</h3>
       <TeacherGroupModal
         ref="editFormRef"
+        :group-teacher="modalToGroupEdit"
         :user="currentType"
         :save-button-label="saveButtonLabel"
         @close="cancel"
@@ -205,6 +270,7 @@ onMounted(() => {
       <TeacherTeamModal
         ref="editFormRef"
         :user="currentType"
+        :teacher-team="modalToTeacherEdit"
         :save-button-label="saveButtonLabel"
         @close="cancel"
         @save="
@@ -219,8 +285,8 @@ onMounted(() => {
   <div class="my-8">
     <VaDivider />
   </div>
-  <VaList>
-    <VaListItem v-for="group in groupTeachers" :key="group.id" class="list__item mb-2">
+  <VaList class="mb-2">
+    <VaListItem v-for="group in groupTeachers" :key="group.id" class="list__item mb-1">
       <VaListItemSection avatar class="justify-center">
         <VaIcon name="group" color="black" />
       </VaListItemSection>
@@ -231,8 +297,36 @@ onMounted(() => {
         </VaListItemLabel>
       </VaListItemSection>
 
-      <VaListItemSection icon style="cursor: pointer">
-        <VaIcon class="" name="more_vert" />
+      <VaListItemSection icon class="m-0">
+        <VaDropdown placement="bottom-end">
+          <template #anchor>
+            <VaButton preset="secondary">
+              <VaIcon name="more_vert" />
+            </VaButton>
+          </template>
+          <VaDropdownContent class="p-0">
+            <VaButton
+              preset="secondary"
+              size="small"
+              style="width: 100%"
+              class="flex justify-between"
+              @click="showEditGroupModal(group)"
+            >
+              <VaIcon name="edit_square" class="mr-1" /> Edit
+            </VaButton>
+          </VaDropdownContent>
+          <VaDropdownContent class="p-0">
+            <VaButton
+              preset="secondary"
+              size="small"
+              style="width: 100%"
+              class="flex justify-between"
+              @click="confirmDeleteGroupModal(group.id, group.name)"
+            >
+              <VaIcon name="delete" class="mr-1" color="danger" /> Delete
+            </VaButton>
+          </VaDropdownContent>
+        </VaDropdown>
       </VaListItemSection>
     </VaListItem>
     <VaListItem v-for="teacher in teacherTeams" :key="teacher.id" class="list__item mb-2">
@@ -253,9 +347,44 @@ onMounted(() => {
         </VaListItemLabel>
       </VaListItemSection>
 
-      <VaListItemSection icon style="cursor: pointer">
-        <VaIcon name="more_vert" color="black" />
+      <VaListItemSection icon class="m-0">
+        <VaDropdown placement="bottom-end">
+          <template #anchor>
+            <VaButton preset="secondary">
+              <VaIcon name="more_vert" />
+            </VaButton>
+          </template>
+          <VaDropdownContent class="p-0">
+            <VaButton
+              preset="secondary"
+              size="small"
+              style="width: 100%"
+              class="flex justify-between"
+              @click="showEditTeacherModal(teacher)"
+            >
+              <VaIcon name="edit_square" class="mr-1" /> Edit
+            </VaButton>
+          </VaDropdownContent>
+          <VaDropdownContent class="p-0">
+            <VaButton
+              preset="secondary"
+              size="small"
+              style="width: 100%"
+              class="flex justify-between"
+              @click="confirmDeleteTeacherInTeam(teacher.id, teacher.teacherName)"
+            >
+              <VaIcon name="delete" class="mr-1" color="danger" /> Delete
+            </VaButton>
+          </VaDropdownContent>
+        </VaDropdown>
       </VaListItemSection>
     </VaListItem>
   </VaList>
 </template>
+
+<style lang="scss" scoped>
+.list__item:hover {
+  background-color: #f1f5f9;
+  cursor: pointer;
+}
+</style>
