@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { PropType, ref, watch } from 'vue'
-import { TeacherTeamRequest } from './types'
+import { TeacherTeamRequest, TeacherTeam } from './types'
 import { useForm } from 'vuestic-ui'
 
 const props = defineProps({
   teacherTeam: {
-    type: Object as PropType<TeacherTeamRequest | null>,
+    type: Object as PropType<TeacherTeam | null>,
     default: null,
   },
   saveButtonLabel: {
@@ -26,7 +26,11 @@ watch(
   () => props.teacherTeam,
   () => {
     if (props.teacherTeam) {
-      newTeacher.value = { ...props.teacherTeam }
+      newTeacher.value = {
+        id: props.teacherTeam.id,
+        teacherName: props.teacherTeam.teacherName,
+        contact: props.teacherTeam.email || props.teacherTeam.phone,
+      }
     }
   },
   { immediate: true },

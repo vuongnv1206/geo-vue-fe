@@ -66,6 +66,28 @@ class GroupTeacherService {
         return Promise.reject(error)
       })
   }
+
+  async updateGroupTeacher(id: string, data: any): Promise<any> {
+    return apiService
+      .put(`v1/groupteachers/${id}`, data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async updateTeacherInTeam(id: string, data: any): Promise<any> {
+    return apiService
+      .put(`v1/teacherteams/teacher-in-team/${id}`, data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new GroupTeacherService()

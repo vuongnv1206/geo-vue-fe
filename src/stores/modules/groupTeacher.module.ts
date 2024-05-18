@@ -65,5 +65,25 @@ export const useGroupTeacherStore = defineStore('groupTeacher', {
           return Promise.reject(error)
         })
     },
+    async updateGroupTeacher(id: string, data: any): Promise<any> {
+      return groupTeacherService
+        .updateGroupTeacher(id, data)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async updateTeacherInTeam(id: string, data: any): Promise<any> {
+      return groupTeacherService
+        .updateTeacherInTeam(id, data)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })

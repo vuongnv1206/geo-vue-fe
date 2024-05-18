@@ -30,11 +30,21 @@ const getTeacherGroups = () => {
 
 const onGroupSaved = async (group: GroupTeacher) => {
   if (modalToGroupEdit.value) {
-    await stores.addGroup(group)
-    notify({
-      message: `${group.name} has been updated`,
-      color: 'success',
-    })
+    await stores
+      .updateGroupTeacher(group.id, group)
+      .then(() => {
+        notify({
+          message: `${group.name} has been updated`,
+          color: 'success',
+        })
+        getTeacherGroups()
+      })
+      .catch((error) => {
+        notify({
+          message: 'Failed to update group teacher\n' + error.message,
+          color: 'danger',
+        })
+      })
   } else {
     await stores
       .addGroup(group)
@@ -56,11 +66,21 @@ const onGroupSaved = async (group: GroupTeacher) => {
 
 const onTeacherSaved = async (teacher: TeacherTeam) => {
   if (modalToTeacherEdit.value) {
-    await stores.addGroup(teacher)
-    notify({
-      message: `${teacher.teacherName} has been updated`,
-      color: 'success',
-    })
+    await stores
+      .updateTeacherInTeam(teacher.id, teacher)
+      .then(() => {
+        notify({
+          message: `${teacher.teacherName} has been updated`,
+          color: 'success',
+        })
+        getTeacherGroups()
+      })
+      .catch((error) => {
+        notify({
+          message: 'Failed to Update teacher\n' + error.message,
+          color: 'danger',
+        })
+      })
   } else {
     await stores
       .addTeacherIntoTeam(teacher)
