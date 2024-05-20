@@ -1,6 +1,7 @@
 export type GroupTeacher = {
   id: string
   name: string
+  teacherTeams: TeacherTeam[]
   // createdBy: string
   // createdOn: string
   // lastModifiedBy: string
@@ -31,4 +32,9 @@ export type GroupTeacherResponse = {
 
 export type TeacherTeamResponse = {
   data: TeacherTeam[]
+}
+
+export type TeacherInGroupRequest = {
+  groupId: string
+  teacherId: string
 }

@@ -17,6 +17,7 @@ const props = defineProps({
 const defaultNewGroupTeacher: GroupTeacher = {
   id: '',
   name: '',
+  teacherTeams: [],
 }
 
 const newGroup = ref<GroupTeacher>({ ...defaultNewGroupTeacher })

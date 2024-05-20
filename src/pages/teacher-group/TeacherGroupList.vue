@@ -215,6 +215,16 @@ const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string
   }
 }
 
+const emit = defineEmits(['select-group'])
+
+function selectGroup(group: GroupTeacher) {
+  emit('select-group', group)
+}
+
+const detailTeacherInTeam = (id: string) => {
+  console.log(id)
+}
+
 onMounted(() => {
   getTeacherGroups()
 })
@@ -306,7 +316,7 @@ onMounted(() => {
     <VaDivider />
   </div>
   <VaList class="mb-2">
-    <VaListItem v-for="group in groupTeachers" :key="group.id" class="list__item mb-1">
+    <VaListItem v-for="group in groupTeachers" :key="group.id" class="list__item mb-1" @click="selectGroup(group)">
       <VaListItemSection avatar class="justify-center">
         <VaIcon name="group" color="black" />
       </VaListItemSection>
@@ -349,10 +359,15 @@ onMounted(() => {
         </VaDropdown>
       </VaListItemSection>
     </VaListItem>
-    <VaListItem v-for="teacher in teacherTeams" :key="teacher.id" class="list__item mb-2">
+    <VaListItem
+      v-for="teacher in teacherTeams"
+      :key="teacher.id"
+      class="list__item mb-2"
+      @click="detailTeacherInTeam(teacher.id)"
+    >
       <VaListItemSection avatar class="justify-center">
         <VaAvatar size="small">
-          <img src="" :alt="teacher.teacherName" />
+          {{ teacher.teacherName.charAt(0).toUpperCase() }}
         </VaAvatar>
       </VaListItemSection>
 

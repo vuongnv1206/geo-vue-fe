@@ -85,5 +85,35 @@ export const useGroupTeacherStore = defineStore('groupTeacher', {
           return Promise.reject(error)
         })
     },
+    async addTeacherIntoGroup(data: any): Promise<any> {
+      return groupTeacherService
+        .addTeacherIntoGroup(data)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async removeTeacherInGroup(data: any): Promise<any> {
+      return groupTeacherService
+        .removeTeacherInGroup(data)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getGroupDetail(id: string): Promise<any> {
+      return groupTeacherService
+        .getGroupDetail(id)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })
