@@ -44,5 +44,22 @@ export default {
         },
       ],
     },
+
+    {
+      name: 'classroom',
+      displayName: 'menu.classroom',
+      meta: {
+        icon: 'snippet_folder',
+      },
+      children: [
+        {
+          name: 'group-class',
+          displayName: 'menu.group-class',
+          meta: {
+            permission: 'GroupClasses.View',
+          },
+        },
+      ],
+    },
   ] as INavigationRoute[],
 }

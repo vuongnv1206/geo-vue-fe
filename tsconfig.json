@@ -18,7 +18,9 @@
       "@/*": ["./src/*"],
       "@stores/*": ["./src/stores/*"],
       "@modules/*": ["./src/stores/modules/*"],
-      "@services/*": ["./src/services/*"]
+      "@services/*": ["./src/services/*"],
+      "@components/*": ["./src/components/*"],
+      "@pages/*": ["./src/pages/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "vite.config.ts", "node_modules/vuestic-ui"],

@@ -58,7 +58,10 @@
 
     "questions": "Questions",
     "question-folder": "Question folder",
-    "question-bank": "Question bank"
+    "question-bank": "Question bank",
+
+    "classroom": "Classroom",
+    "group-class": "Group class"
   },
   "messages": {
     "all": "See all messages",
