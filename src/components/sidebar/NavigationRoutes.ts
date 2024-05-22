@@ -47,15 +47,28 @@ export default {
     {
       name: 'examinations',
       displayName: 'menu.examinations',
-      meta: {
-        icon: 'snippet_folder',
-      },
       children: [
         {
           name: 'paper-folder',
           displayName: 'menu.paper-folder',
           meta: {
             permission: 'QuestionFolders.View',
+          },
+        },
+      ],
+    },
+    {
+      name: 'classroom',
+      displayName: 'menu.classroom',
+      meta: {
+        icon: 'snippet_folder',
+      },
+      children: [
+        {
+          name: 'group-class',
+          displayName: 'menu.group-class',
+          meta: {
+            permission: 'GroupClasses.View',
           },
         },
       ],
