@@ -45,6 +45,19 @@ export default {
       ],
     },
     {
+      name: 'examinations',
+      displayName: 'menu.examinations',
+      children: [
+        {
+          name: 'paper-folder',
+          displayName: 'menu.paper-folder',
+          meta: {
+            permission: 'QuestionFolders.View',
+          },
+        },
+      ],
+    },
+    {
       name: 'classroom',
       displayName: 'menu.classroom',
       meta: {
