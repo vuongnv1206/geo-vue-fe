@@ -161,7 +161,7 @@ const columns = defineVaDataTableColumns([
       <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
         <div class="flex flex-col md:flex-row gap-2 justify-start">
           <VaBreadcrumbs>
-            <VaBreadcrumbsItem v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.id">
+            <VaBreadcrumbsItem v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.id ?? index">
               <a href="#" class="text-blue-500" @click.prevent="navigateToBreadcrumb(index)">
                 {{ breadcrumb.name }}
               </a>
