@@ -60,7 +60,8 @@
     "question-folder": "Question folder",
     "question-bank": "Question bank",
     "examinations": "Examinations",
-    "paper-folder": "Paper folder"
+    "paper-folder": "Paper folder",
+    "teacher-group": "Teacher Group"
   },
   "messages": {
     "all": "See all messages",

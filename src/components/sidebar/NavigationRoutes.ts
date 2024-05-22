@@ -60,5 +60,12 @@ export default {
         },
       ],
     },
+    {
+      name: 'teacher group',
+      displayName: 'menu.teacher-group',
+      meta: {
+        icon: 'group',
+      },
+    },
   ] as INavigationRoute[],
 }
