@@ -49,6 +49,20 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/teacher-group/TeacherGroup.vue'),
       },
+      {
+        name: 'classroom',
+        path: 'classroom',
+        meta: {
+          requiresAuth: true,
+        },
+        children: [
+          {
+            name: 'group-class',
+            path: 'group-class',
+            component: () => import('../pages/classrooms/GroupClassPage.vue'),
+          },
+        ],
+      },
     ],
   },
   {
