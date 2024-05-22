@@ -1,3 +1,4 @@
+// eslint-disable-next-line prettier/prettier
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import AuthLayout from '../layouts/AuthLayout.vue'
@@ -38,6 +39,20 @@ const routes: Array<RouteRecordRaw> = [
             name: 'question-bank',
             path: 'question-bank',
             component: () => import('../pages/question/QuestionBank.vue'),
+          },
+        ],
+      },
+      {
+        name: 'examinations',
+        path: 'examinations',
+        meta: {
+          requiresAuth: true,
+        },
+        children: [
+          {
+            name: 'paper-folder',
+            path: 'paper-folder',
+            component: () => import('../pages/examination/PaperFolder.vue'),
           },
         ],
       },

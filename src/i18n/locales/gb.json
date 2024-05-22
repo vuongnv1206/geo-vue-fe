@@ -58,7 +58,9 @@
 
     "questions": "Questions",
     "question-folder": "Question folder",
-    "question-bank": "Question bank"
+    "question-bank": "Question bank",
+    "examinations": "Examinations",
+    "paper-folder": "Paper folder"
   },
   "messages": {
     "all": "See all messages",
