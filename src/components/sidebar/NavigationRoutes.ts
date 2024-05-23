@@ -47,6 +47,9 @@ export default {
     {
       name: 'examinations',
       displayName: 'menu.examinations',
+      meta: {
+        icon: 'menu_book',
+      },
       children: [
         {
           name: 'paper-folder',
