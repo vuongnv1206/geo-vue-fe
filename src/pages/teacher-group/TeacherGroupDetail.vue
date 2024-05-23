@@ -2,6 +2,8 @@
 import { ref, watch } from 'vue'
 import { GroupTeacher, TeacherInGroupRequest } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
+import { useGroupClassStore } from '@/stores/modules/groupclass.module'
+import { GroupClass } from '../classrooms/type'
 
 const props = defineProps({
   group: {
@@ -19,6 +21,8 @@ const currentSelectedTeacher = ref<{ label: string; value: string }[]>([])
 const selectedTeacher = ref<string[]>([])
 // const currentSelectedTeacher = ref<string[]>([])
 const stores = useGroupTeacherStore()
+
+const groupClassStores = useGroupClassStore()
 
 const dataFilter = {
   keyword: '',
@@ -68,6 +72,7 @@ watch(
   (group) => {
     if (group !== null) {
       getGroupDetail()
+      getGroupClasses()
     }
   },
   { immediate: true },
@@ -109,6 +114,19 @@ const updateTeacherIntoGroup = (selectedTeacherList: string[]) => {
   }
   getGroupDetail()
 }
+
+const groupClasses = ref<GroupClass[]>([])
+const value = ref([])
+const getGroupClasses = () => {
+  groupClassStores
+    .getGroupClass()
+    .then((res) => {
+      groupClasses.value = res
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+}
 </script>
 
 <template>
@@ -148,52 +166,62 @@ const updateTeacherIntoGroup = (selectedTeacherList: string[]) => {
     <VaCardContent class="p-0 mb-2">
       <VaInput placeholder="search class" />
     </VaCardContent>
-    <div class="grid md:grid-cols-4 sm:grid-cols-3 gap-3">
-      <VaCard stripe stripe-color="success" class="border flex flex-col">
-        <VaCardTitle>SE1644</VaCardTitle>
-        <VaCardContent>
-          <VaOptionList
-            v-model="listValue"
-            :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-          />
-        </VaCardContent>
-      </VaCard>
-      <VaCard stripe stripe-color="success" class="border flex flex-col">
-        <VaCardTitle>SE1644</VaCardTitle>
-        <VaCardContent>
-          <VaOptionList
-            v-model="listValue"
-            :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-          />
-        </VaCardContent>
-      </VaCard>
-      <VaCard stripe stripe-color="success" class="border flex flex-col">
-        <VaCardTitle>SE1644</VaCardTitle>
-        <VaCardContent>
-          <VaOptionList
-            v-model="listValue"
-            :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-          />
-        </VaCardContent>
-      </VaCard>
-      <VaCard stripe stripe-color="success" class="border flex flex-col">
-        <VaCardTitle>SE1644</VaCardTitle>
-        <VaCardContent>
-          <VaOptionList
-            v-model="listValue"
-            :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-          />
-        </VaCardContent>
-      </VaCard>
-      <VaCard stripe stripe-color="success" class="border flex flex-col">
-        <VaCardTitle>SE1644</VaCardTitle>
-        <VaCardContent>
-          <VaOptionList
-            v-model="listValue"
-            :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-          />
-        </VaCardContent>
-      </VaCard>
-    </div>
+    <VaAccordion v-model="value" class="max-W-sm" multiple>
+      <VaCollapse v-for="groupClass in groupClasses" :key="groupClass.id" :header="groupClass.name">
+        <template #content>
+          <div
+            v-for="classRoom in groupClass.classes"
+            :key="classRoom.id"
+            class="grid md:grid-cols-4 sm:grid-cols-3 gap-3"
+          >
+            <VaCard stripe stripe-color="success" class="border flex flex-col">
+              <VaCardTitle>{{ classRoom.name }}</VaCardTitle>
+              <VaCardContent>
+                <VaOptionList
+                  v-model="listValue"
+                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
+                />
+              </VaCardContent>
+            </VaCard>
+            <!-- <VaCard stripe stripe-color="success" class="border flex flex-col">
+              <VaCardTitle>SE1644</VaCardTitle>
+              <VaCardContent>
+                <VaOptionList
+                  v-model="listValue"
+                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
+                />
+              </VaCardContent>
+            </VaCard>
+            <VaCard stripe stripe-color="success" class="border flex flex-col">
+              <VaCardTitle>SE1644</VaCardTitle>
+              <VaCardContent>
+                <VaOptionList
+                  v-model="listValue"
+                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
+                />
+              </VaCardContent>
+            </VaCard>
+            <VaCard stripe stripe-color="success" class="border flex flex-col">
+              <VaCardTitle>SE1644</VaCardTitle>
+              <VaCardContent>
+                <VaOptionList
+                  v-model="listValue"
+                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
+                />
+              </VaCardContent>
+            </VaCard>
+            <VaCard stripe stripe-color="success" class="border flex flex-col">
+              <VaCardTitle>SE1644</VaCardTitle>
+              <VaCardContent>
+                <VaOptionList
+                  v-model="listValue"
+                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
+                />
+              </VaCardContent>
+            </VaCard> -->
+          </div>
+        </template>
+      </VaCollapse>
+    </VaAccordion>
   </VaCard>
 </template>

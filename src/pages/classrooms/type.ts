@@ -1,6 +1,7 @@
 export type GroupClass = {
   id: string
   name: string
+  classes: Classrooms[]
 }
 
 export type EmptyGroupClass = {
