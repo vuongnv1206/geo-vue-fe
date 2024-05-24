@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { GroupTeacher, TeacherInGroupRequest } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { GroupClass } from '../classrooms/type'
+import { PermissionNameInClass } from './PermissionInClass.enum'
 
 const props = defineProps({
   group: {
@@ -11,7 +12,7 @@ const props = defineProps({
     default: null,
   },
 })
-const listValue = ref([])
+
 const showSelect = ref(false) // display select teacher
 
 const teacherOptions = ref<{ label: string; value: string }[]>([])
@@ -73,6 +74,7 @@ watch(
     if (group !== null) {
       getGroupDetail()
       getGroupClasses()
+      optionPermissionIncLass()
     }
   },
   { immediate: true },
@@ -127,6 +129,28 @@ const getGroupClasses = () => {
       console.log(error)
     })
 }
+const optionCheckBox = ref<{ key: string; value: string }[]>([])
+
+const optionPermissionIncLass = () => {
+  optionCheckBox.value = Object.entries(PermissionNameInClass).map(([key, value]) => ({
+    key: String(key),
+    value: String(value),
+  }))
+}
+
+const checkedPermissions = computed(() => {
+  const checked: { [key: string]: string[] } = {}
+  groupClasses.value.forEach((groupClass) => {
+    groupClass.classes.forEach((classRoom) => {
+      checked[classRoom.id] =
+        groupDetail.value?.groupPermissionInClasses
+          .filter((permission) => permission.classId == classRoom.id)
+          .map((permission) => permission.permissionType) || []
+    })
+  })
+
+  return checked
+})
 </script>
 
 <template>
@@ -178,47 +202,13 @@ const getGroupClasses = () => {
               <VaCardTitle>{{ classRoom.name }}</VaCardTitle>
               <VaCardContent>
                 <VaOptionList
-                  v-model="listValue"
-                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
+                  v-model="checkedPermissions[classRoom.id]"
+                  :options="optionCheckBox"
+                  :text-by="(op: any) => op.value"
+                  :value-by="(op: any) => op.key"
                 />
               </VaCardContent>
             </VaCard>
-            <!-- <VaCard stripe stripe-color="success" class="border flex flex-col">
-              <VaCardTitle>SE1644</VaCardTitle>
-              <VaCardContent>
-                <VaOptionList
-                  v-model="listValue"
-                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-                />
-              </VaCardContent>
-            </VaCard>
-            <VaCard stripe stripe-color="success" class="border flex flex-col">
-              <VaCardTitle>SE1644</VaCardTitle>
-              <VaCardContent>
-                <VaOptionList
-                  v-model="listValue"
-                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-                />
-              </VaCardContent>
-            </VaCard>
-            <VaCard stripe stripe-color="success" class="border flex flex-col">
-              <VaCardTitle>SE1644</VaCardTitle>
-              <VaCardContent>
-                <VaOptionList
-                  v-model="listValue"
-                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-                />
-              </VaCardContent>
-            </VaCard>
-            <VaCard stripe stripe-color="success" class="border flex flex-col">
-              <VaCardTitle>SE1644</VaCardTitle>
-              <VaCardContent>
-                <VaOptionList
-                  v-model="listValue"
-                  :options="['Giao bài tập, giao đề thi', 'Chấm bài', 'Quản lý danh sách học sinh']"
-                />
-              </VaCardContent>
-            </VaCard> -->
           </div>
         </template>
       </VaCollapse>
