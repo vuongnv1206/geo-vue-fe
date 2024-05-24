@@ -18,6 +18,7 @@ const defaultNewGroupTeacher: GroupTeacher = {
   id: '',
   name: '',
   teacherTeams: [],
+  groupPermissionInClasses: [],
 }
 
 const newGroup = ref<GroupTeacher>({ ...defaultNewGroupTeacher })

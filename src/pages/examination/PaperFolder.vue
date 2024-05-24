@@ -203,8 +203,8 @@ const columns = defineVaDataTableColumns([
         </template>
         <template #cell(lastModifiedOn)="{ rowData }">
           <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-            <div>{{ rowData.lastModifiedOn.split('T')[0] }}</div>
-            <div>{{ rowData.lastModifiedOn.split('T')[1].split('.')[0] }}</div>
+            <div>{{ rowData.lastModifiedOn?.split('T')[0] }}</div>
+            <div>{{ rowData.lastModifiedOn?.split('T')[1].split('.')[0] }}</div>
           </div>
         </template>
         <template #cell(actions)="{ rowData }">
