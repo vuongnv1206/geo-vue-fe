@@ -92,7 +92,7 @@ const handleSelectionChange = (selectedItems: QuestionTree[]) => {
       </template>
       <template #cell(createdBy)="{ rowData }">
         <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-          {{ rowData.owner.firstName }} {{ rowData.owner.lastName }}
+          {{ rowData.owner?.firstName }} {{ rowData.owner?.lastName }}
         </div>
       </template>
       <template #cell(createdOn)="{ rowData }">
@@ -103,8 +103,8 @@ const handleSelectionChange = (selectedItems: QuestionTree[]) => {
       </template>
       <template #cell(lastModifiedOn)="{ rowData }">
         <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-          <div>{{ rowData.lastModifiedOn.split('T')[0] }}</div>
-          <div>{{ rowData.lastModifiedOn.split('T')[1].split('.')[0] }}</div>
+          <div>{{ rowData.lastModifiedOn?.split('T')[0] }}</div>
+          <div>{{ rowData.lastModifiedOn?.split('T')[1].split('.')[0] }}</div>
         </div>
       </template>
       <template #cell(actions)="{ rowData: questionTree }">

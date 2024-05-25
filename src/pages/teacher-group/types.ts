@@ -1,10 +1,19 @@
 export type GroupTeacher = {
   id: string
   name: string
+  teacherTeams: TeacherTeam[]
+  groupPermissionInClasses: GroupPermissionInClass[]
   // createdBy: string
   // createdOn: string
   // lastModifiedBy: string
   // lastModifiedOn: string | null
+}
+
+export type GroupPermissionInClass = {
+  id: string
+  groupTeacherId: string
+  classId: string
+  permissionType: string
 }
 
 export type GroupTeacherRequest = {
@@ -31,4 +40,9 @@ export type GroupTeacherResponse = {
 
 export type TeacherTeamResponse = {
   data: TeacherTeam[]
+}
+
+export type TeacherInGroupRequest = {
+  groupId: string
+  teacherId: string
 }

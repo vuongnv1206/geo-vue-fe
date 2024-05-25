@@ -59,7 +59,10 @@
     "questions": "Questions",
     "question-folder": "Question folder",
     "question-bank": "Question bank",
-
+    "examinations": "Examinations",
+    "paper-folder": "Paper folder",
+    "classroom": "Classroom",
+    "group-class": "Group class",
     "teacher-group": "Teacher Group"
   },
   "messages": {

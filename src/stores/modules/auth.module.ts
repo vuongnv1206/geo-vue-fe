@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import authService from '@services/auth.service'
 import jwtService from '@services/jwt.service'
+import { Register } from '@/pages/auth/types'
 
 export type User = {
   id: string
@@ -66,33 +67,55 @@ export const useAuthStore = defineStore('auth', {
         this.user = null
       }
     },
-    login(email: string, password: string): Promise<any> {
-      return authService
-        .login(email, password)
-        .then((response) => {
-          if (response.data.token) {
-            this.isAuthenticated = true
-            const userParse = jwtService.parseToken(response.data.token)
-            this.user = {
-              id: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
-              fullName: userParse.fullName,
-              emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
-              phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
-              roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
-              tenant: userParse.tenant,
-              permission: userParse.permission,
-            }
-          } else {
-            this.isAuthenticated = false
-            this.user = null
+    async login(email: string, password: string, captchaToken: string): Promise<any> {
+      try {
+        const response = await authService.login(email, password, captchaToken)
+        if (response.data.token) {
+          this.isAuthenticated = true
+          const userParse = jwtService.parseToken(response.data.token)
+          this.user = {
+            id: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
+            fullName: userParse.fullName,
+            emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+            phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
+            roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+            tenant: userParse.tenant,
+            permission: userParse.permission,
           }
-          return Promise.resolve(response.data)
-        })
-        .catch((error) => {
+        } else {
           this.isAuthenticated = false
           this.user = null
-          return Promise.reject(error)
-        })
+        }
+        return await Promise.resolve(response.data)
+      } catch (error) {
+        this.isAuthenticated = false
+        this.user = null
+        return await Promise.reject(error)
+      }
+    },
+    async register(data: Register): Promise<any> {
+      try {
+        const response = await authService.register(data)
+        return await Promise.resolve(response)
+      } catch (error) {
+        return await Promise.reject(error)
+      }
+    },
+    async confirmEmail(tenant: string, userId: string, code: string): Promise<any> {
+      try {
+        const response = await authService.confirmEmail(tenant, userId, code)
+        return await Promise.resolve(response)
+      } catch (error) {
+        return await Promise.reject(error)
+      }
+    },
+    async forgotPassword(email: string): Promise<any> {
+      try {
+        const response = await authService.forgotPassword(email)
+        return await Promise.resolve(response)
+      } catch (error) {
+        return await Promise.reject(error)
+      }
     },
     logout() {
       this.isAuthenticated = false

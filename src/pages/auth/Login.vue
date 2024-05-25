@@ -2,7 +2,7 @@
   <VaForm ref="form" @submit.prevent="submit">
     <h1 class="font-semibold text-4xl mb-4">Log in</h1>
     <p class="text-base mb-4 leading-5">
-      New to Vuestic?
+      New to GEO?
       <RouterLink :to="{ name: 'signup' }" class="font-semibold text-primary">Sign up</RouterLink>
     </p>
     <VaInput
@@ -48,12 +48,14 @@
 import { onBeforeMount, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
-import { validators } from '../../services/utils'
+import { validators, getErrorMessage } from '@services/utils'
 import { useAuthStore } from '@modules/auth.module'
+import { useReCaptcha } from 'vue-recaptcha-v3'
 
 const { validate } = useForm('form')
 const { push } = useRouter()
 const { init } = useToast()
+const reCaptcha = useReCaptcha()
 
 const formData = reactive({
   email: '',
@@ -65,14 +67,17 @@ const store = useAuthStore()
 
 const submit = async () => {
   if (validate()) {
+    await reCaptcha?.recaptchaLoaded()
+    const captchaToken = await reCaptcha?.executeRecaptcha('login')
     store
-      .login(formData.email, formData.password)
+      .login(formData.email, formData.password, captchaToken ?? '')
       .then(() => {
         init({ message: "You've successfully logged in", color: 'success' })
         push({ name: 'dashboard' })
       })
       .catch((error: any) => {
-        init({ message: error, color: 'danger' })
+        const message = getErrorMessage(error)
+        init({ message: message, color: 'danger' })
       })
   }
 }

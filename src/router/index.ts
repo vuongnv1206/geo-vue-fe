@@ -1,3 +1,4 @@
+// eslint-disable-next-line prettier/prettier
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import AuthLayout from '../layouts/AuthLayout.vue'
@@ -42,12 +43,40 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
+        name: 'examinations',
+        path: 'examinations',
+        meta: {
+          requiresAuth: true,
+        },
+        children: [
+          {
+            name: 'paper-folder',
+            path: 'paper-folder',
+            component: () => import('../pages/examination/PaperFolder.vue'),
+          },
+        ],
+      },
+      {
         name: 'teacher group',
         path: 'teacher-group',
         meta: {
           requiresAuth: true,
         },
         component: () => import('../pages/teacher-group/TeacherGroup.vue'),
+      },
+      {
+        name: 'classroom',
+        path: 'classroom',
+        meta: {
+          requiresAuth: true,
+        },
+        children: [
+          {
+            name: 'group-class',
+            path: 'group-class',
+            component: () => import('../pages/classrooms/GroupClassPage.vue'),
+          },
+        ],
       },
     ],
   },
@@ -60,6 +89,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'login',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/Login.vue'),
       },
@@ -68,6 +98,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'signup',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/Signup.vue'),
       },
@@ -76,8 +107,17 @@ const routes: Array<RouteRecordRaw> = [
         path: 'recover-password',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/RecoverPassword.vue'),
+      },
+      {
+        name: 'confirm-email',
+        path: 'confirm-email',
+        meta: {
+          requiresAuth: false,
+        },
+        component: () => import('../pages/auth/ConfirmEmail.vue'),
       },
       {
         name: 'recover-password-email',
@@ -86,6 +126,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: false,
         },
         component: () => import('../pages/auth/CheckTheEmail.vue'),
+      },
+      {
+        name: 'reset-password',
+        path: 'reset-password',
+        meta: {
+          requiresAuth: false,
+        },
+        component: () => import('../pages/auth/ResetPassword.vue'),
       },
       {
         path: '',
