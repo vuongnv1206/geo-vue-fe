@@ -10,3 +10,16 @@ export const validators = {
   },
   required: (v: any) => !!v || 'This field is required',
 }
+
+export const getErrorMessage = (error: any) => {
+  console.log(error)
+  if (error.response) {
+    if (error.response.data.messages.length > 0) {
+      return error.response.data.messages.join(', ')
+    } else {
+      return error.response.data.exception
+    }
+  } else {
+    return error.message
+  }
+}

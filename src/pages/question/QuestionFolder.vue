@@ -89,8 +89,12 @@ const createNewQuestionFolder = () => {
 const selectedItemsEmitted = ref<QuestionTree[]>([])
 
 const deleteSelectedFolder = () => {
-  selectedItemsEmitted.value.forEach((questionTree) => {
-    deleteQuestionTree(questionTree)
+  confirm('Are you sure you want to delete selected folders?').then((agreed) => {
+    if (agreed) {
+      selectedItemsEmitted.value.forEach((questionTree) => {
+        deleteQuestionTree(questionTree)
+      })
+    }
   })
 }
 
