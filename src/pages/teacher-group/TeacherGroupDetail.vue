@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { ref, watch, computed } from 'vue'
-import { GroupTeacher, TeacherInGroupRequest } from './types'
+import { GroupTeacher, TeacherInGroupRequest, SetPermissionInClassGroup } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { GroupClass } from '../classrooms/type'
 import { PermissionNameInClass } from './PermissionInClass.enum'
+import { useToast } from 'vuestic-ui'
 
 const props = defineProps({
   group: {
@@ -23,6 +24,7 @@ const selectedTeacher = ref<string[]>([])
 // const currentSelectedTeacher = ref<string[]>([])
 const stores = useGroupTeacherStore()
 
+const { init: notify } = useToast()
 const groupClassStores = useGroupClassStore()
 
 const dataFilter = {
@@ -52,8 +54,6 @@ const getGroupDetail = () => {
           }))
           selectedTeacher.value = groupDetail.value.teacherTeams.map((teacher) => teacher.id)
           // currentSelectedTeacher.value = groupDetail.value.teacherTeams.map(teacher => teacher.id)
-
-          console.log(selectedTeacher.value)
         }
         stores.getTeacherTeams(dataFilter).then((res) => {
           teacherOptions.value = res.data.map((teacher) => ({
@@ -82,12 +82,10 @@ watch(
 
 const selectTeacherTeam = () => {
   // getTeacherIdInGroup()
-  console.log(selectedTeacher.value.length)
   showSelect.value = !showSelect.value
 }
 
 const updateTeacherIntoGroup = (selectedTeacherList: string[]) => {
-  console.log(currentSelectedTeacher)
   const newSelectedTeacherValue = selectedTeacherList.map((id) => ({
     label: teacherOptions.value.find((option) => option.value === id)?.label || '',
     value: id,
@@ -124,6 +122,7 @@ const getGroupClasses = () => {
     .getGroupClass()
     .then((res) => {
       groupClasses.value = res
+      initializeCheckedPermissions()
     })
     .catch((error) => {
       console.log(error)
@@ -138,7 +137,9 @@ const optionPermissionIncLass = () => {
   }))
 }
 
-const checkedPermissions = computed(() => {
+const checkedPermissions = ref<{ [key: string]: string[] }>({})
+
+const initializeCheckedPermissions = () => {
   const checked: { [key: string]: string[] } = {}
   groupClasses.value.forEach((groupClass) => {
     groupClass.classes.forEach((classRoom) => {
@@ -149,8 +150,46 @@ const checkedPermissions = computed(() => {
     })
   })
 
-  return checked
+  checkedPermissions.value = checked
+}
+
+const permissionTypeMap: { [key: string]: number } = {
+  AssignAssignment: 1,
+  Marking: 2,
+  ManageStudentList: 3,
+}
+
+const getPermissionGroupUserSelected = computed(() => {
+  console.log(checkedPermissions.value)
+  return Object.entries(checkedPermissions.value).flatMap(([id, permissions]) =>
+    permissions.map((permission) => ({
+      classId: id,
+      permissionType: permissionTypeMap[permission],
+    })),
+  )
 })
+
+const updatePermissionGroup = () => {
+  console.log(getPermissionGroupUserSelected.value)
+  const request = ref<SetPermissionInClassGroup>({
+    groupTeacherId: groupDetail.value?.id || '',
+    permissionInClasses: getPermissionGroupUserSelected.value,
+  })
+  stores
+    .setPermissionGroupInClass(request.value)
+    .then(() => {
+      notify({
+        message: `Update permission successfully`,
+        color: 'success',
+      })
+    })
+    .catch((error) => {
+      notify({
+        message: `Update permission fall \n ${error}`,
+        color: 'danger',
+      })
+    })
+}
 </script>
 
 <template>
@@ -187,10 +226,10 @@ const checkedPermissions = computed(() => {
   <VaCard class="p-2 ml-1 rounded">
     <VaCardTitle>Permission management</VaCardTitle>
     <VaDivider />
-    <VaCardContent class="p-0 mb-2">
+    <VaCardContent v-if="props.group" class="p-0 mb-2">
       <VaInput placeholder="search class" />
     </VaCardContent>
-    <VaAccordion v-model="value" class="max-W-sm" multiple>
+    <VaAccordion v-model="value" class="max-W-sm mb-3" multiple>
       <VaCollapse v-for="groupClass in groupClasses" :key="groupClass.id" :header="groupClass.name">
         <template #content>
           <div
@@ -213,5 +252,9 @@ const checkedPermissions = computed(() => {
         </template>
       </VaCollapse>
     </VaAccordion>
+    <div v-if="props.group" class="flex justify-end">
+      <VaButton preset="primary" size="small" class="mr-2"> Cancel </VaButton>
+      <VaButton color="success" size="small" @click="updatePermissionGroup"> Save </VaButton>
+    </div>
   </VaCard>
 </template>

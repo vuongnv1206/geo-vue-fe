@@ -16,6 +16,16 @@ export type GroupPermissionInClass = {
   permissionType: string
 }
 
+export type SetPermissionInClassGroup = {
+  groupTeacherId: string
+  permissionInClasses: PermissionInClass[]
+}
+
+export type PermissionInClass = {
+  classId: string
+  permissionType: number
+}
+
 export type GroupTeacherRequest = {
   name: string
 }
