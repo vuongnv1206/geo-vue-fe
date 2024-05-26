@@ -1,0 +1,179 @@
+<script setup lang="ts">
+import { onMounted, computed, ref, watch } from 'vue'
+import { EmptyAssignment, Attachment, Assignment } from '../types'
+import { Subject } from '@pages/subject/types'
+import { useSubjectStore } from '@/stores/modules/subject.module'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
+
+// Define reactive variables and store
+const subjects = ref<Subject[]>([])
+const subjectStore = useSubjectStore()
+const date = ref<[Date, Date]>([new Date(), new Date()])
+const filesUploaded = ref<File[]>([])
+
+const props = defineProps<{
+  assignment: Assignment | null
+  saveButtonLabel: string
+}>()
+
+defineEmits<{
+  (event: 'save', assignment: Assignment): void
+  (event: 'close'): void
+}>()
+
+// Default assignment object
+const defaultNewAssignment: Assignment = {
+  id: '',
+  name: '',
+  startTime: new Date(),
+  endTime: new Date(),
+  attachmentPaths: [] as Attachment[],
+  content: '',
+  canViewResult: false,
+  requireLoginToSubmit: false,
+  subjectId: '',
+}
+
+const newAssignment = ref({ ...defaultNewAssignment })
+
+// Computed property to check for unsaved changes
+const isFormHasUnsavedChanges = computed(() => {
+  return Object.keys(newAssignment.value).some((key) => {
+    return (
+      newAssignment.value[key as keyof EmptyAssignment] !==
+      (props.assignment ?? defaultNewAssignment)?.[key as keyof EmptyAssignment]
+    )
+  })
+})
+
+defineExpose({
+  isFormHasUnsavedChanges,
+})
+
+// Watcher to update newAssignment when props.assignment changes
+watch(
+  () => props.assignment,
+  () => {
+    if (!props.assignment) {
+      return
+    }
+    newAssignment.value = { ...props.assignment }
+  },
+  { immediate: true },
+)
+
+// Fetch subjects from the store
+const getSubjects = async () => {
+  try {
+    const response = await subjectStore.getSubjects()
+    subjects.value = response.data
+  } catch (error) {
+    console.error('Error fetching subjects:', error)
+  }
+}
+// Computed property to format subjects for select options
+const subjectsOptions = computed(() => {
+  return subjects.value.map((subject) => ({ text: subject.name, value: subject.id }))
+})
+
+const handleDatePicker = () => {
+  newAssignment.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
+  newAssignment.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
+  console.log('Date: ', date.value)
+  console.log('Start Time: ', newAssignment.value)
+}
+
+const dateInputFormat = {
+  format: 'MM/dd/yyyy HH:mm',
+}
+
+// Function to save the attachment path
+const handleAttachment = async () => {
+  const files = filesUploaded.value
+  newAssignment.value.attachmentPaths = await Promise.all(
+    files.map((file) => {
+      return new Promise<Attachment>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const base64Data = reader.result?.toString() ?? ''
+          resolve({
+            name: file.name,
+            extension: file.type.split('/')[1],
+            data: base64Data,
+          })
+        }
+        reader.onerror = (error) => reject(error)
+        reader.readAsDataURL(file)
+      })
+    }),
+  )
+  console.log('Files Uploaded: ', filesUploaded.value)
+  console.log('Processed Attachment Paths: ', newAssignment.value.attachmentPaths)
+}
+
+// Fetch subjects on mount
+onMounted(() => {
+  getSubjects()
+})
+</script>
+
+<template>
+  <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
+    <VaInput
+      v-model="newAssignment.name"
+      label="Name"
+      :rules="[(value) => (value && value.length > 0) || 'Assignment name is required']"
+    />
+    <VueDatePicker
+      v-model="date"
+      label="Time To Do"
+      range
+      model-auto
+      :action-row="{ showNow: true }"
+      :is-24="true"
+      enable-seconds
+      :clearable="true"
+      :text-input="dateInputFormat"
+      :month-change-on-scroll="true"
+      :month-change-on-arrows="true"
+      placeholder="Start choosing or typing date and time"
+    />
+    <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
+    <VaInput v-model="newAssignment.content" label="Content" />
+    <VaSwitch v-model="newAssignment.canViewResult" label="Can View Result" />
+    <VaSwitch v-model="newAssignment.requireLoginToSubmit" label="Require Login to Submit" />
+    <VaSelect
+      v-model="newAssignment.subjectId"
+      value-by="value"
+      :options="subjectsOptions"
+      label="Subject"
+      :rules="[(value) => !!value || 'Subject is required']"
+    />
+    <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
+      <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
+      <VaButton
+        @click="
+          handleDatePicker()
+          handleAttachment()
+          validate() && $emit('save', newAssignment as Assignment)
+        "
+      >
+        {{ saveButtonLabel }}</VaButton
+      >
+    </div>
+  </VaForm>
+</template>
+
+<style lang="scss" scoped>
+.va-select-content__autocomplete {
+  flex: 1;
+}
+
+.va-input-wrapper__text {
+  gap: 0.2rem;
+}
+</style>

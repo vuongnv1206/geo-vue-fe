@@ -2663,6 +2663,13 @@
   resolved "https://registry.npmjs.org/@vue/shared/-/shared-3.3.9.tgz"
   integrity sha512-ZE0VTIR0LmYgeyhurPTpy4KzKsuDyQbMSdM49eKkMnT5X4VfFBLysMzjIZhLEFQYjjOVVfbvUDHckwjDFiO2eA==
 
+"@vuepic/vue-datepicker@^8.6.0":
+  version "8.6.0"
+  resolved "https://registry.npmjs.org/@vuepic/vue-datepicker/-/vue-datepicker-8.6.0.tgz"
+  integrity sha512-ZnG7xquVf7WyMKXk7JxWOJ5ursig1t8o2AtH9ycetiik+lemV9+HNEx+YOR1xeCUfhupGTgJmyAxCSZHP/Sv/w==
+  dependencies:
+    date-fns "^3.6.0"
+
 "@vuestic/tailwind@^0.1.3":
   version "0.1.3"
   resolved "https://registry.npmjs.org/@vuestic/tailwind/-/tailwind-0.1.3.tgz"
@@ -3597,6 +3604,16 @@ d3-scale-chromatic@^3.0.0:
   dependencies:
     d3-color "1 - 3"
     d3-interpolate "1 - 3"
+
+date-fns@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.npmjs.org/date-fns/-/date-fns-3.6.0.tgz"
+  integrity sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==
+
+dayjs@^1.11.11:
+  version "1.11.11"
+  resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.11.tgz"
+  integrity sha512-okzr3f11N6WuqYtZSvm+F776mB41wRZMhKP+hc34YdW+KmtYYK9iqvHSwo2k9FEH3fhGXvOPV6yz2IcSrfRUDg==
 
 de-indent@^1.0.2:
   version "1.0.2"
@@ -7851,7 +7868,7 @@ vue-tsc@^1.8.22:
     "@vue/language-core" "1.8.22"
     semver "^7.5.4"
 
-"vue@^2.6.14 || ^3.3.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", "vue@^3.0.0-0 || ^2.7.0", vue@^3.0.4, vue@^3.2.0, vue@^3.2.25, "vue@>= 3.2.0 < 4.0.0", vue@>=2, vue@3.3.9:
+"vue@^2.6.14 || ^3.3.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", "vue@^3.0.0-0 || ^2.7.0", vue@^3.0.4, vue@^3.2.0, vue@^3.2.25, vue@^3.3.9, "vue@>= 3.2.0 < 4.0.0", vue@>=2, vue@>=3.2.0, vue@3.3.9:
   version "3.3.9"
   resolved "https://registry.npmjs.org/vue/-/vue-3.3.9.tgz"
   integrity sha512-sy5sLCTR8m6tvUk1/ijri3Yqzgpdsmxgj6n6yl7GXXCXqVbmW2RCXe9atE4cEI6Iv7L89v5f35fZRRr5dChP9w==
@@ -7862,10 +7879,10 @@ vue-tsc@^1.8.22:
     "@vue/server-renderer" "3.3.9"
     "@vue/shared" "3.3.9"
 
-vuestic-ui@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.npmjs.org/vuestic-ui/-/vuestic-ui-1.9.0.tgz"
-  integrity sha512-SrFviSp6RbGxcTvxHSEQNJLQL9Gp7zmiEHbz8RnPoqqVVueBa9Exur8bZb9aNvOcXd0RA9p7o9Sl/mYwMIitRQ==
+vuestic-ui@^1.9.10:
+  version "1.9.10"
+  resolved "https://registry.npmjs.org/vuestic-ui/-/vuestic-ui-1.9.10.tgz"
+  integrity sha512-gUwf2TAWpW1/kUNCiZ8zBC4f3CEZDHXkJQsicTU2KEW6D91q6A24DSw8grxcl7myrav4YQhkl6kg0WvVa+CW5Q==
   dependencies:
     "@floating-ui/vue" "^1.0.1"
     "@types/lodash" "^4.14.161"

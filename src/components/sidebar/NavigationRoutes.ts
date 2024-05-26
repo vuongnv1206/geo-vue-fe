@@ -83,5 +83,19 @@ export default {
         icon: 'group',
       },
     },
+    {
+      name: 'assignments',
+      displayName: 'menu.assignments',
+      meta: {
+        icon: 'snippet_folder',
+      },
+    },
+    {
+      name: 'subjects',
+      displayName: 'menu.subjects',
+      meta: {
+        icon: 'snippet_folder',
+      },
+    },
   ] as INavigationRoute[],
 }

@@ -78,6 +78,22 @@ const routes: Array<RouteRecordRaw> = [
           },
         ],
       },
+      {
+        name: 'assignments',
+        path: 'assignments',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/assignment/Assignment.vue'),
+      },
+      {
+        name: 'subjects',
+        path: 'subjects',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/subject/Subject.vue'),
+      },
     ],
   },
   {
