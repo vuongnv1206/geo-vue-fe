@@ -1,4 +1,4 @@
-import { Register } from '@/pages/auth/types'
+import { Register, ResetPassword } from '@/pages/auth/types'
 import apiService from '@services/api.service'
 import jwtService from '@services/jwt.service'
 
@@ -49,6 +49,17 @@ class AuthService {
       .post('/users/forgot-password', {
         email,
       })
+      .then((response) => {
+        return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async resetPassword(data: ResetPassword) {
+    return apiService
+      .post('/users/reset-password', data)
       .then((response) => {
         return Promise.resolve(response)
       })

@@ -25,7 +25,6 @@
 </template>
 
 <script lang="ts" setup>
-// get userId, code, tenant from the query params
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { ref } from 'vue'

@@ -8,3 +8,10 @@ export type Register = {
   phoneNumber: string
   role: string
 }
+
+export type ResetPassword = {
+  email: string
+  password: string
+  token: string
+  captchaToken: string
+}
