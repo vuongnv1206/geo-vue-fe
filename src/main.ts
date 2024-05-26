@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import i18n from './i18n'
 import { createVuestic } from 'vuestic-ui'
 import { createGtm } from '@gtm-support/vue-gtm'
+import { VueReCaptcha } from 'vue-recaptcha-v3'
 
 import stores from './stores'
 import router from './router'
@@ -19,6 +20,15 @@ app.use(createVuestic({ config: vuesticGlobalConfig }))
 const authStore = useAuthStore()
 authStore.checkAuth()
 router.beforeEach((to, from, next) => {
+  if (to.matched.some((record) => record.meta.requiresCaptcha)) {
+    app.use(VueReCaptcha, {
+      siteKey: import.meta.env.VITE_APP_RECAPTCHA_SITE_KEY,
+      loaderOptions: {
+        useRecaptchaNet: true,
+        autoHideBadge: true,
+      },
+    })
+  }
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!authStore.isAuthenticated) {
       next({ name: 'login' })
