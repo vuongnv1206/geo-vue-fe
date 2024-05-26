@@ -47,8 +47,17 @@ const contextmenu = (event: any) => {
       { text: 'Delete', icon: 'delete' },
     ],
     onSelected(option) {
-      console.log('selected', option)
-      console.log('selected', event.item)
+      switch (option.text) {
+        case 'Rename':
+          emit('edit', event.item)
+          break
+        case 'Share':
+          console.log('Share')
+          break
+        case 'Delete':
+          emit('delete', event.item)
+          break
+      }
     },
   })
 }
