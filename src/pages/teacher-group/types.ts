@@ -18,7 +18,7 @@ export type GroupPermissionInClass = {
 
 export type SetPermissionInClassGroup = {
   groupTeacherId: string
-  permissionInClasses: PermissionInClass[]
+  permissionInClassDtos: PermissionInClass[]
 }
 
 export type PermissionInClass = {
