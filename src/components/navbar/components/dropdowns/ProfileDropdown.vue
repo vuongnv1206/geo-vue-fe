@@ -5,7 +5,7 @@
         <VaButton preset="secondary" color="textPrimary">
           <span class="profile-dropdown__anchor min-w-max">
             <slot />
-            <VaAvatar :size="32" color="warning"> 😍 </VaAvatar>
+            <VaAvatar :size="32" color="warning"> {{ shortNameLetter }} </VaAvatar>
           </span>
         </VaButton>
       </template>
@@ -58,7 +58,9 @@ type ProfileOptions = {
   separator: boolean
   list: ProfileListItem[]
 }
-
+const { user } = useAuthStore()
+// Nguyen Van A -> NA
+const shortNameLetter = computed(() => user?.fullName?.charAt(0).toUpperCase())
 const { logout } = useAuthStore()
 const { push } = useRouter()
 
