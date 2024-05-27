@@ -1,3 +1,5 @@
+import { useAuthStore } from '@/stores/modules/auth.module'
+
 class JwtService {
   private USER_TOKEN_KEY = 'user_token'
   private REFRESH_TOKEN = 'refresh_token'
@@ -48,6 +50,10 @@ class JwtService {
 
   destroyUser() {
     window.localStorage.removeItem(this.USER)
+    // destroy store
+    const store = useAuthStore()
+    store.isAuthenticated = false
+    store.user = null
   }
 
   saveTenant(tenant: string): void {
