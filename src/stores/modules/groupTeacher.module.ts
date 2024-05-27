@@ -1,4 +1,4 @@
-import { GroupTeacherResponse, TeacherTeamResponse } from '@/pages/teacher-group/types'
+import { GroupTeacherResponse, SetPermissionInClassGroup, TeacherTeamResponse } from '@/pages/teacher-group/types'
 import groupTeacherService from '@/services/groupTeacher.service'
 import { defineStore } from 'pinia'
 
@@ -108,6 +108,16 @@ export const useGroupTeacherStore = defineStore('groupTeacher', {
     async getGroupDetail(id: string): Promise<any> {
       return groupTeacherService
         .getGroupDetail(id)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async setPermissionGroupInClass(data: SetPermissionInClassGroup): Promise<any> {
+      return groupTeacherService
+        .setPermissionGroupInClass(data)
         .then((res) => {
           return Promise.resolve(res)
         })
