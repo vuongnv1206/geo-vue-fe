@@ -109,20 +109,19 @@ withDefaults(
 const isShown = ref(false)
 
 const resolveLinkAttribute = (item: ProfileListItem) => {
-  return item.to
-    ? { to: { name: item.to } }
-    : item.href
-      ? { href: item.href, target: '_blank' }
-      : item.action
-        ? {
-            onClick: () => {
-              if (item.action === 'logoutAction') {
-                logout()
-                push({ name: 'login' })
-              }
-            },
-          }
-        : {}
+  if (item.to) return { to: { name: item.to } }
+  if (item.href) return { href: item.href, target: '_blank' }
+  if (item.action) {
+    return {
+      onClick: () => {
+        if (item.action === 'logoutAction') {
+          logout()
+          push({ name: 'login' })
+        }
+      },
+    }
+  }
+  return {}
 }
 </script>
 
