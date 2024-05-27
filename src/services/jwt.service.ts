@@ -89,6 +89,15 @@ class JwtService {
     return JSON.parse(jsonPayload)
   }
 
+  getTokenExpiryTime(): number {
+    const token = this.getToken()
+    if (!token) {
+      return 0
+    }
+    const tokenData = this.parseToken(token)
+    return tokenData.exp
+  }
+
   parseTokenLocal(): any {
     const token = this.getToken()
     if (!token) {
