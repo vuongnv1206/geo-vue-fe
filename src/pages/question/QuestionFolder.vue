@@ -64,6 +64,7 @@ const editQuestionTree = (questionTree: QuestionTree) => {
 
 const deleteQuestionTree = (questionTree: QuestionTree) => {
   console.log('deleteQuestionTree', questionTree)
+  loading.value = true
   stores
     .deleteQuestionFolder(questionTree.id)
     .then(() => {
@@ -76,8 +77,11 @@ const deleteQuestionTree = (questionTree: QuestionTree) => {
     .catch((err) => {
       notify({
         message: 'Failed to delete question folder\n' + err.message,
-        color: 'error',
+        color: 'danger',
       })
+    })
+    .finally(() => {
+      loading.value = false
     })
 }
 
@@ -111,7 +115,7 @@ const getQuestionFolders = () => {
       loading.value = false
       notify({
         message: 'Failed to get question folders',
-        color: 'error',
+        color: 'danger',
       })
     })
     .finally(() => {
@@ -146,6 +150,7 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
 const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
   doShowQuestionTreeFormModal.value = false
   if (qFolder.id != '') {
+    loading.value = true
     stores
       .updateQuestionFolder(qFolder.id, qFolder as QuestionTreeEmpty)
       .then(() => {
@@ -158,8 +163,11 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
       .catch((err) => {
         notify({
           message: 'Failed to update question folder\n' + err.message,
-          color: 'error',
+          color: 'danger',
         })
+      })
+      .finally(() => {
+        loading.value = false
       })
   } else {
     if (currentShowFolderId.value != '') {
@@ -167,6 +175,7 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
     } else {
       qFolder.parentId = ''
     }
+    loading.value = true
     stores
       .createQuestionFolder(qFolder as QuestionTreeEmpty)
       .then(() => {
@@ -179,8 +188,11 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
       .catch((err) => {
         notify({
           message: 'Failed to create question folder\n' + err.message,
-          color: 'error',
+          color: 'danger',
         })
+      })
+      .finally(() => {
+        loading.value = false
       })
   }
 }
