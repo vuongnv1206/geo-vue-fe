@@ -1,28 +1,36 @@
 <script lang="ts" setup>
 import { ref, watch, computed } from 'vue'
-import { GroupTeacher, TeacherInGroupRequest } from './types'
+import {
+  GroupTeacher,
+  TeacherInGroupRequest,
+  SetPermissionInClassGroup,
+  TeacherTeam,
+  SetPermissionInClassTeacher,
+} from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { GroupClass } from '../classrooms/type'
 import { PermissionNameInClass } from './PermissionInClass.enum'
+import { useToast } from 'vuestic-ui'
 
 const props = defineProps({
   group: {
     type: Object as () => GroupTeacher | null,
     default: null,
   },
+  teacherId: {
+    type: String as () => string | null,
+    default: null,
+  },
 })
 
-const showSelect = ref(false) // display select teacher
-
+const showSelect = ref(false)
 const teacherOptions = ref<{ label: string; value: string }[]>([])
-
-// const selectedTeacher = ref<{ label: string; value: string }[]>([])
 const currentSelectedTeacher = ref<{ label: string; value: string }[]>([])
 const selectedTeacher = ref<string[]>([])
-// const currentSelectedTeacher = ref<string[]>([])
 const stores = useGroupTeacherStore()
 
+const { init: notify } = useToast()
 const groupClassStores = useGroupClassStore()
 
 const dataFilter = {
@@ -34,129 +42,206 @@ const dataFilter = {
 
 const groupDetail = ref<GroupTeacher | null>(null)
 
-const getGroupDetail = () => {
-  if (props.group !== null) {
-    stores
-      .getGroupDetail(props.group.id)
-      .then((response) => {
-        groupDetail.value = response
-        if (groupDetail.value?.teacherTeams != undefined) {
-          // const teacherOptions =
-          // selectedTeacher.value = groupDetail.value.teacherTeams.map((teacher) => ({
-          //   value: teacher.id,
-          //   label: teacher.teacherName,
-          // }))
-          currentSelectedTeacher.value = groupDetail.value.teacherTeams.map((teacher) => ({
-            value: teacher.id,
-            label: teacher.teacherName,
-          }))
-          selectedTeacher.value = groupDetail.value.teacherTeams.map((teacher) => teacher.id)
-          // currentSelectedTeacher.value = groupDetail.value.teacherTeams.map(teacher => teacher.id)
+const getGroupDetail = async () => {
+  if (!props.group) return
 
-          console.log(selectedTeacher.value)
-        }
-        stores.getTeacherTeams(dataFilter).then((res) => {
-          teacherOptions.value = res.data.map((teacher) => ({
-            value: teacher.id,
-            label: teacher.teacherName,
-          }))
-        })
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+  try {
+    teacherDetail.value = null
+    const response = await stores.getGroupDetail(props.group.id)
+    groupDetail.value = response
+    if (groupDetail.value?.teacherTeams) {
+      currentSelectedTeacher.value = groupDetail.value.teacherTeams.map((teacher) => ({
+        value: teacher.id,
+        label: teacher.teacherName,
+      }))
+      selectedTeacher.value = groupDetail.value.teacherTeams.map((teacher) => teacher.id)
+    }
+    const res = await stores.getTeacherTeams(dataFilter)
+    teacherOptions.value = res.data.map((teacher) => ({
+      value: teacher.id,
+      label: teacher.teacherName,
+    }))
+  } catch (error) {
+    console.error(error)
   }
 }
 
-watch(
-  () => props.group,
-  (group) => {
-    if (group !== null) {
-      getGroupDetail()
-      getGroupClasses()
-      optionPermissionIncLass()
-    }
-  },
-  { immediate: true },
-)
+const teacherDetail = ref<TeacherTeam | null>(null)
+
+const getTeacherDetail = async () => {
+  if (!props.teacherId) return
+  try {
+    groupDetail.value = null
+    const response = await stores.getTeacherPermissionDetail(props.teacherId)
+    teacherDetail.value = response
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 const selectTeacherTeam = () => {
-  // getTeacherIdInGroup()
-  console.log(selectedTeacher.value.length)
   showSelect.value = !showSelect.value
 }
 
-const updateTeacherIntoGroup = (selectedTeacherList: string[]) => {
-  console.log(currentSelectedTeacher)
+const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
   const newSelectedTeacherValue = selectedTeacherList.map((id) => ({
     label: teacherOptions.value.find((option) => option.value === id)?.label || '',
     value: id,
   }))
 
   for (const teacher of newSelectedTeacherValue) {
-    const existTeacher = currentSelectedTeacher.value.some((t) => t.value === teacher.value)
-    if (!existTeacher && groupDetail.value !== null) {
+    if (!currentSelectedTeacher.value.some((t) => t.value === teacher.value) && groupDetail.value) {
       const teacherInGroupRequest: TeacherInGroupRequest = {
         groupId: groupDetail.value.id,
         teacherId: teacher.value,
       }
-      stores.addTeacherIntoGroup(teacherInGroupRequest)
+      await stores.addTeacherIntoGroup(teacherInGroupRequest)
     }
   }
 
   for (let i = currentSelectedTeacher.value.length - 1; i >= 0; i--) {
     const value = currentSelectedTeacher.value[i].value
-    if (!newSelectedTeacherValue.some((item) => item.value === value) && groupDetail.value !== null) {
+    if (!newSelectedTeacherValue.some((item) => item.value === value) && groupDetail.value) {
       const teacherInGroupRequest: TeacherInGroupRequest = {
         groupId: groupDetail.value.id,
         teacherId: value,
       }
-      stores.removeTeacherInGroup(teacherInGroupRequest)
+      await stores.removeTeacherInGroup(teacherInGroupRequest)
     }
   }
-  getGroupDetail()
+  await getGroupDetail()
 }
 
 const groupClasses = ref<GroupClass[]>([])
 const value = ref([])
-const getGroupClasses = () => {
-  groupClassStores
-    .getGroupClass()
-    .then((res) => {
-      groupClasses.value = res
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+
+const getGroupClasses = async () => {
+  try {
+    const res = await groupClassStores.getGroupClass()
+    groupClasses.value = res
+    initializeCheckedPermissions()
+  } catch (error) {
+    console.error(error)
+  }
 }
+
 const optionCheckBox = ref<{ key: string; value: string }[]>([])
 
-const optionPermissionIncLass = () => {
+const optionPermissionInClass = () => {
   optionCheckBox.value = Object.entries(PermissionNameInClass).map(([key, value]) => ({
     key: String(key),
     value: String(value),
   }))
 }
 
-const checkedPermissions = computed(() => {
+const checkedPermissions = ref<{ [key: string]: string[] }>({})
+
+const initializeCheckedPermissions = () => {
   const checked: { [key: string]: string[] } = {}
   groupClasses.value.forEach((groupClass) => {
     groupClass.classes.forEach((classRoom) => {
-      checked[classRoom.id] =
-        groupDetail.value?.groupPermissionInClasses
-          .filter((permission) => permission.classId == classRoom.id)
-          .map((permission) => permission.permissionType) || []
+      if (groupDetail.value !== null) {
+        checked[classRoom.id] =
+          groupDetail.value.groupPermissionInClasses
+            .filter((permission) => permission.classId === classRoom.id)
+            .map((permission) => permission.permissionType) || []
+      }
+      if (teacherDetail.value !== null) {
+        checked[classRoom.id] =
+          teacherDetail.value.teacherPermissionInClassDto
+            .filter((permission) => permission.classId === classRoom.id)
+            .map((permission) => permission.permissionType) || []
+      }
     })
   })
 
-  return checked
-})
+  checkedPermissions.value = checked
+}
+
+const permissionTypeMap: { [key: string]: number } = {
+  AssignAssignment: 1,
+  Marking: 2,
+  ManageStudentList: 3,
+}
+
+const getPermissionGroupUserSelected = computed(() =>
+  Object.entries(checkedPermissions.value).flatMap(([id, permissions]) =>
+    permissions.map((permission) => ({
+      classId: id,
+      permissionType: permissionTypeMap[permission],
+    })),
+  ),
+)
+
+const updatePermissionGroup = async () => {
+  if (props.group) {
+    const requestGroup: SetPermissionInClassGroup = {
+      groupTeacherId: groupDetail.value?.id || '',
+      permissionInClassDtos: getPermissionGroupUserSelected.value,
+    }
+    try {
+      await stores.setPermissionGroupInClass(requestGroup)
+      notify({
+        message: 'Update permission successfully',
+        color: 'success',
+      })
+    } catch (error) {
+      notify({
+        message: `Update permission failed \n ${error}`,
+        color: 'danger',
+      })
+    }
+  }
+  if (props.teacherId) {
+    const requestTeacher: SetPermissionInClassTeacher = {
+      teacherId: teacherDetail.value?.id || '',
+      permissionInClassDtos: getPermissionGroupUserSelected.value,
+    }
+
+    try {
+      await stores.setPermissionTeacherInClass(requestTeacher)
+      notify({
+        message: 'Update permission successfully',
+        color: 'success',
+      })
+    } catch (error) {
+      notify({
+        message: `Update permission failed \n ${error}`,
+        color: 'danger',
+      })
+    }
+  }
+}
+
+watch(
+  () => props.group,
+  async (group) => {
+    if (group) {
+      await getGroupDetail()
+      await getGroupClasses()
+      optionPermissionInClass()
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.teacherId,
+  async (teacher) => {
+    if (teacher) {
+      await getTeacherDetail()
+      await getGroupClasses()
+      optionPermissionInClass()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <VaCard v-if="props.group" class="p-2 ml-1 rounded mb-2">
-    <VaCardTitle
-      >Member in group: <span v-if="groupDetail !== null" class="ml-1"> {{ groupDetail.name }}</span>
+  <VaCard v-if="groupDetail !== null" class="p-2 ml-1 rounded mb-2">
+    <VaCardTitle>
+      Member in group: <span v-if="groupDetail" class="ml-1">{{ groupDetail.name }}</span>
     </VaCardTitle>
     <VaDivider />
     <VaCardContent class="p-0">
@@ -185,33 +270,35 @@ const checkedPermissions = computed(() => {
     </VaCardContent>
   </VaCard>
   <VaCard class="p-2 ml-1 rounded">
-    <VaCardTitle>Permission management</VaCardTitle>
+    <VaCardTitle>Permission management: {{ groupDetail?.name || teacherDetail?.teacherName }}</VaCardTitle>
     <VaDivider />
-    <VaCardContent class="p-0 mb-2">
+    <VaCardContent v-if="props.group" class="p-0 mb-2">
       <VaInput placeholder="search class" />
     </VaCardContent>
-    <VaAccordion v-model="value" class="max-W-sm" multiple>
+    <VaAccordion v-model="value" class="max-W-sm mb-3" multiple>
       <VaCollapse v-for="groupClass in groupClasses" :key="groupClass.id" :header="groupClass.name">
         <template #content>
-          <div
-            v-for="classRoom in groupClass.classes"
-            :key="classRoom.id"
-            class="grid md:grid-cols-4 sm:grid-cols-3 gap-3"
-          >
-            <VaCard stripe stripe-color="success" class="border flex flex-col">
-              <VaCardTitle>{{ classRoom.name }}</VaCardTitle>
-              <VaCardContent>
-                <VaOptionList
-                  v-model="checkedPermissions[classRoom.id]"
-                  :options="optionCheckBox"
-                  :text-by="(op: any) => op.value"
-                  :value-by="(op: any) => op.key"
-                />
-              </VaCardContent>
-            </VaCard>
+          <div class="grid md:grid-cols-4 sm:grid-cols-3 gap-3">
+            <div v-for="classRoom in groupClass.classes" :key="classRoom.id">
+              <VaCard stripe stripe-color="success" class="border flex flex-col">
+                <VaCardTitle>{{ classRoom.name }}</VaCardTitle>
+                <VaCardContent>
+                  <VaOptionList
+                    v-model="checkedPermissions[classRoom.id]"
+                    :options="optionCheckBox"
+                    :text-by="(op: any) => op.value"
+                    :value-by="(op: any) => op.key"
+                  />
+                </VaCardContent>
+              </VaCard>
+            </div>
           </div>
         </template>
       </VaCollapse>
     </VaAccordion>
+    <div v-if="props.group || props.teacherId" class="flex justify-end">
+      <VaButton preset="primary" size="small" class="mr-2"> Cancel </VaButton>
+      <VaButton color="success" size="small" @click="updatePermissionGroup"> Save </VaButton>
+    </div>
   </VaCard>
 </template>

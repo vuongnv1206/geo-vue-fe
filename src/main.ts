@@ -25,6 +25,7 @@ router.beforeEach((to, from, next) => {
       siteKey: import.meta.env.VITE_APP_RECAPTCHA_SITE_KEY,
       loaderOptions: {
         useRecaptchaNet: true,
+        autoHideBadge: true,
       },
     })
   }

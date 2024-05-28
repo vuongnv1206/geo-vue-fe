@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import authService from '@services/auth.service'
 import jwtService from '@services/jwt.service'
-import { Register } from '@/pages/auth/types'
+import { Register, ResetPassword } from '@/pages/auth/types'
 
 export type User = {
   id: string
@@ -112,6 +112,14 @@ export const useAuthStore = defineStore('auth', {
     async forgotPassword(email: string): Promise<any> {
       try {
         const response = await authService.forgotPassword(email)
+        return await Promise.resolve(response)
+      } catch (error) {
+        return await Promise.reject(error)
+      }
+    },
+    async resetPassword(data: ResetPassword): Promise<any> {
+      try {
+        const response = await authService.resetPassword(data)
         return await Promise.resolve(response)
       } catch (error) {
         return await Promise.reject(error)
