@@ -36,7 +36,7 @@ const groupClassStores = useGroupClassStore()
 const dataFilter = {
   keyword: '',
   pageNumber: 0,
-  pageSize: 10,
+  pageSize: 100,
   orderBy: ['id'],
 }
 
@@ -81,6 +81,7 @@ const getTeacherDetail = async () => {
 
 const selectTeacherTeam = () => {
   showSelect.value = !showSelect.value
+  getGroupDetail()
 }
 
 const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
@@ -257,15 +258,26 @@ watch(
               :options="teacherOptions"
               text-by="label"
               value-by="value"
+              :max-visible-options="3"
               autocomplete
               multiple
+              searchable
+              highlight-matched-text
               @update:modelValue="updateTeacherIntoGroup"
-            />
+            >
+              <template #content="{ value }">
+                <VaChip v-for="chip in value.slice(0, 3)" :key="chip" size="small" class="mr-1 my-1">
+                  {{ chip.label }}
+                </VaChip>
+              </template>
+            </VaSelect>
           </div>
         </div>
-        <VaAvatar v-for="teacher in groupDetail?.teacherTeams" :key="teacher.id" color="info" size="small">
-          {{ teacher.teacherName.charAt(0).toUpperCase() }}
-        </VaAvatar>
+        <div class="flex gap-2 flex-wrap">
+          <VaAvatar v-for="teacher in groupDetail?.teacherTeams" :key="teacher.id" color="info" size="small">
+            {{ teacher.teacherName.charAt(0).toUpperCase() }}
+          </VaAvatar>
+        </div>
       </div>
     </VaCardContent>
   </VaCard>

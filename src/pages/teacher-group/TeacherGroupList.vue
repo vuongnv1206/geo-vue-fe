@@ -11,7 +11,7 @@ import TeacherTeamModal from './TeacherTeamModal.vue'
 const dataFilter = {
   keyword: '',
   pageNumber: 0,
-  pageSize: 10,
+  pageSize: 100,
   orderBy: ['id'],
 }
 const stores = useGroupTeacherStore()
