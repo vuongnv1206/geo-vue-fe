@@ -5,6 +5,7 @@ import QuestionFolder from './widgets/QuestionFolder.vue'
 import EditQuestionTreeForm from './widgets/EditQuestionTreeForm.vue'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useModal, useToast } from 'vuestic-ui'
+import { getErrorMessage } from '@/services/utils'
 
 const loading = ref(true)
 const currentShowFolderId = ref<string>('')
@@ -62,27 +63,8 @@ const editQuestionTree = (questionTree: QuestionTree) => {
   doShowQuestionTreeFormModal.value = true
 }
 
-const deleteQuestionTree = (questionTree: QuestionTree) => {
-  console.log('deleteQuestionTree', questionTree)
-  loading.value = true
-  stores
-    .deleteQuestionFolder(questionTree.id)
-    .then(() => {
-      notify({
-        message: 'Question Folder deleted',
-        color: 'success',
-      })
-      getQuestionFolders()
-    })
-    .catch((err) => {
-      notify({
-        message: 'Failed to delete question folder\n' + err.message,
-        color: 'danger',
-      })
-    })
-    .finally(() => {
-      loading.value = false
-    })
+const shareQuestionTree = (questionTree: QuestionTree) => {
+  console.log('shareQuestionTree', questionTree)
 }
 
 const createNewQuestionFolder = () => {
@@ -91,12 +73,39 @@ const createNewQuestionFolder = () => {
 }
 
 const selectedItemsEmitted = ref<QuestionTree[]>([])
+const selectedItemsEmittedDelete = ref<QuestionTree[]>([])
+
+const deleteQuestionTree = (questionTree: QuestionTree) => {
+  loading.value = true
+  if (!selectedItemsEmittedDelete.value.includes(questionTree)) {
+    stores
+      .deleteQuestionFolder(questionTree.id)
+      .then(() => {
+        notify({
+          message: 'Question Folder ' + questionTree.name + ' deleted',
+          color: 'success',
+        })
+        getQuestionFolders()
+      })
+      .catch((err) => {
+        const message = getErrorMessage(err)
+        notify({
+          message: 'Failed to delete question folder ' + questionTree.name + '\n' + message,
+          color: 'danger',
+        })
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }
+}
 
 const deleteSelectedFolder = () => {
   confirm('Are you sure you want to delete selected folders?').then((agreed) => {
     if (agreed) {
       selectedItemsEmitted.value.forEach((questionTree) => {
         deleteQuestionTree(questionTree)
+        selectedItemsEmittedDelete.value.push(questionTree)
       })
     }
   })
@@ -161,8 +170,9 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
         getQuestionFolders()
       })
       .catch((err) => {
+        const message = getErrorMessage(err)
         notify({
-          message: 'Failed to update question folder\n' + err.message,
+          message: 'Failed to update question folder ' + qFolder.name + '\n' + message,
           color: 'danger',
         })
       })
@@ -180,14 +190,15 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
       .createQuestionFolder(qFolder as QuestionTreeEmpty)
       .then(() => {
         notify({
-          message: 'Question Folder created',
+          message: 'Question Folder ' + qFolder.name + ' created',
           color: 'success',
         })
         getQuestionFolders()
       })
       .catch((err) => {
+        const message = getErrorMessage(err)
         notify({
-          message: 'Failed to create question folder\n' + err.message,
+          message: 'Failed to create question folder ' + qFolder.name + '\n' + message,
           color: 'danger',
         })
       })
@@ -238,6 +249,7 @@ onMounted(() => {
         @edit="editQuestionTree"
         @delete="deleteQuestionTree"
         @selectedFolder="selectedFolder"
+        @share="shareQuestionTree"
       />
     </VaCardContent>
   </VaCard>

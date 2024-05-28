@@ -34,6 +34,7 @@ const emit = defineEmits<{
   (event: 'edit', questionTree: QuestionTree): void
   (event: 'delete', questionTree: QuestionTree): void
   (event: 'selectedFolder', questionTree: QuestionTree): void
+  (event: 'share', questionTree: QuestionTree): void
 }>()
 
 const contextmenu = (event: any) => {
@@ -51,7 +52,7 @@ const contextmenu = (event: any) => {
         emit('edit', event.item)
       }
       if (option.text === 'Share') {
-        console.log('Share')
+        emit('share', event.item)
       }
       if (option.text === 'Delete') {
         emit('delete', event.item)
@@ -65,6 +66,7 @@ const dblclick = (event: any) => {
 }
 
 const handleSelectionChange = (selectedItems: QuestionTree[]) => {
+  console.log('selectedItems', selectedItems)
   selectedItemsEmitted.value = selectedItems
 }
 </script>
