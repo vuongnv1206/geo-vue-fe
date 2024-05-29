@@ -18,14 +18,35 @@ const stores = useGroupTeacherStore()
 const { init: notify } = useToast()
 const groupTeachers = ref<GroupTeacher[]>([])
 const teacherTeams = ref<TeacherTeam[]>([])
-
+const loading = ref(true)
 const getTeacherGroups = () => {
-  stores.getGroupTeachers(dataFilter).then((res) => {
-    groupTeachers.value = res.data
-  })
-  stores.getTeacherTeams(dataFilter).then((res) => {
-    teacherTeams.value = res.data
-  })
+  loading.value = true
+  stores
+    .getGroupTeachers(dataFilter)
+    .then((res) => {
+      groupTeachers.value = res.data
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+      notify({
+        message: 'Fail when get data',
+        color: 'danger',
+      })
+    })
+  stores
+    .getTeacherTeams(dataFilter)
+    .then((res) => {
+      teacherTeams.value = res.data
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+      notify({
+        message: 'Fail when get data',
+        color: 'danger',
+      })
+    })
 }
 
 const onGroupSaved = async (group: GroupTeacher) => {
@@ -315,106 +336,112 @@ onMounted(() => {
   <div class="my-8">
     <VaDivider />
   </div>
-  <VaList class="mb-2">
-    <VaListItem v-for="group in groupTeachers" :key="group.id" class="list__item mb-1" @click="selectGroup(group)">
-      <VaListItemSection avatar class="justify-center">
-        <VaIcon name="group" color="black" />
-      </VaListItemSection>
+  <VaInnerLoading :loading="loading">
+    <VaList class="mb-2">
+      <VaListItem v-for="group in groupTeachers" :key="group.id" class="list__item mb-1" @click="selectGroup(group)">
+        <VaListItemSection avatar class="justify-center">
+          <VaIcon name="group" color="black" />
+        </VaListItemSection>
 
-      <VaListItemSection>
-        <VaListItemLabel>
-          {{ group.name }}
-        </VaListItemLabel>
-      </VaListItemSection>
+        <VaListItemSection>
+          <VaListItemLabel>
+            {{ group.name }}
+          </VaListItemLabel>
+        </VaListItemSection>
 
-      <VaListItemSection icon class="m-0">
-        <VaDropdown placement="bottom-end">
-          <template #anchor>
-            <VaButton preset="secondary">
-              <VaIcon name="more_vert" />
-            </VaButton>
-          </template>
-          <VaDropdownContent class="p-0">
-            <VaButton
-              preset="secondary"
-              size="small"
-              style="width: 100%"
-              class="flex justify-between"
-              @click="showEditGroupModal(group)"
-            >
-              <VaIcon name="edit_square" class="mr-1" /> Edit
-            </VaButton>
-          </VaDropdownContent>
-          <VaDropdownContent class="p-0">
-            <VaButton
-              preset="secondary"
-              size="small"
-              style="width: 100%"
-              class="flex justify-between"
-              @click="confirmDeleteGroupModal(group.id, group.name)"
-            >
-              <VaIcon name="delete" class="mr-1" color="danger" /> Delete
-            </VaButton>
-          </VaDropdownContent>
-        </VaDropdown>
-      </VaListItemSection>
-    </VaListItem>
-    <VaListItem
-      v-for="teacher in teacherTeams"
-      :key="teacher.id"
-      class="list__item mb-2"
-      @click="detailTeacherInTeam(teacher.id)"
-    >
-      <VaListItemSection avatar class="justify-center">
-        <VaAvatar size="small">
-          {{ teacher.teacherName.charAt(0).toUpperCase() }}
-        </VaAvatar>
-      </VaListItemSection>
+        <VaListItemSection icon class="m-0">
+          <VaDropdown placement="bottom-end">
+            <template #anchor>
+              <VaButton preset="secondary">
+                <VaIcon name="more_vert" />
+              </VaButton>
+            </template>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="flex justify-between"
+                @click="showEditGroupModal(group)"
+              >
+                <VaIcon name="edit_square" class="mr-1" /> Edit
+              </VaButton>
+            </VaDropdownContent>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="flex justify-between"
+                @click="confirmDeleteGroupModal(group.id, group.name)"
+              >
+                <VaIcon name="delete" class="mr-1" color="danger" /> Delete
+              </VaButton>
+            </VaDropdownContent>
+          </VaDropdown>
+        </VaListItemSection>
+      </VaListItem>
+      <VaListItem
+        v-for="teacher in teacherTeams"
+        :key="teacher.id"
+        class="list__item mb-2"
+        @click="detailTeacherInTeam(teacher.id)"
+      >
+        <VaListItemSection avatar class="justify-center">
+          <VaAvatar size="small">
+            {{ teacher.teacherName.charAt(0).toUpperCase() }}
+          </VaAvatar>
+        </VaListItemSection>
 
-      <VaListItemSection>
-        <VaListItemLabel>
-          {{ teacher.teacherName }}
-          <VaIcon v-if="teacher.teacherId === '00000000-0000-0000-0000-000000000000'" class="mr-2" name="no_accounts" />
-        </VaListItemLabel>
-        <VaListItemLabel caption>
-          {{ teacher.email }}
-          {{ teacher.phone }}
-        </VaListItemLabel>
-      </VaListItemSection>
+        <VaListItemSection>
+          <VaListItemLabel>
+            {{ teacher.teacherName }}
+            <VaIcon
+              v-if="teacher.teacherId === '00000000-0000-0000-0000-000000000000'"
+              class="mr-2"
+              name="no_accounts"
+            />
+          </VaListItemLabel>
+          <VaListItemLabel caption>
+            {{ teacher.email }}
+            {{ teacher.phone }}
+          </VaListItemLabel>
+        </VaListItemSection>
 
-      <VaListItemSection icon class="m-0">
-        <VaDropdown placement="bottom-end">
-          <template #anchor>
-            <VaButton preset="secondary">
-              <VaIcon name="more_vert" />
-            </VaButton>
-          </template>
-          <VaDropdownContent class="p-0">
-            <VaButton
-              preset="secondary"
-              size="small"
-              style="width: 100%"
-              class="flex justify-between"
-              @click="showEditTeacherModal(teacher)"
-            >
-              <VaIcon name="edit_square" class="mr-1" /> Edit
-            </VaButton>
-          </VaDropdownContent>
-          <VaDropdownContent class="p-0">
-            <VaButton
-              preset="secondary"
-              size="small"
-              style="width: 100%"
-              class="flex justify-between"
-              @click="confirmDeleteTeacherInTeam(teacher.id, teacher.teacherName)"
-            >
-              <VaIcon name="delete" class="mr-1" color="danger" /> Delete
-            </VaButton>
-          </VaDropdownContent>
-        </VaDropdown>
-      </VaListItemSection>
-    </VaListItem>
-  </VaList>
+        <VaListItemSection icon class="m-0">
+          <VaDropdown placement="bottom-end">
+            <template #anchor>
+              <VaButton preset="secondary">
+                <VaIcon name="more_vert" />
+              </VaButton>
+            </template>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="flex justify-between"
+                @click="showEditTeacherModal(teacher)"
+              >
+                <VaIcon name="edit_square" class="mr-1" /> Edit
+              </VaButton>
+            </VaDropdownContent>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="flex justify-between"
+                @click="confirmDeleteTeacherInTeam(teacher.id, teacher.teacherName)"
+              >
+                <VaIcon name="delete" class="mr-1" color="danger" /> Delete
+              </VaButton>
+            </VaDropdownContent>
+          </VaDropdown>
+        </VaListItemSection>
+      </VaListItem>
+    </VaList>
+  </VaInnerLoading>
 </template>
 
 <style lang="scss" scoped>
