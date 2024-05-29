@@ -1,4 +1,8 @@
-import { SetPermissionInClassGroup, TeacherInGroupRequest } from '@/pages/teacher-group/types'
+import {
+  SetPermissionInClassGroup,
+  SetPermissionInClassTeacher,
+  TeacherInGroupRequest,
+} from '@/pages/teacher-group/types'
 import apiService from './api.service'
 
 class GroupTeacherService {
@@ -126,6 +130,28 @@ class GroupTeacherService {
   async setPermissionGroupInClass(data: SetPermissionInClassGroup): Promise<any> {
     return apiService
       .post('v1/permissionclasses/group-permission-in-class', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async getTeacherPermissionDetail(teacherId: string): Promise<any> {
+    return apiService
+      .get(`v1/permissionclasses/teacher-permission-in-class/${teacherId}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async setPermissionTeacherInClass(data: SetPermissionInClassTeacher): Promise<any> {
+    return apiService
+      .post('v1/permissionclasses/teacher-permission-in-class', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
