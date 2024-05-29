@@ -56,3 +56,8 @@ export type TeacherInGroupRequest = {
   groupId: string
   teacherId: string
 }
+
+export type TeacherTeamTeacherGroupCombine = {
+  teacherTeam: TeacherTeam | null
+  groupTeacher: GroupTeacher | null
+}

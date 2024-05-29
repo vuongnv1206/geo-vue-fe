@@ -38,7 +38,6 @@ const emit = defineEmits<{
 }>()
 
 const contextmenu = (event: any) => {
-  console.log('contextmenu', event)
   event.event.preventDefault()
   show({
     event: event.event,
@@ -66,7 +65,6 @@ const dblclick = (event: any) => {
 }
 
 const handleSelectionChange = (selectedItems: QuestionTree[]) => {
-  console.log('selectedItems', selectedItems)
   selectedItemsEmitted.value = selectedItems
 }
 </script>
