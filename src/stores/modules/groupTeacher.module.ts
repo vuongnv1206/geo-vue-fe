@@ -1,6 +1,7 @@
 import { GroupTeacherResponse, SetPermissionInClassGroup, TeacherTeamResponse } from '@/pages/teacher-group/types'
 import groupTeacherService from '@/services/groupTeacher.service'
 import { defineStore } from 'pinia'
+import { SetPermissionInClassTeacher } from '../../pages/teacher-group/types'
 
 export const useGroupTeacherStore = defineStore('groupTeacher', {
   state: () => ({}),
@@ -118,6 +119,26 @@ export const useGroupTeacherStore = defineStore('groupTeacher', {
     async setPermissionGroupInClass(data: SetPermissionInClassGroup): Promise<any> {
       return groupTeacherService
         .setPermissionGroupInClass(data)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getTeacherPermissionDetail(teacherId: string): Promise<any> {
+      return groupTeacherService
+        .getTeacherPermissionDetail(teacherId)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async setPermissionTeacherInClass(data: SetPermissionInClassTeacher): Promise<any> {
+      return groupTeacherService
+        .setPermissionTeacherInClass(data)
         .then((res) => {
           return Promise.resolve(res)
         })

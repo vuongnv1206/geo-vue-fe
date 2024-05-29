@@ -11,7 +11,7 @@ import TeacherTeamModal from './TeacherTeamModal.vue'
 const dataFilter = {
   keyword: '',
   pageNumber: 0,
-  pageSize: 10,
+  pageSize: 100,
   orderBy: ['id'],
 }
 const stores = useGroupTeacherStore()
@@ -215,14 +215,14 @@ const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string
   }
 }
 
-const emit = defineEmits(['select-group'])
+const emit = defineEmits(['select-group', 'select-teacher'])
 
 function selectGroup(group: GroupTeacher) {
   emit('select-group', group)
 }
 
-const detailTeacherInTeam = (id: string) => {
-  console.log(id)
+function detailTeacherInTeam(teacherId: string) {
+  emit('select-teacher', teacherId)
 }
 
 onMounted(() => {
