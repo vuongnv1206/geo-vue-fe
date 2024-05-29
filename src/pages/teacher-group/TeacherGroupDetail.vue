@@ -246,39 +246,48 @@ watch(
     </VaCardTitle>
     <VaDivider />
     <VaCardContent class="p-0">
-      <div class="flex gap-2 flex-wrap">
-        <div class="text-center" style="cursor: pointer">
-          <VaAvatar color="secondary" size="small" @click="selectTeacherTeam">
-            <VaIcon name="add" />
-          </VaAvatar>
-          <div v-if="showSelect">
-            <VaSelect
-              v-model="selectedTeacher"
-              label="Select more"
-              :options="teacherOptions"
-              text-by="label"
-              value-by="value"
-              :max-visible-options="3"
-              autocomplete
-              multiple
-              searchable
-              highlight-matched-text
-              @update:modelValue="updateTeacherIntoGroup"
-            >
-              <template #content="{ value }">
-                <VaChip v-for="chip in value.slice(0, 3)" :key="chip" size="small" class="mr-1 my-1">
-                  {{ chip.label }}
-                </VaChip>
-              </template>
-            </VaSelect>
+      <VaCardContent class="p-0">
+        <div class="flex gap-2">
+          <div class="text-center" style="cursor: pointer">
+            <VaAvatar color="secondary" size="small" @click="selectTeacherTeam">
+              <VaIcon name="add" />
+            </VaAvatar>
+            <div v-if="showSelect">
+              <VaSelect
+                v-model="selectedTeacher"
+                label="Select more"
+                :options="teacherOptions"
+                text-by="label"
+                value-by="value"
+                :max-visible-options="3"
+                autocomplete
+                multiple
+                searchable
+                highlight-matched-text
+                @update:modelValue="updateTeacherIntoGroup"
+              >
+                <template #content="{ value }">
+                  <VaChip v-for="chip in value.slice(0, 3)" :key="chip" size="small" class="mr-1 my-1">
+                    {{ chip.label }}
+                  </VaChip>
+                </template>
+              </VaSelect>
+            </div>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <div v-for="teacher in groupDetail?.teacherTeams" :key="teacher.id">
+              <VaDropdown trigger="hover">
+                <template #anchor>
+                  <VaAvatar color="info" size="small" class="text-center">
+                    {{ teacher.teacherName.charAt(0).toUpperCase() }}
+                  </VaAvatar>
+                </template>
+                <VaDropdownContent> {{ teacher.teacherName }} </VaDropdownContent>
+              </VaDropdown>
+            </div>
           </div>
         </div>
-        <div class="flex gap-2 flex-wrap">
-          <VaAvatar v-for="teacher in groupDetail?.teacherTeams" :key="teacher.id" color="info" size="small">
-            {{ teacher.teacherName.charAt(0).toUpperCase() }}
-          </VaAvatar>
-        </div>
-      </div>
+      </VaCardContent>
     </VaCardContent>
   </VaCard>
   <VaCard class="p-2 ml-1 rounded">
