@@ -17,6 +17,8 @@ export interface IPaperFoldersService {
   paperFolders_Update(request: UpdatePaperFolderRequest, id: string): Promise<string>
 
   paperFolders_Share(id: string, request: SharePaperFolderRequest): Promise<string>
+
+  papers_GetParents(id: string): Promise<PaperFolderDto[]>
 }
 
 class PaperFoldersService implements IPaperFoldersService {
@@ -74,6 +76,17 @@ class PaperFoldersService implements IPaperFoldersService {
   async paperFolders_Share(id: string, request: SharePaperFolderRequest): Promise<string> {
     return apiService
       .post(`/v1/paperfolders/${id}/share-paper-folder`, request)
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+  }
+
+  async papers_GetParents(id: string): Promise<PaperFolderDto[]> {
+    return apiService
+      .get(`/v1/paperfolders/${id}/parents`)
       .catch((error: any) => {
         return Promise.reject(error)
       })

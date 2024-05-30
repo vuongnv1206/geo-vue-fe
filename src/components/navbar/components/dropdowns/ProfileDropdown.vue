@@ -5,7 +5,7 @@
         <VaButton preset="secondary" color="textPrimary">
           <span class="profile-dropdown__anchor min-w-max">
             <slot />
-            <VaAvatar :size="32" color="warning"> 😍 </VaAvatar>
+            <VaAvatar :size="32" color="warning"> {{ shortNameLetter }} </VaAvatar>
           </span>
         </VaButton>
       </template>
@@ -58,7 +58,9 @@ type ProfileOptions = {
   separator: boolean
   list: ProfileListItem[]
 }
-
+const { user } = useAuthStore()
+// Nguyen Van A -> NA
+const shortNameLetter = computed(() => user?.fullName?.charAt(0).toUpperCase())
 const { logout } = useAuthStore()
 const { push } = useRouter()
 
@@ -107,20 +109,19 @@ withDefaults(
 const isShown = ref(false)
 
 const resolveLinkAttribute = (item: ProfileListItem) => {
-  return item.to
-    ? { to: { name: item.to } }
-    : item.href
-      ? { href: item.href, target: '_blank' }
-      : item.action
-        ? {
-            onClick: () => {
-              if (item.action === 'logoutAction') {
-                logout()
-                push({ name: 'login' })
-              }
-            },
-          }
-        : {}
+  if (item.to) return { to: { name: item.to } }
+  if (item.href) return { href: item.href, target: '_blank' }
+  if (item.action) {
+    return {
+      onClick: () => {
+        if (item.action === 'logoutAction') {
+          logout()
+          push({ name: 'login' })
+        }
+      },
+    }
+  }
+  return {}
 }
 </script>
 

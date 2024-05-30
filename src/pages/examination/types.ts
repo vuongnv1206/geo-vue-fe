@@ -15,6 +15,12 @@ export interface PaperFolderDto {
   lastModifiedBy: string
   lastModifiedOn: string | null
   paperFolderChildrens?: PaperFolderDto[] | null
+  parents?: PaperFolderParentDto[]
+}
+
+export interface PaperFolderParentDto {
+  id: string
+  name: string
 }
 
 export interface SearchPaperFolderRequest {
@@ -37,4 +43,52 @@ export interface SharePaperFolderRequest {
   canAdd?: boolean
   canUpdate?: boolean
   canDelete?: boolean
+}
+
+export interface SearchPaperRequest {
+  paperFolderId?: string | null
+  name?: string | null
+}
+
+export interface PaperInListDto {
+  id: string
+  examName: string
+  paperLabelId?: string | null
+  numberOfQuestion?: number
+  duration?: number | null
+  status?: string | null
+  showMarkResult?: boolean
+  showQuestionAnswer?: boolean
+  password?: string | null
+  type?: string
+  paperFolderId?: string | null
+  isPublish?: boolean
+  examCode?: string
+  content?: string | null
+  description?: string | null
+  createdBy: string
+  createdOn: string
+  creatorName?: string | null
+  lastModifiedBy: string | null
+  lastModifiedOn: string | null
+  paperLable?: PaperLabelDto
+  paperFolder?: PaperFolderDto
+  parents?: PaperFolderParentDto[]
+}
+
+export interface PaperLabelDto {
+  id?: string
+  name?: string
+}
+
+export interface CombinedData {
+  type: string
+  paths: { id: string | null; name: string }[]
+  id: string
+  name: string
+  status?: string | null
+  createdBy: string
+  createdOn: string
+  lastModifiedBy: string | null
+  lastModifiedOn: string | null
 }

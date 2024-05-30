@@ -16,6 +16,21 @@ export type GroupPermissionInClass = {
   permissionType: string
 }
 
+export type SetPermissionInClassGroup = {
+  groupTeacherId: string
+  permissionInClassDtos: PermissionInClass[]
+}
+
+export type SetPermissionInClassTeacher = {
+  teacherId: string
+  permissionInClassDtos: PermissionInClass[]
+}
+
+export type PermissionInClass = {
+  classId: string
+  permissionType: number
+}
+
 export type GroupTeacherRequest = {
   name: string
 }
@@ -26,6 +41,13 @@ export type TeacherTeam = {
   teacherName: string
   email: string
   phone: string
+  teacherPermissionInClassDto: TeacherPermissionInClass[]
+}
+
+export type TeacherPermissionInClass = {
+  id: string
+  classId: string
+  permissionType: string
 }
 
 export type TeacherTeamRequest = {
@@ -45,4 +67,9 @@ export type TeacherTeamResponse = {
 export type TeacherInGroupRequest = {
   groupId: string
   teacherId: string
+}
+
+export type TeacherTeamTeacherGroupCombine = {
+  teacherTeam: TeacherTeam | null
+  groupTeacher: GroupTeacher | null
 }

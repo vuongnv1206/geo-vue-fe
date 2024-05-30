@@ -11,6 +11,8 @@ const { push } = useRouter()
 const { init } = useToast()
 const store = useAuthStore()
 
+const isLoading = ref(false)
+
 const formData = reactive({
   firstName: '',
   lastName: '',
@@ -34,6 +36,8 @@ const submit = () => {
       role: roleTabValue.value === 0 ? 'Student' : 'Teacher',
     }
 
+    isLoading.value = true
+
     store
       .register(registerData)
       .then(() => {
@@ -51,6 +55,9 @@ const submit = () => {
           message: message,
           color: 'danger',
         })
+      })
+      .finally(() => {
+        isLoading.value = false
       })
   }
 }
@@ -86,80 +93,82 @@ const emailRules: ((v: string) => boolean | string)[] = [
 </script>
 
 <template>
-  <VaForm ref="form" @submit.prevent="submit">
-    <h1 class="font-semibold text-4xl mb-4">Sign up</h1>
-    <p class="text-base mb-4 leading-5">
-      Have an account?
-      <RouterLink :to="{ name: 'login' }" class="font-semibold text-primary">Login</RouterLink>
-    </p>
-    <VaTabs v-model="roleTabValue">
-      <template #tabs>
-        <VaTab v-for="tab in ['Student', 'Teacher']" :key="tab">
-          {{ tab }}
-        </VaTab>
-      </template>
-    </VaTabs>
-    <VaDivider class="mb-4" />
-    <div class="grid grid-cols-2 gap-4 items-start">
-      <VaInput
-        v-model="formData.firstName"
-        :rules="[(v) => !!v || 'First Name field is required']"
-        class="mb-4"
-        label="First Name"
-      />
-      <VaInput
-        v-model="formData.lastName"
-        :rules="[(v) => !!v || 'Last Name field is required']"
-        class="mb-4"
-        label="Last Name"
-      />
-    </div>
-    <VaInput v-model="formData.username" :rules="usernameRules" class="mb-4" label="Username" />
-    <VaInput v-model="formData.phoneNumber" :rules="phoneNumberRules" class="mb-4" label="Phone Number" />
-    <VaInput v-model="formData.email" :rules="emailRules" class="mb-4" label="Email" type="email" />
-    <VaValue v-slot="isPasswordVisible" :default-value="false">
-      <VaInput
-        ref="password1"
-        v-model="formData.password"
-        :rules="passwordRules"
-        :type="isPasswordVisible.value ? 'text' : 'password'"
-        class="mb-4"
-        label="Password"
-        messages="Password should be 8+ characters: letters, numbers, and special characters."
-        @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
-      >
-        <template #appendInner>
-          <VaIcon
-            :name="isPasswordVisible.value ? 'mso-visibility_off' : 'mso-visibility'"
-            class="cursor-pointer"
-            color="secondary"
-          />
+  <VaInnerLoading :loading="isLoading" :size="60">
+    <VaForm ref="form" @submit.prevent="submit">
+      <h1 class="font-semibold text-4xl mb-4">Sign up</h1>
+      <p class="text-base mb-4 leading-5">
+        Have an account?
+        <RouterLink :to="{ name: 'login' }" class="font-semibold text-primary">Login</RouterLink>
+      </p>
+      <VaTabs v-model="roleTabValue">
+        <template #tabs>
+          <VaTab v-for="tab in ['Student', 'Teacher']" :key="tab">
+            {{ tab }}
+          </VaTab>
         </template>
-      </VaInput>
-      <VaInput
-        ref="password2"
-        v-model="formData.repeatPassword"
-        :rules="[
-          (v) => !!v || 'Repeat Password field is required',
-          (v) => v === formData.password || 'Passwords don\'t match',
-        ]"
-        :type="isPasswordVisible.value ? 'text' : 'password'"
-        class="mb-4"
-        label="Repeat Password"
-        @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
-      >
-        <template #appendInner>
-          <VaIcon
-            :name="isPasswordVisible.value ? 'mso-visibility_off' : 'mso-visibility'"
-            class="cursor-pointer"
-            color="secondary"
-          />
-        </template>
-      </VaInput>
-    </VaValue>
+      </VaTabs>
+      <VaDivider class="mb-4" />
+      <div class="grid grid-cols-2 gap-4 items-start">
+        <VaInput
+          v-model="formData.firstName"
+          :rules="[(v) => !!v || 'First Name field is required']"
+          class="mb-4"
+          label="First Name"
+        />
+        <VaInput
+          v-model="formData.lastName"
+          :rules="[(v) => !!v || 'Last Name field is required']"
+          class="mb-4"
+          label="Last Name"
+        />
+      </div>
+      <VaInput v-model="formData.username" :rules="usernameRules" class="mb-4" label="Username" />
+      <VaInput v-model="formData.phoneNumber" :rules="phoneNumberRules" class="mb-4" label="Phone Number" />
+      <VaInput v-model="formData.email" :rules="emailRules" class="mb-4" label="Email" type="email" />
+      <VaValue v-slot="isPasswordVisible" :default-value="false">
+        <VaInput
+          ref="password1"
+          v-model="formData.password"
+          :rules="passwordRules"
+          :type="isPasswordVisible.value ? 'text' : 'password'"
+          class="mb-4"
+          label="Password"
+          messages="Password should be 8+ characters: letters, numbers, and special characters."
+          @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
+        >
+          <template #appendInner>
+            <VaIcon
+              :name="isPasswordVisible.value ? 'mso-visibility_off' : 'mso-visibility'"
+              class="cursor-pointer"
+              color="secondary"
+            />
+          </template>
+        </VaInput>
+        <VaInput
+          ref="password2"
+          v-model="formData.repeatPassword"
+          :rules="[
+            (v) => !!v || 'Repeat Password field is required',
+            (v) => v === formData.password || 'Passwords don\'t match',
+          ]"
+          :type="isPasswordVisible.value ? 'text' : 'password'"
+          class="mb-4"
+          label="Repeat Password"
+          @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
+        >
+          <template #appendInner>
+            <VaIcon
+              :name="isPasswordVisible.value ? 'mso-visibility_off' : 'mso-visibility'"
+              class="cursor-pointer"
+              color="secondary"
+            />
+          </template>
+        </VaInput>
+      </VaValue>
 
-    <div class="flex justify-center mt-4">
-      <VaButton class="w-full" @click="submit"> Create account</VaButton>
-    </div>
-  </VaForm>
+      <div class="flex justify-center mt-4">
+        <VaButton class="w-full" @click="submit"> Create account</VaButton>
+      </div>
+    </VaForm>
+  </VaInnerLoading>
 </template>

@@ -1,8 +1,24 @@
-import { Register } from '@/pages/auth/types'
+import { Register, ResetPassword } from '@/pages/auth/types'
 import apiService from '@services/api.service'
 import jwtService from '@services/jwt.service'
 
 class AuthService {
+  async refreshToken(): Promise<any> {
+    return apiService
+      .post('/tokens/refresh', {
+        token: jwtService.getToken(),
+        refreshToken: jwtService.getRefreshToken(),
+      })
+      .then((response) => {
+        jwtService.saveToken(response.data)
+        jwtService.saveUser(jwtService.parseTokenLocal())
+        return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
   async login(email: string, password: string, captchaToken: string): Promise<any> {
     return apiService
       .post('/tokens', {
@@ -49,6 +65,17 @@ class AuthService {
       .post('/users/forgot-password', {
         email,
       })
+      .then((response) => {
+        return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async resetPassword(data: ResetPassword) {
+    return apiService
+      .post('/users/reset-password', data)
       .then((response) => {
         return Promise.resolve(response)
       })

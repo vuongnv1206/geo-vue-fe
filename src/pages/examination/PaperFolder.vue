@@ -1,29 +1,49 @@
 <script lang="ts" setup>
 import { usePaperFolderStore } from '@/stores/modules/paperFolder.module'
+import { usePaperStore } from '@/stores/modules/paper.module'
 import { onMounted, ref } from 'vue'
-import { PaperFolderDto, SearchPaperFolderRequest, UpdatePaperFolderRequest } from './types'
-import { defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui/web-components'
-import { CreatePaperFolderRequest } from './types'
+import {
+  PaperFolderDto,
+  SearchPaperFolderRequest,
+  SearchPaperRequest,
+  UpdatePaperFolderRequest,
+  CreatePaperFolderRequest,
+  PaperInListDto,
+  CombinedData,
+} from './types'
+import { useMenu, useModal, useToast } from 'vuestic-ui/web-components'
 import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
-const stores = usePaperFolderStore()
+import { computed } from 'vue'
+
+const paperFolderStore = usePaperFolderStore()
+const paperStore = usePaperStore()
 const loading = ref(true)
+
 const searchPaperFolderRequest = ref<SearchPaperFolderRequest>({})
+const searchPaperRequest = ref<SearchPaperRequest>({})
+
 const paperFolderDtos = ref<PaperFolderDto[]>([])
+const papers = ref<PaperInListDto[]>([])
+
+const searchTerm = ref<string>('') // Add search term
 
 const folderToEdit = ref<PaperFolderDto | null>(null)
 const doShowEditFolderModal = ref(false)
+
 const breadcrumbs = ref<{ id: string | null; name: string }[]>([{ id: null, name: 'Root' }])
 
 const { init: notify } = useToast()
-
 const editFormRef = ref()
 const currentFolderId = ref<string | null>(null)
+
+const selectedItems = ref<CombinedData[]>([])
+const showPathColumn = ref(false)
 
 const { confirm } = useModal()
 
 const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
   if (folderToEdit.value) {
-    stores
+    paperFolderStore
       .updatePaperFolder(request, request.id)
       .then(() => {
         notify({
@@ -45,7 +65,7 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
       parentId: currentFolderId.value,
       subjectId: request.subjectId ?? null,
     }
-    stores
+    paperFolderStore
       .createPaperFolder(createRequest)
       .then(() => {
         notify({
@@ -66,12 +86,13 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
 
 const onFolderDelete = async (folder: PaperFolderDto) => {
   try {
-    await stores.deletePaperFolder(folder.id)
+    await paperFolderStore.deletePaperFolder(folder.id)
     notify({
       message: `${folder.name} has been deleted`,
       color: 'success',
     })
-    getPaperFolders()
+    getPaperFolders(currentFolderId.value) // Refresh the list of folders under the current parent folder
+    getPapers(currentFolderId.value) // Refresh the list of papers under the current parent folder
   } catch (err: any) {
     notify({
       message: `Failed to delete folder\n${err.message}`,
@@ -79,45 +100,167 @@ const onFolderDelete = async (folder: PaperFolderDto) => {
     })
   }
 }
+
+const onPaperDelete = async (paper: PaperInListDto) => {
+  try {
+    await paperStore.deletePaper(paper.id)
+    notify({
+      message: `${paper.examName} has been deleted`,
+      color: 'success',
+    })
+    getPapers(currentFolderId.value)
+  } catch (err: any) {
+    notify({
+      message: `Failed to delete paper\n${err.message}`,
+      color: 'error',
+    })
+  }
+}
+
+const onDeleteSelectedItems = async () => {
+  confirm('Are you sure you want to delete selected items?').then(async (agreed) => {
+    if (agreed) {
+      const deletePromises = selectedItems.value.map(async (item) => {
+        if (item.type === 'folder') {
+          const folder = paperFolderDtos.value.find((folder) => folder.id === item.id)
+          if (folder) {
+            return onFolderDelete(folder)
+          }
+        } else if (item.type === 'paper') {
+          const paper = papers.value.find((paper) => paper.id === item.id)
+          if (paper) {
+            return onPaperDelete(paper)
+          }
+        }
+      })
+
+      try {
+        await Promise.all(deletePromises)
+        selectedItems.value = []
+        getPaperFolders(currentFolderId.value)
+        getPapers(currentFolderId.value)
+      } catch (err: any) {
+        notify({
+          message: `Failed to delete selected items\n${err.message}`,
+          color: 'error',
+        })
+      }
+    }
+  })
+}
+
 onMounted(() => {
   getPaperFolders()
+  getPapers()
 })
 
-const getPaperFolders = async (parentId?: string | null) => {
+const getPaperFolders = async (parentId?: string | null, name?: string | null) => {
   loading.value = true
-  // Thiết lập parentId cho request
-  searchPaperFolderRequest.value.parentId = parentId
-  stores
+  searchPaperFolderRequest.value = { parentId, name }
+  paperFolderStore
     .searchPaperFolders(searchPaperFolderRequest.value)
     .then((res) => {
       loading.value = false
       paperFolderDtos.value = res
-      console.log(paperFolderDtos)
     })
     .catch(() => {
       loading.value = false
-      notify({
-        message: 'Failed to get question folders',
-        color: 'error',
-      })
+      notify({ message: 'Failed to get question folders', color: 'error' })
     })
 }
 
-const handleFolderDoubleClick = (event: any) => {
-  const folderId = event.item.id
-  currentFolderId.value = folderId
-  // Gọi hàm để lấy các thư mục con của thư mục này
-  getPaperFolders(event.item.id) // Truyền parentId của thư mục được chọn
-
-  breadcrumbs.value.push({ id: folderId, name: event.item.name })
-  getPaperFolders(folderId) // Truyền parentId của thư mục được chọn
+const getPapers = async (folderId?: string | null, name?: string | null) => {
+  papers.value = []
+  loading.value = true
+  searchPaperRequest.value = { paperFolderId: folderId, name }
+  paperStore
+    .searchPapers(searchPaperRequest.value)
+    .then((res) => {
+      loading.value = false
+      papers.value = res
+    })
+    .catch(() => {
+      loading.value = false
+      notify({ message: 'Failed to get papers', color: 'error' })
+    })
 }
+const handleFolderDoubleClick = async (event: any) => {
+  const item = event.item
+  if (item.type === 'folder') {
+    const folderId = item.id
+    if (currentFolderId.value !== folderId) {
+      currentFolderId.value = folderId
+      const folder = paperFolderDtos.value.find((folder) => folder.id === folderId)
+      if (folder && folder.parents) {
+        // Cập nhật breadcrumbs theo đường dẫn của folder
+        breadcrumbs.value = [
+          { id: null, name: 'Root' },
+          ...folder.parents.map((parent) => ({ id: parent.id, name: parent.name })),
+          { id: folder.id, name: folder.name },
+        ]
 
+        breadcrumbs.value.pop()
+      }
+      searchTerm.value = ''
+      showPathColumn.value = false
+      getPaperFolders(folderId, searchTerm.value)
+
+      getPapers(folderId, searchTerm.value)
+    }
+  } else if (item.type === 'paper') {
+    showPaperDetail(item)
+  }
+}
+const showPaperDetail = (paper: PaperInListDto) => {
+  console.log('Show paper detail:', paper)
+  // For example, you could navigate to a detail page
+}
 const navigateToBreadcrumb = (index: number) => {
   const breadcrumb = breadcrumbs.value[index]
   breadcrumbs.value = breadcrumbs.value.slice(0, index + 1)
   currentFolderId.value = breadcrumb.id
-  getPaperFolders(breadcrumb.id)
+  searchTerm.value = ''
+  //papers.value = []
+  getPaperFolders(breadcrumb.id, searchTerm.value)
+  getPapers(breadcrumb.id, searchTerm.value)
+}
+const handleSearch = () => {
+  if (searchTerm.value) {
+    showPathColumn.value = true
+  } else {
+    showPathColumn.value = false
+  }
+  papers.value = []
+  getPaperFolders(currentFolderId.value, searchTerm.value)
+  getPapers(currentFolderId.value, searchTerm.value)
+}
+
+const navigateToPath = async (id: string | null) => {
+  if (id) {
+    if (currentFolderId.value !== id) {
+      const folder = paperFolderDtos.value.find((folder) => folder.id === id)
+      if (folder && folder.parents) {
+        breadcrumbs.value = [
+          { id: null, name: 'Root' },
+          ...folder.parents.map((parent) => ({ id: parent.id, name: parent.name })),
+        ]
+      }
+      currentFolderId.value = id
+      //papers.value = []
+      searchTerm.value = ''
+      getPaperFolders(id, searchTerm.value)
+      getPapers(id, searchTerm.value)
+      showPathColumn.value = false
+    }
+  } else {
+    breadcrumbs.value = [{ id: null, name: 'Root' }]
+    currentFolderId.value = null
+    //papers.value = []
+    getPaperFolders()
+    getPapers()
+    showPathColumn.value = false
+    searchTerm.value = ''
+  }
 }
 
 const showAddPaperFolderModal = () => {
@@ -145,17 +288,85 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   }
 }
 
-const columns = defineVaDataTableColumns([
-  { label: 'Folder Name', key: 'name', sortable: true },
-  { label: 'Created By', key: 'creatorName', sortable: true },
-  { label: 'Created On', key: 'createdOn', sortable: true },
-  { label: 'Last Modified On', key: 'lastModifiedOn', sortable: true },
-  { label: ' ', key: 'actions' },
-])
+const { show } = useMenu()
+const contextmenu = (event: any) => {
+  const item = event.item
+  if (item.type === 'folder') {
+    event.event.preventDefault()
+    show({
+      event: event.event,
+      options: [
+        { text: 'Rename', icon: 'edit' },
+        { text: 'Share', icon: 'share' },
+        { text: 'Delete', icon: 'delete' },
+      ],
+      onSelected(option) {
+        if (option.text === 'Rename') {
+          showEditPaperFolderModal(item)
+        } else if (option.text === 'Delete') {
+          onFolderDelete(item)
+        }
+      },
+    })
+  }
+}
+
+const tableColumns = computed(() => {
+  const columns = [
+    { label: 'Name', key: 'name', sortable: true },
+    { label: 'Status', key: 'status', sortable: true },
+    { label: 'Created On', key: 'createdOn', sortable: true },
+    { label: 'Last Modified On', key: 'lastModifiedOn', sortable: true },
+    { label: ' ', key: 'actions' },
+  ]
+  if (showPathColumn.value) {
+    columns.splice(columns.length - 1, 0, { label: 'Path', key: 'path', sortable: true })
+  }
+  return columns
+})
+
+const onSelectedItemsChange = (items: CombinedData[]) => {
+  selectedItems.value = items
+}
+
+const combinedData = computed(() => {
+  const resolvedFolders = paperFolderDtos.value.map((folder) => ({
+    ...folder,
+    name: folder.name,
+    status: '',
+    createdOn: folder.createdOn || '',
+    lastModifiedOn: folder.lastModifiedOn || '',
+    type: 'folder',
+    paths: folder.parents
+      ? [{ id: null, name: 'Root' }, ...folder.parents.map((parent) => ({ id: parent.id, name: parent.name }))]
+      : [],
+    createdBy: folder.createdBy || '',
+    lastModifiedBy: folder.lastModifiedBy || null,
+  }))
+
+  const resolvedPapers = papers.value.map((paper) => ({
+    ...paper,
+    name: paper.examName,
+    status: paper.status,
+    createdOn: paper.createdOn || '',
+    lastModifiedOn: paper.lastModifiedOn || '',
+    type: 'paper',
+    paths: paper.parents
+      ? [{ id: null, name: 'Root' }, ...paper.parents.map((parent) => ({ id: parent.id, name: parent.name }))]
+      : [],
+    createdBy: paper.createdBy || '',
+    lastModifiedBy: paper.lastModifiedBy || null,
+  }))
+
+  return [...resolvedFolders, ...resolvedPapers]
+})
 </script>
 
 <template>
-  <h1 class="page-title font-bold">Paper Folder</h1>
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px">
+    <VaInput v-model="searchTerm" placeholder="Search..." />
+    <VaButton @click="handleSearch">Search</VaButton>
+  </div>
   <VaCard>
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
@@ -169,30 +380,40 @@ const columns = defineVaDataTableColumns([
           </VaBreadcrumbs>
         </div>
         <div class="flex flex-col md:flex-row gap-2 justify-end">
-          <VaButton icon="add" @click="showAddPaperFolderModal()">Paper Folder</VaButton>
+          <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
+            Delete
+          </VaButton>
+
+          <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
         </div>
       </div>
+
       <VaDataTable
-        :items="paperFolderDtos"
-        :columns="columns"
+        :items="combinedData"
+        :columns="tableColumns"
         hoverable
-        clickable
         selectable
+        clickable
         select-mode="multiple"
+        :disable-client-side-sorting="false"
+        @row:contextmenu="contextmenu($event)"
         @row:dblclick="handleFolderDoubleClick($event)"
+        @selectionChange="onSelectedItemsChange($event.currentSelectedItems)"
       >
         <template #cell(name)="{ rowData }">
           <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-            <div>
+            <div v-if="rowData.type === 'folder'">
               <VaIcon class="mr-2" name="folder" size="large" />
+              <span>{{ rowData.name }}</span>
+            </div>
+            <div v-else>
               <span>{{ rowData.name }}</span>
             </div>
           </div>
         </template>
-
-        <template #cell(createdBy)="{ rowData }">
-          <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-            {{ rowData.creatorName }}
+        <template #cell(status)="{ rowData }">
+          <div v-if="rowData.type === 'paper'" class="flex items-center gap-2 ellipsis max-w-[230px]">
+            {{ rowData.status }}
           </div>
         </template>
         <template #cell(createdOn)="{ rowData }">
@@ -207,8 +428,21 @@ const columns = defineVaDataTableColumns([
             <div>{{ rowData.lastModifiedOn?.split('T')[1].split('.')[0] }}</div>
           </div>
         </template>
+
+        <template #cell(path)="{ rowData }">
+          <div v-if="rowData.paths" class="flex items-center gap-2 ellipsis max-w-[230px]">
+            <VaBreadcrumbs separator="/">
+              <VaBreadcrumbsItem v-for="(segment, index) in rowData.paths" :key="index">
+                <a href="#" @click.prevent="navigateToPath(segment.id)">
+                  {{ segment.name }}
+                </a>
+              </VaBreadcrumbsItem>
+            </VaBreadcrumbs>
+          </div>
+        </template>
+
         <template #cell(actions)="{ rowData }">
-          <div class="flex gap-2 justify-end">
+          <div v-if="rowData.type === 'folder'" class="flex gap-2 justify-end">
             <VaButton
               preset="primary"
               size="small"

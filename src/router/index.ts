@@ -132,6 +132,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'reset-password',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/ResetPassword.vue'),
       },

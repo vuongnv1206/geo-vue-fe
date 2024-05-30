@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import authService from '@services/auth.service'
 import jwtService from '@services/jwt.service'
-import { Register } from '@/pages/auth/types'
+import { Register, ResetPassword } from '@/pages/auth/types'
 
 export type User = {
   id: string
@@ -116,6 +116,39 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         return await Promise.reject(error)
       }
+    },
+    async resetPassword(data: ResetPassword): Promise<any> {
+      try {
+        const response = await authService.resetPassword(data)
+        return await Promise.resolve(response)
+      } catch (error) {
+        return await Promise.reject(error)
+      }
+    },
+    async refreshToken(): Promise<any> {
+      return authService
+        .refreshToken()
+        .then((response) => {
+          this.isAuthenticated = true
+          const userParse = jwtService.parseToken(response.data.token)
+          this.user = {
+            id: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
+            fullName: userParse.fullName,
+            emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+            phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
+            roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+            tenant: userParse.tenant,
+            permission: userParse.permission,
+          }
+          return response.data.token
+        })
+        .catch(() => {
+          this.isAuthenticated = false
+          this.user = null
+          jwtService.destroyToken()
+          jwtService.destroyUser()
+          return ''
+        })
     },
     logout() {
       this.isAuthenticated = false

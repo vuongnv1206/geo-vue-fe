@@ -60,5 +60,15 @@ export const usePaperFolderStore = defineStore('paperFolder', {
         throw error
       }
     },
+    async getListParents(id: string): Promise<PaperFolderDto[]> {
+      try {
+        const response = await PaperFoldersService.papers_GetParents(id)
+        this.paperFolders = response
+        return response
+      } catch (error) {
+        this.error = error as string
+        throw error
+      }
+    },
   },
 })
