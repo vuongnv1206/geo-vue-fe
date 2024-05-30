@@ -3,6 +3,8 @@ import apiService from '@services/api.service'
 
 export interface IPapersService {
   papers_SearchPaper(request: SearchPaperRequest): Promise<PaperInListDto[]>
+
+  papers_Delete(id: string): Promise<string>
 }
 
 export class PapersService implements IPapersService {
@@ -11,6 +13,16 @@ export class PapersService implements IPapersService {
 
     return apiService
       .post(url, request)
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+  }
+  async papers_Delete(id: string): Promise<string> {
+    return apiService
+      .delete(`/v1/papers/${id}`)
       .catch((error: any) => {
         return Promise.reject(error)
       })
