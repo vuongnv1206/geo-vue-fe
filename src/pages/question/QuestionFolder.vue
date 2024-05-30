@@ -19,6 +19,17 @@ const groupTeacherStore = useGroupTeacherStore()
 const questionTreeMain = ref<QuestionTree>()
 const questionTrees = ref<QuestionTree[]>([])
 
+const props = defineProps({
+  showTitle: {
+    type: Boolean,
+    default: true,
+  },
+  mode: {
+    type: String,
+    default: 'full',
+  },
+})
+
 const getCurrentShowFolder = (questionTree: QuestionTree) => {
   if (questionTree.currentShow) {
     questionTrees.value = questionTree.children
@@ -413,7 +424,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1 class="page-title font-bold">Question Folder</h1>
+  <h1 v-if="props.showTitle" class="page-title font-bold">Question Folder</h1>
   <VaCard>
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
@@ -431,20 +442,21 @@ onMounted(() => {
         </div>
         <div class="flex flex-col md:flex-row gap-2 justify-end">
           <VaButton
-            v-if="selectedItemsEmitted.length != 0"
+            v-if="selectedItemsEmitted.length != 0 && props.mode == 'full'"
             icon="delete"
             color="danger"
             @click="deleteSelectedFolder()"
           >
             Delete</VaButton
           >
-          <VaButton icon="add" @click="createNewQuestionFolder()">Question Folder</VaButton>
+          <VaButton v-if="props.mode == 'full'" icon="add" @click="createNewQuestionFolder()">Question Folder</VaButton>
         </div>
       </div>
       <QuestionFolder
         v-model:selectedItemsEmitted="selectedItemsEmitted"
         :question-trees="questionTrees"
         :loading="loading"
+        :mode="props.mode"
         @edit="editQuestionTree"
         @delete="deleteQuestionTree"
         @selectedFolder="selectedFolder"
