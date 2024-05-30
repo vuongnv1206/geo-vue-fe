@@ -19,5 +19,14 @@ export const usePaperStore = defineStore('paper', {
         throw error
       }
     },
+    async deletePaper(id: string): Promise<string> {
+      try {
+        const response = await papersService.papers_Delete(id)
+        return response
+      } catch (error) {
+        this.error = error as string
+        throw error
+      }
+    },
   },
 })
