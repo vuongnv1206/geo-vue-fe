@@ -12,13 +12,10 @@ const props = defineProps<{
   index: number | null
 }>()
 
-const editQuestion = (question: Question) => {
-  console.log('Edit question', question)
-}
-
-const deleteQuestion = (question: Question) => {
-  console.log('Delete question', question)
-}
+const emit = defineEmits<{
+  (event: 'edit', question: Question): void
+  (event: 'delete', question: Question): void
+}>()
 </script>
 
 <template>
@@ -27,43 +24,43 @@ const deleteQuestion = (question: Question) => {
       v-if="props.question?.questionType === QuestionType.SingleChoice"
       :question="props.question"
       :index="null"
-      @edit="editQuestion"
-      @delete="deleteQuestion"
+      @edit="emit('edit', props.question as Question)"
+      @delete="emit('delete', props.question as Question)"
     />
     <QuestionMultipleChoice
       v-if="props.question?.questionType === QuestionType.MultipleChoice"
       :question="props.question"
       :index="null"
-      @edit="editQuestion"
-      @delete="deleteQuestion"
+      @edit="emit('edit', props.question as Question)"
+      @delete="emit('delete', props.question as Question)"
     />
     <QuestionFillBlankView
       v-if="props.question?.questionType === QuestionType.FillBlank"
       :question="props.question"
       :index="null"
-      @edit="editQuestion"
-      @delete="deleteQuestion"
+      @edit="emit('edit', props.question as Question)"
+      @delete="emit('delete', props.question as Question)"
     />
     <QuestionMatchingView
       v-if="props.question?.questionType === QuestionType.Matching"
       :question="props.question"
       :index="null"
-      @edit="editQuestion"
-      @delete="deleteQuestion"
+      @edit="emit('edit', props.question as Question)"
+      @delete="emit('delete', props.question as Question)"
     />
     <QuestionReadingView
       v-if="props.question?.questionType === QuestionType.Reading"
       :question="props.question"
       :index="null"
-      @edit="editQuestion"
-      @delete="deleteQuestion"
+      @edit="emit('edit', props.question as Question)"
+      @delete="emit('delete', props.question as Question)"
     />
     <QuestionWritingView
       v-if="props.question?.questionType === QuestionType.Writing"
       :question="props.question"
       :index="null"
-      @edit="editQuestion"
-      @delete="deleteQuestion"
+      @edit="emit('edit', props.question as Question)"
+      @delete="emit('delete', props.question as Question)"
     />
   </VaCard>
 </template>

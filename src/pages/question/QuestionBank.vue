@@ -112,6 +112,14 @@ const handleExpanded = (expanded: string[]) => {
   }
 }
 
+const editQuestion = (question: Question) => {
+  console.log('Edit question', question)
+}
+
+const deleteQuestion = (question: Question) => {
+  console.log('Delete question', question)
+}
+
 onMounted(() => {
   loading.value = true
   stores
@@ -194,7 +202,7 @@ onMounted(() => {
           </VaCard>
           <VaScrollContainer v-else class="max-h-[800px]" vertical>
             <div v-for="testQuestion in testQuestions" :key="testQuestion.id">
-              <QuestionView :question="testQuestion" :index="null" />
+              <QuestionView :question="testQuestion" :index="null" @edit="editQuestion" @delete="deleteQuestion" />
             </div>
             <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
               <div class="flex flex-col gap-4 w-full">
