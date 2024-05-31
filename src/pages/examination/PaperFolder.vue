@@ -14,6 +14,7 @@ import {
 import { useMenu, useModal, useToast } from 'vuestic-ui/web-components'
 import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const paperFolderStore = usePaperFolderStore()
 const paperStore = usePaperStore()
@@ -211,8 +212,11 @@ const handleFolderDoubleClick = async (event: any) => {
     showPaperDetail(item)
   }
 }
+
+const router = useRouter()
 const showPaperDetail = (paper: PaperInListDto) => {
   console.log('Show paper detail:', paper)
+  router.push({ name: 'admin-exam-detail', params: { id: paper.id } })
   // For example, you could navigate to a detail page
 }
 const navigateToBreadcrumb = (index: number) => {
@@ -407,6 +411,7 @@ const combinedData = computed(() => {
               <span>{{ rowData.name }}</span>
             </div>
             <div v-else>
+              <VaIcon class="mr-2" name="description" size="large" />
               <span>{{ rowData.name }}</span>
             </div>
           </div>
