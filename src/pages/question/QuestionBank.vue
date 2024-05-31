@@ -1,20 +1,43 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Question, QuestionTree } from './types'
+import { Question, QuestionTree, SearchQuestion } from './types'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
+import { useQuestionStore } from '@/stores/modules/question.module'
 import QuestionView from './widgets/QuestionView.vue'
 
 const nodes = ref<QuestionTree[]>([])
 const stores = useQuestionFolderStore()
+const storesQuestion = useQuestionStore()
 
 const loading = ref(false)
 const loadingNode = ref(false)
 
 const currentSelectedFolder = ref<QuestionTree | null>(null)
 
+const searchValue = ref<SearchQuestion>({
+  pageNumber: 1,
+  pageSize: 30,
+})
+
+const testQuestions = ref<Question[]>([])
+
+const searchQuestion = (search: SearchQuestion) => {
+  console.log(search)
+  storesQuestion
+    .SearchQuestion(search)
+    .then((res) => {
+      testQuestions.value = res.data
+      console.log(testQuestions.value)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
+
 const handleSelectFolder = (node: QuestionTree) => {
   currentSelectedFolder.value = node
-  console.log(node)
+  searchValue.value.folderId = node.id
+  searchQuestion(searchValue.value)
 }
 
 const findNode = (nodes: QuestionTree[], nodeId: string): QuestionTree | null => {
@@ -89,300 +112,6 @@ const handleExpanded = (expanded: string[]) => {
   }
 }
 
-const testQuestions = ref<Question[]>([
-  {
-    content: 'Test add',
-    image: '/disk/test.png',
-    audio: '',
-    questionFolder: {
-      name: 'Ngành IA',
-      parentId: '',
-    },
-    questionType: 1,
-    questionLable: null,
-    questionPassages: [],
-    answers: [
-      {
-        id: '0f9c1eb0-57e8-4262-aa78-6f0d22fdbd7a',
-        content: 'answer 1',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: true,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-    ],
-    createdBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    createdOn: '2024-05-30T04:43:02.217887+07:00',
-    lastModifiedBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    lastModifiedOn: '2024-05-30T04:43:02.217887+07:00',
-    deletedOn: '',
-    deletedBy: '',
-    id: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-  },
-  {
-    content: 'Test add',
-    image: '/disk/test.png',
-    audio: '',
-    questionFolder: {
-      name: 'Ngành IA',
-      parentId: '',
-    },
-    questionType: 1,
-    questionLable: null,
-    questionPassages: [],
-    answers: [
-      {
-        id: '0f9c1eb0-57e8-4262-aa78-6f0d22fdbd7a',
-        content: 'answer 1',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: true,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-    ],
-    createdBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    createdOn: '2024-05-30T04:43:02.217887+07:00',
-    lastModifiedBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    lastModifiedOn: '2024-05-30T04:43:02.217887+07:00',
-    deletedOn: '',
-    deletedBy: '',
-    id: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-  },
-  {
-    content: 'Test add',
-    image: '/disk/test.png',
-    audio: '',
-    questionFolder: {
-      name: 'Ngành IA',
-      parentId: '',
-    },
-    questionType: 1,
-    questionLable: null,
-    questionPassages: [],
-    answers: [
-      {
-        id: '0f9c1eb0-57e8-4262-aa78-6f0d22fdbd7a',
-        content: 'answer 1',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: true,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-    ],
-    createdBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    createdOn: '2024-05-30T04:43:02.217887+07:00',
-    lastModifiedBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    lastModifiedOn: '2024-05-30T04:43:02.217887+07:00',
-    deletedOn: '',
-    deletedBy: '',
-    id: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-  },
-  {
-    content: 'Test add',
-    image: '/disk/test.png',
-    audio: '',
-    questionFolder: {
-      name: 'Ngành IA',
-      parentId: '',
-    },
-    questionType: 1,
-    questionLable: null,
-    questionPassages: [],
-    answers: [
-      {
-        id: '0f9c1eb0-57e8-4262-aa78-6f0d22fdbd7a',
-        content: 'answer 1',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: true,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-    ],
-    createdBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    createdOn: '2024-05-30T04:43:02.217887+07:00',
-    lastModifiedBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    lastModifiedOn: '2024-05-30T04:43:02.217887+07:00',
-    deletedOn: '',
-    deletedBy: '',
-    id: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-  },
-  {
-    content: 'Test add',
-    image: '/disk/test.png',
-    audio: '',
-    questionFolder: {
-      name: 'Ngành IA',
-      parentId: '',
-    },
-    questionType: 1,
-    questionLable: null,
-    questionPassages: [],
-    answers: [
-      {
-        id: '0f9c1eb0-57e8-4262-aa78-6f0d22fdbd7a',
-        content: 'answer 1',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: true,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-      {
-        id: 'fd1710ff-ea22-4b4f-aedd-462022841014',
-        content: 'answer 2',
-        questionId: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-        isCorrect: false,
-      },
-    ],
-    createdBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    createdOn: '2024-05-30T04:43:02.217887+07:00',
-    lastModifiedBy: '17d8b48f-679d-4eea-b7a4-af8a6dabcb25',
-    lastModifiedOn: '2024-05-30T04:43:02.217887+07:00',
-    deletedOn: '',
-    deletedBy: '',
-    id: '789b8469-74ff-423c-bf96-9e025a63e1aa',
-  },
-  {
-    content:
-      "The $_fillblank[1] Ocean is the largest ocean on Earth, covering about $_fillblank[2] of the Earth's surface.",
-    image: '',
-    audio: '',
-    questionFolder: {
-      name: 'Geography',
-      parentId: null,
-    },
-    questionType: 4,
-    questionLable: {
-      name: 'Geography Facts',
-    },
-    questionPassages: [],
-    answers: [
-      {
-        id: '0d17e87e-e05c-4929-9625-f3cc9d472db6',
-        content: '$_[1]Pacific',
-        questionId: '748b715a-af78-474e-aee5-85946c979940',
-        isCorrect: true,
-      },
-      {
-        id: '32971f92-2ff9-4a9a-a99b-153e2cf30e55',
-        content: '$_[2]30%',
-        questionId: '748b715a-af78-474e-aee5-85946c979940',
-        isCorrect: true,
-      },
-    ],
-    createdBy: '00000000-0000-0000-0000-000000000000',
-    createdOn: '2024-05-30T04:41:28.764029+07:00',
-    lastModifiedBy: '00000000-0000-0000-0000-000000000000',
-    lastModifiedOn: '2024-05-30T04:41:28.764029+07:00',
-    deletedOn: null,
-    deletedBy: null,
-    id: '748b715a-af78-474e-aee5-85946c979940',
-  },
-])
-
 onMounted(() => {
   loading.value = true
   stores
@@ -403,7 +132,7 @@ onMounted(() => {
   <h1 class="h1">Question Bank</h1>
   <section class="flex flex-col gap-4">
     <div class="flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-[20%]">
+      <div class="w-full sm:w-[25%]">
         <VaInnerLoading :loading="loading" :size="60">
           <VaCard class="flex flex-col">
             <VaCardTitle class="flex items-start justify-between">
@@ -447,7 +176,7 @@ onMounted(() => {
           </VaCard>
         </VaInnerLoading>
       </div>
-      <div class="flex flex-col gap-4 w-full sm:w-[80%]">
+      <div class="flex flex-col gap-4 w-full sm:w-[75%]">
         <VaCard class="flex flex-col min-h-[800px]">
           <VaCardTitle class="flex items-start justify-between">
             <h1 class="card-title text-secondary font-bold uppercase">
@@ -467,6 +196,14 @@ onMounted(() => {
             <div v-for="testQuestion in testQuestions" :key="testQuestion.id">
               <QuestionView :question="testQuestion" :index="null" />
             </div>
+            <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
+              <div class="flex flex-col gap-4 w-full">
+                <VaCardContent class="flex flex-col items-center justify-center">
+                  <h2 class="va-h5">No question in this folder</h2>
+                  <p class="text-base leading-5">Please select another folder</p>
+                </VaCardContent>
+              </div>
+            </VaCard>
           </VaScrollContainer>
         </VaCard>
       </div>

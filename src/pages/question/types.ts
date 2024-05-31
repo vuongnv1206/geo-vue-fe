@@ -88,8 +88,8 @@ export type Question = {
   audio: string | null
   questionFolder: QuestionFolder | null
   questionType: QuestionType
-  questionLable: any
-  questionPassages: Question[]
+  questionLable: QuestionLable | null
+  questionPassages: QuestionPassage[]
   answers: Answer[]
   createdBy: string
   createdOn: string
@@ -98,6 +98,18 @@ export type Question = {
   deletedOn: string | null
   deletedBy: string | null
   id: string
+}
+
+export type QuestionLable = {
+  id: string | null
+  name: string
+  color: string | undefined
+}
+
+export type QuestionPassage = {
+  id: string
+  content: string
+  answers: Answer[]
 }
 
 export type Answer = {
@@ -113,14 +125,14 @@ export type QuestionFolder = {
 }
 
 export type SearchQuestion = {
-  pageNumber: number
-  pageSize: number
-  sortBy: string
-  sortingOrder: 'asc' | 'desc' | null
-  folderId: string
-  content: string
-  questionType: number
-  questionLableId: string
+  pageNumber?: number | null | undefined
+  pageSize?: number | null | undefined
+  sortBy?: string | null | undefined
+  sortingOrder?: 'asc' | 'desc' | null | undefined
+  folderId?: string | null | undefined
+  content?: string | null | undefined
+  questionType?: number | null | undefined
+  questionLableId?: string | null | undefined
 }
 
 export type Pagination = {

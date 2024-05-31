@@ -9,6 +9,7 @@ import { useModal, useToast } from 'vuestic-ui'
 import { getErrorMessage } from '@/services/utils'
 import { GroupTeacher, TeacherTeam, TeacherTeamTeacherGroupCombine } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
+import { avatarColor } from '@/services/utils'
 
 const loading = ref(true)
 const currentShowFolderId = ref<string>('')
@@ -519,7 +520,10 @@ onMounted(() => {
       <template #option="{ option }">
         <div class="flex justify-between items-center p-2">
           <div class="flex items-center gap-2">
-            <VaAvatar v-if="getOptionName(option as TeacherTeamTeacherGroupCombine).isUser" :size="48" color="info"
+            <VaAvatar
+              v-if="getOptionName(option as TeacherTeamTeacherGroupCombine).isUser"
+              :size="48"
+              :color="avatarColor(getOptionName(option as TeacherTeamTeacherGroupCombine).data)"
               >{{
                 getOptionName(option as TeacherTeamTeacherGroupCombine)
                   .data?.charAt(0)
@@ -572,7 +576,11 @@ onMounted(() => {
             class="list__item ml-5"
           >
             <VaListItemSection avatar>
-              <VaAvatar v-if="permission.user ? true : false" :size="42" color="info">
+              <VaAvatar
+                v-if="permission.user ? true : false"
+                :size="42"
+                :color="avatarColor(getNameUserGroup(permission))"
+              >
                 {{ getNameUserGroup(permission)?.charAt(0) }}
               </VaAvatar>
               <VaAvatar v-else :size="42" color="warning" icon="group"> </VaAvatar>
@@ -633,7 +641,9 @@ onMounted(() => {
       <div class="gap-4 ml-10 mt-10">
         <VaListItem>
           <VaListItemSection avatar>
-            <VaAvatar :size="48" color="info">{{ getNameUserGroup(editPermissionValue)?.charAt(0) }}</VaAvatar>
+            <VaAvatar :size="48" :color="avatarColor(getNameUserGroup(editPermissionValue))">{{
+              getNameUserGroup(editPermissionValue)?.charAt(0)
+            }}</VaAvatar>
           </VaListItemSection>
           <VaListItemSection>
             <VaListItemLabel>
@@ -688,7 +698,9 @@ onMounted(() => {
       <div class="gap-4 ml-10 mt-10">
         <VaListItem>
           <VaListItemSection avatar>
-            <VaAvatar :size="48" color="info">{{ getNameUserGroup(editPermissionValue)?.charAt(0) }}</VaAvatar>
+            <VaAvatar :size="48" :color="avatarColor(getNameUserGroup(editPermissionValue))">{{
+              getNameUserGroup(editPermissionValue)?.charAt(0)
+            }}</VaAvatar>
           </VaListItemSection>
           <VaListItemSection>
             <VaListItemLabel>
