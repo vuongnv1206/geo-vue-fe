@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import QuestionInPaperCard from './widgets/QuestionInPaperCard.vue'
+import AssignPaperModal from './widgets/AssignPaperModal.vue'
 
 const showSidebar = ref(false)
 const valueCollapses = ref([])
@@ -10,6 +12,9 @@ const collapses = ref([
 ])
 
 const valueTap = ref(0)
+
+const showModalDetail = ref(false)
+const showAssignPaperModal = ref(false)
 
 const Clicked = () => {
   alert('ookokoko')
@@ -71,12 +76,15 @@ const Clicked = () => {
             <VaCardTitle class="flex justify-between">
               <span> Assigned to</span>
               <div>
-                <VaButton preset="secondary" size="small">
+                <VaButton preset="secondary" size="small" @click="showAssignPaperModal = !showAssignPaperModal">
                   <VaIcon name="edit_square" size="small" class="material-symbols-outlined" />
                   edit
                 </VaButton>
               </div>
             </VaCardTitle>
+            <VaModal v-model="showAssignPaperModal">
+              <AssignPaperModal />
+            </VaModal>
             <VaCardContent class="p-0">
               <!-- <VaButton preset="secondary" border-color="none" size="small" text-color="secondary" class="w-full">
                 Everyone
@@ -144,7 +152,26 @@ const Clicked = () => {
               </div>
             </VaCardTitle>
             <VaCardContent>
-              <VaButton preset="secondary" size="small" text-color="secondary" class="w-full"> See detail </VaButton>
+              <VaButton
+                preset="secondary"
+                size="small"
+                text-color="secondary"
+                class="w-full"
+                @click="showModalDetail = true"
+              >
+                See detail
+              </VaButton>
+              <VaModal v-model="showModalDetail" close-button hide-default-actions max-height="80vh">
+                <VaCard class="p-0">
+                  <p>Name paper</p>
+                  <VaDivider />
+                  <VaCardContent class="p-0">
+                    <QuestionInPaperCard />
+                    <QuestionInPaperCard />
+                    <QuestionInPaperCard />
+                  </VaCardContent>
+                </VaCard>
+              </VaModal>
             </VaCardContent>
           </VaCard>
         </VaCardContent>
@@ -184,9 +211,5 @@ const Clicked = () => {
 
 .class-button {
   --va-button-sm-font-size: 0.6rem;
-}
-
-.va-collapse__body-wrapper--bordered {
-  border-bottom: none !important;
 }
 </style>
