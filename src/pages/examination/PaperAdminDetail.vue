@@ -81,6 +81,10 @@ const deletePaper = async () => {
   }
 }
 
+const paperConfigAction = () => {
+  router.push({ name: 'paper-config', params: { id: route.params.id } })
+}
+
 const handleSaveAssigned = (selectedOption: string) => {
   console.log(selectedOption)
   assignedOptionValue.value = selectedOption
@@ -131,7 +135,9 @@ onMounted(() => {
             <VaCardTitle>Menu</VaCardTitle>
             <VaCardContent>
               <VaMenuList class="w-full">
-                <VaMenuItem> <VaIcon name="settings" class="material-symbols-outlined" /> Setting </VaMenuItem>
+                <VaMenuItem @click="paperConfigAction">
+                  <VaIcon name="settings" class="material-symbols-outlined" /> Setting
+                </VaMenuItem>
                 <VaMenuItem><VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem>
                 <VaMenuItem>
                   <VaIcon name="settings" class="material-symbols-outlined" /> Advanced monitoring
@@ -272,7 +278,7 @@ onMounted(() => {
     <template #content>
       <VaCardTitle>Student submit (0/0)</VaCardTitle>
       <VaCard class="mt-2 ml-2" style="height: 60vh">
-        <VaCardContent class="p-0">
+        <VaCardContent v-if="assignedOptionValue === 'By Class'" class="p-0">
           <VaCardTitle>
             <VaButton size="small">Select class group: Khoi 12 (2) </VaButton>
           </VaCardTitle>
@@ -289,6 +295,48 @@ onMounted(() => {
               </VaCardContent>
             </VaCard>
           </VaTabs>
+        </VaCardContent>
+        <VaCardContent v-if="assignedOptionValue === 'Everyone'" class="p-2 grid md:grid-cols-6 xs:grid-cols-2">
+          <VaCard outlined class="mr-2" href="./text-review">
+            <div class="p-2 flex">
+              <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
+              <div>
+                <p><b>Duc nguyen</b></p>
+                <span style="font-weight: none">Point: 0</span>
+              </div>
+            </div>
+            <VaDivider class="m-0" />
+            <VaCardContent class="p-2">
+              <div class="flex justify-between">
+                <p class="va-text-secondary text-xs">Duration:</p>
+                <p class="va-text-secondary text-xs">9 second(s)</p>
+              </div>
+              <div class="flex justify-between">
+                <p class="va-text-secondary text-xs">Due Date:</p>
+                <p class="va-text-secondary text-xs">29 minute(s) ago</p>
+              </div>
+            </VaCardContent>
+          </VaCard>
+          <VaCard outlined class="mr-2" href="./text-review">
+            <div class="p-2 flex">
+              <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
+              <div>
+                <p><b>Duc nguyen</b></p>
+                <span style="font-weight: none">Point: 0</span>
+              </div>
+            </div>
+            <VaDivider class="m-0" />
+            <VaCardContent class="p-2">
+              <div class="flex justify-between">
+                <p class="va-text-secondary text-xs">Duration:</p>
+                <p class="va-text-secondary text-xs">9 second(s)</p>
+              </div>
+              <div class="flex justify-between">
+                <p class="va-text-secondary text-xs">Due Date:</p>
+                <p class="va-text-secondary text-xs">29 minute(s) ago</p>
+              </div>
+            </VaCardContent>
+          </VaCard>
         </VaCardContent>
       </VaCard>
     </template>
