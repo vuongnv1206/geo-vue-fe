@@ -14,7 +14,9 @@ import {
 import { useMenu, useModal, useToast } from 'vuestic-ui/web-components'
 import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const paperFolderStore = usePaperFolderStore()
 const paperStore = usePaperStore()
 const loading = ref(true)
@@ -273,6 +275,11 @@ const showEditPaperFolderModal = (folder: PaperFolderDto) => {
   doShowEditFolderModal.value = true
 }
 
+const showCreatePaper = () => {
+  console.log(currentFolderId.value)
+  router.push({ name: 'create-paper', params: { folderId: currentFolderId.value } })
+}
+
 const beforeEditFormModalClose = async (hide: () => unknown) => {
   if (editFormRef.value.isFormHasUnsavedChanges) {
     const agreed = await confirm({
@@ -383,6 +390,7 @@ const combinedData = computed(() => {
           <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
             Delete
           </VaButton>
+          <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
 
           <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
         </div>
