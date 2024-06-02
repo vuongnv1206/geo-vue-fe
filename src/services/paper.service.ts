@@ -1,10 +1,12 @@
-import { PaperInListDto, SearchPaperRequest } from '@/pages/examination/types'
+import { PaperDto, PaperInListDto, SearchPaperRequest } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
 export interface IPapersService {
   papers_SearchPaper(request: SearchPaperRequest): Promise<PaperInListDto[]>
 
   papers_Delete(id: string): Promise<string>
+
+  paperDetail(id: string): Promise<PaperDto>
 }
 
 export class PapersService implements IPapersService {
@@ -28,6 +30,16 @@ export class PapersService implements IPapersService {
       })
       .then((response) => {
         return Promise.resolve(response.data)
+      })
+  }
+  async paperDetail(id: string): Promise<PaperDto> {
+    return apiService
+      .get(`/v1/papers/${id}`)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
       })
   }
 }

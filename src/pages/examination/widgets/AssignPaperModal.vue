@@ -1,13 +1,36 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
-const valueOption = ref('Everyone')
+import { ref, PropType, watch } from 'vue'
+
+const props = defineProps({
+  currentAssigned: {
+    type: Object as PropType<string>,
+    default: null,
+  },
+})
+
+const valueOption = ref('')
+const emit = defineEmits(['close', 'save'])
+
+watch(
+  () => props.currentAssigned,
+  () => {
+    if (props.currentAssigned) {
+      valueOption.value = props.currentAssigned
+    }
+  },
+  { immediate: true },
+)
+
+const onSave = () => {
+  emit('save', valueOption.value)
+}
 </script>
 
 <template>
   <VaCard class="p-0">
     <b class="pr-3 text-xs"> Who is allowed to take the exam </b>
     <VaRadio v-model="valueOption" :options="['Everyone', 'By Class', 'By Student']" class="assign-radio mb-2" />
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 items-start">
+    <div v-if="valueOption == 'By Class'" class="grid grid-cols-1 md:grid-cols-3 gap-2 items-start">
       <VaCard outlined class="border-style col-span-1">
         <div class="p-2">
           <VaInput placeholder="Search" />
@@ -28,6 +51,10 @@ const valueOption = ref('Everyone')
         <VaDivider class="m-0" />
         <VaCardContent> </VaCardContent>
       </VaCard>
+    </div>
+    <div class="d-flex">
+      <VaButton preset="primary" size="small" class="m-1 mt-2">Cancel</VaButton>
+      <VaButton size="small" class="m-1 mt-2" @click="onSave">Save</VaButton>
     </div>
   </VaCard>
 </template>
