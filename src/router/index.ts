@@ -1,4 +1,3 @@
-// eslint-disable-next-line prettier/prettier
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import AuthLayout from '../layouts/AuthLayout.vue'
@@ -75,6 +74,11 @@ const routes: Array<RouteRecordRaw> = [
             name: 'group-class',
             path: 'group-class',
             component: () => import('../pages/classrooms/GroupClassPage.vue'),
+          },
+          {
+            name: 'class',
+            path: 'class',
+            component: () => import('../pages/classrooms/Class.vue'),
           },
         ],
       },
