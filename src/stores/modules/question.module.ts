@@ -15,5 +15,15 @@ export const useQuestionStore = defineStore('question', {
           return Promise.reject(error)
         })
     },
+    async DeleteQuestion(id: string): Promise<void> {
+      return questionService
+        .deleteQuestion(id)
+        .then(() => {
+          return Promise.resolve()
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })

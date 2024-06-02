@@ -5,6 +5,7 @@ import QuestionFolder from './widgets/QuestionFolder.vue'
 import EditQuestionTreeForm from './widgets/EditQuestionTreeForm.vue'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
+import { useAuthStore } from '@/stores/modules/auth.module'
 import { useModal, useToast } from 'vuestic-ui'
 import { getErrorMessage } from '@/services/utils'
 import { GroupTeacher, TeacherTeam, TeacherTeamTeacherGroupCombine } from '../teacher-group/types'
@@ -16,6 +17,7 @@ const currentShowFolderId = ref<string>('')
 
 const stores = useQuestionFolderStore()
 const groupTeacherStore = useGroupTeacherStore()
+const authStore = useAuthStore()
 
 const questionTreeMain = ref<QuestionTree>()
 const questionTrees = ref<QuestionTree[]>([])
@@ -104,6 +106,7 @@ const permissionEdit = ref({
   canAdd: false,
   canUpdate: false,
   canDelete: false,
+  canShare: false,
 })
 
 const editPermission = (permission: QuestionFolderPermission) => {
@@ -114,6 +117,7 @@ const editPermission = (permission: QuestionFolderPermission) => {
     canAdd: permission.canAdd,
     canUpdate: permission.canUpdate,
     canDelete: permission.canDelete,
+    canShare: permission.canShare,
   }
 }
 
@@ -145,6 +149,7 @@ const AddPermission = (option: TeacherTeamTeacherGroupCombine) => {
     canAdd: false,
     canUpdate: false,
     canDelete: false,
+    canShare: false,
     createdBy: '',
     createdOn: '',
     lastModifiedBy: '',
@@ -158,6 +163,7 @@ const AddPermission = (option: TeacherTeamTeacherGroupCombine) => {
     canAdd: false,
     canUpdate: false,
     canDelete: false,
+    canShare: false,
   }
   doShowQuestionTreePermisionFormAddModal.value = true
 }
@@ -193,6 +199,27 @@ const getTeacherGroups = () => {
 }
 
 const shareQuestionTree = (questionTree: QuestionTree) => {
+  const currentUserId = authStore.user?.id
+  console.log(currentUserId)
+  // loop through permission to check if current user has permission
+  let hasPermission = false
+  questionTree.permission.forEach((permission) => {
+    console.log(permission)
+    if (permission.user?.id == currentUserId) {
+      if (permission.canShare) {
+        hasPermission = true
+      }
+    }
+  })
+
+  if (!hasPermission) {
+    notify({
+      message: 'You do not have permission to share this folder',
+      color: 'danger',
+    })
+    return
+  }
+
   QuestionTreeToEdit.value = questionTree
   // sortPermission for owner first
   QuestionTreeToEdit.value.permission.sort((a) => {
@@ -370,6 +397,7 @@ const onShareQuestionFolderPermission = () => {
     canAdd: permissionEdit.value.canAdd,
     canUpdate: permissionEdit.value.canUpdate,
     canDelete: permissionEdit.value.canDelete,
+    canShare: permissionEdit.value.canShare,
     emails: [],
     folderId: editPermissionValue.value?.questionFolderId || '',
     phones: [],
@@ -677,6 +705,7 @@ onMounted(() => {
         <VaCheckbox v-model="permissionEdit.canAdd" label="Create" />
         <VaCheckbox v-model="permissionEdit.canUpdate" label="Update" />
         <VaCheckbox v-model="permissionEdit.canDelete" label="Delete" />
+        <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
       </div>
     </VaForm>
   </VaModal>

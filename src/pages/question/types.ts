@@ -37,6 +37,7 @@ export type QuestionFolderPermission = {
   canAdd: boolean
   canUpdate: boolean
   canDelete: boolean
+  canShare: boolean
   createdBy: string
   createdOn: string
   lastModifiedBy: string
@@ -70,6 +71,7 @@ export type SharePermission = {
   canAdd: boolean
   canUpdate: boolean
   canDelete: boolean
+  canShare: boolean
 }
 
 export type QuestionSearchRes = {

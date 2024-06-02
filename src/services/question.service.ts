@@ -12,6 +12,16 @@ class QuestionService {
         return Promise.reject(error)
       })
   }
+  async deleteQuestion(id: string): Promise<void> {
+    return apiService
+      .delete(`/v1/question/${id}`)
+      .then(() => {
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new QuestionService()
