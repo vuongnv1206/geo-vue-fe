@@ -16,6 +16,7 @@ import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const paperFolderStore = usePaperFolderStore()
 const paperStore = usePaperStore()
 const loading = ref(true)
@@ -213,7 +214,6 @@ const handleFolderDoubleClick = async (event: any) => {
   }
 }
 
-const router = useRouter()
 const showPaperDetail = (paper: PaperInListDto) => {
   console.log('Show paper detail:', paper)
   router.push({ name: 'admin-exam-detail', params: { id: paper.id } })
@@ -275,6 +275,11 @@ const showAddPaperFolderModal = () => {
 const showEditPaperFolderModal = (folder: PaperFolderDto) => {
   folderToEdit.value = folder
   doShowEditFolderModal.value = true
+}
+
+const showCreatePaper = () => {
+  console.log(currentFolderId.value)
+  router.push({ name: 'create-paper', params: { folderId: currentFolderId.value } })
 }
 
 const beforeEditFormModalClose = async (hide: () => unknown) => {
@@ -387,6 +392,7 @@ const combinedData = computed(() => {
           <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
             Delete
           </VaButton>
+          <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
 
           <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
         </div>
