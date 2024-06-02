@@ -1,3 +1,4 @@
+import { Question } from '../question/types'
 export interface CreatePaperFolderRequest {
   name: string
   parentId?: string | null
@@ -74,6 +75,32 @@ export interface PaperInListDto {
   paperLable?: PaperLabelDto
   paperFolder?: PaperFolderDto
   parents?: PaperFolderParentDto[]
+}
+
+export interface PaperDto {
+  id: string
+  examName: string
+  paperLabelId?: string | null
+  numberOfQuestion?: number
+  duration?: number | null
+  status?: string | null
+  showMarkResult?: boolean
+  showQuestionAnswer?: boolean
+  password?: string | null
+  type?: string
+  paperFolderId?: string | null
+  isPublish?: boolean
+  examCode?: string
+  content?: string | null
+  description?: string | null
+  createdBy: string
+  createdOn: string
+  creatorName?: string | null
+  lastModifiedBy: string | null
+  lastModifiedOn: string | null
+  paperLable?: PaperLabelDto
+  paperFolder?: PaperFolderDto
+  questions?: Question[]
 }
 
 export interface PaperLabelDto {
