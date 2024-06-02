@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { ref, PropType, watch } from 'vue'
+import { ref, PropType, watch, onMounted } from 'vue'
+import { useGroupClassStore } from '@/stores/modules/groupclass.module'
+import { GroupClass } from '@/pages/classrooms/type'
 
 const props = defineProps({
   currentAssigned: {
@@ -8,8 +10,25 @@ const props = defineProps({
   },
 })
 
+const groupClassStores = useGroupClassStore()
+
 const valueOption = ref('')
 const emit = defineEmits(['close', 'save'])
+
+const groupClasses = ref<GroupClass[] | null>(null)
+
+const getGroupClasses = async () => {
+  try {
+    const res = await groupClassStores.getGroupClass()
+    groupClasses.value = res
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const getClassByGroupClass = (groupId: string) => {
+  console.log(groupId)
+}
 
 watch(
   () => props.currentAssigned,
@@ -24,20 +43,35 @@ watch(
 const onSave = () => {
   emit('save', valueOption.value)
 }
+
+onMounted(() => {
+  getGroupClasses()
+})
 </script>
 
 <template>
   <VaCard class="p-0">
     <b class="pr-3 text-xs"> Who is allowed to take the exam </b>
     <VaRadio v-model="valueOption" :options="['Everyone', 'By Class', 'By Student']" class="assign-radio mb-2" />
-    <div v-if="valueOption == 'By Class'" class="grid grid-cols-1 md:grid-cols-3 gap-2 items-start">
+    <div
+      v-if="valueOption == 'By Class' && groupClasses !== null"
+      class="grid grid-cols-1 md:grid-cols-3 gap-2 items-start"
+    >
       <VaCard outlined class="border-style col-span-1">
         <div class="p-2">
           <VaInput placeholder="Search" />
         </div>
         <VaDivider class="m-0" />
         <VaCardContent class="p-1">
-          <VaMenuList :options="['Option 1', 'Option 2', 'Option 3']" class="w-full" />
+          <VaScrollContainer vertical class="max-h-[60vh]">
+            <VaMenuList
+              :options="groupClasses"
+              :text-by="(groupClass: GroupClass) => groupClass.name"
+              class="w-full"
+              :value-by="(groupClass: GroupClass) => groupClass.id"
+              @selected="getClassByGroupClass"
+            />
+          </VaScrollContainer>
         </VaCardContent>
       </VaCard>
 
@@ -49,7 +83,9 @@ const onSave = () => {
           </div>
         </div>
         <VaDivider class="m-0" />
-        <VaCardContent> </VaCardContent>
+        <VaCardContent>
+          <!-- <VaCheckbox class="mb-6" :label="label" /> -->
+        </VaCardContent>
       </VaCard>
     </div>
     <div class="d-flex">
