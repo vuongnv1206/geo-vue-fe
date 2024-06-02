@@ -37,6 +37,7 @@ export type QuestionFolderPermission = {
   canAdd: boolean
   canUpdate: boolean
   canDelete: boolean
+  canShare: boolean
   createdBy: string
   createdOn: string
   lastModifiedBy: string
@@ -70,4 +71,85 @@ export type SharePermission = {
   canAdd: boolean
   canUpdate: boolean
   canDelete: boolean
+  canShare: boolean
+}
+
+export type QuestionSearchRes = {
+  data: Question[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type Question = {
+  content: string
+  image: string | null
+  audio: string | null
+  questionFolder: QuestionFolder | null
+  questionType: QuestionType
+  questionLable: QuestionLable | null
+  questionPassages: QuestionPassage[]
+  answers: Answer[]
+  createdBy: string
+  createdOn: string
+  lastModifiedBy: string
+  lastModifiedOn: string
+  deletedOn: string | null
+  deletedBy: string | null
+  id: string
+}
+
+export type QuestionLable = {
+  id: string | null
+  name: string
+  color: string | undefined
+}
+
+export type QuestionPassage = {
+  id: string
+  content: string
+  answers: Answer[]
+}
+
+export type Answer = {
+  id: string
+  content: string
+  questionId: string
+  isCorrect: boolean
+}
+
+export type QuestionFolder = {
+  name: string
+  parentId: string | null
+}
+
+export type SearchQuestion = {
+  pageNumber?: number | null | undefined
+  pageSize?: number | null | undefined
+  sortBy?: string | null | undefined
+  sortingOrder?: 'asc' | 'desc' | null | undefined
+  folderId?: string | null | undefined
+  content?: string | null | undefined
+  questionType?: number | null | undefined
+  questionLableId?: string | null | undefined
+}
+
+export type Pagination = {
+  page: number
+  perPage: number
+  total: number
+}
+
+export enum QuestionType {
+  SingleChoice = 1,
+  MultipleChoice = 2,
+  FillBlank = 4,
+  Matching = 5,
+  Reading = 6,
+  ReadingQuestionPassage = 7,
+  Writing = 8,
+  Other = 100,
 }

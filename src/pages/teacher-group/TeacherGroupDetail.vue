@@ -307,8 +307,8 @@ watch(
                 highlight-matched-text
                 @update:modelValue="updateTeacherIntoGroup"
               >
-                <template #content="{ value }">
-                  <VaChip v-for="chip in value.slice(0, 3)" :key="chip" size="small" class="mr-1 my-1">
+                <template #content="{ value2 }">
+                  <VaChip v-for="chip in value2.slice(0, 3)" :key="chip" size="small" class="mr-1 my-1">
                     {{ chip.label }}
                   </VaChip>
                 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType } from 'vue'
+import { onBeforeMount, PropType } from 'vue'
 import { defineVaDataTableColumns, useMenu } from 'vuestic-ui'
 import { QuestionTree } from '../types'
 
@@ -21,6 +21,10 @@ const props = defineProps({
   },
   loading: {
     type: Boolean,
+    required: true,
+  },
+  mode: {
+    type: String,
     required: true,
   },
 })
@@ -67,6 +71,17 @@ const dblclick = (event: any) => {
 const handleSelectionChange = (selectedItems: QuestionTree[]) => {
   selectedItemsEmitted.value = selectedItems
 }
+
+const hasChildren = (node: QuestionTree) => {
+  return node.children && node.children.length > 0
+}
+
+onBeforeMount(() => {
+  // edit column if mode is lite
+  if (props.mode == 'lite') {
+    columns.splice(2, 3)
+  }
+})
 </script>
 
 <template>
@@ -87,7 +102,8 @@ const handleSelectionChange = (selectedItems: QuestionTree[]) => {
       <template #cell(name)="{ rowData }">
         <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
           <div>
-            <VaIcon class="mr-2" name="folder" size="large" />
+            <VaIcon v-if="hasChildren(rowData as QuestionTree)" class="mr-2" name="folder_copy" size="large" />
+            <VaIcon v-else class="mr-2" name="folder" size="large" />
             <span>{{ rowData.name }}</span>
           </div>
         </div>
@@ -97,24 +113,24 @@ const handleSelectionChange = (selectedItems: QuestionTree[]) => {
           <div>{{ rowData.totalQuestions }}</div>
         </div>
       </template>
-      <template #cell(createdBy)="{ rowData }">
+      <template v-if="props.mode == 'full'" #cell(createdBy)="{ rowData }">
         <div class="flex items-center gap-2 ellipsis max-w-[230px]">
           {{ rowData.owner?.firstName }} {{ rowData.owner?.lastName }}
         </div>
       </template>
-      <template #cell(createdOn)="{ rowData }">
+      <template v-if="props.mode == 'full'" #cell(createdOn)="{ rowData }">
         <div class="flex items-center gap-2 ellipsis max-w-[230px]">
           <div>{{ rowData.createdOn.split('T')[0] }}</div>
           <div>{{ rowData.createdOn.split('T')[1].split('.')[0] }}</div>
         </div>
       </template>
-      <template #cell(lastModifiedOn)="{ rowData }">
+      <template v-if="props.mode == 'full'" #cell(lastModifiedOn)="{ rowData }">
         <div class="flex items-center gap-2 ellipsis max-w-[230px]">
           <div>{{ rowData.lastModifiedOn?.split('T')[0] }}</div>
           <div>{{ rowData.lastModifiedOn?.split('T')[1].split('.')[0] }}</div>
         </div>
       </template>
-      <template #cell(actions)="{ rowData: questionTree }">
+      <template v-if="props.mode == 'full'" #cell(actions)="{ rowData: questionTree }">
         <div class="flex gap-2 justify-end">
           <VaButton
             preset="primary"

@@ -213,8 +213,10 @@ const handleFolderDoubleClick = async (event: any) => {
     showPaperDetail(item)
   }
 }
+
 const showPaperDetail = (paper: PaperInListDto) => {
   console.log('Show paper detail:', paper)
+  router.push({ name: 'admin-exam-detail', params: { id: paper.id } })
   // For example, you could navigate to a detail page
 }
 const navigateToBreadcrumb = (index: number) => {
@@ -415,6 +417,7 @@ const combinedData = computed(() => {
               <span>{{ rowData.name }}</span>
             </div>
             <div v-else>
+              <VaIcon class="mr-2" name="description" size="large" />
               <span>{{ rowData.name }}</span>
             </div>
           </div>

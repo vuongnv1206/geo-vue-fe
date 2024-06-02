@@ -5,19 +5,33 @@ import QuestionFolder from './widgets/QuestionFolder.vue'
 import EditQuestionTreeForm from './widgets/EditQuestionTreeForm.vue'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
+import { useAuthStore } from '@/stores/modules/auth.module'
 import { useModal, useToast } from 'vuestic-ui'
 import { getErrorMessage } from '@/services/utils'
 import { GroupTeacher, TeacherTeam, TeacherTeamTeacherGroupCombine } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
+import { avatarColor } from '@/services/utils'
 
 const loading = ref(true)
 const currentShowFolderId = ref<string>('')
 
 const stores = useQuestionFolderStore()
 const groupTeacherStore = useGroupTeacherStore()
+const authStore = useAuthStore()
 
 const questionTreeMain = ref<QuestionTree>()
 const questionTrees = ref<QuestionTree[]>([])
+
+const props = defineProps({
+  showTitle: {
+    type: Boolean,
+    default: true,
+  },
+  mode: {
+    type: String,
+    default: 'full',
+  },
+})
 
 const getCurrentShowFolder = (questionTree: QuestionTree) => {
   if (questionTree.currentShow) {
@@ -92,6 +106,7 @@ const permissionEdit = ref({
   canAdd: false,
   canUpdate: false,
   canDelete: false,
+  canShare: false,
 })
 
 const editPermission = (permission: QuestionFolderPermission) => {
@@ -102,6 +117,7 @@ const editPermission = (permission: QuestionFolderPermission) => {
     canAdd: permission.canAdd,
     canUpdate: permission.canUpdate,
     canDelete: permission.canDelete,
+    canShare: permission.canShare,
   }
 }
 
@@ -133,6 +149,7 @@ const AddPermission = (option: TeacherTeamTeacherGroupCombine) => {
     canAdd: false,
     canUpdate: false,
     canDelete: false,
+    canShare: false,
     createdBy: '',
     createdOn: '',
     lastModifiedBy: '',
@@ -146,6 +163,7 @@ const AddPermission = (option: TeacherTeamTeacherGroupCombine) => {
     canAdd: false,
     canUpdate: false,
     canDelete: false,
+    canShare: false,
   }
   doShowQuestionTreePermisionFormAddModal.value = true
 }
@@ -181,6 +199,27 @@ const getTeacherGroups = () => {
 }
 
 const shareQuestionTree = (questionTree: QuestionTree) => {
+  const currentUserId = authStore.user?.id
+  console.log(currentUserId)
+  // loop through permission to check if current user has permission
+  let hasPermission = false
+  questionTree.permission.forEach((permission) => {
+    console.log(permission)
+    if (permission.user?.id == currentUserId) {
+      if (permission.canShare) {
+        hasPermission = true
+      }
+    }
+  })
+
+  if (!hasPermission) {
+    notify({
+      message: 'You do not have permission to share this folder',
+      color: 'danger',
+    })
+    return
+  }
+
   QuestionTreeToEdit.value = questionTree
   // sortPermission for owner first
   QuestionTreeToEdit.value.permission.sort((a) => {
@@ -358,6 +397,7 @@ const onShareQuestionFolderPermission = () => {
     canAdd: permissionEdit.value.canAdd,
     canUpdate: permissionEdit.value.canUpdate,
     canDelete: permissionEdit.value.canDelete,
+    canShare: permissionEdit.value.canShare,
     emails: [],
     folderId: editPermissionValue.value?.questionFolderId || '',
     phones: [],
@@ -413,7 +453,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1 class="page-title font-bold">Question Folder</h1>
+  <h1 v-if="props.showTitle" class="page-title font-bold">Question Folder</h1>
   <VaCard>
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
@@ -431,20 +471,21 @@ onMounted(() => {
         </div>
         <div class="flex flex-col md:flex-row gap-2 justify-end">
           <VaButton
-            v-if="selectedItemsEmitted.length != 0"
+            v-if="selectedItemsEmitted.length != 0 && props.mode == 'full'"
             icon="delete"
             color="danger"
             @click="deleteSelectedFolder()"
           >
             Delete</VaButton
           >
-          <VaButton icon="add" @click="createNewQuestionFolder()">Question Folder</VaButton>
+          <VaButton v-if="props.mode == 'full'" icon="add" @click="createNewQuestionFolder()">Question Folder</VaButton>
         </div>
       </div>
       <QuestionFolder
         v-model:selectedItemsEmitted="selectedItemsEmitted"
         :question-trees="questionTrees"
         :loading="loading"
+        :mode="props.mode"
         @edit="editQuestionTree"
         @delete="deleteQuestionTree"
         @selectedFolder="selectedFolder"
@@ -507,7 +548,10 @@ onMounted(() => {
       <template #option="{ option }">
         <div class="flex justify-between items-center p-2">
           <div class="flex items-center gap-2">
-            <VaAvatar v-if="getOptionName(option as TeacherTeamTeacherGroupCombine).isUser" :size="48" color="info"
+            <VaAvatar
+              v-if="getOptionName(option as TeacherTeamTeacherGroupCombine).isUser"
+              :size="48"
+              :color="avatarColor(getOptionName(option as TeacherTeamTeacherGroupCombine).data)"
               >{{
                 getOptionName(option as TeacherTeamTeacherGroupCombine)
                   .data?.charAt(0)
@@ -560,7 +604,11 @@ onMounted(() => {
             class="list__item ml-5"
           >
             <VaListItemSection avatar>
-              <VaAvatar v-if="permission.user ? true : false" :size="42" color="info">
+              <VaAvatar
+                v-if="permission.user ? true : false"
+                :size="42"
+                :color="avatarColor(getNameUserGroup(permission))"
+              >
                 {{ getNameUserGroup(permission)?.charAt(0) }}
               </VaAvatar>
               <VaAvatar v-else :size="42" color="warning" icon="group"> </VaAvatar>
@@ -621,7 +669,9 @@ onMounted(() => {
       <div class="gap-4 ml-10 mt-10">
         <VaListItem>
           <VaListItemSection avatar>
-            <VaAvatar :size="48" color="info">{{ getNameUserGroup(editPermissionValue)?.charAt(0) }}</VaAvatar>
+            <VaAvatar :size="48" :color="avatarColor(getNameUserGroup(editPermissionValue))">{{
+              getNameUserGroup(editPermissionValue)?.charAt(0)
+            }}</VaAvatar>
           </VaListItemSection>
           <VaListItemSection>
             <VaListItemLabel>
@@ -655,6 +705,7 @@ onMounted(() => {
         <VaCheckbox v-model="permissionEdit.canAdd" label="Create" />
         <VaCheckbox v-model="permissionEdit.canUpdate" label="Update" />
         <VaCheckbox v-model="permissionEdit.canDelete" label="Delete" />
+        <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
       </div>
     </VaForm>
   </VaModal>
@@ -676,7 +727,9 @@ onMounted(() => {
       <div class="gap-4 ml-10 mt-10">
         <VaListItem>
           <VaListItemSection avatar>
-            <VaAvatar :size="48" color="info">{{ getNameUserGroup(editPermissionValue)?.charAt(0) }}</VaAvatar>
+            <VaAvatar :size="48" :color="avatarColor(getNameUserGroup(editPermissionValue))">{{
+              getNameUserGroup(editPermissionValue)?.charAt(0)
+            }}</VaAvatar>
           </VaListItemSection>
           <VaListItemSection>
             <VaListItemLabel>
