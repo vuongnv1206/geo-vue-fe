@@ -215,7 +215,6 @@ const handleFolderDoubleClick = async (event: any) => {
 
 const router = useRouter()
 const showPaperDetail = (paper: PaperInListDto) => {
-  console.log('Show paper detail:', paper)
   router.push({ name: 'admin-exam-detail', params: { id: paper.id } })
   // For example, you could navigate to a detail page
 }

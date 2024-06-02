@@ -2,14 +2,16 @@
 import { ref, onMounted } from 'vue'
 import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import QuestionView from '../question/widgets/QuestionView.vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto } from './types'
-import { useToast } from 'vuestic-ui'
+import { useToast, useModal } from 'vuestic-ui'
 
 const route = useRoute()
+const router = useRouter()
 const paperStore = usePaperStore()
 const { init: notify } = useToast()
+const { confirm } = useModal()
 
 const paperDetail = ref<PaperDto | null>(null)
 
@@ -50,6 +52,33 @@ const assignedOptionValue = ref('Everyone')
 
 const Clicked = () => {
   alert('ookokoko')
+}
+
+const deletePaper = async () => {
+  const result = await confirm({
+    message: `Are you sure want to delete "${paperDetail.value?.examName}"?`,
+    title: 'Delete Paper',
+    okText: 'Confirm',
+    size: 'small',
+  })
+
+  if (result && paperDetail.value !== null) {
+    paperStore
+      .deletePaper(paperDetail.value.id)
+      .then(() => {
+        notify({
+          message: `Delete ${paperDetail.value?.examName} successfully`,
+          color: 'success',
+        })
+        router.push({ name: 'paper-folder' })
+      })
+      .catch((error) => {
+        notify({
+          message: `Failed to delete \n ${error}`,
+          color: 'danger',
+        })
+      })
+  }
 }
 
 const handleSaveAssigned = (selectedOption: string) => {
@@ -107,7 +136,7 @@ onMounted(() => {
                 <VaMenuItem>
                   <VaIcon name="settings" class="material-symbols-outlined" /> Advanced monitoring
                 </VaMenuItem>
-                <VaMenuItem class="va-text-danger">
+                <VaMenuItem class="va-text-danger" @click="deletePaper">
                   <VaIcon name="delete" class="material-symbols-outlined" />
                   Delete
                 </VaMenuItem>
