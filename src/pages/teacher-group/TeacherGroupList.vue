@@ -8,12 +8,15 @@ import { useModal, useToast } from 'vuestic-ui'
 import TeacherGroupModal from './TeacherGroupModal.vue'
 import TeacherTeamModal from './TeacherTeamModal.vue'
 
-const dataFilter = {
-  keyword: '',
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
   pageNumber: 0,
   pageSize: 100,
   orderBy: ['id'],
-}
+})
 const stores = useGroupTeacherStore()
 const { init: notify } = useToast()
 const groupTeachers = ref<GroupTeacher[]>([])
@@ -21,8 +24,9 @@ const teacherTeams = ref<TeacherTeam[]>([])
 const loading = ref(true)
 const getTeacherGroups = () => {
   loading.value = true
+  dataFilter.value.advancedSearch.fields = ['name']
   stores
-    .getGroupTeachers(dataFilter)
+    .getGroupTeachers(dataFilter.value)
     .then((res) => {
       groupTeachers.value = res.data
       loading.value = false
@@ -34,8 +38,13 @@ const getTeacherGroups = () => {
         color: 'danger',
       })
     })
+}
+
+const getTeacherTeams = () => {
+  loading.value = true
+  dataFilter.value.advancedSearch.fields = ['phone', 'teacherName']
   stores
-    .getTeacherTeams(dataFilter)
+    .getTeacherTeams(dataFilter.value)
     .then((res) => {
       teacherTeams.value = res.data
       loading.value = false
@@ -59,6 +68,7 @@ const onGroupSaved = async (group: GroupTeacher) => {
           color: 'success',
         })
         getTeacherGroups()
+        getTeacherTeams()
       })
       .catch((error) => {
         notify({
@@ -75,6 +85,7 @@ const onGroupSaved = async (group: GroupTeacher) => {
           color: 'success',
         })
         getTeacherGroups()
+        getTeacherTeams()
       })
       .catch((err) => {
         notify({
@@ -95,6 +106,7 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
           color: 'success',
         })
         getTeacherGroups()
+        getTeacherTeams()
       })
       .catch((error) => {
         notify({
@@ -111,6 +123,7 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
           color: 'success',
         })
         getTeacherGroups()
+        getTeacherTeams()
       })
       .catch((err) => {
         notify({
@@ -200,6 +213,7 @@ const confirmDeleteGroupModal = async (groupId: string, groupName: string) => {
           color: 'success',
         })
         getTeacherGroups()
+        getTeacherTeams()
       })
       .catch((error) => {
         notify({
@@ -226,6 +240,7 @@ const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string
           color: 'success',
         })
         getTeacherGroups()
+        getTeacherTeams()
       })
       .catch((error) => {
         notify({
@@ -248,13 +263,21 @@ function detailTeacherInTeam(teacherId: string) {
 
 onMounted(() => {
   getTeacherGroups()
+  getTeacherTeams()
 })
+
+const handlerSearch = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  dataFilter.value.advancedSearch.keyword = input.value
+  getTeacherGroups()
+  getTeacherTeams()
+}
 </script>
 
 <template>
   <div class="flex mt-2">
     <div class="mr-3 flex-grow">
-      <VaInput class="" placeholder="Search name, phone or email">
+      <VaInput class="" placeholder="Search name, phone or email" @input="handlerSearch">
         <template #appendInner>
           <VaIcon color="secondary" class="material-icons"> search </VaIcon>
         </template>
@@ -341,7 +364,7 @@ onMounted(() => {
       <VaList class="mb-2" style="max-height: 60vh">
         <VaListItem v-for="group in groupTeachers" :key="group.id" class="list__item mb-1" @click="selectGroup(group)">
           <VaListItemSection avatar class="justify-center">
-            <VaIcon name="group" color="black" />
+            <VaIcon name="group" />
           </VaListItemSection>
 
           <VaListItemSection>

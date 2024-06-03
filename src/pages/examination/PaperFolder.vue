@@ -87,35 +87,53 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
 }
 
 const onFolderDelete = async (folder: PaperFolderDto) => {
-  try {
-    await paperFolderStore.deletePaperFolder(folder.id)
-    notify({
-      message: `${folder.name} has been deleted`,
-      color: 'success',
-    })
-    getPaperFolders(currentFolderId.value) // Refresh the list of folders under the current parent folder
-    getPapers(currentFolderId.value) // Refresh the list of papers under the current parent folder
-  } catch (err: any) {
-    notify({
-      message: `Failed to delete folder\n${err.message}`,
-      color: 'error',
-    })
+  const result = await confirm({
+    message: `Are you sure you want to delete "${folder.name}"?`,
+    title: 'Delete Folder',
+    okText: 'Confirm',
+    cancelText: 'Cancel',
+    size: 'small',
+  })
+  if (result) {
+    try {
+      await paperFolderStore.deletePaperFolder(folder.id)
+      notify({
+        message: `${folder.name} has been deleted`,
+        color: 'success',
+      })
+      getPaperFolders(currentFolderId.value) // Refresh the list of folders under the current parent folder
+      getPapers(currentFolderId.value) // Refresh the list of papers under the current parent folder
+    } catch (err: any) {
+      notify({
+        message: `Failed to delete folder\n${err.message}`,
+        color: 'error',
+      })
+    }
   }
 }
 
 const onPaperDelete = async (paper: PaperInListDto) => {
-  try {
-    await paperStore.deletePaper(paper.id)
-    notify({
-      message: `${paper.examName} has been deleted`,
-      color: 'success',
-    })
-    getPapers(currentFolderId.value)
-  } catch (err: any) {
-    notify({
-      message: `Failed to delete paper\n${err.message}`,
-      color: 'error',
-    })
+  const result = await confirm({
+    message: `Are you sure you want to delete "${paper.examName}"?`,
+    title: 'Delete Folder',
+    okText: 'Confirm',
+    cancelText: 'Cancel',
+    size: 'small',
+  })
+  if (result) {
+    try {
+      await paperStore.deletePaper(paper.id)
+      notify({
+        message: `${paper.examName} has been deleted`,
+        color: 'success',
+      })
+      getPapers(currentFolderId.value)
+    } catch (err: any) {
+      notify({
+        message: `Failed to delete paper\n${err.message}`,
+        color: 'error',
+      })
+    }
   }
 }
 
