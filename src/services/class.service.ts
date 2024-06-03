@@ -13,7 +13,7 @@ class ClassService {
       })
   }
 
-  async getClassroomByGroupClassId(id: string): Promise<Classrooms> {
+  async getClassroomByGroupClassId(id: string): Promise<Classrooms[]> {
     return apiService
       .get(`/v1/class/get-class-by-group-class/${id}`)
       .then((response) => {
@@ -99,6 +99,16 @@ class ClassService {
   async deleteUserInClass(data: UserInClassRequest): Promise<Classrooms> {
     return apiService
       .post(`v1/class/delete-user-in-class`, data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  async getClassSearch(data: any): Promise<any> {
+    return apiService
+      .post(`v1/class/search`, data)
       .then((response) => {
         return Promise.resolve(response.data)
       })

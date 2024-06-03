@@ -15,7 +15,7 @@ export const useClassStore = defineStore('class', {
           return Promise.reject(error)
         })
     },
-    async getClassroomByGroupClassId(id: string): Promise<Classrooms> {
+    async getClassroomByGroupClassId(id: string): Promise<Classrooms[]> {
       return classService
         .getClassroomByGroupClassId(id)
         .then((response) => {
@@ -99,6 +99,16 @@ export const useClassStore = defineStore('class', {
     async deleteUserInClass(data: UserInClassRequest): Promise<Classrooms> {
       return classService
         .deleteUserInClass(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getClassSearch(data: any): Promise<any> {
+      return classService
+        .getClassSearch(data)
         .then((response) => {
           return Promise.resolve(response)
         })
