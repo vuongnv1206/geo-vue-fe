@@ -8,7 +8,6 @@ const folderId = ref(route.params.folderId ?? null)
 const basic = ref([])
 
 onMounted(() => {
-  console.log(folderId.value)
   const { init: notify } = useToast()
   notify({
     message: `Folder ID: ${folderId.value}`,
