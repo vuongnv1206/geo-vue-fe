@@ -2,6 +2,9 @@
 import { ref, PropType, watch, onMounted } from 'vue'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { GroupClass } from '@/pages/classrooms/type'
+import { useClassStore } from '@/stores/modules/class.module'
+import { Classrooms } from '../../classrooms/type'
+import { useToast } from 'vuestic-ui'
 
 const props = defineProps({
   currentAssigned: {
@@ -10,7 +13,10 @@ const props = defineProps({
   },
 })
 
+const { init: notify } = useToast()
+
 const groupClassStores = useGroupClassStore()
+const classStores = useClassStore()
 
 const valueOption = ref('')
 const emit = defineEmits(['close', 'save'])
@@ -26,8 +32,30 @@ const getGroupClasses = async () => {
   }
 }
 
+const classRoomsInGroup = ref<Classrooms[]>([])
+const selectedGroupClass = ref<string>('')
+const dataFilter = {
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+  groupClassId: '',
+}
+
 const getClassByGroupClass = (groupId: string) => {
-  console.log(groupId)
+  dataFilter.groupClassId = groupId
+  classStores
+    .getClassSearch(dataFilter)
+    .then((res) => {
+      classRoomsInGroup.value = res.data
+      selectedGroupClass.value = groupId
+    })
+    .catch((error) => {
+      notify({
+        message: `get classrooms fail \n ${error}`,
+        color: 'danger',
+      })
+    })
 }
 
 watch(
@@ -59,18 +87,20 @@ onMounted(() => {
     >
       <VaCard outlined class="border-style col-span-1">
         <div class="p-2">
-          <VaInput placeholder="Search" />
+          <VaInput placeholder="Search group class" />
         </div>
         <VaDivider class="m-0" />
         <VaCardContent class="p-1">
           <VaScrollContainer vertical class="max-h-[60vh]">
-            <VaMenuList
-              :options="groupClasses"
-              :text-by="(groupClass: GroupClass) => groupClass.name"
-              class="w-full"
-              :value-by="(groupClass: GroupClass) => groupClass.id"
-              @selected="getClassByGroupClass"
-            />
+            <VaSidebarItem
+              v-for="groupClass in groupClasses"
+              :key="groupClass.id"
+              :active="selectedGroupClass === groupClass.id"
+            >
+              <VaSidebarItemContent class="p-1 min-h-[30px]" @click="getClassByGroupClass(groupClass.id)">
+                {{ groupClass.name }}
+              </VaSidebarItemContent>
+            </VaSidebarItem>
           </VaScrollContainer>
         </VaCardContent>
       </VaCard>
@@ -79,12 +109,17 @@ onMounted(() => {
         <div class="p-2 flex justify-between">
           <VaButton preset="secondary"> <VaIcon name="menu_open" /></VaButton>
           <div>
-            <VaInput placeholder="Search" class="p-0" />
+            <VaInput placeholder="Search class in group" class="p-0" />
           </div>
         </div>
         <VaDivider class="m-0" />
-        <VaCardContent>
-          <!-- <VaCheckbox class="mb-6" :label="label" /> -->
+        <VaCardContent class="grid grid-cols-3">
+          <VaCheckbox
+            v-for="classroom in classRoomsInGroup"
+            :key="classroom.id"
+            class="mr-2 mb-2"
+            :label="classroom.name"
+          />
         </VaCardContent>
       </VaCard>
     </div>
