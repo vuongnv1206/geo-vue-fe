@@ -18,7 +18,7 @@ const stores = useAssignmentStore()
 const formRef = ref()
 const date = ref<[Date, Date]>([new Date(), new Date()])
 const assignmentDetails = ref<AssignmentDetails | null>(null)
-const assignmentId = router.currentRoute.value.params.id
+const assignmentId = router.currentRoute.value.params.id.toString()
 const newAssignmentDetails = ref<AssignmentDetails>({
   id: '',
   name: '',
@@ -94,7 +94,7 @@ const handleClickUpdate = async () => {
   if (formRef.value?.validate()) {
     handleDatePicker()
     try {
-      await stores.updateAssignment(assignmentId.toString(), newAssignmentDetails.value as EmptyAssignmentDetails)
+      await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
       notify({ message: 'Assignment updated successfully', color: 'success' })
       router.push({ name: 'assignment-details', params: { id: assignmentId } })
     } catch (error) {
@@ -106,7 +106,7 @@ const handleClickUpdate = async () => {
 
 onMounted(() => {
   if (assignmentId) {
-    getAssignment(assignmentId.toString())
+    getAssignment(assignmentId)
   }
 })
 </script>

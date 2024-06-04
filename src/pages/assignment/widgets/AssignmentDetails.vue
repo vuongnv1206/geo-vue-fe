@@ -15,7 +15,7 @@ const breakpoints = useBreakpoint()
 const { init: notify } = useToast()
 const showSidebar = ref(breakpoints.smUp)
 const assignment = ref<Assignment | null>(null)
-const assignmentId = router.currentRoute.value.params.id
+const assignmentId = router.currentRoute.value.params.id.toString()
 
 const getAssignment = (id: string) => {
   stores
@@ -67,12 +67,12 @@ function formatDate(dateString: Date) {
 
 const handleDelete = () => {
   if (assignmentId) {
-    deleteAssignment(assignmentId.toString())
+    deleteAssignment(assignmentId)
   }
 }
 onMounted(() => {
   if (assignmentId) {
-    getAssignment(assignmentId.toString())
+    getAssignment(assignmentId)
   }
 })
 </script>
