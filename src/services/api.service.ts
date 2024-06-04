@@ -4,10 +4,13 @@ import JwtService from '@services/jwt.service'
 JwtService.saveTenant('root')
 
 class ApiService {
-  private api_url = 'http://localhost:5000/api'
+  private api_url = import.meta.env.VITE_APP_BASE_URL as string
 
   private axios = axios.create({
     baseURL: this.api_url,
+    headers: {
+      'x-from-host': location.host,
+    },
   })
 
   async get(path: string) {

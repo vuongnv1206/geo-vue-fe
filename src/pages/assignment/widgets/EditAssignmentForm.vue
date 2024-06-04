@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useForm, ValidationRule } from 'vuestic-ui'
 import { onMounted, computed, ref, watch } from 'vue'
 import { EmptyAssignment, Attachment, Assignment } from '../types'
 import { Subject } from '@pages/subject/types'
@@ -7,8 +8,11 @@ import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { validators } from '@/services/utils'
+import { SelectableOption } from 'vuestic-ui/dist/types/composables'
 dayjs.extend(utc)
 
+const { validate } = useForm('form')
 // Define reactive variables and store
 const subjects = ref<Subject[]>([])
 const subjectStore = useSubjectStore()
@@ -20,7 +24,7 @@ const props = defineProps<{
   saveButtonLabel: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (event: 'save', assignment: Assignment): void
   (event: 'close'): void
 }>()
@@ -36,6 +40,7 @@ const defaultNewAssignment: Assignment = {
   canViewResult: false,
   requireLoginToSubmit: false,
   subjectId: '',
+  subjectName: '',
 }
 
 const newAssignment = ref({ ...defaultNewAssignment })
@@ -91,6 +96,14 @@ const dateInputFormat = {
   format: 'MM/dd/yyyy HH:mm',
 }
 
+const handleClickUpdate = () => {
+  if (validate()) {
+    handleDatePicker()
+    handleAttachment()
+  }
+  emit('save', newAssignment.value as Assignment)
+}
+
 // Function to save the attachment path
 const handleAttachment = async () => {
   const files = filesUploaded.value
@@ -111,8 +124,8 @@ const handleAttachment = async () => {
       })
     }),
   )
-  console.log('Files Uploaded: ', filesUploaded.value)
-  console.log('Processed Attachment Paths: ', newAssignment.value.attachmentPaths)
+  // console.log('Files Uploaded: ', filesUploaded.value)
+  // console.log('Processed Attachment Paths: ', newAssignment.value.attachmentPaths)
 }
 
 // Fetch subjects on mount
@@ -122,11 +135,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
+  <VaForm class="flex flex-col gap-2">
     <VaInput
       v-model="newAssignment.name"
       label="Name"
-      :rules="[(value) => (value && value.length > 0) || 'Assignment name is required']"
+      :rules="[validators.required2('name'), validators.maxLength(50)]"
     />
     <VueDatePicker
       v-model="date"
@@ -143,7 +156,7 @@ onMounted(() => {
       placeholder="Start choosing or typing date and time"
     />
     <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
-    <VaInput v-model="newAssignment.content" label="Content" />
+    <VaInput v-model="newAssignment.content" label="Content" :rules="[validators.maxLength(2000)]" />
     <VaSwitch v-model="newAssignment.canViewResult" label="Can View Result" />
     <VaSwitch v-model="newAssignment.requireLoginToSubmit" label="Require Login to Submit" />
     <VaSelect
@@ -151,19 +164,11 @@ onMounted(() => {
       value-by="value"
       :options="subjectsOptions"
       label="Subject"
-      :rules="[(value) => !!value || 'Subject is required']"
+      :rules="[validators.required2('subject') as ValidationRule<SelectableOption>]"
     />
     <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
-      <VaButton
-        @click="
-          handleDatePicker()
-          handleAttachment()
-          validate() && $emit('save', newAssignment as Assignment)
-        "
-      >
-        {{ saveButtonLabel }}</VaButton
-      >
+      <VaButton @click="handleClickUpdate()"> {{ saveButtonLabel }}</VaButton>
     </div>
   </VaForm>
 </template>

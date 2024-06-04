@@ -79,13 +79,44 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
-        name: 'assignments',
-        path: 'assignments',
+        name: 'assignment',
+        path: '/assignments',
         meta: {
           requiresAuth: true,
         },
-        component: () => import('../pages/assignment/Assignment.vue'),
+        children: [
+          {
+            name: 'assignments',
+            component: () => import('../pages/assignment/Assignment.vue'),
+            path: '',
+          },
+          {
+            name: 'assignment-details',
+            path: ':id',
+            component: () => import('../pages/assignment/widgets/AssignmentDetails.vue'),
+          },
+          {
+            name: 'edit-assignment-details',
+            path: '/assignments/:id/edit',
+            component: () => import('../pages/assignment/widgets/EditAssignmentDetails.vue'),
+          },
+        ],
       },
+      // {
+      //   name: 'assignments',
+      //   path: '/assignments',
+      //   meta: {
+      //     requiresAuth: true,
+      //   },
+      //   component: () => import('../pages/assignment/Assignment.vue'),
+      //   children: [
+      //     {
+      //       name: 'assignment-details',
+      //       path: ':id',
+      //       component: () => import('../pages/assignment/widgets/AssignmentDetails.vue'),
+      //     },
+      //   ],
+      // },
       {
         name: 'subjects',
         path: 'subjects',
@@ -105,6 +136,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'login',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/Login.vue'),
       },
@@ -113,6 +145,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'signup',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/Signup.vue'),
       },
@@ -121,8 +154,17 @@ const routes: Array<RouteRecordRaw> = [
         path: 'recover-password',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/RecoverPassword.vue'),
+      },
+      {
+        name: 'confirm-email',
+        path: 'confirm-email',
+        meta: {
+          requiresAuth: false,
+        },
+        component: () => import('../pages/auth/ConfirmEmail.vue'),
       },
       {
         name: 'recover-password-email',
@@ -131,6 +173,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: false,
         },
         component: () => import('../pages/auth/CheckTheEmail.vue'),
+      },
+      {
+        name: 'reset-password',
+        path: 'reset-password',
+        meta: {
+          requiresAuth: false,
+        },
+        component: () => import('../pages/auth/ResetPassword.vue'),
       },
       {
         path: '',
