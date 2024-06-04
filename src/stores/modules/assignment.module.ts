@@ -35,7 +35,7 @@ export const useAssignmentStore = defineStore('assignment', {
           return Promise.reject(error)
         })
     },
-    async updateAssignment(id: string, data: EmptyAssignment): Promise<any> {
+    async updateAssignment(id: string, data: any): Promise<any> {
       return assignmentService
         .updateAssignment(id, data)
         .then((response) => {

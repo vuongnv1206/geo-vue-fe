@@ -94,7 +94,7 @@ const handleClickUpdate = async () => {
   if (formRef.value?.validate()) {
     handleDatePicker()
     try {
-      await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
+      await stores.updateAssignment(assignmentId.toString(), newAssignmentDetails.value as EmptyAssignmentDetails)
       notify({ message: 'Assignment updated successfully', color: 'success' })
       router.push({ name: 'assignment-details', params: { id: assignmentId } })
     } catch (error) {
@@ -106,7 +106,7 @@ const handleClickUpdate = async () => {
 
 onMounted(() => {
   if (assignmentId) {
-    getAssignment(assignmentId)
+    getAssignment(assignmentId.toString())
   }
 })
 </script>

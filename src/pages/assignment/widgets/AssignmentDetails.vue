@@ -67,12 +67,12 @@ function formatDate(dateString: Date) {
 
 const handleDelete = () => {
   if (assignmentId) {
-    deleteAssignment(assignmentId)
+    deleteAssignment(assignmentId.toString())
   }
 }
 onMounted(() => {
   if (assignmentId) {
-    getAssignment(assignmentId)
+    getAssignment(assignmentId.toString())
   }
 })
 </script>
