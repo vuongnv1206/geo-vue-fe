@@ -119,3 +119,23 @@ export interface CombinedData {
   lastModifiedBy: string | null
   lastModifiedOn: string | null
 }
+
+export interface PaperStudentDto {
+  id: string
+  examName: string
+  paperLabelId?: string | null
+  numberOfQuestion?: number
+  duration?: number | null
+  status?: string | null
+  showMarkResult?: boolean
+  showQuestionAnswer?: boolean
+  type?: string
+  isPublish?: boolean
+  examCode?: string
+  description?: string | null
+  createdBy: string
+  createdOn: string
+  creatorName?: string | null
+  paperLable?: PaperLabelDto
+  NumberOfQuizzes: number
+}
