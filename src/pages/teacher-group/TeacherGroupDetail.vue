@@ -278,6 +278,25 @@ watch(
   },
   { immediate: true },
 )
+
+const searchQuery = ref('')
+
+const filteredGroupClasses = computed(() => {
+  if (!searchQuery.value) {
+    return groupClasses.value
+  }
+  return groupClasses.value
+    .map((groupClass) => {
+      const filteredClasses = groupClass.classes.filter((classRoom) =>
+        classRoom.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+      )
+      return {
+        ...groupClass,
+        classes: filteredClasses,
+      }
+    })
+    .filter((groupClass) => groupClass.classes.length > 0)
+})
 </script>
 
 <template>
@@ -337,11 +356,11 @@ watch(
     <VaDivider />
     <VaInnerLoading v-if="groupDetail !== null || teacherDetail !== null" :loading="loading">
       <VaCardContent v-if="props.group" class="p-0 mb-2">
-        <VaInput placeholder="search class" />
+        <VaInput v-model="searchQuery" placeholder="search class" />
       </VaCardContent>
       <VaScrollContainer vertical>
         <VaAccordion v-model="value" class="max-W-sm mb-3" multiple style="max-height: 55vh">
-          <VaCollapse v-for="groupClass in groupClasses" :key="groupClass.id" :header="groupClass.name">
+          <VaCollapse v-for="groupClass in filteredGroupClasses" :key="groupClass.id" :header="groupClass.name">
             <template #content>
               <div class="grid md:grid-cols-4 sm:grid-cols-3 gap-3">
                 <div v-for="classRoom in groupClass.classes" :key="classRoom.id">
