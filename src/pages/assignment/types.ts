@@ -12,7 +12,6 @@ export type Assignment = {
 }
 
 export type EmptyAssignment = {
-  id: string | null
   name: string
   startTime: Date | null
   endTime: Date | null
@@ -21,6 +20,24 @@ export type EmptyAssignment = {
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectName: string
+}
+
+export type AssignmentDetails = {
+  id: string
+  name: string
+  startTime: Date | null
+  endTime: Date | null
+  canViewResult: boolean
+  requireLoginToSubmit: boolean
+  subjectId: string
+}
+export type EmptyAssignmentDetails = {
+  name: string
+  startTime: Date | null
+  endTime: Date | null
+  canViewResult: boolean
+  requireLoginToSubmit: boolean
+  subjectId: string
 }
 
 export type Attachment = {

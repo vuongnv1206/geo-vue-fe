@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { EmptySubject, Subject } from '../types'
+import { validators } from '@/services/utils'
 
 const props = defineProps<{
   subject: Subject | null
@@ -43,15 +44,16 @@ watch(
   },
   { immediate: true },
 )
-
-const required = (v: string) => !!v || 'This field is required'
 </script>
 
 <template>
   <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
-    <VaInput v-model="newSubject.name" label="Subject name" :rules="[required]" />
-    <VaInput v-model="newSubject.description" label="Description" :rules="[required]" />
-    <!-- Add other fields as needed -->
+    <VaInput
+      v-model="newSubject.name"
+      label="Subject name"
+      :rules="[validators.required2('name'), validators.maxLength(50)]"
+    />
+    <VaInput v-model="newSubject.description" label="Description" :rules="[validators.maxLength(2000)]" />
     <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
       <VaButton @click="validate() && $emit('save', newSubject as Subject)">{{ saveButtonLabel }}</VaButton>

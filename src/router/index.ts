@@ -79,12 +79,28 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
-        name: 'assignments',
-        path: 'assignments',
+        name: 'assignment',
+        path: '/assignments',
         meta: {
           requiresAuth: true,
         },
-        component: () => import('../pages/assignment/Assignment.vue'),
+        children: [
+          {
+            name: 'assignments',
+            component: () => import('../pages/assignment/Assignment.vue'),
+            path: '',
+          },
+          {
+            name: 'assignment-details',
+            path: ':id',
+            component: () => import('../pages/assignment/widgets/AssignmentDetails.vue'),
+          },
+          {
+            name: 'edit-assignment-details',
+            path: '/assignments/:id/edit',
+            component: () => import('../pages/assignment/widgets/EditAssignmentDetails.vue'),
+          },
+        ],
       },
       {
         name: 'subjects',

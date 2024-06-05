@@ -6,6 +6,7 @@ import { useSubjectStore } from '@/stores/modules/subject.module'
 import { useModal, useToast } from 'vuestic-ui'
 import EditSubjectForm from './widgets/EditSubjectForm.vue'
 
+const loading = ref(true)
 const stores = useSubjectStore()
 const subjects = ref<Subject[]>([])
 // const currentSubjectId = ref<string>('')
@@ -17,14 +18,21 @@ const editFormRef = ref()
 const { confirm } = useModal()
 
 const getSubjects = () => {
+  loading.value = true
   stores
     .getSubjects()
     .then((response) => {
       subjects.value = response.data
       console.log('Subjects:', subjects.value)
+      loading.value = false
     })
     .catch((error) => {
       console.log('Error:', error)
+      notify({
+        message: 'Failed to get subjects\n' + error.message,
+        color: 'error',
+      })
+      loading.value = false
     })
 }
 
@@ -135,6 +143,7 @@ onMounted(() => {
       </div>
       <SubjectTable
         v-model:selectedItemsEmitted="selectedItemsEmitted"
+        :loading="loading"
         :subjects="subjects"
         @edit="editSubject"
         @delete="deleteSubject"

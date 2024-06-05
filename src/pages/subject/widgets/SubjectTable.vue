@@ -14,11 +14,16 @@ const columns = defineVaDataTableColumns([
 const emit = defineEmits<{
   (event: 'edit', subject: Subject): void
   (event: 'delete', subject: Subject): void
+  (event: 'selectedSubject', subject: Subject): void
 }>()
 
 const props = defineProps({
   subjects: {
     type: Array as PropType<Subject[]>,
+    required: true,
+  },
+  loading: {
+    type: Boolean,
     required: true,
   },
 })
@@ -38,19 +43,34 @@ const contextmenu = (event: any) => {
     },
   })
 }
+
+const dblclick = (event: any) => {
+  emit('selectedSubject', event.item)
+}
+
+const selectedItemsEmitted = defineModel('selectedItemsEmitted', {
+  type: Array as PropType<Subject[]>,
+  default: [],
+})
+
+const handleSelectionChange = (selectedItems: Subject[]) => {
+  selectedItemsEmitted.value = selectedItems
+}
 </script>
 
 <template>
   <div>
     <VaDataTable
-      :items="props.subjects"
-      :columns="columns"
       hoverable
       clickable
       selectable
+      :columns="columns"
       select-mode="multiple"
+      :items="props.subjects"
       :disable-client-side-sorting="false"
+      @row:dblclick="dblclick($event)"
       @row:contextmenu="contextmenu($event)"
+      @selectionChange="handleSelectionChange($event.currentSelectedItems)"
     >
       <template #cell(name)="{ rowData }">
         <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
