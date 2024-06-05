@@ -127,13 +127,11 @@ const resolveLinkAttribute = (item: ProfileListItem) => {
 <style lang="scss">
 .profile-dropdown {
   cursor: pointer;
-
   &__content {
     .menu-item:hover {
       background: var(--hover-color);
     }
   }
-
   &__anchor {
     display: inline-block;
   }
