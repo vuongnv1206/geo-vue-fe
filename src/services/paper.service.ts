@@ -1,4 +1,4 @@
-import { PaperDto, PaperInListDto, SearchPaperRequest } from '@/pages/examination/types'
+import { PaperDto, PaperInListDto, PaperStudentDto, SearchPaperRequest } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
 export interface IPapersService {
@@ -35,6 +35,16 @@ export class PapersService implements IPapersService {
   async paperDetail(id: string): Promise<PaperDto> {
     return apiService
       .get(`/v1/papers/${id}`)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  async paperDetailByStudentRole(id: string): Promise<PaperStudentDto> {
+    return apiService
+      .get(`/v1/submitpapers/paper/${id}`)
       .then((res) => {
         return Promise.resolve(res.data)
       })
