@@ -77,6 +77,20 @@ export default {
       ],
     },
     {
+      name: 'assignments',
+      displayName: 'menu.assignments',
+      meta: {
+        icon: 'snippet_folder',
+      },
+    },
+    {
+      name: 'subjects',
+      displayName: 'menu.subjects',
+      meta: {
+        icon: 'snippet_folder',
+      },
+    },
+    {
       name: 'teacher group',
       displayName: 'menu.teacher-group',
       meta: {

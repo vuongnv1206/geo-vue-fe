@@ -63,7 +63,9 @@
     "paper-folder": "Paper folder",
     "classroom": "Classroom",
     "group-class": "Group class",
-    "teacher-group": "Teacher Group"
+    "teacher-group": "Teacher Group",
+    "assignments": "Assignment",
+    "subjects": "Subject"
   },
   "messages": {
     "all": "See all messages",
