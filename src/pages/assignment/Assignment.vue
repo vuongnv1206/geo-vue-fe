@@ -1,29 +1,37 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Assignment, EmptyAssignment } from './types'
 import AssignmentTable from './widgets/AssignmentTable.vue'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { useModal, useToast } from 'vuestic-ui'
 import EditAssignmentForm from './widgets/EditAssignmentForm.vue'
 
+const editFormRef = ref()
+const loading = ref(true)
+const router = useRouter()
+const { confirm } = useModal()
+const { init: notify } = useToast()
 const stores = useAssignmentStore()
 const assignments = ref<Assignment[]>([])
-// const currentAssignmentId = ref<string>('')
+const doShowAssignmentFormModal = ref(false)
 const selectedItemsEmitted = ref<Assignment[]>([])
 const AssignmentToEdit = ref<Assignment | null>(null)
-const doShowAssignmentFormModal = ref(false)
-const { init: notify } = useToast()
-const editFormRef = ref()
-const { confirm } = useModal()
 
 const getAssignments = () => {
+  loading.value = true
   stores
     .getAssignments()
     .then((response) => {
       assignments.value = response.data
+      loading.value = false
     })
     .catch((error) => {
-      console.log('Error:', error)
+      loading.value = false
+      notify({
+        message: 'Failed to get assignments\n' + error.message,
+        color: 'error',
+      })
     })
 }
 
@@ -62,9 +70,11 @@ const editAssignment = (assignment: Assignment) => {
   doShowAssignmentFormModal.value = true
 }
 
-// const selectedAssignment = (assignment: Assignment) => {
-//   currentAssignmentId.value = assignment.id
-// }
+const selectedAssignment = (assignment: Assignment) => {
+  // currentAssignmentId.value = assignment.id
+  // console.log('selectedAssignment', currentAssignmentId)
+  router.push({ name: 'assignment-details', params: { id: assignment.id } })
+}
 
 const beforeEditFormModalClose = async (hide: () => unknown) => {
   if (editFormRef.value.isFormHasUnsavedChanges) {
@@ -133,23 +143,25 @@ onMounted(() => {
           color="danger"
           @click="deleteSelectedAssignment()"
         >
-          Delete</VaButton
-        >
+          Delete
+        </VaButton>
         <VaButton icon="add" @click="createNewAssignment()">Assignment</VaButton>
       </div>
       <AssignmentTable
         v-model:selectedItemsEmitted="selectedItemsEmitted"
         :assignments="assignments"
+        :loading="loading"
         @edit="editAssignment"
         @delete="deleteAssignment"
+        @selectedAssignment="selectedAssignment"
       />
     </VaCardContent>
   </VaCard>
   <VaModal
     v-slot="{ cancel, ok }"
     v-model="doShowAssignmentFormModal"
-    size="small"
     stateful
+    size="small"
     close-button
     mobile-fullscreen
     hide-default-actions

@@ -20,11 +20,16 @@ const columns = defineVaDataTableColumns([
 const emit = defineEmits<{
   (event: 'edit', assignment: Assignment): void
   (event: 'delete', assignment: Assignment): void
+  (event: 'selectedAssignment', assignment: Assignment): void
 }>()
 
 const props = defineProps({
   assignments: {
     type: Array as PropType<Assignment[]>,
+    required: true,
+  },
+  loading: {
+    type: Boolean,
     required: true,
   },
 })
@@ -44,30 +49,46 @@ const contextmenu = (event: any) => {
     },
   })
 }
+
+const dblclick = (event: any) => {
+  emit('selectedAssignment', event.item)
+}
+
+const selectedItemsEmitted = defineModel('selectedItemsEmitted', {
+  type: Array as PropType<Assignment[]>,
+  default: [],
+})
+
+const handleSelectionChange = (selectedItems: Assignment[]) => {
+  selectedItemsEmitted.value = selectedItems
+}
 </script>
 
 <template>
   <div>
     <VaDataTable
-      :items="props.assignments"
-      :columns="columns"
       hoverable
       clickable
       selectable
+      :columns="columns"
       select-mode="multiple"
+      :loading="props.loading"
+      :items="props.assignments"
       :disable-client-side-sorting="false"
+      @row:dblclick="dblclick($event)"
       @row:contextmenu="contextmenu($event)"
+      @selectionChange="handleSelectionChange($event.currentSelectedItems)"
     >
-      <template #cell(name)="{ rowData }">
-        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-          <div>
-            <span>{{ rowData.name }}</span>
-          </div>
-        </div>
-      </template>
       <template #cell(subjectName)="{ rowData }">
         <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
           <div>{{ rowData.subjectName }}</div>
+        </div>
+      </template>
+      <template #cell(name)="{ rowData }">
+        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+          <!-- <RouterLink :to="{ name: 'assignment-details', params: { id: rowData.id } }"> -->
+          {{ rowData.name }}
+          <!-- </RouterLink> -->
         </div>
       </template>
       <template #cell(content)="{ rowData }">
@@ -76,15 +97,12 @@ const contextmenu = (event: any) => {
         </div>
       </template>
       <!-- <template #cell(attachmentPath)="{ rowData }">
-                <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-                    <div>
-                        // show only name of the attachmentPath
-                        
-                        
-
-                    </div>
-                </div>
-            </template> -->
+        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+          <div>
+            <div>{{ rowData.attachmentPath }}</div>
+          </div>
+        </div>
+      </template> -->
       <template #cell(startTime)="{ rowData }">
         <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
           <div>{{ rowData.startTime }}</div>
@@ -113,7 +131,7 @@ const contextmenu = (event: any) => {
             color="primary"
             icon="mso-edit"
             aria-label="Edit assignment"
-            @click="emit('edit', assignment as Assignment)"
+            @click="$emit('edit', assignment)"
           />
           <VaButton
             preset="primary"
@@ -121,7 +139,7 @@ const contextmenu = (event: any) => {
             icon="mso-delete"
             color="danger"
             aria-label="Delete assignment"
-            @click="emit('delete', assignment as Assignment)"
+            @click="$emit('delete', assignment)"
           />
         </div>
       </template>
