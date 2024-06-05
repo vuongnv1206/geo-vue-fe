@@ -71,6 +71,20 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
+        name: 'exam',
+        path: 'exam',
+        meta: {
+          requiresAuth: true,
+        },
+        children: [
+          {
+            name: 'exam-start',
+            path: 'exam-start/:id',
+            component: () => import('../pages/examination/student/PaperStartView.vue'),
+          },
+        ],
+      },
+      {
         name: 'teacher group',
         path: 'teacher-group',
         meta: {
