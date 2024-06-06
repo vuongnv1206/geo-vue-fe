@@ -32,15 +32,15 @@ const getPaperDetail = () => {
     })
 }
 
-const formatDateTimeForDisplay = (dateTime: string | null | undefined): string | null => {
-  if (!dateTime) return null
+const formatDateTimeForDisplay = (dateTime: string | undefined): string | undefined => {
+  if (!dateTime) return undefined
   const [date, timeWithZone] = dateTime.split('T')
   const [time] = timeWithZone ? timeWithZone.split('+') : ['00:00:00']
   return `${date} ${time}`
 }
 
-const formatDateTimeForSave = (dateTime: string | null | undefined): string | null => {
-  if (!dateTime) return null
+const formatDateTimeForSave = (dateTime: string | undefined): string | undefined => {
+  if (!dateTime) return undefined
   const [date, time] = dateTime.split(' ')
   return `${date}T${time}`
 }
@@ -48,18 +48,18 @@ const formatDateTimeForSave = (dateTime: string | null | undefined): string | nu
 const editPaper = ref<UpdatePaperRequest>({
   id: paperId.toString(),
   examName: '',
-  status: null,
-  startTime: null,
-  endTime: null,
-  paperLabelId: null,
-  duration: null,
+  status: 0,
+  startTime: undefined,
+  endTime: undefined,
+  paperLabelId: undefined,
+  duration: 0,
   shuffle: false,
   showMarkResult: false,
   showQUestionAnswer: false,
-  password: null,
+  password: undefined,
   type: 0,
   isPublish: false,
-  description: null,
+  description: '',
 })
 
 watch(
@@ -70,17 +70,17 @@ watch(
         id: paperDetail.value.id,
         examName: paperDetail.value.examName,
         status: 0,
-        startTime: formatDateTimeForDisplay(paperDetail.value.startTime),
-        endTime: formatDateTimeForDisplay(paperDetail.value.endTime),
-        paperLabelId: paperDetail.value.paperLabelId ?? null,
+        startTime: formatDateTimeForDisplay(paperDetail.value.startTime ?? undefined),
+        endTime: formatDateTimeForDisplay(paperDetail.value.endTime ?? undefined),
+        paperLabelId: paperDetail.value.paperLabelId ?? undefined,
         duration: paperDetail.value.duration ?? 0,
         shuffle: false, // Assuming a default value
         showMarkResult: paperDetail.value.showMarkResult ?? false,
         showQUestionAnswer: paperDetail.value.showQuestionAnswer ?? false,
-        password: paperDetail.value.password ?? null,
+        password: paperDetail.value.password ?? '',
         type: parseInt(paperDetail.value.type ?? '0'), // Assuming type needs to be converted to a number
         isPublish: paperDetail.value.isPublish ?? false,
-        description: paperDetail.value.description ?? null,
+        description: paperDetail.value.description ?? '',
       }
     }
   },
@@ -170,8 +170,8 @@ const saveDraffPaper = (isPublish: boolean) => {
 }
 
 const resetAccessTime = () => {
-  editPaper.value.startTime = null
-  editPaper.value.endTime = null
+  editPaper.value.startTime = undefined
+  editPaper.value.endTime = undefined
 }
 
 onMounted(() => {
@@ -179,7 +179,6 @@ onMounted(() => {
   getGroupClasses()
 })
 </script>
-
 <template>
   <div class="flex justify-center">
     <div class="md:max-w-[60%] md:min-w-[60%] sm:max-w-[90%] sm:min-w-[90%]">

@@ -145,16 +145,16 @@ export interface PaperStudentDto {
 export interface UpdatePaperRequest {
   id: string
   examName: string
-  status?: number | null
-  startTime?: string | null
-  endTime?: string | null
-  paperLabelId?: string | null | undefined
-  duration?: number | null
+  status?: number
+  startTime?: string
+  endTime?: string
+  paperLabelId?: string
+  duration?: number
   shuffle?: boolean
   showMarkResult?: boolean
   showQUestionAnswer?: boolean
-  password?: string | null
+  password?: string
   type: number
   isPublish?: boolean
-  description?: string | null
+  description?: string
 }
