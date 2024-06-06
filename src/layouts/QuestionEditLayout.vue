@@ -4,8 +4,8 @@ import AppNavbar from '../components/navbar/AppNavbar.vue'
 import { onMounted, ref } from 'vue'
 import { Question, QuestionType } from '@/pages/question/types'
 import QuestionEditView from '@/pages/question/widgets/QuestionEditView.vue'
-// @ts-expect-error missing type
-import richer from 'richer-than-rich' // eslint-disable-line @typescript-eslint/no-unused-vars
+// @ts-expect-error Richer is not defined
+import Richer from 'richer-than-rich'
 import 'richer-than-rich/dist/style.css'
 import {
   GeoMarkdown2Objects,
@@ -481,7 +481,7 @@ onMounted(() => {
         </div>
         <div>
           <div class="p-1">
-            <VaScrollContainer class="min-h-[600px] max-h-[790px]" vertical>
+            <VaScrollContainer class="min-h-[600px] max-h-[90vh]" vertical>
               <div v-for="(question, i) in listQuestions" :key="question.id || ''" class="w-full">
                 <QuestionEditView :question="question" :index="i + 1" @edit="handleEditEvent" />
               </div>
@@ -515,7 +515,7 @@ onMounted(() => {
               <Richer
                 :model-value="editorContent"
                 :buttons="[{ name: 'format', label: 'Format', icon: 'i-moon', action: handleEditorBtnFormat }]"
-                class="h-[785px]"
+                class="h-[90vh]"
                 @keyup="handleEditor"
                 @click="handleEditorClick"
               ></Richer>

@@ -74,13 +74,13 @@ const getCorrectAnswer = (question: Question) => {
     <QuestionEditHeadView :question="props.question" :index="props.index" class="ml-[20px]" />
     <div class="mt-4 ml-[20px]">
       <!-- eslint-disable vue/no-v-html -->
-      <p v-html="formatContent(props.question?.content || '')"></p>
+      <div style="line-height: initial" v-html="formatContent(props.question?.content || '')"></div>
       <!--eslint-enable-->
     </div>
     <div class="mt-5 ml-[20px]">
       <b style="color: var(--va-success)">Correct answer:</b>
     </div>
-    <div class="mb-2 mt-2 flex flex-wrap gap-4 ml-[20px]">
+    <div style="line-height: initial" class="mb-2 mt-2 flex flex-wrap gap-4 ml-[20px]">
       <div
         v-for="(pair, index2) in getCorrectAnswer(props.question as Question)"
         :key="index2"
@@ -96,3 +96,9 @@ const getCorrectAnswer = (question: Question) => {
     />
   </VaCardContent>
 </template>
+
+<style scoped>
+li.mt-2 {
+  word-break: break-all;
+}
+</style>
