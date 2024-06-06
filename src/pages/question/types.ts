@@ -86,20 +86,21 @@ export type QuestionSearchRes = {
 
 export type Question = {
   content: string
-  image: string | null
-  audio: string | null
-  questionFolder: QuestionFolder | null
+  image?: string | null
+  audio?: string | null
+  questionFolder?: QuestionFolder | null
   questionType: QuestionType
-  questionLable: QuestionLable | null
-  questionPassages: QuestionPassage[]
+  questionLable?: QuestionLable | null
+  questionPassages?: QuestionPassage[] | null
   answers: Answer[]
-  createdBy: string
-  createdOn: string
-  lastModifiedBy: string
-  lastModifiedOn: string
-  deletedOn: string | null
-  deletedBy: string | null
-  id: string
+  createdBy?: string | null
+  createdOn?: string | null
+  lastModifiedBy?: string | null
+  lastModifiedOn?: string | null
+  deletedOn?: string | null
+  deletedBy?: string | null
+  id?: string | null | undefined
+  index?: number | null | undefined
 }
 
 export type QuestionLable = {
@@ -115,10 +116,10 @@ export type QuestionPassage = {
 }
 
 export type Answer = {
-  id: string
+  id?: string | null
   content: string
-  questionId: string
-  isCorrect: boolean
+  questionId?: string | null
+  isCorrect?: boolean | null
 }
 
 export type QuestionFolder = {

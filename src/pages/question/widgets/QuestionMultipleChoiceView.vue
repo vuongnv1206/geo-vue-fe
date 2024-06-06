@@ -17,6 +17,10 @@ const indexToLetter = (index: number) => {
   return String.fromCharCode(65 + index)
 }
 
+const getContentFormat = (question: Question) => {
+  return question.content.replace(/\n/g, '<br>')
+}
+
 const getCorrectAnswer = (question: Question) => {
   return question.answers
     .filter((answer) => answer.isCorrect)
@@ -29,7 +33,9 @@ const getCorrectAnswer = (question: Question) => {
   <VaCardContent class="leading-3 text-sm">
     <QuestionHeadView :question="props.question" :index="props.index" />
     <div class="mt-2">
-      {{ props.question?.content }}
+      <!-- eslint-disable vue/no-v-html -->
+      <p style="line-height: initial" v-html="getContentFormat(props.question as Question)" />
+      <!--eslint-enable-->
     </div>
     <VaCardBlock class="grid xs:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2 mt-2">
       <VaCardBlock v-for="(answer, index2) in props.question?.answers" :key="index2" class="col-span-1">

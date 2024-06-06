@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
-import { Question } from '../types'
-import QuestionHeadView from './child/QuestionHeadView.vue'
-import QuestionFooterView from './child/QuestionFooterView.vue'
+import { Question } from '../../types'
+import QuestionEditHeadView from './child/QuestionEditHeadView.vue'
 
 const props = defineProps<{
   question: Question | null
@@ -54,22 +53,24 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <VaCardContent class="leading-3 text-sm">
-    <QuestionHeadView :question="props.question" :index="props.index" />
-    <div class="mt-2">
+  <VaCardContent class="leading-3 p-2 text-sm py-5">
+    <QuestionEditHeadView :question="props.question" :index="props.index" class="ml-[20px]" />
+    <div class="mt-2 ml-[20px]">
       <span v-if="!readMoreActivated">
         <!-- eslint-disable vue/no-v-html -->
         <div style="line-height: initial" v-html="props.question?.content.slice(0, 500).replace(/\n/g, '<br>')"></div>
         <!--eslint-enable-->
         ...
-        <button href="#" class="text-primary" @click="readMoreActivated = !readMoreActivated">Read more</button>
+        <button class="text-primary" @click="readMoreActivated = !readMoreActivated">Read more</button>
       </span>
       <span v-else>
+        <!-- eslint-disable vue/no-v-html -->
         <div style="line-height: initial" v-html="props.question?.content.replace(/\n/g, '<br>')"></div>
+        <!--eslint-enable-->
       </span>
     </div>
     <!-- Question passages -->
-    <VaBadge overlap :text="`${props.question?.questionPassages?.length}`" class="mt-3">
+    <VaBadge overlap :text="`${props.question?.questionPassages?.length}`" class="mt-3 ml-[20px]">
       <VaButton
         preset="secondary"
         border-color="primary"
@@ -81,9 +82,13 @@ onBeforeMount(() => {
       </VaButton>
     </VaBadge>
     <!-- eslint-disable vue/no-v-html -->
-    <div v-if="showQuestionPassage" class="mt-3" v-html="getQuestionPassage(props.question as Question)"></div>
+    <div
+      v-if="showQuestionPassage"
+      class="mt-3 ml-[20px]"
+      v-html="getQuestionPassage(props.question as Question)"
+    ></div>
     <!--eslint-enable-->
-    <VaCardBlock class="grid xs:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2 mt-2">
+    <VaCardBlock class="grid xs:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2 mt-2 ml-[20px]">
       <VaCardBlock v-for="(answer, index2) in props.question?.answers" :key="index2" class="col-span-1">
         <VaCardContent>
           <b>{{ indexToLetter(index2) }}.</b> {{ answer.content }}

@@ -3,6 +3,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import AuthLayout from '../layouts/AuthLayout.vue'
 import AppLayout from '../layouts/AppLayout.vue'
+import QuestionEditLayout from '@/layouts/QuestionEditLayout.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -84,6 +85,11 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
     ],
+  },
+  {
+    name: 'question-edit',
+    path: '/question-edit/:id',
+    component: QuestionEditLayout,
   },
   {
     path: '/auth',

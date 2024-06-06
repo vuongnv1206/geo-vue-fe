@@ -4,7 +4,7 @@ import { watchDebounced } from '@vueuse/core'
 import { Question, QuestionTree, SearchQuestion, QuestionSearchRes, Pagination } from './types'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useQuestionStore } from '@/stores/modules/question.module'
-import { useToast } from 'vuestic-ui'
+import { useModal, useToast } from 'vuestic-ui'
 import { getErrorMessage } from '@/services/utils'
 import { QuestionTypeColor } from '@services/utils'
 import QuestionView from './widgets/QuestionView.vue'
@@ -12,6 +12,7 @@ import QuestionView from './widgets/QuestionView.vue'
 const nodes = ref<QuestionTree[]>([])
 const stores = useQuestionFolderStore()
 const storesQuestion = useQuestionStore()
+const { confirm } = useModal()
 
 const loading = ref(false)
 const loadingNode = ref(false)
@@ -131,6 +132,7 @@ const searchQuestionWithType = () => {
 const handleSelectFolder = (node: QuestionTree) => {
   currentSelectedFolder.value = node
   searchValue.value.folderId = node.id
+  pagination.value.page = 1
   searchQuestion(searchValue.value)
 }
 
@@ -211,24 +213,32 @@ const editQuestion = (question: Question) => {
 }
 
 const deleteQuestion = (question: Question) => {
-  storesQuestion
-    .DeleteQuestion(question.id)
-    .then(() => {
-      init({
-        title: 'Success',
-        message: 'Delete question successfully',
-        color: 'success',
+  confirm({
+    title: 'Delete question',
+    message: `Are you sure you want to delete?`,
+  }).then((agreed) => {
+    if (!agreed) {
+      return
+    }
+    storesQuestion
+      .DeleteQuestion(question.id || '')
+      .then(() => {
+        init({
+          title: 'Success',
+          message: 'Delete question successfully',
+          color: 'success',
+        })
+        searchQuestion(searchValue.value)
       })
-      searchQuestion(searchValue.value)
-    })
-    .catch((err) => {
-      const message = getErrorMessage(err)
-      init({
-        title: 'Error',
-        message: message,
-        color: 'danger',
+      .catch((err) => {
+        const message = getErrorMessage(err)
+        init({
+          title: 'Error',
+          message: message,
+          color: 'danger',
+        })
       })
-    })
+  })
 }
 
 const AddNewQuestion = () => {
@@ -372,7 +382,7 @@ onMounted(() => {
                   </VaCardContent>
                 </VaCard>
               </VaSkeletonGroup>
-              <div v-for="testQuestion in testQuestions" :key="testQuestion.id">
+              <div v-for="testQuestion in testQuestions" :key="testQuestion.id || ''">
                 <QuestionView :question="testQuestion" :index="null" @edit="editQuestion" @delete="deleteQuestion" />
               </div>
               <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
