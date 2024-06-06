@@ -69,6 +69,11 @@ const routes: Array<RouteRecordRaw> = [
             path: 'admin/paper-config/:id',
             component: () => import('../pages/examination/PaperConfigAction.vue'),
           },
+          {
+            name: 'paper-config-online',
+            path: 'admin/paper-config-online/:id',
+            component: () => import('../pages/examination/PaperConfigOnline.vue'),
+          },
         ],
       },
       {

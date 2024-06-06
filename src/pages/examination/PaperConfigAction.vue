@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { PaperDto } from '@/pages/examination/types'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { useToast } from 'vuestic-ui'
+
 const paperDetail = ref<PaperDto | null>(null)
 const route = useRoute()
+const router = useRouter()
 const paperStore = usePaperStore()
 const { init: notify } = useToast()
+const paperId = route.params.id
 const getPaperDetail = () => {
-  const paperId = route.params.id
   paperStore
     .paperDetail(paperId.toString())
     .then((res) => {
@@ -21,6 +23,10 @@ const getPaperDetail = () => {
         color: 'danger',
       })
     })
+}
+
+const configOnline = () => {
+  router.push({ name: 'paper-config-online', params: { id: paperId } })
 }
 
 onMounted(() => {
@@ -43,7 +49,9 @@ onMounted(() => {
             both multiple choice and essay
           </p>
 
-          <VaButton preset="secondary" border-color="primary" icon="settings">Config Online Testing</VaButton>
+          <VaButton preset="secondary" border-color="primary" icon="settings" @click="configOnline"
+            >Config Online Testing</VaButton
+          >
         </VaCardContent>
       </VaCard>
 
