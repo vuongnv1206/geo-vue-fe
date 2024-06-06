@@ -1,5 +1,5 @@
 import papersService from '@/services/paper.service'
-import { PaperDto, PaperInListDto, SearchPaperRequest } from '@/pages/examination/types'
+import { PaperDto, PaperInListDto, SearchPaperRequest, UpdatePaperRequest } from '@/pages/examination/types'
 
 import { defineStore } from 'pinia'
 
@@ -32,6 +32,15 @@ export const usePaperStore = defineStore('paper', {
       try {
         const response = await papersService.paperDetail(id)
         return response
+      } catch (error) {
+        this.error = error as string
+        throw error
+      }
+    },
+    async paperUpdate(id: string, request: UpdatePaperRequest): Promise<any> {
+      try {
+        const res = await papersService.paperUpdate(id, request)
+        return res
       } catch (error) {
         this.error = error as string
         throw error

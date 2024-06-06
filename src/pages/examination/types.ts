@@ -83,6 +83,8 @@ export interface PaperDto {
   paperLabelId?: string | null
   numberOfQuestion?: number
   duration?: number | null
+  startTime?: string | null
+  endTime?: string | null
   status?: string | null
   showMarkResult?: boolean
   showQuestionAnswer?: boolean
@@ -118,4 +120,21 @@ export interface CombinedData {
   createdOn: string
   lastModifiedBy: string | null
   lastModifiedOn: string | null
+}
+
+export interface UpdatePaperRequest {
+  id: string
+  examName: string
+  status?: number | null
+  startTime?: string | null
+  endTime?: string | null
+  paperLabelId?: string | null | undefined
+  duration?: number | null
+  shuffle?: boolean
+  showMarkResult?: boolean
+  showQUestionAnswer?: boolean
+  password?: string | null
+  type: number
+  isPublish?: boolean
+  description?: string | null
 }
