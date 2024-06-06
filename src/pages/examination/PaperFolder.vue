@@ -16,6 +16,7 @@ import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const paperFolderStore = usePaperFolderStore()
 const paperStore = usePaperStore()
 const loading = ref(true)
@@ -86,35 +87,53 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
 }
 
 const onFolderDelete = async (folder: PaperFolderDto) => {
-  try {
-    await paperFolderStore.deletePaperFolder(folder.id)
-    notify({
-      message: `${folder.name} has been deleted`,
-      color: 'success',
-    })
-    getPaperFolders(currentFolderId.value) // Refresh the list of folders under the current parent folder
-    getPapers(currentFolderId.value) // Refresh the list of papers under the current parent folder
-  } catch (err: any) {
-    notify({
-      message: `Failed to delete folder\n${err.message}`,
-      color: 'error',
-    })
+  const result = await confirm({
+    message: `Are you sure you want to delete "${folder.name}"?`,
+    title: 'Delete Folder',
+    okText: 'Confirm',
+    cancelText: 'Cancel',
+    size: 'small',
+  })
+  if (result) {
+    try {
+      await paperFolderStore.deletePaperFolder(folder.id)
+      notify({
+        message: `${folder.name} has been deleted`,
+        color: 'success',
+      })
+      getPaperFolders(currentFolderId.value) // Refresh the list of folders under the current parent folder
+      getPapers(currentFolderId.value) // Refresh the list of papers under the current parent folder
+    } catch (err: any) {
+      notify({
+        message: `Failed to delete folder\n${err.message}`,
+        color: 'error',
+      })
+    }
   }
 }
 
 const onPaperDelete = async (paper: PaperInListDto) => {
-  try {
-    await paperStore.deletePaper(paper.id)
-    notify({
-      message: `${paper.examName} has been deleted`,
-      color: 'success',
-    })
-    getPapers(currentFolderId.value)
-  } catch (err: any) {
-    notify({
-      message: `Failed to delete paper\n${err.message}`,
-      color: 'error',
-    })
+  const result = await confirm({
+    message: `Are you sure you want to delete "${paper.examName}"?`,
+    title: 'Delete Folder',
+    okText: 'Confirm',
+    cancelText: 'Cancel',
+    size: 'small',
+  })
+  if (result) {
+    try {
+      await paperStore.deletePaper(paper.id)
+      notify({
+        message: `${paper.examName} has been deleted`,
+        color: 'success',
+      })
+      getPapers(currentFolderId.value)
+    } catch (err: any) {
+      notify({
+        message: `Failed to delete paper\n${err.message}`,
+        color: 'error',
+      })
+    }
   }
 }
 
@@ -213,9 +232,7 @@ const handleFolderDoubleClick = async (event: any) => {
   }
 }
 
-const router = useRouter()
 const showPaperDetail = (paper: PaperInListDto) => {
-  console.log('Show paper detail:', paper)
   router.push({ name: 'admin-exam-detail', params: { id: paper.id } })
   // For example, you could navigate to a detail page
 }
@@ -275,6 +292,11 @@ const showAddPaperFolderModal = () => {
 const showEditPaperFolderModal = (folder: PaperFolderDto) => {
   folderToEdit.value = folder
   doShowEditFolderModal.value = true
+}
+
+const showCreatePaper = () => {
+  console.log(currentFolderId.value)
+  router.push({ name: 'create-paper', params: { folderId: currentFolderId.value } })
 }
 
 const beforeEditFormModalClose = async (hide: () => unknown) => {
@@ -387,6 +409,7 @@ const combinedData = computed(() => {
           <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
             Delete
           </VaButton>
+          <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
 
           <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
         </div>

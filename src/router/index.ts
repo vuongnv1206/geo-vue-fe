@@ -1,4 +1,3 @@
-// eslint-disable-next-line prettier/prettier
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import AuthLayout from '../layouts/AuthLayout.vue'
@@ -56,9 +55,33 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/examination/PaperFolder.vue'),
           },
           {
+            name: 'create-paper',
+            path: 'create-paper/:folderId?',
+            component: () => import('../pages/examination/CreatePaper.vue'),
+          },
+          {
             name: 'admin-exam-detail',
             path: 'admin/exam-detail/:id',
             component: () => import('../pages/examination/PaperAdminDetail.vue'),
+          },
+          {
+            name: 'paper-config',
+            path: 'admin/paper-config/:id',
+            component: () => import('../pages/examination/PaperConfigAction.vue'),
+          },
+        ],
+      },
+      {
+        name: 'exam',
+        path: 'exam',
+        meta: {
+          requiresAuth: true,
+        },
+        children: [
+          {
+            name: 'exam-start',
+            path: 'exam-start/:id',
+            component: () => import('../pages/examination/student/PaperStartView.vue'),
           },
         ],
       },
@@ -81,6 +104,11 @@ const routes: Array<RouteRecordRaw> = [
             name: 'group-class',
             path: 'group-class',
             component: () => import('../pages/classrooms/GroupClassPage.vue'),
+          },
+          {
+            name: 'class',
+            path: 'class',
+            component: () => import('../pages/classrooms/Class.vue'),
           },
         ],
       },

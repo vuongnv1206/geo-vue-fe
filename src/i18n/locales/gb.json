@@ -62,8 +62,10 @@
     "examinations": "Examinations",
     "paper-folder": "Paper folder",
     "classroom": "Classroom",
+    "class": "Class",
     "group-class": "Group class",
-    "teacher-group": "Teacher Group"
+    "teacher-group": "Teacher Group",
+    "exam": "Exam"
   },
   "messages": {
     "all": "See all messages",

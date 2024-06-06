@@ -58,10 +58,22 @@ export type TeacherTeamRequest = {
 
 export type GroupTeacherResponse = {
   data: GroupTeacher[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
 
 export type TeacherTeamResponse = {
   data: TeacherTeam[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
 
 export type TeacherInGroupRequest = {

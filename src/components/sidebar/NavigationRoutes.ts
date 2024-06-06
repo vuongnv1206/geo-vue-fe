@@ -74,6 +74,13 @@ export default {
             permission: 'GroupClasses.View',
           },
         },
+        {
+          name: 'class',
+          displayName: 'menu.class',
+          meta: {
+            permission: 'Classes.View',
+          },
+        },
       ],
     },
     {
