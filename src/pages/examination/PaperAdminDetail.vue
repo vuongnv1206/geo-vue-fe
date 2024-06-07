@@ -390,6 +390,7 @@ onMounted(() => {
             </VaCardContent>
           </VaCard>
         </VaCardContent>
+        <VaPagination :pages="10" :visible-pages="3" buttons-preset="secondary" class="justify-center sm:justify-end" />
       </VaCard>
     </template>
   </VaLayout>
