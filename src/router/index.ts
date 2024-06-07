@@ -117,6 +117,38 @@ const routes: Array<RouteRecordRaw> = [
           },
         ],
       },
+      // {
+      //   name: 'assignment',
+      //   path: '/assignments',
+      //   meta: {
+      //     requiresAuth: true,
+      //   },
+      //   children: [
+      //     {
+      //       name: 'assignments',
+      //       component: () => import('../pages/assignment/Assignment.vue'),
+      //       path: '',
+      //     },
+      //     {
+      //       name: 'assignment-details',
+      //       path: ':id',
+      //       component: () => import('../pages/assignment/widgets/AssignmentDetails.vue'),
+      //     },
+      //     {
+      //       name: 'edit-assignment-details',
+      //       path: '/assignments/:id/edit',
+      //       component: () => import('../pages/assignment/widgets/EditAssignmentDetails.vue'),
+      //     },
+      //   ],
+      // },
+      {
+        name: 'subjects',
+        path: 'subjects',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/subject/Subject.vue'),
+      },
     ],
   },
   {
