@@ -109,7 +109,6 @@ onMounted(() => {
         <div class="flex flex-col md:flex-row gap-2 justify-start"></div>
         <VaButton icon="add" @click="createNewGroupClass">GroupClass</VaButton>
       </div>
-
       <GroupClassCard
         :group-classes="listGroupClass"
         :loading="loading"
