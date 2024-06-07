@@ -2,7 +2,7 @@
 import { useRoute } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { ref, onMounted } from 'vue'
-import { PaperStudentDto } from '../types'
+import { PaperStudentDto, SubmitPaperDto } from '../types'
 import { useToast } from 'vuestic-ui'
 const route = useRoute()
 const { init: notify } = useToast()
@@ -10,8 +10,8 @@ const paperStore = usePaperStore()
 
 const paperDetail = ref<PaperStudentDto | null>(null)
 
+const paperId = route.params.id
 const getPaperDetail = () => {
-  const paperId = route.params.id
   paperStore
     .paperDetailByStudentRole(paperId.toString())
     .then((res) => {
@@ -28,6 +28,44 @@ const getPaperDetail = () => {
 const isShowHistory = ref(false)
 const showTestHistory = () => {
   isShowHistory.value = !isShowHistory.value
+  getSubmittedStudents()
+}
+
+const submittedStudents = ref<SubmitPaperDto[] | null>(null)
+const dataFilterSubmittedStudent = ref({
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 10,
+  orderBy: ['id'],
+  paperId: paperId.toString(),
+})
+const getSubmittedStudents = () => {
+  paperStore
+    .getSubmittedStudentsInPaper(paperId.toString(), dataFilterSubmittedStudent.value)
+    .then((res) => {
+      submittedStudents.value = res.data
+    })
+    .catch((error) => {
+      notify({
+        message: `get fail submitted students \n ${error}`,
+        color: 'danger',
+      })
+    })
+}
+const getFormattedDuration = (startTime: string, endTime: string) => {
+  const start = new Date(startTime)
+  const end = new Date(endTime)
+  const durationInSeconds = (end.getTime() - start.getTime()) / 1000
+
+  if (durationInSeconds < 60) {
+    return `${Math.round(durationInSeconds)} sec`
+  } else if (durationInSeconds < 3600) {
+    return `${Math.round(durationInSeconds / 60)} min`
+  } else if (durationInSeconds < 86400) {
+    return `${Math.round(durationInSeconds / 3600)} hours`
+  } else {
+    return `${Math.round(durationInSeconds / 86400)} days`
+  }
 }
 
 onMounted(() => {
@@ -78,15 +116,24 @@ onMounted(() => {
   <div v-if="isShowHistory">
     <VaCard>
       <VaCardTitle>Your work history</VaCardTitle>
-      <VaCardContent> Empty </VaCardContent>
+      <VaCardContent v-if="submittedStudents === null && submittedStudents === undefined"> Empty </VaCardContent>
       <VaCardContent class="grid grid-cols-3">
-        <VaCard outlined class="cursor-pointer mr-2 mb-2">
-          <VaCardTitle class="justify-center" style="font-size: 0.8rem">Your score: 5</VaCardTitle>
+        <VaCard
+          v-for="submittedStudent in submittedStudents"
+          :key="submittedStudent.id"
+          outlined
+          class="cursor-pointer mr-2 mb-2"
+        >
+          <VaCardTitle class="justify-center" style="font-size: 0.8rem"
+            >Your score: {{ submittedStudent.totalMark }}</VaCardTitle
+          >
           <VaDivider class="m-0" />
-          <VaCardContent>
+          <VaCardContent v-if="submittedStudent.endTime !== null && submittedStudent.endTime !== undefined">
             <div class="flex justify-between mb-2">
               <p><VaIcon name="timer" class="material-symbols-outlined mr-2" /> Duration</p>
-              <p class="font-semibold">40 minute(s)</p>
+              <p class="font-semibold">
+                {{ getFormattedDuration(submittedStudent.startTime, submittedStudent.endTime) }}
+              </p>
             </div>
             <div class="flex justify-between mt-2 mb-2">
               <p><VaIcon name="check_circle" color="success" class="material-symbols-outlined mr-2" />Correct amount</p>

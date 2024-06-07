@@ -4,7 +4,7 @@ import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import QuestionView from '../question/widgets/QuestionView.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto } from './types'
+import { PaperDto, SubmitPaperDto } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 
 const route = useRoute()
@@ -15,8 +15,8 @@ const { confirm } = useModal()
 
 const paperDetail = ref<PaperDto | null>(null)
 
+const paperId = route.params.id
 const getPaperDetail = () => {
-  const paperId = route.params.id
   paperStore
     .paperDetail(paperId.toString())
     .then((res) => {
@@ -91,8 +91,46 @@ const handleSaveAssigned = (selectedOption: string) => {
   showAssignPaperModal.value = false
 }
 
+const submittedStudents = ref<SubmitPaperDto[] | null>(null)
+const dataFilterSubmittedStudent = ref({
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 10,
+  orderBy: ['id'],
+  paperId: paperId.toString(),
+})
+const getSubmittedStudents = () => {
+  paperStore
+    .getSubmittedStudentsInPaper(paperId.toString(), dataFilterSubmittedStudent.value)
+    .then((res) => {
+      submittedStudents.value = res.data
+    })
+    .catch((error) => {
+      notify({
+        message: `get fail submitted students \n ${error}`,
+        color: 'danger',
+      })
+    })
+}
+const getFormattedDuration = (startTime: string, endTime: string) => {
+  const start = new Date(startTime)
+  const end = new Date(endTime)
+  const durationInSeconds = (end.getTime() - start.getTime()) / 1000
+
+  if (durationInSeconds < 60) {
+    return `${Math.round(durationInSeconds)} sec`
+  } else if (durationInSeconds < 3600) {
+    return `${Math.round(durationInSeconds / 60)} min`
+  } else if (durationInSeconds < 86400) {
+    return `${Math.round(durationInSeconds / 3600)} hours`
+  } else {
+    return `${Math.round(durationInSeconds / 86400)} days`
+  }
+}
+
 onMounted(() => {
   getPaperDetail()
+  getSubmittedStudents()
 })
 </script>
 
@@ -296,48 +334,63 @@ onMounted(() => {
             </VaCard>
           </VaTabs>
         </VaCardContent>
-        <VaCardContent v-if="assignedOptionValue === 'Everyone'" class="p-2 grid md:grid-cols-6 xs:grid-cols-2">
-          <VaCard outlined class="mr-2" href="./text-review">
-            <div class="p-2 flex">
-              <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
+        <VaCardContent v-if="assignedOptionValue === 'Everyone'" class="p-2 grid md:grid-cols-4 xs:grid-cols-2">
+          <VaCard
+            v-for="submittedStudent in submittedStudents"
+            :key="submittedStudent.id"
+            outlined
+            class="mr-2"
+            href="./text-review"
+          >
+            <div class="p-2 flex justify-between">
+              <div class="flex">
+                <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
+                <div>
+                  <p>
+                    <b>{{ submittedStudent.creatorName }}</b>
+                  </p>
+                  <span style="font-weight: none">Point: {{ submittedStudent.totalMark }}</span>
+                </div>
+              </div>
               <div>
-                <p><b>Duc nguyen</b></p>
-                <span style="font-weight: none">Point: 0</span>
+                <VaChip
+                  square
+                  size="small"
+                  :color="
+                    submittedStudent.status === 'doing'
+                      ? 'warning'
+                      : submittedStudent.status === 'end'
+                        ? 'success'
+                        : 'secondary'
+                  "
+                  >{{ submittedStudent.status }}</VaChip
+                >
               </div>
             </div>
             <VaDivider class="m-0" />
             <VaCardContent class="p-2">
-              <div class="flex justify-between">
-                <p class="va-text-secondary text-xs">Duration:</p>
-                <p class="va-text-secondary text-xs">9 second(s)</p>
-              </div>
-              <div class="flex justify-between">
-                <p class="va-text-secondary text-xs">Due Date:</p>
-                <p class="va-text-secondary text-xs">29 minute(s) ago</p>
-              </div>
-            </VaCardContent>
-          </VaCard>
-          <VaCard outlined class="mr-2" href="./text-review">
-            <div class="p-2 flex">
-              <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
-              <div>
-                <p><b>Duc nguyen</b></p>
-                <span style="font-weight: none">Point: 0</span>
-              </div>
-            </div>
-            <VaDivider class="m-0" />
-            <VaCardContent class="p-2">
-              <div class="flex justify-between">
-                <p class="va-text-secondary text-xs">Duration:</p>
-                <p class="va-text-secondary text-xs">9 second(s)</p>
-              </div>
-              <div class="flex justify-between">
-                <p class="va-text-secondary text-xs">Due Date:</p>
-                <p class="va-text-secondary text-xs">29 minute(s) ago</p>
-              </div>
+              <template v-if="submittedStudent.endTime !== null && submittedStudent.endTime !== undefined">
+                <div class="flex justify-between">
+                  <p class="va-text-secondary text-xs">Duration:</p>
+                  <p class="va-text-secondary text-xs">
+                    {{ getFormattedDuration(submittedStudent.startTime, submittedStudent.endTime) }}
+                  </p>
+                </div>
+                <div class="flex justify-between">
+                  <p class="va-text-secondary text-xs">Due Date:</p>
+                  <p class="va-text-secondary text-xs">{{ submittedStudent.endTime }}</p>
+                </div>
+              </template>
+              <template v-if="submittedStudent.endTime === null">
+                <div class="flex justify-between">
+                  <p class="va-text-secondary text-xs">Start time:</p>
+                  <p class="va-text-secondary text-xs">{{ submittedStudent.startTime }}</p>
+                </div>
+              </template>
             </VaCardContent>
           </VaCard>
         </VaCardContent>
+        <VaPagination :pages="10" :visible-pages="3" buttons-preset="secondary" class="justify-center sm:justify-end" />
       </VaCard>
     </template>
   </VaLayout>
