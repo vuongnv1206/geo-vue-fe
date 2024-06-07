@@ -71,6 +71,16 @@ export class PapersService implements IPapersService {
         return Promise.reject(error)
       })
   }
+  async getSubmittedStudentsInPaper(paperId: string, request: any): Promise<any> {
+    return apiService
+      .post(`/v1/submitpapers/paper/${paperId}/students-submitted`, request)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new PapersService()
