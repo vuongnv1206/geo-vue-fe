@@ -130,7 +130,7 @@ const handleSelectionChange = (selectedItems: Assignment[]) => {
             color="primary"
             icon="mso-edit"
             aria-label="Edit assignment"
-            @click="emit('edit', assignment as Assignment)"
+            @click="$emit('edit', assignment as Assignment)"
           />
           <VaButton
             preset="primary"
@@ -138,7 +138,7 @@ const handleSelectionChange = (selectedItems: Assignment[]) => {
             icon="mso-delete"
             color="danger"
             aria-label="Delete assignment"
-            @click="emit('delete', assignment as Assignment)"
+            @click="$emit('delete', assignment as Assignment)"
           />
         </div>
       </template>

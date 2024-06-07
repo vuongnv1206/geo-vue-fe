@@ -29,6 +29,9 @@ export const format = {
   formatDate: (date: Date) => {
     return dayjs(date).format('DD/MM/YYYY - HH:mm')
   },
+  getTimeString: (date: string) => {
+    return date.split('T')[0] + ' ' + date.split('T')[1].split('.')[0]
+  },
 }
 
 export const notifications = {
