@@ -11,7 +11,7 @@ const props = defineProps<{
   question: Question | null
   index: number | null
   showActionButton: boolean
-  isStripe: boolean
+  isStripe: boolean | undefined
 }>()
 
 const emit = defineEmits<{
