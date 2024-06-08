@@ -5,11 +5,10 @@ import { validators } from '@/services/utils'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { Subject } from '@pages/subject/types'
 import VueDatePicker from '@vuepic/vue-datepicker'
-import { useForm, ValidationRule } from 'vuestic-ui'
 import { onMounted, computed, ref, watch } from 'vue'
 import { useSubjectStore } from '@/stores/modules/subject.module'
 import { EmptyAssignment, Attachment, Assignment } from '../types'
-import { SelectableOption } from 'vuestic-ui/dist/types/composables'
+import { useForm } from 'vuestic-ui/web-components'
 dayjs.extend(utc)
 
 const { validate } = useForm('form')
@@ -131,11 +130,7 @@ onMounted(() => {
 
 <template>
   <VaForm class="flex flex-col gap-2">
-    <VaInput
-      v-model="newAssignment.name"
-      label="Name"
-      :rules="[validators.required2('name'), validators.maxLength(50)]"
-    />
+    <VaInput v-model="newAssignment.name" label="Name" :rules="[validators.required, validators.maxLength(50)]" />
     <VueDatePicker
       v-model="date"
       label="Time To Do"
@@ -159,7 +154,7 @@ onMounted(() => {
       value-by="value"
       :options="subjectsOptions"
       label="Subject"
-      :rules="[validators.required2('subject') as ValidationRule<SelectableOption>]"
+      :rules="[validators.required]"
     />
     <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="emit('close')">Cancel</VaButton>
