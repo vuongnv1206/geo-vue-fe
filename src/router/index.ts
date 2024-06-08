@@ -121,7 +121,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     name: 'question-edit',
-    path: '/question-edit/:id',
+    path: '/question-edit',
     component: QuestionEditLayout,
   },
   {

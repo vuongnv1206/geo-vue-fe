@@ -22,6 +22,16 @@ class QuestionService {
         return Promise.reject(error)
       })
   }
+  async createQuestion(data: any): Promise<void> {
+    return apiService
+      .post('/v1/question', data)
+      .then(() => {
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new QuestionService()
