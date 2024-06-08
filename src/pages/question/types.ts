@@ -101,6 +101,7 @@ export type Question = {
   deletedBy?: string | null
   id?: string | null | undefined
   index?: number | null | undefined
+  isSelected: boolean
 }
 
 export type QuestionLable = {

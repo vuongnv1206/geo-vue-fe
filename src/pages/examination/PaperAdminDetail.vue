@@ -302,7 +302,7 @@ onMounted(() => {
                   <VaDivider />
                   <VaCardContent class="p-0">
                     <template v-for="question in paperDetail?.questions" :key="question.id">
-                      <QuestionView :question="question" :index="null" />
+                      <QuestionView :question="question" :index="null" :is-stripe="false" :show-action-button="false" />
                     </template>
                   </VaCardContent>
                 </VaCard>
