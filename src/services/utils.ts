@@ -11,7 +11,6 @@ export const validators = {
     return pattern.test(v) || 'Please enter a valid email address'
   },
   required: (v: any) => !!v || 'This field is required',
-  isNumber: (v: any) => !isNaN(parseFloat(v)) || 'This field must be a number',
 }
 
 export const getErrorMessage = (error: any) => {

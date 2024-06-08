@@ -180,18 +180,3 @@ export interface SubmitPaperResponse {
   hasPreviousPage: boolean
   hasNextPage: boolean
 }
-
-export interface CreatePaperRequest {
-  examName: string
-  status: number | 1 // 1: publish, 2: private
-  password: string | undefined
-  type: number
-  paperFolderId?: string
-  description?: string
-  questions: QuestionIntoPaperRequest[]
-}
-
-export interface QuestionIntoPaperRequest {
-  questionId: string | null | undefined
-  mark: number | 1
-}

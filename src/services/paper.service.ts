@@ -4,7 +4,6 @@ import {
   SearchPaperRequest,
   UpdatePaperRequest,
   PaperStudentDto,
-  CreatePaperRequest,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -75,16 +74,6 @@ export class PapersService implements IPapersService {
   async getSubmittedStudentsInPaper(paperId: string, request: any): Promise<any> {
     return apiService
       .post(`/v1/submitpapers/paper/${paperId}/students-submitted`, request)
-      .then((res) => {
-        return Promise.resolve(res.data)
-      })
-      .catch((error) => {
-        return Promise.reject(error)
-      })
-  }
-  async createPaper(request: CreatePaperRequest): Promise<any> {
-    return apiService
-      .post('/v1/papers', request)
       .then((res) => {
         return Promise.resolve(res.data)
       })

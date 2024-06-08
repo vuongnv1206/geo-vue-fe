@@ -60,11 +60,6 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/examination/CreatePaper.vue'),
           },
           {
-            name: 'create-paper-question-bank',
-            path: 'create-paper/:folderId?/question-bank',
-            component: () => import('../pages/examination/CreatePaperInQuestionBank.vue'),
-          },
-          {
             name: 'admin-exam-detail',
             path: 'admin/exam-detail/:id',
             component: () => import('../pages/examination/PaperAdminDetail.vue'),

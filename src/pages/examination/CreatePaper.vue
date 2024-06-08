@@ -1,16 +1,11 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useToast } from 'vuestic-ui'
 
 const route = useRoute()
-const router = useRouter()
 const folderId = ref(route.params.folderId ?? null)
 const basic = ref([])
-
-const createPaperUseQuestionBank = () => {
-  router.push({ name: 'create-paper-question-bank', params: { folderId: folderId.value } })
-}
 
 onMounted(() => {
   const { init: notify } = useToast()
@@ -58,7 +53,7 @@ onMounted(() => {
     <div style="flex: 1">
       <VaCard>
         <VaCardContent>
-          <VaButton block outline color="primary" style="margin-bottom: 10px" @click="createPaperUseQuestionBank">
+          <VaButton block outline color="primary" style="margin-bottom: 10px">
             <VaIcon name="edit" style="margin-right: 10px" /> Tự soạn Đề thi / Bài tập
           </VaButton>
           <p style="margin-left: 40px; color: gray">

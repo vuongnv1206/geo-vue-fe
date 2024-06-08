@@ -383,14 +383,7 @@ onMounted(() => {
                 </VaCard>
               </VaSkeletonGroup>
               <div v-for="testQuestion in testQuestions" :key="testQuestion.id || ''">
-                <QuestionView
-                  :question="testQuestion"
-                  :index="null"
-                  :is-stripe="false"
-                  :show-action-button="true"
-                  @edit="editQuestion"
-                  @delete="deleteQuestion"
-                />
+                <QuestionView :question="testQuestion" :index="null" @edit="editQuestion" @delete="deleteQuestion" />
               </div>
               <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
                 <div class="flex flex-col gap-4 w-full">

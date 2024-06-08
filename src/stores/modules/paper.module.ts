@@ -6,7 +6,6 @@ import {
   UpdatePaperRequest,
   PaperStudentDto,
   SubmitPaperResponse,
-  CreatePaperRequest,
 } from '@/pages/examination/types'
 
 import { defineStore } from 'pinia'
@@ -67,15 +66,6 @@ export const usePaperStore = defineStore('paper', {
       try {
         const response = await papersService.getSubmittedStudentsInPaper(paperId, request)
         return response
-      } catch (error) {
-        this.error = error as string
-        throw error
-      }
-    },
-    async createPaper(request: CreatePaperRequest): Promise<any> {
-      try {
-        const res = await papersService.createPaper(request)
-        return res
       } catch (error) {
         this.error = error as string
         throw error
