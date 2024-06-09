@@ -1,4 +1,5 @@
 import { QuestionType } from '@/pages/question/types'
+import dayjs from 'dayjs'
 
 export const sleep = (ms = 0) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -12,6 +13,50 @@ export const validators = {
   },
   required: (v: any) => !!v || 'This field is required',
   isNumber: (v: any) => !isNaN(parseFloat(v)) || 'This field must be a number',
+  required2: (fieldName: string) => (v: string) => !!v || `Field ${fieldName} is required`,
+  minLength: (length: number) => (v: string) =>
+    (v && v.length >= length) || `Must be greater than ${length} characters`,
+  // maxLength: (length: number) => (v: string) => (v && v.length <= length) || `Must be less than ${length} characters`,
+  maxLength: (length: number) => (v: string | null) =>
+    v === null || v.length <= length || `Must be less than ${length} characters`,
+  numeric: (v: string) => /^\d+$/.test(v) || 'Only numeric characters are allowed',
+  minValue: (min: number) => (v: string) =>
+    (v && parseFloat(v) >= min) || `Value must be greater than or equal to ${min}`,
+  maxValue: (max: number) => (v: string) => (v && parseFloat(v) <= max) || `Value must be less than or equal to ${max}`,
+  validDate: (v: string) => !isNaN(Date.parse(v)) || 'Please enter a valid date',
+}
+
+export const format = {
+  formatDate: (date: Date) => {
+    return dayjs(date).format('DD/MM/YYYY - HH:mm')
+  },
+  getTimeString: (date: string) => {
+    return date.split('T')[0] + ' ' + date.split('T')[1].split('.')[0]
+  },
+}
+
+export const notifications = {
+  updatedSuccessfully: (message: string) => {
+    return message + ' updated successfully'
+  },
+  createSuccessfully: (message: string) => {
+    return message + ' created successfully'
+  },
+  deleteSuccessfully: (message: string) => {
+    return message + ' deleted successfully'
+  },
+  getFailed: (message: string) => {
+    return 'Failed to get ' + message + '\n'
+  },
+  updateFailed: (message: string) => {
+    return 'Failed to update ' + message + '\n'
+  },
+  createFailed: (message: string) => {
+    return 'Failed to create ' + message + '\n'
+  },
+  deleteFailed: (message: string) => {
+    return 'Failed to delete ' + message + '\n'
+  },
 }
 
 export const getErrorMessage = (error: any) => {

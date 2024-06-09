@@ -65,7 +65,9 @@
     "class": "Class",
     "group-class": "Group class",
     "teacher-group": "Teacher Group",
-    "exam": "Exam"
+    "exam": "Exam",
+    "assignments": "Assignment",
+    "subjects": "Subject"
   },
   "messages": {
     "all": "See all messages",

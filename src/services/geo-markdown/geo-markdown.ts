@@ -334,6 +334,9 @@ const readingMarkdown = (question: Question, index: number) => {
   const passage = `Q${index + 1}. ${question.content}`
   const questions = question.questionPassages
     ?.map((passageQuestion, passageIndex) => {
+      if (!passageQuestion.answers) {
+        return ''
+      }
       const answers = passageQuestion.answers
         .map((answer, answerIndex) => {
           const isCorrect = answer.isCorrect ? '*' : ''
