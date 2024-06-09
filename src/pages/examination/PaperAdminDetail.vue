@@ -94,6 +94,10 @@ const handleSaveAssigned = (selectedOption: string) => {
 onMounted(() => {
   getPaperDetail()
 })
+
+const navigateToExamReview = () => {
+  router.push({ name: 'exam-review' })
+}
 </script>
 
 <template>
@@ -297,45 +301,27 @@ onMounted(() => {
           </VaTabs>
         </VaCardContent>
         <VaCardContent v-if="assignedOptionValue === 'Everyone'" class="p-2 grid md:grid-cols-6 xs:grid-cols-2">
-          <VaCard outlined class="mr-2" href="./text-review">
-            <div class="p-2 flex">
-              <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
-              <div>
-                <p><b>Duc nguyen</b></p>
-                <span style="font-weight: none">Point: 0</span>
+          <VaCard outlined class="mr-2" style="cursor: pointer">
+            <div style="width: 100%; height: 100%" @click="navigateToExamReview">
+              <div class="p-2 flex">
+                <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
+                <div>
+                  <p><b>Duc nguyen</b></p>
+                  <span style="font-weight: none">Point: 0</span>
+                </div>
               </div>
+              <VaDivider class="m-0" />
+              <VaCardContent class="p-2">
+                <div class="flex justify-between">
+                  <p class="va-text-secondary text-xs">Duration:</p>
+                  <p class="va-text-secondary text-xs">9 second(s)</p>
+                </div>
+                <div class="flex justify-between">
+                  <p class="va-text-secondary text-xs">Due Date:</p>
+                  <p class="va-text-secondary text-xs">29 minute(s) ago</p>
+                </div>
+              </VaCardContent>
             </div>
-            <VaDivider class="m-0" />
-            <VaCardContent class="p-2">
-              <div class="flex justify-between">
-                <p class="va-text-secondary text-xs">Duration:</p>
-                <p class="va-text-secondary text-xs">9 second(s)</p>
-              </div>
-              <div class="flex justify-between">
-                <p class="va-text-secondary text-xs">Due Date:</p>
-                <p class="va-text-secondary text-xs">29 minute(s) ago</p>
-              </div>
-            </VaCardContent>
-          </VaCard>
-          <VaCard outlined class="mr-2" href="./text-review">
-            <div class="p-2 flex">
-              <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
-              <div>
-                <p><b>Duc nguyen</b></p>
-                <span style="font-weight: none">Point: 0</span>
-              </div>
-            </div>
-            <VaDivider class="m-0" />
-            <VaCardContent class="p-2">
-              <div class="flex justify-between">
-                <p class="va-text-secondary text-xs">Duration:</p>
-                <p class="va-text-secondary text-xs">9 second(s)</p>
-              </div>
-              <div class="flex justify-between">
-                <p class="va-text-secondary text-xs">Due Date:</p>
-                <p class="va-text-secondary text-xs">29 minute(s) ago</p>
-              </div>
-            </VaCardContent>
           </VaCard>
         </VaCardContent>
       </VaCard>

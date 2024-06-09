@@ -158,3 +158,51 @@ export interface UpdatePaperRequest {
   isPublish?: boolean
   description?: string
 }
+
+export interface GetLastResultExamRequest {
+  paperId: string
+  userId: string
+  paperSubmitId: string
+}
+
+export interface LastResultExamDto {
+  paperId?: string
+  status?: SubmitPaperStatus
+  startTime?: Date
+  endTime?: Date | null
+  totalMark?: number
+  rightAnswer?: number
+  totalQuestion?: number
+  paper?: PaperDto
+  submitPaperDetails?: SubmitPaperDetailDto[]
+  student?: UserDetailsDto
+}
+
+export interface UserDetailsDto {
+  id: string
+  userName: string
+  firstName?: string | null
+  lastName?: string | null
+  email: string | null
+  isActive: boolean
+  emailConfirmed?: boolean
+  phoneNumber?: string | null
+  imageUrl?: string | null
+}
+
+export interface SubmitPaperDetailDto {
+  submitPaperId: string
+  questionId: string
+  answerRaw: string
+  mark?: number | null
+  createdBy?: string
+  createdOn?: Date
+  lastModifiedBy?: string
+  lastModifiedOn?: Date | null
+}
+
+export enum SubmitPaperStatus {
+  Start = 0,
+  Doing = 1,
+  End = 2,
+}
