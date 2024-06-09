@@ -183,11 +183,11 @@ export interface SubmitPaperResponse {
 
 export interface CreatePaperRequest {
   examName: string
-  status: number | 1 // 1: publish, 2: private
-  password: string | undefined
+  status: number
+  password: string | undefined | null
   type: number
-  paperFolderId?: string
-  description?: string
+  paperFolderId?: string | undefined | null
+  description?: string | undefined | null
   questions: QuestionIntoPaperRequest[]
 }
 

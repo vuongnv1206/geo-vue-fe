@@ -6,24 +6,27 @@ import QuestionView from '../question/widgets/QuestionView.vue'
 import { CreatePaperRequest, QuestionIntoPaperRequest } from './types'
 import { useRoute, useRouter } from 'vue-router'
 import { validators } from '@services/utils'
-import { useModal } from 'vuestic-ui'
+import { useModal, useToast } from 'vuestic-ui'
 import UpdatePaperPurpose from '@/pages/examination/widgets/UpdatePaperPurpose.vue'
+import { usePaperStore } from '../../stores/modules/paper.module'
 
 const route = useRoute()
 const router = useRouter()
-const folderId = route.params.folderId
+const { init: notify } = useToast()
+const folderId = route.params.folderId ? route.params.folderId.toString() : null
 const { confirm } = useModal()
 const showQuestionBankModal = ref(false)
 const questionsInPaper = ref<Question[]>([])
 const questionRequest = ref<QuestionIntoPaperRequest[]>([])
 const totalPointPaper = ref(0)
+const storePaper = usePaperStore()
 
 const paperRequest = ref<CreatePaperRequest>({
   examName: '',
   status: 1,
   password: '',
   type: 0,
-  paperFolderId: folderId.toString(),
+  paperFolderId: folderId,
   description: '',
   questions: [],
 })
@@ -47,8 +50,15 @@ const updateTotalPoint = () => {
 
 const showUpdatePaperPurpose = ref(false)
 const continueCreatePaper = () => {
-  paperRequest.value.questions = questionRequest.value
-  showUpdatePaperPurpose.value = !showUpdatePaperPurpose.value
+  if (questionRequest.value.length < 2) {
+    notify({
+      message: "Couldn't save! Please, add more than 1 question",
+      color: 'danger',
+    })
+  } else {
+    paperRequest.value.questions = questionRequest.value
+    showUpdatePaperPurpose.value = !showUpdatePaperPurpose.value
+  }
 }
 
 const deleteQuestion = async (questionId: string | null | undefined) => {
@@ -74,6 +84,28 @@ const cancelCreatePaper = async () => {
   if (result) {
     router.push({ name: 'paper-folder' })
   }
+}
+
+const saveCreatePaper = (data: CreatePaperRequest) => {
+  console.log(data)
+  storePaper
+    .createPaper(data)
+    .then((res) => {
+      notify({
+        message: 'Create paper successfully',
+        color: 'success',
+      })
+      router.push({ name: 'admin-exam-detail', params: { id: res.id } })
+    })
+    .catch((error) => {
+      notify({
+        message: `Fail create paper \n ${error}`,
+        color: 'danger',
+      })
+    })
+}
+const cancelUpdatePaper = () => {
+  showUpdatePaperPurpose.value = !showUpdatePaperPurpose.value
 }
 </script>
 
@@ -150,5 +182,18 @@ const cancelCreatePaper = async () => {
       </VaButton>
     </div>
   </div>
-  <UpdatePaperPurpose v-if="showUpdatePaperPurpose" :paper-request="paperRequest" />
+  <UpdatePaperPurpose
+    v-if="showUpdatePaperPurpose"
+    :paper-request="paperRequest"
+    @save="
+      (data: CreatePaperRequest) => {
+        saveCreatePaper(data)
+      }
+    "
+    @cancel="
+      () => {
+        cancelUpdatePaper()
+      }
+    "
+  />
 </template>
