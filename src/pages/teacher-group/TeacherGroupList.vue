@@ -3,7 +3,7 @@
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { ref, onMounted, computed } from 'vue'
 import { GroupTeacher, TeacherTeam } from './types'
-
+import { getErrorMessage } from '@/services/utils'
 import { useModal, useToast } from 'vuestic-ui'
 import TeacherGroupModal from './TeacherGroupModal.vue'
 import TeacherTeamModal from './TeacherTeamModal.vue'
@@ -31,10 +31,11 @@ const getTeacherGroups = () => {
       groupTeachers.value = res.data
       loading.value = false
     })
-    .catch(() => {
+    .catch((error) => {
+      const message = getErrorMessage(error)
       loading.value = false
       notify({
-        message: 'Fail when get data',
+        message: `${message}`,
         color: 'danger',
       })
     })
@@ -49,10 +50,11 @@ const getTeacherTeams = () => {
       teacherTeams.value = res.data
       loading.value = false
     })
-    .catch(() => {
+    .catch((error) => {
+      const message = getErrorMessage(error)
       loading.value = false
       notify({
-        message: 'Fail when get data',
+        message: `${message}`,
         color: 'danger',
       })
     })
@@ -71,8 +73,9 @@ const onGroupSaved = async (group: GroupTeacher) => {
         getTeacherTeams()
       })
       .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: 'Failed to update group teacher\n' + error.message,
+          message: 'Failed to update group teacher\n' + message,
           color: 'danger',
         })
       })
@@ -87,9 +90,10 @@ const onGroupSaved = async (group: GroupTeacher) => {
         getTeacherGroups()
         getTeacherTeams()
       })
-      .catch((err) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: 'Failed to create group teacher\n' + err.message,
+          message: 'Failed to create group teacher\n' + message,
           color: 'danger',
         })
       })
@@ -109,8 +113,9 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
         getTeacherTeams()
       })
       .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: 'Failed to Update teacher\n' + error.message,
+          message: 'Failed to Update teacher\n' + message,
           color: 'danger',
         })
       })
@@ -125,9 +130,10 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
         getTeacherGroups()
         getTeacherTeams()
       })
-      .catch((err) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: 'Failed to add teacher into team\n' + err.message,
+          message: 'Failed to add teacher into team\n' + message,
           color: 'danger',
         })
       })
@@ -216,8 +222,9 @@ const confirmDeleteGroupModal = async (groupId: string, groupName: string) => {
         getTeacherTeams()
       })
       .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete \n ${error}`,
+          message: `Failed to delete \n ${message}`,
           color: 'danger',
         })
       })
@@ -243,8 +250,9 @@ const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string
         getTeacherTeams()
       })
       .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete \n ${error}`,
+          message: `Failed to delete \n ${message}`,
           color: 'danger',
         })
       })

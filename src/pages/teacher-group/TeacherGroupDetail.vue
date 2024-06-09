@@ -12,6 +12,7 @@ import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { GroupClass } from '../classrooms/type'
 import { PermissionNameInClass } from './PermissionInClass.enum'
 import { useToast } from 'vuestic-ui'
+import { getErrorMessage } from '@/services/utils'
 
 const loading = ref(true)
 
@@ -70,7 +71,11 @@ const getGroupDetail = async () => {
     loading.value = false
   } catch (error) {
     loading.value = false
-    console.error(error)
+    const message = getErrorMessage(error)
+    notify({
+      message: `${message}`,
+      color: 'danger',
+    })
   }
 }
 
@@ -83,7 +88,11 @@ const getTeacherDetail = async () => {
     const response = await stores.getTeacherPermissionDetail(props.teacherId)
     teacherDetail.value = response
   } catch (error) {
-    console.error(error)
+    const message = getErrorMessage(error)
+    notify({
+      message: `${message}`,
+      color: 'danger',
+    })
   }
 }
 
@@ -113,8 +122,9 @@ const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
           })
         })
         .catch((error) => {
+          const message = getErrorMessage(error)
           notify({
-            message: `Add ${teacher.label} into group fail \n ${error}`,
+            message: `Add ${teacher.label} into group fail \n ${message}`,
             color: 'danger',
           })
         })
@@ -137,8 +147,9 @@ const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
           })
         })
         .catch((error) => {
+          const message = getErrorMessage(error)
           notify({
-            message: `Remove ${currentSelectedTeacher.value[i].label} into group fail \n ${error}`,
+            message: `Remove ${currentSelectedTeacher.value[i].label} into group fail \n ${message}`,
             color: 'danger',
           })
         })
@@ -156,7 +167,11 @@ const getGroupClasses = async () => {
     groupClasses.value = res
     initializeCheckedPermissions()
   } catch (error) {
-    console.error(error)
+    const message = getErrorMessage(error)
+    notify({
+      message: `${message}`,
+      color: 'danger',
+    })
   }
 }
 
@@ -225,8 +240,9 @@ const updatePermissionGroup = async () => {
       getGroupDetail()
     } catch (error) {
       loading.value = false
+      const message = getErrorMessage(error)
       notify({
-        message: `Update permission failed \n ${error}`,
+        message: `Update permission failed \n ${message}`,
         color: 'danger',
       })
     }
@@ -247,8 +263,9 @@ const updatePermissionGroup = async () => {
       getTeacherDetail()
     } catch (error) {
       loading.value = false
+      const message = getErrorMessage(error)
       notify({
-        message: `Update permission failed \n ${error}`,
+        message: `Update permission failed \n ${message}`,
         color: 'danger',
       })
     }
@@ -308,7 +325,7 @@ const filteredGroupClasses = computed(() => {
     <VaCardContent class="p-0">
       <VaCardContent class="p-0">
         <div class="flex gap-2">
-          <div class="text-center" style="cursor: pointer">
+          <div class="text-center cursor-pointer">
             <VaAvatar color="secondary" size="small" @click="selectTeacherTeam">
               <VaIcon name="add" />
             </VaAvatar>
@@ -327,7 +344,7 @@ const filteredGroupClasses = computed(() => {
                 @update:modelValue="updateTeacherIntoGroup"
               >
                 <template #content="{ value2 }">
-                  <VaChip v-for="chip in value2.slice(0, 3)" :key="chip" size="small" class="mr-1 my-1">
+                  <VaChip v-for="chip in value2" :key="chip" size="small" class="mr-1 my-1">
                     {{ chip.label }}
                   </VaChip>
                 </template>
