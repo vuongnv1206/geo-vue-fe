@@ -4,7 +4,7 @@ import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import QuestionView from '../question/widgets/QuestionView.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto } from './types'
+import { PaperDto, SubmitPaperDto } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 
 const route = useRoute()
@@ -15,8 +15,8 @@ const { confirm } = useModal()
 
 const paperDetail = ref<PaperDto | null>(null)
 
+const paperId = route.params.id
 const getPaperDetail = () => {
-  const paperId = route.params.id
   paperStore
     .paperDetail(paperId.toString())
     .then((res) => {
@@ -91,8 +91,46 @@ const handleSaveAssigned = (selectedOption: string) => {
   showAssignPaperModal.value = false
 }
 
+const submittedStudents = ref<SubmitPaperDto[] | null>(null)
+const dataFilterSubmittedStudent = ref({
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 10,
+  orderBy: ['id'],
+  paperId: paperId.toString(),
+})
+const getSubmittedStudents = () => {
+  paperStore
+    .getSubmittedStudentsInPaper(paperId.toString(), dataFilterSubmittedStudent.value)
+    .then((res) => {
+      submittedStudents.value = res.data
+    })
+    .catch((error) => {
+      notify({
+        message: `get fail submitted students \n ${error}`,
+        color: 'danger',
+      })
+    })
+}
+// const getFormattedDuration = (startTime: string, endTime: string) => {
+//   const start = new Date(startTime)
+//   const end = new Date(endTime)
+//   const durationInSeconds = (end.getTime() - start.getTime()) / 1000
+
+//   if (durationInSeconds < 60) {
+//     return `${Math.round(durationInSeconds)} sec`
+//   } else if (durationInSeconds < 3600) {
+//     return `${Math.round(durationInSeconds / 60)} min`
+//   } else if (durationInSeconds < 86400) {
+//     return `${Math.round(durationInSeconds / 3600)} hours`
+//   } else {
+//     return `${Math.round(durationInSeconds / 86400)} days`
+//   }
+// }
+
 onMounted(() => {
   getPaperDetail()
+  getSubmittedStudents()
 })
 
 const navigateToExamReview = () => {
@@ -324,6 +362,7 @@ const navigateToExamReview = () => {
             </div>
           </VaCard>
         </VaCardContent>
+        <VaPagination :pages="10" :visible-pages="3" buttons-preset="secondary" class="justify-center sm:justify-end" />
       </VaCard>
     </template>
   </VaLayout>

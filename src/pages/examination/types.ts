@@ -206,3 +206,24 @@ export enum SubmitPaperStatus {
   Doing = 1,
   End = 2,
 }
+export interface SubmitPaperDto {
+  id: string
+  paperId: string
+  status: string
+  startTime: string
+  endTime?: string | undefined
+  totalMark: number
+  createdBy: string
+  creatorName: string
+  createdOn: string
+}
+
+export interface SubmitPaperResponse {
+  data: SubmitPaperDto[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}

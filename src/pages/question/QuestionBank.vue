@@ -3,8 +3,10 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import { Question, QuestionTree, SearchQuestion, QuestionSearchRes, Pagination } from './types'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
+import { useQuestionEditStore } from '@/stores/modules/questionEdit.module'
 import { useQuestionStore } from '@/stores/modules/question.module'
 import { useModal, useToast } from 'vuestic-ui'
+import { useRouter } from 'vue-router'
 import { getErrorMessage } from '@/services/utils'
 import { QuestionTypeColor } from '@services/utils'
 import QuestionView from './widgets/QuestionView.vue'
@@ -12,6 +14,8 @@ import QuestionView from './widgets/QuestionView.vue'
 const nodes = ref<QuestionTree[]>([])
 const stores = useQuestionFolderStore()
 const storesQuestion = useQuestionStore()
+const storesQEdit = useQuestionEditStore()
+const router = useRouter()
 const { confirm } = useModal()
 
 const loading = ref(false)
@@ -33,14 +37,22 @@ const QuestionTypeOptions = [
   { id: 100, name: 'Other', questionType: 100 },
 ]
 
+const QuestionSortOptions = [
+  { id: 0, name: 'Newest', questionType: 1 },
+  { id: 1, name: 'Oldest', questionType: 2 },
+  { id: 2, name: 'Last Modified', questionType: 4 },
+]
+
 const QuestionTypeValue = ref(QuestionTypeOptions[0])
+
+const QuestionSortValue = ref(QuestionSortOptions[0])
 
 const testQuestions = ref<Question[]>([])
 const questionSearchRes = ref<QuestionSearchRes | null>(null)
 
 const pagination = ref<Pagination>({
   page: 1,
-  perPage: 2,
+  perPage: 10,
   total: 0,
 })
 
@@ -50,7 +62,7 @@ const searchValue = ref<SearchQuestion>({
 })
 
 const filters = ref({
-  search: '',
+  keyword: '',
 })
 
 const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.value.perPage))
@@ -83,7 +95,7 @@ const searchQuestion = (search: SearchQuestion) => {
 watchDebounced(
   filters.value,
   () => {
-    searchValue.value.content = filters.value.search
+    searchValue.value.keyword = filters.value.keyword
     searchQuestion(searchValue.value)
   },
   { debounce: 500, maxWait: 1000 },
@@ -242,7 +254,19 @@ const deleteQuestion = (question: Question) => {
 }
 
 const AddNewQuestion = () => {
+  // push to add new question page
   console.log('Add new question')
+  if (currentSelectedFolder.value?.id) {
+    storesQEdit.clearQuestions()
+    storesQEdit.setFolder(currentSelectedFolder.value)
+    router.push({ name: 'question-edit' })
+  } else {
+    init({
+      title: 'Error',
+      message: 'Please select a folder to add question',
+      color: 'danger',
+    })
+  }
 }
 
 watch(
@@ -250,6 +274,27 @@ watch(
   () => {
     console.log('Search question with type')
     searchQuestionWithType()
+  },
+  { immediate: true },
+)
+
+watch(
+  () => QuestionSortValue.value.id,
+  () => {
+    if (QuestionSortValue.value.id === 0) {
+      searchValue.value.orderBy = []
+      searchValue.value.orderBy.push('CreatedOn desc')
+      console.log(searchValue.value)
+    }
+    if (QuestionSortValue.value.id === 1) {
+      searchValue.value.orderBy = []
+      searchValue.value.orderBy.push('CreatedOn asc')
+    }
+    if (QuestionSortValue.value.id === 2) {
+      searchValue.value.orderBy = []
+      searchValue.value.orderBy.push('LastModifiedOn desc')
+    }
+    searchQuestion(searchValue.value)
   },
   { immediate: true },
 )
@@ -324,10 +369,12 @@ onMounted(() => {
             <h1 class="card-title text-secondary font-bold uppercase">
               List question of <b>{{ currentSelectedFolder?.name || '?' }}</b>
             </h1>
-            <div class="flex gap-2"></div>
+            <div class="flex gap-2">
+              <VaButton icon="add" @click="AddNewQuestion">Add Question</VaButton>
+            </div>
           </VaCardTitle>
-          <div class="flex flex-col md:flex-row gap-2 mb-2 p-3 justify-between">
-            <div class="flex flex-col md:flex-row gap-2 justify-start">
+          <div class="flex flex-wrap gap-2 mb-2 p-3 justify-start">
+            <div>
               <VaSelect
                 v-model="QuestionTypeValue"
                 track-by="id"
@@ -340,7 +387,7 @@ onMounted(() => {
                   <VaBadge
                     :text="(value as any).name"
                     :color="QuestionTypeColor((value as any).questionType)"
-                    class="mr-2 mt-2"
+                    class="mr-2"
                   />
                 </template>
                 <template #option="{ option, selectOption }">
@@ -355,14 +402,42 @@ onMounted(() => {
                   </button>
                 </template>
               </VaSelect>
-              <VaInput v-model="filters.search" label="Search content" placeholder="Search">
+            </div>
+            <div>
+              <VaInput v-model="filters.keyword" label="Search content" placeholder="Search">
                 <template #prependInner>
                   <VaIcon name="search" color="secondary" size="small" />
                 </template>
               </VaInput>
             </div>
             <div>
-              <VaButton icon="add" @click="AddNewQuestion">Add Question</VaButton>
+              <VaSelect
+                v-model="QuestionSortValue"
+                track-by="id"
+                :text-by="(option) => (option as any).name"
+                placeholder="Newest"
+                label="Sort by"
+                :options="QuestionSortOptions"
+              >
+                <template #content="{ value }">
+                  <VaBadge
+                    :text="(value as any).name"
+                    :color="QuestionTypeColor((value as any).questionType)"
+                    class="mr-2"
+                  />
+                </template>
+                <template #option="{ option, selectOption }">
+                  <button class="w-full flex items-center" @click="() => selectOption(option)">
+                    <div class="flex justify-between items-center p-2">
+                      <VaBadge
+                        :text="(option as any).name"
+                        :color="QuestionTypeColor((option as any).questionType)"
+                        class="mr-2"
+                      />
+                    </div>
+                  </button>
+                </template>
+              </VaSelect>
             </div>
           </div>
           <VaCard v-if="currentSelectedFolder == null" class="mb-5 pr-4 flex justify-center">

@@ -25,6 +25,9 @@ const indexToLetter = (index: number) => {
 const getQuestionPassage = (question: Question) => {
   return question.questionPassages
     ?.map((passage) => {
+      if (!passage || !passage.answers || !passage.content) {
+        return ''
+      }
       const passageAnswers = passage.answers
         .map((answer, index) => {
           const color = answer.isCorrect ? 'text-success' : ''
