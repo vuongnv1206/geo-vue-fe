@@ -13,7 +13,7 @@ import { usePaperStore } from '../../stores/modules/paper.module'
 const route = useRoute()
 const router = useRouter()
 const { init: notify } = useToast()
-const folderId = route.params.folderId ? route.params.folderId.toString() : null
+const folderId = route.params.folderId ? route.params.folderId.toString() : undefined
 const { confirm } = useModal()
 const showQuestionBankModal = ref(false)
 const questionsInPaper = ref<Question[]>([])

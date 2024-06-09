@@ -22,10 +22,10 @@ const emit = defineEmits(['cancel', 'save'])
 const paper = ref<CreatePaperRequest>({
   examName: '',
   status: 1,
-  password: '' || null,
+  password: '' || undefined,
   type: 0,
-  paperFolderId: '' || null,
-  description: '' || null,
+  paperFolderId: '' || undefined,
+  description: '' || undefined,
   questions: [],
 })
 
