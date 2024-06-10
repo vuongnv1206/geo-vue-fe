@@ -1,18 +1,110 @@
 <script lang="ts" setup>
-//import { useSubmitPaperStore } from '@/stores/modules/submitPaper.module';
+import { useSubmitPaperStore } from '@/stores/modules/submitPaper.module'
 import { ref } from 'vue'
-import { VaButton, VaCard } from 'vuestic-ui'
+import { useToast, VaButton, VaCard } from 'vuestic-ui'
+import { GetLastResultExamRequest, LastResultExamDto, QuestionDto } from './types'
+import { useRoute } from 'vue-router'
+import { onMounted } from 'vue'
+import { QuestionType } from './types'
+import { computed } from 'vue'
 
+import SingleChoiceQuestion from './questionType/SingleChoiceQuestion.vue'
+
+const route = useRoute()
 const showSidebar = ref(true)
-//const submitPaperStore = useSubmitPaperStore()
-const options = [
-  { text: 'True', value: 'one' },
-  { text: 'False', value: 'two' },
-]
+const submitPaperStore = useSubmitPaperStore()
+const { init: notify } = useToast()
 
-const activeOptions = ref<{ [key: string]: boolean }>({
-  one: false,
-  two: false,
+const request: GetLastResultExamRequest = {
+  paperId: route.params.paperId as string,
+  userId: route.params.userId as string,
+  submitPaperId: route.params.submitPaperId as string,
+}
+
+const result = ref<LastResultExamDto | null>(null)
+
+const groupedQuestions = ref<{ [key: string]: QuestionDto[] }>({
+  singleChoice: [],
+  multipleChoice: [],
+  fillBlank: [],
+  matching: [],
+  reading: [],
+  writing: [],
+  other: [],
+})
+
+const getLastExamResult = () => {
+  submitPaperStore
+    .getLastResultExam(request)
+    .then((res) => {
+      result.value = res
+      if (res && res.paper && res.paper.questions) {
+        groupedQuestions.value = groupQuestionsByType(res.paper.questions)
+      }
+    })
+    .catch((error) => {
+      notify({
+        message: `Not Found ${error}`,
+        color: 'danger',
+      })
+    })
+}
+
+onMounted(() => {
+  getLastExamResult()
+})
+
+// Computed property to group the questions by type
+const groupQuestionsByType = (questions: QuestionDto[]) => {
+  const groups: { [key: string]: QuestionDto[] } = {
+    singleChoice: [],
+    multipleChoice: [],
+    fillBlank: [],
+    matching: [],
+    reading: [],
+    writing: [],
+    other: [],
+  }
+
+  questions.forEach((question) => {
+    switch (question.questionType) {
+      case QuestionType.SingleChoice:
+        groups.singleChoice.push(question)
+        break
+      case QuestionType.MultipleChoice:
+        groups.multipleChoice.push(question)
+        break
+      case QuestionType.FillBlank:
+        groups.fillBlank.push(question)
+        break
+      case QuestionType.Matching:
+        groups.matching.push(question)
+        break
+      case QuestionType.Reading:
+      case QuestionType.ReadingQuestionPassage:
+        groups.reading.push(question)
+        break
+      case QuestionType.Writing:
+        groups.writing.push(question)
+        break
+      default:
+        groups.other.push(question)
+        break
+    }
+  })
+
+  return groups
+}
+
+const initialTab = computed(() => {
+  if (groupedQuestions.value.singleChoice.length) return 'singleChoice'
+  if (groupedQuestions.value.multipleChoice.length) return 'multipleChoice'
+  if (groupedQuestions.value.fillBlank.length) return 'fillBlank'
+  if (groupedQuestions.value.matching.length) return 'matching'
+  if (groupedQuestions.value.reading.length) return 'reading'
+  if (groupedQuestions.value.writing.length) return 'writing'
+  if (groupedQuestions.value.other.length) return 'other'
+  return null
 })
 </script>
 
@@ -23,7 +115,9 @@ const activeOptions = ref<{ [key: string]: boolean }>({
         <VaCardTitle>
           <div class="flex items-center">
             <VaAvatar size="small" class="mr-2"> N </VaAvatar>
-            <p><b>Duc nguyen</b></p>
+            <p>
+              <b>{{ result?.student?.userName }}</b>
+            </p>
           </div>
         </VaCardTitle>
         <VaDivider />
@@ -34,10 +128,14 @@ const activeOptions = ref<{ [key: string]: boolean }>({
 
             <VaCardActions align="stretch" vertical>
               <VaListItem>
-                <p><b>Điểm:</b> 5/10</p>
+                <p><b>Điểm:</b> {{ result?.totalMark }}/10</p>
               </VaListItem>
               <VaListItem>
-                <p><b>Trắc nghiệm:</b> 5 (2/3 câu)</p>
+                <p>
+                  <b>Trắc nghiệm:</b>({{
+                    result?.submitPaperDetails?.filter((detail) => detail.isCorrect).length || 0
+                  }}/{{ result?.totalQuestion }} câu)
+                </p>
               </VaListItem>
               <VaListItem>
                 <p><b>Tự luận:</b> <span style="color: red">Chưa chấm</span> (1 câu)</p>
@@ -70,50 +168,44 @@ const activeOptions = ref<{ [key: string]: boolean }>({
                 <VaButton icon="filter_list" size="small">Filter</VaButton>
               </template>
               <div class="p-4">
-                <div v-for="option in options" :key="option.value" class="flex items-center mb-2">
-                  <span class="mr-2">{{ option.text }}</span>
-                  <VaSwitch v-model="activeOptions[option.value]" size="small" />
-                </div>
+                <!-- Thêm các tùy chọn filter nếu cần -->
               </div>
             </VaMenu>
           </VaNavbarItem>
         </template>
         <template #center>
-          <VaNavbarItem class="navbar-item-slot"> Exam Name </VaNavbarItem>
+          <VaNavbarItem>
+            {{ result?.paper.examName }}
+          </VaNavbarItem>
         </template>
       </VaNavbar>
       <VaCard class="mt-2 ml-2" style="height: 80vh">
-        <VaTabs stateful grow>
-          <template #tabs>
-            <VaTab v-for="title in ['Trắc nghiệm', 'Tự luận']" :key="title" :name="title">
-              {{ title }}
-            </VaTab>
-          </template>
+        <VaTabs v-model="initialTab" stateful grow>
+          <VaTab v-if="groupedQuestions.singleChoice.length" name="singleChoice" label="Single Choice">
+            <SingleChoiceQuestion
+              :questions="groupedQuestions.singleChoice"
+              :student-answers="result?.submitPaperDetails ?? []"
+            />
+          </VaTab>
+          <!-- <VaTab v-if="groupedQuestions.multipleChoice.length" name="multipleChoice" label="Multiple Choice">
+            <MultipleChoiceQuestion :questions="groupedQuestions.multipleChoice" />
+          </VaTab>
+          <VaTab v-if="groupedQuestions.fillBlank.length" name="fillBlank" label="Fill in the Blank">
+            <FillBlankQuestion :questions="groupedQuestions.fillBlank" />
+          </VaTab>
+          <VaTab v-if="groupedQuestions.matching.length" name="matching" label="Matching">
+            <MatchingQuestion :questions="groupedQuestions.matching" />
+          </VaTab>
+          <VaTab v-if="groupedQuestions.reading.length" name="reading" label="Reading">
+            <ReadingQuestion :questions="groupedQuestions.reading" />
+          </VaTab>
+          <VaTab v-if="groupedQuestions.writing.length" name="writing" label="Writing">
+            <EssayQuestion :questions="groupedQuestions.writing" />
+          </VaTab>
+          <VaTab v-if="groupedQuestions.other.length" name="other" label="Other">
+            <SingleChoiceQuestion :questions="groupedQuestions.other" />
+          </VaTab> -->
         </VaTabs>
-        <VaCardContent>
-          <!-- Nội dung tab Trắc nghiệm -->
-
-          <div v-for="i in 3" :key="i" class="mt-4">
-            <VaCard class="mb-4" :bordered="false" stripe stripe-color="success" outlined>
-              <VaCardContent>
-                <h4>Câu {{ i }}</h4>
-                <p>
-                  Trong cuộc khai thác thuộc địa lần thứ hai ở Đông Dương 1919-1929, thực dân Pháp tập trung đầu tư vào:
-                </p>
-                <div class="ml-4">
-                  <p>A. Ngành chế tạo máy.</p>
-                  <p>B. Công nghiệp hóa chất.</p>
-                  <p>C. Đồn điền cao su.</p>
-                  <p>D. Công nghiệp luyện kim.</p>
-                </div>
-                <div class="flex items-center justify-between mt-2">
-                  <span class="text-red-500">Giải thích</span>
-                  <span class="text-green-500">Đáp án đúng: A</span>
-                </div>
-              </VaCardContent>
-            </VaCard>
-          </div>
-        </VaCardContent>
       </VaCard>
     </template>
   </VaLayout>

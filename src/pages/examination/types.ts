@@ -1,4 +1,3 @@
-import { Question } from '../question/types'
 export interface CreatePaperFolderRequest {
   name: string
   parentId?: string | null
@@ -102,7 +101,7 @@ export interface PaperDto {
   lastModifiedOn: string | null
   paperLable?: PaperLabelDto
   paperFolder?: PaperFolderDto
-  questions?: Question[]
+  questions?: QuestionDto[] | null
 }
 
 export interface PaperLabelDto {
@@ -162,7 +161,7 @@ export interface UpdatePaperRequest {
 export interface GetLastResultExamRequest {
   paperId: string
   userId: string
-  paperSubmitId: string
+  submitPaperId: string
 }
 
 export interface LastResultExamDto {
@@ -171,10 +170,9 @@ export interface LastResultExamDto {
   startTime?: Date
   endTime?: Date | null
   totalMark?: number
-  rightAnswer?: number
   totalQuestion?: number
-  paper?: PaperDto
-  submitPaperDetails?: SubmitPaperDetailDto[]
+  paper: PaperDto
+  submitPaperDetails?: SubmitPaperDetailDto[] | null
   student?: UserDetailsDto
 }
 
@@ -195,6 +193,7 @@ export interface SubmitPaperDetailDto {
   questionId: string
   answerRaw: string
   mark?: number | null
+  isCorrect: boolean
   createdBy?: string
   createdOn?: Date
   lastModifiedBy?: string
@@ -226,4 +225,63 @@ export interface SubmitPaperResponse {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
+}
+
+export enum QuestionType {
+  SingleChoice = 1,
+  MultipleChoice = 2,
+  FillBlank = 4,
+  Matching = 5,
+  Reading = 6,
+  ReadingQuestionPassage = 7,
+  Writing = 8,
+  Other = 100,
+}
+
+export interface QuestionDto {
+  id: string
+  content?: string | null
+  image?: string | null
+  audio?: string | null
+  questionFolder?: QuestionFolderDto | null
+  questionType?: QuestionType | null
+  questionLable?: QuestionLableDto | null
+  questionPassages?: QuestionPassagesDto[] | null
+  createdBy: string
+  createdOn: Date
+  lastModifiedBy?: string
+  lastModifiedOn?: Date | null
+  answers?: AnswerDto[] | null
+}
+
+export interface AuditableEntity {
+  createdBy: string
+  createdOn: Date
+  lastModifiedBy?: string
+  lastModifiedOn?: Date | null
+  deletedOn?: Date | null
+  deletedBy?: string | null
+}
+export interface QuestionFolderDto {
+  name?: string
+  parentId?: string | null
+}
+
+export interface QuestionLableDto {
+  id?: string
+  name?: string
+  color?: string
+}
+
+export interface QuestionPassagesDto {
+  id: string
+  content?: string | null
+  answers?: AnswerDto[] | null
+}
+
+export interface AnswerDto {
+  id: string
+  content?: string | null
+  questionId?: string | null
+  isCorrect?: boolean
 }

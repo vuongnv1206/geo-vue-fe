@@ -8,7 +8,7 @@ export interface ISubmitPapersService {
 export class SubmitPapersService implements ISubmitPapersService {
   async submitPapers_GetLastResult(request: GetLastResultExamRequest): Promise<LastResultExamDto> {
     return apiService
-      .post(`/v1/submitpapers/paper/last-result?`, request)
+      .post(`/v1/submitpapers/last-result`, request)
       .then((res) => {
         return Promise.resolve(res.data)
       })

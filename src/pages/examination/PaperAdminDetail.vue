@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import AssignPaperModal from './widgets/AssignPaperModal.vue'
-import QuestionView from '../question/widgets/QuestionView.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto, SubmitPaperDto } from './types'
@@ -112,30 +111,37 @@ const getSubmittedStudents = () => {
       })
     })
 }
-// const getFormattedDuration = (startTime: string, endTime: string) => {
-//   const start = new Date(startTime)
-//   const end = new Date(endTime)
-//   const durationInSeconds = (end.getTime() - start.getTime()) / 1000
+const getFormattedDuration = (startTime: string, endTime: string) => {
+  const start = new Date(startTime)
+  const end = new Date(endTime)
+  const durationInSeconds = (end.getTime() - start.getTime()) / 1000
 
-//   if (durationInSeconds < 60) {
-//     return `${Math.round(durationInSeconds)} sec`
-//   } else if (durationInSeconds < 3600) {
-//     return `${Math.round(durationInSeconds / 60)} min`
-//   } else if (durationInSeconds < 86400) {
-//     return `${Math.round(durationInSeconds / 3600)} hours`
-//   } else {
-//     return `${Math.round(durationInSeconds / 86400)} days`
-//   }
-// }
+  if (durationInSeconds < 60) {
+    return `${Math.round(durationInSeconds)} sec`
+  } else if (durationInSeconds < 3600) {
+    return `${Math.round(durationInSeconds / 60)} min`
+  } else if (durationInSeconds < 86400) {
+    return `${Math.round(durationInSeconds / 3600)} hours`
+  } else {
+    return `${Math.round(durationInSeconds / 86400)} days`
+  }
+}
+
+const navigateToExamReview = (paperId: string, userId: string, submitPaperId: string) => {
+  router.push({
+    name: 'exam-review',
+    params: {
+      paperId,
+      userId,
+      submitPaperId,
+    },
+  })
+}
 
 onMounted(() => {
   getPaperDetail()
   getSubmittedStudents()
 })
-
-const navigateToExamReview = () => {
-  router.push({ name: 'exam-review' })
-}
 </script>
 
 <template>
@@ -306,7 +312,7 @@ const navigateToExamReview = () => {
                   <VaDivider />
                   <VaCardContent class="p-0">
                     <template v-for="question in paperDetail?.questions" :key="question.id">
-                      <QuestionView :question="question" :index="null" />
+                      <!-- <QuestionView :question="question" :index="null" :is-stripe="false" :show-action-button="false" /> -->
                     </template>
                   </VaCardContent>
                 </VaCard>
@@ -338,28 +344,60 @@ const navigateToExamReview = () => {
             </VaCard>
           </VaTabs>
         </VaCardContent>
-        <VaCardContent v-if="assignedOptionValue === 'Everyone'" class="p-2 grid md:grid-cols-6 xs:grid-cols-2">
-          <VaCard outlined class="mr-2" style="cursor: pointer">
-            <div style="width: 100%; height: 100%" @click="navigateToExamReview">
-              <div class="p-2 flex">
+        <VaCardContent v-if="assignedOptionValue === 'Everyone'" class="p-2 grid md:grid-cols-4 xs:grid-cols-2">
+          <VaCard
+            v-for="submittedStudent in submittedStudents"
+            :key="submittedStudent.id"
+            outlined
+            class="mr-2"
+            @click="navigateToExamReview(submittedStudent.paperId, submittedStudent.createdBy, submittedStudent.id)"
+          >
+            <div class="p-2 flex justify-between">
+              <div class="flex">
                 <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
                 <div>
-                  <p><b>Duc nguyen</b></p>
-                  <span style="font-weight: none">Point: 0</span>
+                  <p>
+                    <b>{{ submittedStudent.creatorName }}</b>
+                  </p>
+                  <span style="font-weight: none">Point: {{ submittedStudent.totalMark }}</span>
                 </div>
               </div>
-              <VaDivider class="m-0" />
-              <VaCardContent class="p-2">
+              <div>
+                <VaChip
+                  square
+                  size="small"
+                  :color="
+                    submittedStudent.status === 'doing'
+                      ? 'warning'
+                      : submittedStudent.status === 'end'
+                        ? 'success'
+                        : 'secondary'
+                  "
+                  >{{ submittedStudent.status }}</VaChip
+                >
+              </div>
+            </div>
+            <VaDivider class="m-0" />
+            <VaCardContent class="p-2">
+              <template v-if="submittedStudent.endTime !== null && submittedStudent.endTime !== undefined">
                 <div class="flex justify-between">
                   <p class="va-text-secondary text-xs">Duration:</p>
-                  <p class="va-text-secondary text-xs">9 second(s)</p>
+                  <p class="va-text-secondary text-xs">
+                    {{ getFormattedDuration(submittedStudent.startTime, submittedStudent.endTime) }}
+                  </p>
                 </div>
                 <div class="flex justify-between">
                   <p class="va-text-secondary text-xs">Due Date:</p>
-                  <p class="va-text-secondary text-xs">29 minute(s) ago</p>
+                  <p class="va-text-secondary text-xs">{{ submittedStudent.endTime }}</p>
                 </div>
-              </VaCardContent>
-            </div>
+              </template>
+              <template v-if="submittedStudent.endTime === null">
+                <div class="flex justify-between">
+                  <p class="va-text-secondary text-xs">Start time:</p>
+                  <p class="va-text-secondary text-xs">{{ submittedStudent.startTime }}</p>
+                </div>
+              </template>
+            </VaCardContent>
           </VaCard>
         </VaCardContent>
         <VaPagination :pages="10" :visible-pages="3" buttons-preset="secondary" class="justify-center sm:justify-end" />
