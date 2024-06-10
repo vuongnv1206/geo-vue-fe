@@ -10,6 +10,8 @@ import QuestionWritingView from './QuestionWritingView.vue'
 const props = defineProps<{
   question: Question | null
   index: number | null
+  showActionButton: boolean
+  isStripe: boolean | undefined
 }>()
 
 const emit = defineEmits<{
@@ -19,11 +21,16 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <VaCard class="col-span-3 md:col-span-1 min-h-[100px] border border-dashed border-backgroundBorder m-3">
+  <VaCard
+    class="col-span-3 md:col-span-1 min-h-[100px] border border-dashed border-backgroundBorder m-3"
+    :stripe="props.isStripe"
+    stripe-color="success"
+  >
     <QuestionSingleChoiceView
       v-if="props.question?.questionType === QuestionType.SingleChoice"
       :question="props.question"
       :index="props.index"
+      :show-action-button="props.showActionButton"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
     />
@@ -31,6 +38,7 @@ const emit = defineEmits<{
       v-if="props.question?.questionType === QuestionType.MultipleChoice"
       :question="props.question"
       :index="props.index"
+      :show-action-button="props.showActionButton"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
     />
@@ -38,6 +46,7 @@ const emit = defineEmits<{
       v-if="props.question?.questionType === QuestionType.FillBlank"
       :question="props.question"
       :index="props.index"
+      :show-action-button="props.showActionButton"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
     />
@@ -45,6 +54,7 @@ const emit = defineEmits<{
       v-if="props.question?.questionType === QuestionType.Matching"
       :question="props.question"
       :index="props.index"
+      :show-action-button="props.showActionButton"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
     />
@@ -52,6 +62,7 @@ const emit = defineEmits<{
       v-if="props.question?.questionType === QuestionType.Reading"
       :question="props.question"
       :index="props.index"
+      :show-action-button="props.showActionButton"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
     />
@@ -59,6 +70,7 @@ const emit = defineEmits<{
       v-if="props.question?.questionType === QuestionType.Writing"
       :question="props.question"
       :index="props.index"
+      :show-action-button="props.showActionButton"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
     />

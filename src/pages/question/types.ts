@@ -102,6 +102,7 @@ export type Question = {
   deletedBy?: string | null
   id?: string | null | undefined
   index?: number | null | undefined
+  isSelected?: boolean
   owner?: UserDetail | null
 }
 
@@ -138,6 +139,7 @@ export type SearchQuestion = {
   keyword?: string | null | undefined
   questionType?: number | null | undefined
   questionLableId?: string | null | undefined
+  content?: string | null | undefined
 }
 
 export type Pagination = {
