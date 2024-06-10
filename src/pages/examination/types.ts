@@ -285,3 +285,17 @@ export interface AnswerDto {
   questionId?: string | null
   isCorrect?: boolean
 }
+export interface CreatePaperRequest {
+  examName: string
+  status: number
+  password: string | undefined
+  type: number
+  paperFolderId?: string | undefined
+  description?: string | undefined
+  questions: QuestionIntoPaperRequest[]
+}
+
+export interface QuestionIntoPaperRequest {
+  questionId: string | null | undefined
+  mark: number | 1
+}

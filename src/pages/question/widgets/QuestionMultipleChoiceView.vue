@@ -6,6 +6,7 @@ import QuestionFooterView from './child/QuestionFooterView.vue'
 const props = defineProps<{
   question: Question | null
   index: number | null
+  showActionButton: boolean
 }>()
 
 const emit = defineEmits<{
@@ -52,6 +53,7 @@ const getCorrectAnswer = (question: Question) => {
     <!-- footer -->
     <QuestionFooterView
       :question="props.question"
+      :show-action-button="props.showActionButton"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
     />

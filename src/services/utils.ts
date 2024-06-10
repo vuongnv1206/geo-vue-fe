@@ -12,6 +12,7 @@ export const validators = {
     return pattern.test(v) || 'Please enter a valid email address'
   },
   required: (v: any) => !!v || 'This field is required',
+  isNumber: (v: any) => !isNaN(parseFloat(v)) || 'This field must be a number',
   required2: (fieldName: string) => (v: string) => !!v || `Field ${fieldName} is required`,
   minLength: (length: number) => (v: string) =>
     (v && v.length >= length) || `Must be greater than ${length} characters`,
