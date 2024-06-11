@@ -664,7 +664,7 @@ export const SingleChoiceGeoMarkdown2Objects = (text: string) => {
       content: question,
       answers,
       questionType: QuestionType.SingleChoice,
-      index: parseInt(questionMatch[1]),
+      rawIndex: parseInt(questionMatch[1]),
     }
     questions.push(q)
   }
@@ -695,7 +695,7 @@ export const MultipleChoiceGeoMarkdown2Objects = (text: string) => {
       content: question,
       answers,
       questionType: QuestionType.MultipleChoice,
-      index: parseInt(questionMatch[1]),
+      rawIndex: parseInt(questionMatch[1]),
     }
     questions.push(q)
   }
@@ -733,7 +733,7 @@ export const FillBlankGeoMarkdown2Objects = (text: string) => {
       content: question,
       answers,
       questionType: QuestionType.FillBlank,
-      index: parseInt(questionMatch[1]),
+      rawIndex: parseInt(questionMatch[1]),
     }
 
     questions.push(q)
@@ -807,7 +807,7 @@ export const MatchingGeoMarkdown2Objects = (text: string) => {
       content: JSON.stringify(content),
       answers,
       questionType: QuestionType.Matching,
-      index: parseInt(questionMatch[1]),
+      rawIndex: parseInt(questionMatch[1]),
     }
 
     questions.push(q)
@@ -863,7 +863,7 @@ export const ReadingGeoMarkdown2Objects = (text: string) => {
       content: passage,
       questionPassages,
       questionType: QuestionType.Reading,
-      index: parseInt(questionMatch[1]),
+      rawIndex: parseInt(questionMatch[1]),
       answers: [],
     }
 
@@ -888,7 +888,7 @@ export const WritingGeoMarkdown2Objects = (text: string) => {
       content: question,
       answers: [],
       questionType: QuestionType.Writing,
-      index: parseInt(questionMatch[1]),
+      rawIndex: parseInt(questionMatch[1]),
     }
     questions.push(q)
   }

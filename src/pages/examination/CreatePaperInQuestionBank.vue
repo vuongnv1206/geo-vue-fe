@@ -32,12 +32,14 @@ const paperRequest = ref<CreatePaperRequest>({
 })
 
 const AddQuestionsToPaper = (questions: Question[]) => {
+  let indexQuestion = 0
   questions.forEach((question) => {
     if (!questionRequest.value.some((req) => req.questionId === question.id)) {
       questionsInPaper.value.push(question)
       questionRequest.value.push({
         questionId: question.id,
         mark: 1,
+        rawIndex: indexQuestion++,
       })
     }
   })
@@ -95,7 +97,7 @@ const saveCreatePaper = (data: CreatePaperRequest) => {
         message: 'Create paper successfully',
         color: 'success',
       })
-      router.push({ name: 'admin-exam-detail', params: { id: res.id } })
+      router.push({ name: 'admin-exam-detail', params: { id: res } })
     })
     .catch((error) => {
       notify({

@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto, SubmitPaperDto } from './types'
 import { useToast, useModal } from 'vuestic-ui'
+import QuestionView from '../question/widgets/QuestionView.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,6 +21,7 @@ const getPaperDetail = () => {
     .paperDetail(paperId.toString())
     .then((res) => {
       paperDetail.value = res
+      console.log(res)
     })
     .catch((error) => {
       notify({

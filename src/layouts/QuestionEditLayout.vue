@@ -128,8 +128,8 @@ const renderEditorContent = () => {
 renderEditorContent()
 
 const handleEditEvent = (question: Question) => {
-  if (question.index) {
-    listQuestions.value[question.index - 1] = question
+  if (question.rawIndex) {
+    listQuestions.value[question.rawIndex - 1] = question
     const editor = document.querySelector('.richer__content') as any
     editorContent.value = ''
     renderEditorContent()

@@ -1,21 +1,22 @@
 <script lang="ts" setup>
 import { defineProps } from 'vue'
-import { QuestionDto, SubmitPaperDetailDto } from '../types'
+import { SubmitPaperDetailDto } from '../types'
+import { Question } from '@/pages/question/types'
 
 const props = defineProps<{
-  questions: QuestionDto[]
+  questions: Question[]
   studentAnswers: SubmitPaperDetailDto[]
 }>()
 
-const getCorrectAnswer = (question: QuestionDto) => {
+const getCorrectAnswer = (question: Question) => {
   return question.answers?.find((answer) => answer.isCorrect)?.content || ''
 }
 
-const getUserAnswer = (questionId: string) => {
+const getUserAnswer = (questionId: string | undefined) => {
   return props.studentAnswers.find((detail) => detail.questionId === questionId)?.answerRaw || ''
 }
 
-const isUserAnswerCorrect = (questionId: string) => {
+const isUserAnswerCorrect = (questionId: string | undefined) => {
   return props.studentAnswers.find((detail) => detail.questionId === questionId)?.isCorrect || false
 }
 </script>

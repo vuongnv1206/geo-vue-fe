@@ -2,11 +2,12 @@
 import { useSubmitPaperStore } from '@/stores/modules/submitPaper.module'
 import { ref } from 'vue'
 import { useToast, VaButton, VaCard } from 'vuestic-ui'
-import { GetLastResultExamRequest, LastResultExamDto, QuestionDto } from './types'
+import { GetLastResultExamRequest, LastResultExamDto } from './types'
 import { useRoute } from 'vue-router'
 import { onMounted } from 'vue'
-import { QuestionType } from './types'
+import { QuestionType } from '../question/types'
 import { computed } from 'vue'
+import { Question } from '../question/types'
 
 import SingleChoiceQuestion from './questionType/SingleChoiceQuestion.vue'
 
@@ -23,7 +24,7 @@ const request: GetLastResultExamRequest = {
 
 const result = ref<LastResultExamDto | null>(null)
 
-const groupedQuestions = ref<{ [key: string]: QuestionDto[] }>({
+const groupedQuestions = ref<{ [key: string]: Question[] }>({
   singleChoice: [],
   multipleChoice: [],
   fillBlank: [],
@@ -55,8 +56,8 @@ onMounted(() => {
 })
 
 // Computed property to group the questions by type
-const groupQuestionsByType = (questions: QuestionDto[]) => {
-  const groups: { [key: string]: QuestionDto[] } = {
+const groupQuestionsByType = (questions: Question[]) => {
+  const groups: { [key: string]: Question[] } = {
     singleChoice: [],
     multipleChoice: [],
     fillBlank: [],

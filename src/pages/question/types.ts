@@ -100,8 +100,8 @@ export type Question = {
   lastModifiedOn?: string | null
   deletedOn?: string | null
   deletedBy?: string | null
-  id?: string | null | undefined
-  index?: number | null | undefined
+  id?: string | undefined
+  rawIndex?: number | null | undefined
   isSelected?: boolean
   owner?: UserDetail | null
 }
@@ -119,7 +119,7 @@ export type QuestionPassage = {
 }
 
 export type Answer = {
-  id?: string | null
+  id?: string | undefined
   content: string
   questionId?: string | null
   isCorrect?: boolean | null
