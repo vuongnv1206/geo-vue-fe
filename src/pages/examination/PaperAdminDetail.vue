@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import AssignPaperModal from './widgets/AssignPaperModal.vue'
-import QuestionView from '../question/widgets/QuestionView.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto, SubmitPaperDto } from './types'
@@ -126,6 +125,17 @@ const getFormattedDuration = (startTime: string, endTime: string) => {
   } else {
     return `${Math.round(durationInSeconds / 86400)} days`
   }
+}
+
+const navigateToExamReview = (paperId: string, userId: string, submitPaperId: string) => {
+  router.push({
+    name: 'exam-review',
+    params: {
+      paperId,
+      userId,
+      submitPaperId,
+    },
+  })
 }
 
 onMounted(() => {
@@ -340,7 +350,7 @@ onMounted(() => {
             :key="submittedStudent.id"
             outlined
             class="mr-2"
-            href="./text-review"
+            @click="navigateToExamReview(submittedStudent.paperId, submittedStudent.createdBy, submittedStudent.id)"
           >
             <div class="p-2 flex justify-between">
               <div class="flex">
