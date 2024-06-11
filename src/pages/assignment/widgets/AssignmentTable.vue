@@ -1,10 +1,15 @@
 <script lang="ts" setup>
-import { PropType } from 'vue'
+import { onMounted, PropType, ref } from 'vue'
 import { Assignment } from '../types'
 import { defineVaDataTableColumns, useMenu } from 'vuestic-ui'
 import { format } from '@/services/utils'
+import { useClassStore } from '@/stores/modules/class.module'
+import { ClassResponse } from '@/pages/classrooms/type'
 
 const { show } = useMenu()
+
+const classStores = useClassStore()
+const assignmentsByClass = ref<ClassResponse[]>([])
 
 const columns = defineVaDataTableColumns([
   { label: 'Subject', key: 'subjectName', sortable: true },
@@ -63,6 +68,23 @@ const selectedItemsEmitted = defineModel('selectedItemsEmitted', {
 const handleSelectionChange = (selectedItems: Assignment[]) => {
   selectedItemsEmitted.value = selectedItems
 }
+
+const getAssignmentByClass = () => {
+  classStores
+    .getClasses()
+    .then((response) => {
+      assignmentsByClass.value = response.data
+      console.log('ClassAssignment:', response)
+      console.log('ClassAssignment222:', assignmentsByClass.value)
+    })
+    .catch(() => {
+      console.log('error')
+    })
+}
+
+onMounted(() => {
+  getAssignmentByClass()
+})
 </script>
 
 <template>
@@ -144,23 +166,43 @@ const handleSelectionChange = (selectedItems: Assignment[]) => {
       </template>
     </VaDataTable>
   </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[4rem]">
-    <VaCard
-      v-for="assignment in assignments"
-      :key="assignment.id"
-      :style="{ '--va-card-outlined-border': '1px solid var(--va-background-element)' }"
-      outlined
-    >
-      <VaCardContent class="flex flex-col h-full">
-        <div class="flex flex-col items-center gap-4 grow">
-          <h4 class="va-h4 text-center self-stretch overflow-hidden line-clamp-2 text-ellipsis">
-            {{ assignment.name }}
-          </h4>
-          <!-- Display other assignment details here -->
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[4rem]">
+    <div v-for="assClass in assignmentsByClass" :key="assClass.id" class="border p-2 rounded">
+      <VaCard class="flex justify-between items-center mb-2">
+        <VaCard>{{ assClass.name }}</VaCard>
+        <VaChip outline class="ml-1" size="small">Share</VaChip>
+        <!-- isOnwer ? 'Share' : '' -->
+        <div class="flex items-center space-x-2 ml-auto">
+          <!-- <a href="#" class="text-blue-500">Xem tất cả</a> -->
+          <VaButton preset="plain" size="small">Xem tất cả</VaButton>
         </div>
-        <VaDivider class="my-6" />
-      </VaCardContent>
-    </VaCard>
+      </VaCard>
+      <VaDivider />
+      <VaList>
+        <VaListItem v-for="assignment in assClass.assignments" :key="assignment.id" class="mb-1">
+          <VaCard class="flex flex-row items-center border rounded-lg p-2 w-full">
+            <VaListItemSection avatar>
+              <VaIcon name="book" size="3rem" />
+            </VaListItemSection>
+            <VaListItemSection>
+              <VaListItemLabel>
+                {{ assignment.name }}
+              </VaListItemLabel>
+              <VaListItemLabel caption>
+                {{ format.formatDate(assignment.startTime) }}
+              </VaListItemLabel>
+              <VaListItemLabel caption>
+                {{ format.formatDate(assignment.endTime) }}
+              </VaListItemLabel>
+            </VaListItemSection>
+            <VaListItemSection icon>
+              <VaCard>0/100</VaCard>
+            </VaListItemSection>
+          </VaCard>
+        </VaListItem>
+      </VaList>
+    </div>
   </div>
 </template>
 

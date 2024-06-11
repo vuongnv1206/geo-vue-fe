@@ -133,7 +133,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1 class="page-title font-bold">Assignment</h1>
   <VaCard>
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 justify-end">

@@ -43,6 +43,7 @@ function getGroupClasses() {
     .getGroupClass()
     .then((res) => {
       listGroupClass.value = res
+      console.log('Department: ', listGroupClass.value)
     })
     .finally(() => {
       loading.value = false
@@ -128,6 +129,7 @@ function getClassByUser() {
     .getClassroomByUser()
     .then((res) => {
       classrooms.value = res
+      console.log('Class: ', classrooms.value)
     })
     .catch(() => {
       notify({

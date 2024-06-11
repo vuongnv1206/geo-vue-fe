@@ -1,7 +1,24 @@
-import { Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/type'
+import {
+  AssignmentToClassRequest,
+  Classrooms,
+  EmptyClassrooms,
+  UserInClass,
+  UserInClassRequest,
+} from '@/pages/classrooms/type'
 import apiService from './api.service'
 
 class ClassService {
+  async getClasses(): Promise<any> {
+    return apiService
+      .post('/v1/class/search', { request: {} })
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
   async getClassroomByGroupClass(): Promise<Classrooms> {
     return apiService
       .get(`/v1/groupclasses/group-class-detail`)
@@ -109,6 +126,28 @@ class ClassService {
   async getClassSearch(data: any): Promise<any> {
     return apiService
       .post(`v1/class/search`, data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async AssignAssignmentToClass(data: AssignmentToClassRequest): Promise<any> {
+    return apiService
+      .post(`v1/class/assign-assignment-to-class`, data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async RemoveAssignmentFromClass(data: AssignmentToClassRequest): Promise<any> {
+    return apiService
+      .post(`v1/class/remove-assignment-from-class`, data)
       .then((response) => {
         return Promise.resolve(response.data)
       })

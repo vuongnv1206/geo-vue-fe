@@ -92,7 +92,7 @@ onMounted(() => {
       <VaDivider />
     </template>
     <template #left>
-      <VaSidebar v-model="showSidebar" style="margin-right: 5px">
+      <VaSidebar v-model="showSidebar" class="mr-2">
         <VaCard v-if="assignment">
           <VaCard>
             <VaCardTitle>{{ assignment.name }}</VaCardTitle>
@@ -105,19 +105,19 @@ onMounted(() => {
           </VaCard>
           <VaCard>
             <VaCardTitle>Menu</VaCardTitle>
-            <VaCard outlined style="margin-left: 15px; margin-right: 10px">
+            <VaCard outlined class="mx-3">
               <VaCardActions align="stretch" vertical>
                 <VaButton
                   icon="edit"
                   preset="secondary"
                   :to="{ name: 'edit-assignment-details', params: { id: assignmentId } }"
-                  style="justify-content: flex-start"
+                  class="justify-start"
                   >Setting
                 </VaButton>
                 <VaButton
                   icon="delete"
                   preset="secondary"
-                  style="justify-content: flex-start"
+                  class="justify-start"
                   @click="deleteAssignment(assignmentId)"
                 >
                   Delete</VaButton
@@ -148,15 +148,24 @@ onMounted(() => {
     </template>
     <template #content>
       <main class="p-4">
-        <h3 class="va-h3">Page content</h3>
+        <h3 class="text-xl font-bold">Page content</h3>
         <p>
           Page content must be wrapped in main tag. You must do it manually. Here you can place any blocks you need in
           your application.
         </p>
-
         <p>For example, you can place here your router view, add sidebar with navigation in #left slot.</p>
         <p>If you're using VaSidebar for page navigation don't forget to wrap it in nav tag.</p>
       </main>
     </template>
   </VaLayout>
 </template>
+
+<style lang="scss" scoped>
+.va-select-content__autocomplete {
+  flex: 1;
+}
+
+.va-input-wrapper__text {
+  gap: 0.2rem;
+}
+</style>
