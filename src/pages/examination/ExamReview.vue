@@ -104,7 +104,7 @@ const initialTab = computed(() => {
   if (groupedQuestions.value.reading.length) return 'reading'
   if (groupedQuestions.value.writing.length) return 'writing'
   if (groupedQuestions.value.other.length) return 'other'
-  return null
+  return undefined
 })
 </script>
 
