@@ -243,7 +243,7 @@ const addTemplateMultipleChoice = () => {
 const addTemplateFillBlank = () => {
   const question: Question = {
     content:
-      "The $_fillblank[1] Ocean is the largest ocean on Earth, covering about $_fillblank[2] of the Earth's surface.\na",
+      "The $_fillblank[1] Ocean is the largest ocean on Earth, covering about $_fillblank[2] of the Earth's surface.",
     image: null,
     audio: null,
     questionType: 4,
