@@ -542,7 +542,7 @@ export const readingText2Html = (text: string) => {
   let questionMatch
   while ((questionMatch = questionsRegex.exec(text)) !== null) {
     const question = questionMatch[0].trim()
-    const questionRegex = /Q(\d+)\.(\d+)\.(.*?\n(?:.*\n)*?)(?=A\.)/s
+    const questionRegex = /Q(\d+)\.(\d+)\.(.*?\n(?:.*\n)*?)(?=A\.|\*A\.)/
     const questionMatch2 = question.match(questionRegex)
     const index2 = questionMatch[1]
     const questionContent = questionMatch2
@@ -556,6 +556,7 @@ export const readingText2Html = (text: string) => {
           })
           .join('')
       : ''
+
     const answersRegex = /(\*?)([A-Z])\.\s(.+)/g
     const answers = []
     let answerMatch
@@ -835,7 +836,7 @@ export const ReadingGeoMarkdown2Objects = (text: string) => {
     let passageQuestionMatch
 
     while ((passageQuestionMatch = passageQuestionsRegex.exec(match[0])) !== null) {
-      const questionContentRegex = /Q(\d+)\.(\d+)\.(.*?\n(?:.*\n)*?)(?=A\.)/s
+      const questionContentRegex = /Q(\d+)\.(\d+)\.(.*?\n(?:.*\n)*?)(?=A\.|\*A\.)/
       const questionContentMatch = passageQuestionMatch[0].match(questionContentRegex)
       const question = questionContentMatch ? questionContentMatch[3].trim() : ''
 

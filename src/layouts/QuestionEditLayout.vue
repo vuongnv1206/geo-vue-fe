@@ -309,7 +309,7 @@ const addTemplateReading = () => {
         answers: [
           {
             content: 'Answer 1',
-            isCorrect: false,
+            isCorrect: true,
           },
           {
             content: 'Answer 2',
