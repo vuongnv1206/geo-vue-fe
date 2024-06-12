@@ -5,9 +5,9 @@ import { ClassResponse, Classrooms, EmptyClassrooms, UserInClass, UserInClassReq
 export const useClassStore = defineStore('class', {
   state: () => ({}),
   actions: {
-    async getClasses(): Promise<ClassResponse> {
+    async getClasses(data: any): Promise<ClassResponse> {
       return classService
-        .getClasses()
+        .getClasses(data)
         .then((response) => {
           return Promise.resolve(response)
         })

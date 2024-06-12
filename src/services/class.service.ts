@@ -8,9 +8,9 @@ import {
 import apiService from './api.service'
 
 class ClassService {
-  async getClasses(): Promise<any> {
+  async getClasses(data: any): Promise<any> {
     return apiService
-      .post('/v1/class/search', { request: {} })
+      .post('/v1/class/search', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })

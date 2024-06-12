@@ -1,8 +1,8 @@
 export type Assignment = {
   id: string
   name: string
-  startTime: Date | null
-  endTime: Date | null
+  startTime: Date
+  endTime: Date
   attachmentPaths: Attachment[]
   content: string
   canViewResult: boolean

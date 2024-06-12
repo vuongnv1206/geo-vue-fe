@@ -1,79 +1,57 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { Assignment, EmptyAssignment } from './types'
 import AssignmentTable from '@pages/assignment/widgets/AssignmentTable.vue'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-
 import { useModal, useToast } from 'vuestic-ui'
 import EditAssignmentForm from '@pages/assignment/widgets/EditAssignmentForm.vue'
 import { notifications } from '@/services/utils'
+import { useClassStore } from '@/stores/modules/class.module'
+import { Classrooms } from '../classrooms/type'
 
 const editFormRef = ref()
 const loading = ref(true)
-const router = useRouter()
 const { confirm } = useModal()
 const { init: notify } = useToast()
 const stores = useAssignmentStore()
-const assignments = ref<Assignment[]>([])
 const doShowAssignmentFormModal = ref(false)
-const selectedItemsEmitted = ref<Assignment[]>([])
-const AssignmentToEdit = ref<Assignment | null>(null)
+const assignment = ref<Assignment | null>(null)
+const classStores = useClassStore()
+const assignmentsByClass = ref<Classrooms[]>([])
 
-const getAssignments = () => {
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
+
+const getAssignmentByClass = () => {
   loading.value = true
-  stores
-    .getAssignments()
+  // dataFilter.value.advancedSearch.fields = ['name']
+  classStores
+    .getClasses(dataFilter)
     .then((response) => {
-      assignments.value = response.data
+      assignmentsByClass.value = response.data
+      console.log('Response:', response)
+      console.log('ClassAssignment:', assignmentsByClass.value)
       loading.value = false
     })
     .catch((error) => {
       loading.value = false
       notify({
-        message: notifications.getFailed('assignments') + error.message,
+        message: notifications.getFailed('class assignments') + error.message,
         color: 'error',
       })
     })
-}
-
-const deleteAssignment = (assignment: Assignment) => {
-  console.log('deleteSelectedAssignment', assignment)
-  stores
-    .deleteAssignment(assignment.id)
-    .then(() => {
-      notify({
-        message: notifications.deleteSuccessfully(assignment.name),
-        color: 'success',
-      })
-      getAssignments()
-    })
-    .catch((error) => {
-      notify({
-        message: notifications.deleteFailed(assignment.name) + error.message,
-        color: 'error',
-      })
-    })
-}
-
-const deleteSelectedAssignment = () => {
-  selectedItemsEmitted.value.forEach((assignment) => {
-    deleteAssignment(assignment)
-  })
 }
 
 const createNewAssignment = () => {
-  AssignmentToEdit.value = null
+  assignment.value = null
   doShowAssignmentFormModal.value = true
-}
-
-const editAssignment = (assignment: Assignment) => {
-  AssignmentToEdit.value = assignment
-  doShowAssignmentFormModal.value = true
-}
-
-const selectedAssignment = (assignment: Assignment) => {
-  router.push({ name: 'assignment-details', params: { id: assignment.id } })
 }
 
 const beforeEditFormModalClose = async (hide: () => unknown) => {
@@ -93,42 +71,24 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
 
 const onAssignmentSaved = async (assignment: Assignment) => {
   doShowAssignmentFormModal.value = false
-  if (assignment.id != '') {
-    stores
-      .updateAssignment(assignment.id, assignment as EmptyAssignment)
-      .then(() => {
-        notify({
-          message: notifications.updatedSuccessfully(assignment.name),
-          color: 'success',
-        })
-        getAssignments()
+  stores
+    .createAssignment(assignment as EmptyAssignment)
+    .then(() => {
+      notify({
+        message: notifications.createSuccessfully(assignment.name),
+        color: 'success',
       })
-      .catch((error) => {
-        notify({
-          message: notifications.updateFailed(assignment.name) + error.message,
-          color: 'error',
-        })
+      getAssignmentByClass()
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.createFailed(assignment.name) + error.message,
+        color: 'error',
       })
-  } else {
-    stores
-      .createAssignment(assignment as EmptyAssignment)
-      .then(() => {
-        notify({
-          message: notifications.createSuccessfully(assignment.name),
-          color: 'success',
-        })
-        getAssignments()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.createFailed(assignment.name) + error.message,
-          color: 'error',
-        })
-      })
-  }
+    })
 }
 onMounted(() => {
-  getAssignments()
+  getAssignmentByClass()
 })
 </script>
 
@@ -136,24 +96,9 @@ onMounted(() => {
   <VaCard>
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 justify-end">
-        <VaButton
-          v-if="selectedItemsEmitted.length != 0"
-          icon="delete"
-          color="danger"
-          @click="deleteSelectedAssignment()"
-        >
-          Delete
-        </VaButton>
         <VaButton icon="add" @click="createNewAssignment()">Assignment</VaButton>
       </div>
-      <AssignmentTable
-        v-model:selectedItemsEmitted="selectedItemsEmitted"
-        :assignments="assignments"
-        :loading="loading"
-        @edit="editAssignment"
-        @delete="deleteAssignment"
-        @selectedAssignment="selectedAssignment"
-      />
+      <AssignmentTable :loading="loading" :assignments-by-class="assignmentsByClass" />
     </VaCardContent>
   </VaCard>
   <VaModal
@@ -167,11 +112,11 @@ onMounted(() => {
     :before-cancel="beforeEditFormModalClose"
     @close="doShowAssignmentFormModal = false"
   >
-    <h3 class="text-lg font-bold">{{ AssignmentToEdit ? 'Edit' : 'Create' }} Assignment</h3>
+    <h3 class="text-lg font-bold">Create Assignment</h3>
     <EditAssignmentForm
       ref="editFormRef"
-      :assignment="AssignmentToEdit"
-      :save-button-label="AssignmentToEdit === null ? 'Add' : 'Save'"
+      :assignment="assignment"
+      :save-button-label="'Save'"
       @close="cancel"
       @save="
         (assignment: Assignment) => {

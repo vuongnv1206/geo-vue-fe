@@ -1,3 +1,94 @@
+<template>
+  <VaLayout>
+    <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'assignments' }" />
+  </VaLayout>
+  <VaDivider />
+  <VaLayout
+    :top="{ order: 1 }"
+    :left="{ absolute: breakpoints.smDown, order: 2, overlay: breakpoints.smDown && showSidebar }"
+    @leftOverlayClick="showSidebar = false"
+  >
+    <template #left>
+      <VaSidebar v-model="showSidebar" class="mr-2">
+        <VaCard v-if="assignment">
+          <VaCard>
+            <VaCardTitle>{{ assignment.name }}</VaCardTitle>
+            <VaCardContent>
+              Start Time: {{ assignment.startTime ? format.formatDate(assignment.startTime) : '' }}
+            </VaCardContent>
+            <VaCardContent>
+              End Time: {{ assignment.endTime ? format.formatDate(assignment.endTime) : '' }}
+            </VaCardContent>
+          </VaCard>
+          <VaCard>
+            <VaCardTitle>Menu</VaCardTitle>
+            <VaCard outlined class="mx-3">
+              <VaCardActions align="stretch" vertical>
+                <VaButton
+                  icon="edit"
+                  preset="secondary"
+                  :to="{ name: 'edit-assignment-details', params: { id: assignmentId } }"
+                  class="justify-start"
+                  >Setting
+                </VaButton>
+                <VaButton
+                  icon="delete"
+                  preset="secondary"
+                  class="justify-start"
+                  @click="deleteAssignment(assignmentId)"
+                >
+                  Delete</VaButton
+                >
+              </VaCardActions>
+            </VaCard>
+          </VaCard>
+          <VaCard>
+            <VaCardTitle>Attachment File</VaCardTitle>
+            <VaCardContent>
+              {{ assignment.attachmentPaths ? assignment.attachmentPaths : 'No attachment file' }}
+            </VaCardContent>
+          </VaCard>
+          <VaCard>
+            <VaCardTitle>Content</VaCardTitle>
+            <VaCardContent>
+              {{ assignment.content ? assignment.content : 'Content is empty' }}
+            </VaCardContent>
+          </VaCard>
+        </VaCard>
+      </VaSidebar>
+    </template>
+    <template #top>
+      <VaNavbar class="py-1">
+        <template #left>
+          <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
+        </template>
+        <template #right>
+          <div class="flex">
+            <div class="mr-3 flex-grow">
+              <VaInput class="" placeholder="Search">
+                <template #appendInner>
+                  <VaIcon color="secondary" class="material-icons"> search </VaIcon>
+                </template>
+              </VaInput>
+            </div>
+          </div>
+        </template>
+      </VaNavbar>
+    </template>
+    <template #content>
+      <main class="p-4">
+        <h3 class="text-xl font-bold">Page content</h3>
+        <p>
+          Page content must be wrapped in main tag. You must do it manually. Here you can place any blocks you need in
+          your application.
+        </p>
+        <p>For example, you can place here your router view, add sidebar with navigation in #left slot.</p>
+        <p>If you're using VaSidebar for page navigation don't forget to wrap it in nav tag.</p>
+      </main>
+    </template>
+  </VaLayout>
+</template>
+
 <script lang="ts" setup>
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
@@ -61,104 +152,6 @@ onMounted(() => {
   }
 })
 </script>
-
-<template>
-  <VaLayout>
-    <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'assignments' }" />
-  </VaLayout>
-  <VaDivider />
-  <VaLayout
-    :top="{ order: 1 }"
-    :left="{ absolute: breakpoints.smDown, order: 2, overlay: breakpoints.smDown && showSidebar }"
-    @leftOverlayClick="showSidebar = false"
-  >
-    <template #top>
-      <VaNavbar class="py-1">
-        <template #left>
-          <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
-        </template>
-        <template #right>
-          <div class="flex">
-            <div class="mr-3 flex-grow">
-              <VaInput class="" placeholder="Search">
-                <template #appendInner>
-                  <VaIcon color="secondary" class="material-icons"> search </VaIcon>
-                </template>
-              </VaInput>
-            </div>
-          </div>
-        </template>
-      </VaNavbar>
-      <VaDivider />
-    </template>
-    <template #left>
-      <VaSidebar v-model="showSidebar" class="mr-2">
-        <VaCard v-if="assignment">
-          <VaCard>
-            <VaCardTitle>{{ assignment.name }}</VaCardTitle>
-            <VaCardContent>
-              Start Time: {{ assignment.startTime ? format.formatDate(assignment.startTime) : '' }}
-            </VaCardContent>
-            <VaCardContent>
-              End Time: {{ assignment.endTime ? format.formatDate(assignment.endTime) : '' }}
-            </VaCardContent>
-          </VaCard>
-          <VaCard>
-            <VaCardTitle>Menu</VaCardTitle>
-            <VaCard outlined class="mx-3">
-              <VaCardActions align="stretch" vertical>
-                <VaButton
-                  icon="edit"
-                  preset="secondary"
-                  :to="{ name: 'edit-assignment-details', params: { id: assignmentId } }"
-                  class="justify-start"
-                  >Setting
-                </VaButton>
-                <VaButton
-                  icon="delete"
-                  preset="secondary"
-                  class="justify-start"
-                  @click="deleteAssignment(assignmentId)"
-                >
-                  Delete</VaButton
-                >
-              </VaCardActions>
-            </VaCard>
-          </VaCard>
-          <VaCard>
-            <VaCardTitle>Attachment File</VaCardTitle>
-            <VaCardContent>
-              {{ assignment.attachmentPaths ? assignment.attachmentPaths : 'No attachment file' }}
-            </VaCardContent>
-          </VaCard>
-          <VaCard>
-            <VaCardTitle>Attachment File</VaCardTitle>
-            <VaCardContent>
-              {{ assignment.attachmentPaths ? assignment.attachmentPaths : 'No attachment file' }}
-            </VaCardContent>
-          </VaCard>
-          <VaCard>
-            <VaCardTitle>Content</VaCardTitle>
-            <VaCardContent>
-              {{ assignment.content ? assignment.content : 'Content is empty' }}
-            </VaCardContent>
-          </VaCard>
-        </VaCard>
-      </VaSidebar>
-    </template>
-    <template #content>
-      <main class="p-4">
-        <h3 class="text-xl font-bold">Page content</h3>
-        <p>
-          Page content must be wrapped in main tag. You must do it manually. Here you can place any blocks you need in
-          your application.
-        </p>
-        <p>For example, you can place here your router view, add sidebar with navigation in #left slot.</p>
-        <p>If you're using VaSidebar for page navigation don't forget to wrap it in nav tag.</p>
-      </main>
-    </template>
-  </VaLayout>
-</template>
 
 <style lang="scss" scoped>
 .va-select-content__autocomplete {
