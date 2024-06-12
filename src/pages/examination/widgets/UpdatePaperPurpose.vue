@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropTypes } from 'vuestic-ui/dist/types/services/component-config'
+import { PropType } from 'vue'
 import { CreatePaperRequest } from '../types'
 import { computed, ref, watch, onMounted } from 'vue'
 import { validators } from '@services/utils'
@@ -12,7 +12,7 @@ const { init: notify } = useToast()
 
 const props = defineProps({
   paperRequest: {
-    type: Object as PropTypes<CreatePaperRequest | null>,
+    type: Object as PropType<CreatePaperRequest | null>,
     default: null,
   },
 })
