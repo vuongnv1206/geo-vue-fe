@@ -6,7 +6,6 @@ import { GetLastResultExamRequest, LastResultExamDto } from './types'
 import { useRoute } from 'vue-router'
 import { onMounted } from 'vue'
 import { QuestionType } from '../question/types'
-import { computed } from 'vue'
 import { Question } from '../question/types'
 
 import SingleChoiceQuestion from './questionType/SingleChoiceQuestion.vue'
@@ -34,6 +33,8 @@ const groupedQuestions = ref<{ [key: string]: Question[] }>({
   other: [],
 })
 
+const maxPointInPaper = ref<number | undefined>(0)
+
 const getLastExamResult = () => {
   submitPaperStore
     .getLastResultExam(request)
@@ -42,6 +43,7 @@ const getLastExamResult = () => {
       if (res && res.paper && res.paper.questions) {
         groupedQuestions.value = groupQuestionsByType(res.paper.questions)
       }
+      maxPointInPaper.value = res.paper.maxPoint
     })
     .catch((error) => {
       notify({
@@ -55,18 +57,20 @@ onMounted(() => {
   getLastExamResult()
 })
 
-// Computed property to group the questions by type
-const groupQuestionsByType = (questions: Question[]) => {
-  const groups: { [key: string]: Question[] } = {
-    singleChoice: [],
-    multipleChoice: [],
-    fillBlank: [],
-    matching: [],
-    reading: [],
-    writing: [],
-    other: [],
-  }
+const valueTab = ref('all')
+const questionTypesLabel = ref(['all'])
 
+// Computed property to group the questions by type
+const groups: { [key: string]: Question[] } = {
+  singleChoice: [],
+  multipleChoice: [],
+  fillBlank: [],
+  matching: [],
+  reading: [],
+  writing: [],
+  other: [],
+}
+const groupQuestionsByType = (questions: Question[]) => {
   questions.forEach((question) => {
     switch (question.questionType) {
       case QuestionType.SingleChoice:
@@ -94,23 +98,21 @@ const groupQuestionsByType = (questions: Question[]) => {
     }
   })
 
+  for (const label in groups) {
+    if (groups[label].length > 0) {
+      questionTypesLabel.value.push(label)
+    }
+  }
   return groups
 }
 
-const initialTab = computed(() => {
-  if (groupedQuestions.value.singleChoice.length) return 'singleChoice'
-  if (groupedQuestions.value.multipleChoice.length) return 'multipleChoice'
-  if (groupedQuestions.value.fillBlank.length) return 'fillBlank'
-  if (groupedQuestions.value.matching.length) return 'matching'
-  if (groupedQuestions.value.reading.length) return 'reading'
-  if (groupedQuestions.value.writing.length) return 'writing'
-  if (groupedQuestions.value.other.length) return 'other'
-  return undefined
-})
+const filterGroupQuestionType = () => {
+  console.log(valueTab.value)
+}
 </script>
 
 <template>
-  <VaLayout style="height: 85vh">
+  <VaLayout>
     <template #left>
       <VaCard v-if="showSidebar" style="min-width: 20rem; max-width: 30rem" bordered>
         <VaCardTitle>
@@ -129,7 +131,7 @@ const initialTab = computed(() => {
 
             <VaCardActions align="stretch" vertical>
               <VaListItem>
-                <p><b>Điểm:</b> {{ result?.totalMark }}/10</p>
+                <p><b>Điểm:</b> {{ result?.totalMark }}/{{ maxPointInPaper }}</p>
               </VaListItem>
               <VaListItem>
                 <p>
@@ -181,14 +183,22 @@ const initialTab = computed(() => {
         </template>
       </VaNavbar>
       <VaCard class="mt-2 ml-2" style="height: 80vh">
-        <VaTabs v-model="initialTab" stateful grow>
-          <VaTab v-if="groupedQuestions.singleChoice.length" name="singleChoice" label="Single Choice">
+        <VaTabs v-model="valueTab">
+          <template #tabs>
+            <VaTab v-for="title in questionTypesLabel" :key="title" :name="title" @click="filterGroupQuestionType">
+              {{ title }}
+            </VaTab>
+          </template>
+        </VaTabs>
+        <VaCardContent>
+          <VaScrollContainer>
             <SingleChoiceQuestion
               :questions="groupedQuestions.singleChoice"
               :student-answers="result?.submitPaperDetails ?? []"
             />
-          </VaTab>
-          <!-- <VaTab v-if="groupedQuestions.multipleChoice.length" name="multipleChoice" label="Multiple Choice">
+          </VaScrollContainer>
+        </VaCardContent>
+        <!-- <VaTab v-if="groupedQuestions.multipleChoice.length" name="multipleChoice" label="Multiple Choice">
             <MultipleChoiceQuestion :questions="groupedQuestions.multipleChoice" />
           </VaTab>
           <VaTab v-if="groupedQuestions.fillBlank.length" name="fillBlank" label="Fill in the Blank">
@@ -206,7 +216,6 @@ const initialTab = computed(() => {
           <VaTab v-if="groupedQuestions.other.length" name="other" label="Other">
             <SingleChoiceQuestion :questions="groupedQuestions.other" />
           </VaTab> -->
-        </VaTabs>
       </VaCard>
     </template>
   </VaLayout>
