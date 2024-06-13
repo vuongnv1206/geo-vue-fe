@@ -351,7 +351,7 @@ onMounted(() => {
             v-for="submittedStudent in submittedStudents"
             :key="submittedStudent.id"
             outlined
-            class="mr-2"
+            class="mr-2 cursor-pointer"
             @click="navigateToExamReview(submittedStudent.paperId, submittedStudent.createdBy, submittedStudent.id)"
           >
             <div class="p-2 flex justify-between">
