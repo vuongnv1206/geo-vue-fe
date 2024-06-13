@@ -1,10 +1,20 @@
 import { defineStore } from 'pinia'
 import classService from '@/services/class.service'
-import { Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/type'
+import { ClassResponse, Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/type'
 
 export const useClassStore = defineStore('class', {
   state: () => ({}),
   actions: {
+    async getClasses(data: any): Promise<ClassResponse> {
+      return classService
+        .getClasses(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
     async getClassroomByGroupClass(): Promise<Classrooms> {
       return classService
         .getClassroomByGroupClass()
@@ -109,6 +119,26 @@ export const useClassStore = defineStore('class', {
     async getClassSearch(data: any): Promise<any> {
       return classService
         .getClassSearch(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async AssignAssignmentToClass(data: any): Promise<any> {
+      return classService
+        .AssignAssignmentToClass(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async RemoveAssignmentFromClass(data: any): Promise<any> {
+      return classService
+        .RemoveAssignmentFromClass(data)
         .then((response) => {
           return Promise.resolve(response)
         })

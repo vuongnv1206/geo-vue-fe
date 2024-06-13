@@ -147,8 +147,8 @@ onMounted(() => {
     />
     <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
     <VaInput v-model="newAssignment.content" label="Content" />
-    <VaSwitch v-model="newAssignment.canViewResult" label="Can View Result" />
-    <VaSwitch v-model="newAssignment.requireLoginToSubmit" label="Require Login to Submit" />
+    <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
+    <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
     <VaSelect
       v-model="newAssignment.subjectId"
       value-by="value"

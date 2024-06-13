@@ -9,6 +9,7 @@ import { notifications, validators } from '@/services/utils'
 import { useModal, useToast } from 'vuestic-ui/web-components'
 import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
+
 dayjs.extend(utc)
 
 const formRef = ref()
@@ -113,8 +114,8 @@ onMounted(() => {
       <VaDivider />
       <VaForm
         ref="formRef"
-        class="flex flex-col gap-2"
-        style="margin-left: 350px; margin-right: 350px"
+        class="flex flex-col gap-4 mx-auto"
+        style="max-width: 700px"
         @submit.prevent="handleClickUpdate"
       >
         <CardTitle>Global Setting</CardTitle>
@@ -138,10 +139,10 @@ onMounted(() => {
         />
         <VaSwitch v-model="newAssignmentDetails.canViewResult" size="small" label="Can View Result" />
         <VaSwitch v-model="newAssignmentDetails.requireLoginToSubmit" size="small" label="Require Login to Submit" />
-        <VaLayout style="height: 350px">
+        <VaLayout class="h-88">
           <template #left>
-            <VaSidebar v-model="showSidebar" style="margin-right: 5px">
-              <div class="mt-2 mr-1 ml-1">
+            <VaSidebar v-model="showSidebar" class="mr-2">
+              <div class="mt-1 mx-1">
                 <VaInput class="" placeholder="Search">
                   <template #appendInner>
                     <VaIcon color="secondary" class="material-icons"> search </VaIcon>
@@ -176,7 +177,7 @@ onMounted(() => {
               </template>
               <template #content>
                 <VaDivider />
-                <p>
+                <p class="p-4">
                   Page content must be wrapped in main tag. You must do it manually. Here you can place any blocks you
                   need in your application.
                 </p>
@@ -185,7 +186,7 @@ onMounted(() => {
           </template>
         </VaLayout>
 
-        <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
+        <div class="flex flex-col-reverse sm:flex-row mt-4 gap-2 justify-end">
           <VaButton preset="secondary" color="secondary" @click="goBack()">Cancel</VaButton>
           <VaButton type="submit">Save</VaButton>
         </div>

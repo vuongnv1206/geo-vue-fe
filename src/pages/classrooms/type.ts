@@ -1,3 +1,5 @@
+import { Assignment } from '../assignment/types'
+
 export type GroupClass = {
   id: string
   name: string
@@ -14,12 +16,30 @@ export type Classrooms = {
   schoolYear: string
   ownerId: string
   groupClassId: string
+  groupClassName: string
+  numberUserOfClass: number
+  assignments: Assignment[]
+}
+
+export type ClassResponse = {
+  data: Classrooms[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
 
 export type EmptyClassrooms = {
   name: string
   schoolYear: string
   groupClassId: string
+}
+
+export type AssignmentToClassRequest = {
+  assignmentId: string
+  classesdId: string
 }
 
 export type UserInClassRequest = {
