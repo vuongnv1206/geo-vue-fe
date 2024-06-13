@@ -193,8 +193,16 @@ const filterGroupQuestionType = () => {
         <VaCardContent>
           <VaScrollContainer>
             <SingleChoiceQuestion
+              v-if="valueTab == 'singleChoice' || valueTab == 'all'"
               :questions="groupedQuestions.singleChoice"
               :student-answers="result?.submitPaperDetails ?? []"
+              :show-action-button="false"
+            />
+            <SingleChoiceQuestion
+              v-if="valueTab == 'multipleChoice' || valueTab == 'all'"
+              :questions="groupedQuestions.multipleChoice"
+              :student-answers="result?.submitPaperDetails ?? []"
+              :show-action-button="false"
             />
           </VaScrollContainer>
         </VaCardContent>
