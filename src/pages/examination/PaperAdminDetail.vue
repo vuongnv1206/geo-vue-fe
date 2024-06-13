@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import AssignPaperModal from './widgets/AssignPaperModal.vue'
-import QuestionView from '../question/widgets/QuestionView.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto, SubmitPaperDto } from './types'
 import { useToast, useModal } from 'vuestic-ui'
+import QuestionView from '../question/widgets/QuestionView.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -21,6 +21,7 @@ const getPaperDetail = () => {
     .paperDetail(paperId.toString())
     .then((res) => {
       paperDetail.value = res
+      console.log(res)
     })
     .catch((error) => {
       notify({
@@ -126,6 +127,17 @@ const getFormattedDuration = (startTime: string, endTime: string) => {
   } else {
     return `${Math.round(durationInSeconds / 86400)} days`
   }
+}
+
+const navigateToExamReview = (paperId: string, userId: string, submitPaperId: string) => {
+  router.push({
+    name: 'exam-review',
+    params: {
+      paperId,
+      userId,
+      submitPaperId,
+    },
+  })
 }
 
 onMounted(() => {
@@ -302,7 +314,7 @@ onMounted(() => {
                   <VaDivider />
                   <VaCardContent class="p-0">
                     <template v-for="question in paperDetail?.questions" :key="question.id">
-                      <QuestionView :question="question" :index="null" />
+                      <QuestionView :question="question" :index="null" :is-stripe="false" :show-action-button="false" />
                     </template>
                   </VaCardContent>
                 </VaCard>
@@ -339,8 +351,8 @@ onMounted(() => {
             v-for="submittedStudent in submittedStudents"
             :key="submittedStudent.id"
             outlined
-            class="mr-2"
-            href="./text-review"
+            class="mr-2 cursor-pointer"
+            @click="navigateToExamReview(submittedStudent.paperId, submittedStudent.createdBy, submittedStudent.id)"
           >
             <div class="p-2 flex justify-between">
               <div class="flex">

@@ -1,22 +1,18 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { watchDebounced } from '@vueuse/core'
-import { Question, QuestionTree, SearchQuestion, QuestionSearchRes, Pagination } from './types'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
-import { useQuestionEditStore } from '@/stores/modules/questionEdit.module'
 import { useQuestionStore } from '@/stores/modules/question.module'
-import { useModal, useToast } from 'vuestic-ui'
-import { useRouter } from 'vue-router'
+import { useToast } from 'vuestic-ui'
 import { getErrorMessage } from '@/services/utils'
 import { QuestionTypeColor } from '@services/utils'
-import QuestionView from './widgets/QuestionView.vue'
+import QuestionView from '@/pages/question/widgets/QuestionView.vue'
+import { Question, QuestionSearchRes, QuestionTree, SearchQuestion } from '@pages/question/types'
+import { Pagination } from '../../question/types'
 
 const nodes = ref<QuestionTree[]>([])
 const stores = useQuestionFolderStore()
 const storesQuestion = useQuestionStore()
-const storesQEdit = useQuestionEditStore()
-const router = useRouter()
-const { confirm } = useModal()
 
 const loading = ref(false)
 const loadingNode = ref(false)
@@ -37,22 +33,14 @@ const QuestionTypeOptions = [
   { id: 100, name: 'Other', questionType: 100 },
 ]
 
-const QuestionSortOptions = [
-  { id: 0, name: 'Newest', questionType: 1 },
-  { id: 1, name: 'Oldest', questionType: 2 },
-  { id: 2, name: 'Last Modified', questionType: 4 },
-]
-
 const QuestionTypeValue = ref(QuestionTypeOptions[0])
-
-const QuestionSortValue = ref(QuestionSortOptions[0])
 
 const testQuestions = ref<Question[]>([])
 const questionSearchRes = ref<QuestionSearchRes | null>(null)
 
 const pagination = ref<Pagination>({
   page: 1,
-  perPage: 10,
+  perPage: 2,
   total: 0,
 })
 
@@ -62,7 +50,7 @@ const searchValue = ref<SearchQuestion>({
 })
 
 const filters = ref({
-  keyword: '',
+  search: '',
 })
 
 const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.value.perPage))
@@ -75,7 +63,10 @@ const searchQuestion = (search: SearchQuestion) => {
   storesQuestion
     .SearchQuestion(search)
     .then((res) => {
-      testQuestions.value = res.data
+      testQuestions.value = res.data.map((question: any) => ({
+        ...question,
+        isSelected: selectedQuestions.value.find((q) => q.id === question.id),
+      }))
       questionSearchRes.value = res
     })
     .catch((err) => {
@@ -95,7 +86,7 @@ const searchQuestion = (search: SearchQuestion) => {
 watchDebounced(
   filters.value,
   () => {
-    searchValue.value.keyword = filters.value.keyword
+    searchValue.value.content = filters.value.search
     searchQuestion(searchValue.value)
   },
   { debounce: 500, maxWait: 1000 },
@@ -220,55 +211,6 @@ const handleExpanded = (expanded: string[]) => {
   }
 }
 
-const editQuestion = (question: Question) => {
-  console.log('Edit question', question)
-}
-
-const deleteQuestion = (question: Question) => {
-  confirm({
-    title: 'Delete question',
-    message: `Are you sure you want to delete?`,
-  }).then((agreed) => {
-    if (!agreed) {
-      return
-    }
-    storesQuestion
-      .DeleteQuestion(question.id || '')
-      .then(() => {
-        init({
-          title: 'Success',
-          message: 'Delete question successfully',
-          color: 'success',
-        })
-        searchQuestion(searchValue.value)
-      })
-      .catch((err) => {
-        const message = getErrorMessage(err)
-        init({
-          title: 'Error',
-          message: message,
-          color: 'danger',
-        })
-      })
-  })
-}
-
-const AddNewQuestion = () => {
-  // push to add new question page
-  console.log('Add new question')
-  if (currentSelectedFolder.value?.id) {
-    storesQEdit.clearQuestions()
-    storesQEdit.setFolder(currentSelectedFolder.value)
-    router.push({ name: 'question-edit' })
-  } else {
-    init({
-      title: 'Error',
-      message: 'Please select a folder to add question',
-      color: 'danger',
-    })
-  }
-}
-
 watch(
   () => QuestionTypeValue.value.id,
   () => {
@@ -278,26 +220,28 @@ watch(
   { immediate: true },
 )
 
-watch(
-  () => QuestionSortValue.value.id,
-  () => {
-    if (QuestionSortValue.value.id === 0) {
-      searchValue.value.orderBy = []
-      searchValue.value.orderBy.push('CreatedOn desc')
-      console.log(searchValue.value)
+const selectedQuestions = ref<Question[]>([])
+
+const chooseQuestionBank = (questionId: string | null | undefined) => {
+  const question = testQuestions.value.find((q) => q.id === questionId)
+  if (question) {
+    question.isSelected = !question.isSelected
+    if (question.isSelected) {
+      const exists = selectedQuestions.value.find((q) => q.id === questionId)
+      if (!exists) {
+        selectedQuestions.value.push(question)
+      }
+    } else {
+      selectedQuestions.value = selectedQuestions.value.filter((q) => q.id !== questionId)
     }
-    if (QuestionSortValue.value.id === 1) {
-      searchValue.value.orderBy = []
-      searchValue.value.orderBy.push('CreatedOn asc')
-    }
-    if (QuestionSortValue.value.id === 2) {
-      searchValue.value.orderBy = []
-      searchValue.value.orderBy.push('LastModifiedOn desc')
-    }
-    searchQuestion(searchValue.value)
-  },
-  { immediate: true },
-)
+  }
+}
+
+const emit = defineEmits(['save'])
+
+const saveQuestion = () => {
+  emit('save', selectedQuestions.value)
+}
 
 onMounted(() => {
   loading.value = true
@@ -316,12 +260,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1 class="h1">Question Bank</h1>
   <section class="flex flex-col gap-4">
     <div class="flex flex-col sm:flex-row gap-4">
       <div class="w-full sm:w-[25%]">
         <VaInnerLoading :loading="loading" :size="60">
-          <VaCard class="flex flex-col">
+          <VaCard class="flex flex-col" outlined>
             <VaCardTitle class="flex items-start justify-between">
               <h1 class="card-title text-secondary font-bold uppercase">Folders</h1>
               <div class="flex gap-2"></div>
@@ -363,18 +306,16 @@ onMounted(() => {
           </VaCard>
         </VaInnerLoading>
       </div>
-      <div class="flex flex-col gap-4 w-full sm:w-[75%]">
-        <VaCard class="flex flex-col min-h-[800px]">
+      <div class="flex flex-col gap-4 w-full sm:w-[75%] border-left">
+        <VaCard class="flex flex-col min-h-[500px]" outlined>
           <VaCardTitle class="flex items-start justify-between">
             <h1 class="card-title text-secondary font-bold uppercase">
               List question of <b>{{ currentSelectedFolder?.name || '?' }}</b>
             </h1>
-            <div class="flex gap-2">
-              <VaButton icon="add" @click="AddNewQuestion">Add Question</VaButton>
-            </div>
+            <div class="flex gap-2"></div>
           </VaCardTitle>
-          <div class="flex flex-wrap gap-2 mb-2 p-3 justify-start">
-            <div>
+          <div class="flex flex-col md:flex-row gap-2 mb-2 p-3 justify-between">
+            <div class="grid grid-cols-2 gap-2">
               <VaSelect
                 v-model="QuestionTypeValue"
                 track-by="id"
@@ -382,12 +323,13 @@ onMounted(() => {
                 placeholder="All"
                 label="Question Type"
                 :options="QuestionTypeOptions"
+                class="col-span-1"
               >
                 <template #content="{ value }">
                   <VaBadge
                     :text="(value as any).name"
                     :color="QuestionTypeColor((value as any).questionType)"
-                    class="mr-2"
+                    class="mr-2 mt-2"
                   />
                 </template>
                 <template #option="{ option, selectOption }">
@@ -402,42 +344,39 @@ onMounted(() => {
                   </button>
                 </template>
               </VaSelect>
-            </div>
-            <div>
-              <VaInput v-model="filters.keyword" label="Search content" placeholder="Search">
+              <VaSelect
+                v-model="QuestionTypeValue"
+                track-by="id"
+                :text-by="(option) => (option as any).name"
+                placeholder="All"
+                label="Question tag"
+                :options="QuestionTypeOptions"
+                class="col-span-1"
+              >
+                <template #content="{ value }">
+                  <VaBadge
+                    :text="(value as any).name"
+                    :color="QuestionTypeColor((value as any).questionType)"
+                    class="mr-2 mt-2"
+                  />
+                </template>
+                <template #option="{ option, selectOption }">
+                  <button class="w-full flex items-center" @click="() => selectOption(option)">
+                    <div class="flex justify-between items-center p-2">
+                      <VaBadge
+                        :text="(option as any).name"
+                        :color="QuestionTypeColor((option as any).questionType)"
+                        class="mr-2"
+                      />
+                    </div>
+                  </button>
+                </template>
+              </VaSelect>
+              <VaInput v-model="filters.search" label="Search content" placeholder="Search" class="col-span-2">
                 <template #prependInner>
                   <VaIcon name="search" color="secondary" size="small" />
                 </template>
               </VaInput>
-            </div>
-            <div>
-              <VaSelect
-                v-model="QuestionSortValue"
-                track-by="id"
-                :text-by="(option) => (option as any).name"
-                placeholder="Newest"
-                label="Sort by"
-                :options="QuestionSortOptions"
-              >
-                <template #content="{ value }">
-                  <VaBadge
-                    :text="(value as any).name"
-                    :color="QuestionTypeColor((value as any).questionType)"
-                    class="mr-2"
-                  />
-                </template>
-                <template #option="{ option, selectOption }">
-                  <button class="w-full flex items-center" @click="() => selectOption(option)">
-                    <div class="flex justify-between items-center p-2">
-                      <VaBadge
-                        :text="(option as any).name"
-                        :color="QuestionTypeColor((option as any).questionType)"
-                        class="mr-2"
-                      />
-                    </div>
-                  </button>
-                </template>
-              </VaSelect>
             </div>
           </div>
           <VaCard v-if="currentSelectedFolder == null" class="mb-5 pr-4 flex justify-center">
@@ -449,7 +388,7 @@ onMounted(() => {
             </div>
           </VaCard>
           <VaInnerLoading v-else :loading="loadingQuestion" :size="60">
-            <VaScrollContainer class="min-h-[600px] max-h-[500px]" vertical>
+            <VaScrollContainer class="max-h-[500px]" vertical>
               <VaSkeletonGroup v-if="loadingQuestion" animation="wave" :delay="0">
                 <VaCard>
                   <VaCardContent class="flex items-center">
@@ -461,10 +400,10 @@ onMounted(() => {
                 <QuestionView
                   :question="testQuestion"
                   :index="null"
-                  :is-stripe="false"
-                  :show-action-button="true"
-                  @edit="editQuestion"
-                  @delete="deleteQuestion"
+                  :show-action-button="false"
+                  :is-stripe="testQuestion.isSelected"
+                  class="cursor-pointer"
+                  @click="chooseQuestionBank(testQuestion.id)"
                 />
               </div>
               <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
@@ -513,6 +452,10 @@ onMounted(() => {
             </div>
           </VaCardContent>
         </VaCard>
+        <div>
+          <p>Number of questions selected: {{ selectedQuestions.length }}</p>
+          <VaButton @click="saveQuestion">Choose question</VaButton>
+        </div>
       </div>
     </div>
   </section>
