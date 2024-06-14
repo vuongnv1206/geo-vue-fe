@@ -11,6 +11,7 @@ import { Question } from '../question/types'
 import SingleChoiceQuestion from './questionType/SingleChoiceQuestion.vue'
 import MatchingQuestion from './questionType/MatchingQuestion.vue'
 import FillBlankQUestion from './questionType/FillBlankQuestion.vue'
+import WritingQuestion from './questionType/WritingQuestion.vue'
 
 const route = useRoute()
 const showSidebar = ref(true)
@@ -224,6 +225,13 @@ const filterGroupQuestionType = () => {
               />
               <FillBlankQUestion
                 v-if="question.questionType == QuestionType.FillBlank && (valueTab == 'fillBlank' || valueTab == 'all')"
+                :question="question"
+                :student-answers="result?.submitPaperDetails ?? []"
+                :show-action-button="false"
+                :index="index + 1"
+              />
+              <WritingQuestion
+                v-if="question.questionType == QuestionType.Writing && (valueTab == 'writing' || valueTab == 'all')"
                 :question="question"
                 :student-answers="result?.submitPaperDetails ?? []"
                 :show-action-button="false"

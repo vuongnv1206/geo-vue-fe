@@ -104,6 +104,7 @@ export type Question = {
   rawIndex?: number | null | undefined
   isSelected?: boolean
   owner?: UserDetail | null
+  mark?: number | null
 }
 
 export type QuestionLable = {
