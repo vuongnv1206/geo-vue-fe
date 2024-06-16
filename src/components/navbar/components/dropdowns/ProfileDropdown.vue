@@ -76,6 +76,7 @@ withDefaults(
         list: [
           {
             name: 'profile',
+            to: 'profile',
             icon: 'mso-account_circle',
           },
         ],

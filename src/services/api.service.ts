@@ -72,6 +72,10 @@ class ApiService {
     )
   }
 
+  getAxiosInstance() {
+    return this.axios_instance
+  }
+
   async get(path: string) {
     return this.axios_instance.get(path)
   }
