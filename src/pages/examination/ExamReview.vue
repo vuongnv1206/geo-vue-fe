@@ -9,6 +9,10 @@ import { QuestionType } from '../question/types'
 import { Question } from '../question/types'
 
 import SingleChoiceQuestion from './questionType/SingleChoiceQuestion.vue'
+import MatchingQuestion from './questionType/MatchingQuestion.vue'
+import FillBlankQuestion from './questionType/FillBlankQuestion.vue'
+import WritingQuestion from './questionType/WritingQuestion.vue'
+import ReadingQuestion from './questionType/ReadingQuestion.vue'
 
 const route = useRoute()
 const showSidebar = ref(true)
@@ -182,7 +186,7 @@ const filterGroupQuestionType = () => {
           </VaNavbarItem>
         </template>
       </VaNavbar>
-      <VaCard class="mt-2 ml-2" style="height: 80vh">
+      <VaCard class="mt-2 ml-2">
         <VaTabs v-model="valueTab">
           <template #tabs>
             <VaTab v-for="title in questionTypesLabel" :key="title" :name="title" @click="filterGroupQuestionType">
@@ -191,31 +195,59 @@ const filterGroupQuestionType = () => {
           </template>
         </VaTabs>
         <VaCardContent>
-          <VaScrollContainer>
-            <SingleChoiceQuestion
-              :questions="groupedQuestions.singleChoice"
-              :student-answers="result?.submitPaperDetails ?? []"
-            />
+          <VaScrollContainer class="min-h-[60vh] max-h-[80vh]" vertical>
+            <div v-for="(question, index) in result?.paper.questions" :key="question.id">
+              <SingleChoiceQuestion
+                v-if="
+                  question.questionType == QuestionType.SingleChoice &&
+                  (valueTab == 'singleChoice' || valueTab == 'all')
+                "
+                :question="question"
+                :student-answers="result?.submitPaperDetails ?? []"
+                :show-action-button="false"
+                :index="index + 1"
+              />
+              <SingleChoiceQuestion
+                v-if="
+                  question.questionType == QuestionType.MultipleChoice &&
+                  (valueTab == 'multipleChoice' || valueTab == 'all')
+                "
+                :question="question"
+                :student-answers="result?.submitPaperDetails ?? []"
+                :show-action-button="false"
+                :index="index + 1"
+              />
+              <MatchingQuestion
+                v-if="question.questionType == QuestionType.Matching && (valueTab == 'matching' || valueTab == 'all')"
+                :question="question"
+                :student-answers="result?.submitPaperDetails ?? []"
+                :show-action-button="false"
+                :index="index + 1"
+              />
+              <FillBlankQuestion
+                v-if="question.questionType == QuestionType.FillBlank && (valueTab == 'fillBlank' || valueTab == 'all')"
+                :question="question"
+                :student-answers="result?.submitPaperDetails ?? []"
+                :show-action-button="false"
+                :index="index + 1"
+              />
+              <WritingQuestion
+                v-if="question.questionType == QuestionType.Writing && (valueTab == 'writing' || valueTab == 'all')"
+                :question="question"
+                :student-answers="result?.submitPaperDetails ?? []"
+                :show-action-button="false"
+                :index="index + 1"
+              />
+              <ReadingQuestion
+                v-if="question.questionType == QuestionType.Reading && (valueTab == 'reading' || valueTab == 'all')"
+                :question="question"
+                :student-answers="result?.submitPaperDetails ?? []"
+                :show-action-button="false"
+                :index="index + 1"
+              />
+            </div>
           </VaScrollContainer>
         </VaCardContent>
-        <!-- <VaTab v-if="groupedQuestions.multipleChoice.length" name="multipleChoice" label="Multiple Choice">
-            <MultipleChoiceQuestion :questions="groupedQuestions.multipleChoice" />
-          </VaTab>
-          <VaTab v-if="groupedQuestions.fillBlank.length" name="fillBlank" label="Fill in the Blank">
-            <FillBlankQuestion :questions="groupedQuestions.fillBlank" />
-          </VaTab>
-          <VaTab v-if="groupedQuestions.matching.length" name="matching" label="Matching">
-            <MatchingQuestion :questions="groupedQuestions.matching" />
-          </VaTab>
-          <VaTab v-if="groupedQuestions.reading.length" name="reading" label="Reading">
-            <ReadingQuestion :questions="groupedQuestions.reading" />
-          </VaTab>
-          <VaTab v-if="groupedQuestions.writing.length" name="writing" label="Writing">
-            <EssayQuestion :questions="groupedQuestions.writing" />
-          </VaTab>
-          <VaTab v-if="groupedQuestions.other.length" name="other" label="Other">
-            <SingleChoiceQuestion :questions="groupedQuestions.other" />
-          </VaTab> -->
       </VaCard>
     </template>
   </VaLayout>
