@@ -21,6 +21,11 @@ const indexToLetter = (index: number) => {
   return String.fromCharCode(65 + index)
 }
 
+const getPointAchieve = (questionId: string | undefined) => {
+  const a = props.studentAnswers.find((detail) => detail.questionId === questionId)?.mark || 0
+  return a
+}
+
 // const getUserAnswer = (questionId: string | undefined) => {
 //   return props.studentAnswers.find((detail) => detail.questionId === questionId)?.answerRaw || ''
 // }
@@ -62,6 +67,7 @@ onBeforeMount(() => {
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="question" :index="index" />
+    <VaCardTitle>Point: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
     <div class="mt-2">
       <span v-if="!readMoreActivated">
         <!-- eslint-disable vue/no-v-html -->

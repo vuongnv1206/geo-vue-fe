@@ -205,9 +205,7 @@ onMounted(() => {
               label="Exam name"
               class="mb-2 col-span-2"
             />
-            <VaSelect :rules="[(v) => v || 'Field is required']" label="Grade" class="mb-2 pr-1" />
             <VaSelect :rules="[(v) => v || 'Field is required']" label="Subject" class="mb-2 pl-1" />
-            <VaSelect :rules="[(v) => v || 'Field is required']" label="Purpose of create exam" class="mb-2 pr-1" />
             <VaCounter
               v-model="editPaper.duration"
               label="Test duration (minutes)"

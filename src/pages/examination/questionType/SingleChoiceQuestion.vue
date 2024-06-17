@@ -17,7 +17,14 @@ const getCorrectAnswer = (question?: Question) => {
 }
 
 const getUserAnswer = (questionId: string | undefined) => {
-  return props.studentAnswers.find((detail) => detail.questionId === questionId)?.answerRaw || ''
+  const answerRaw = props.studentAnswers.find((detail) => detail.questionId === questionId)?.answerRaw || ''
+
+  return answerRaw.split('|')
+}
+
+const getPointAchieve = (questionId: string | undefined) => {
+  const a = props.studentAnswers.find((detail) => detail.questionId === questionId)?.mark || 0
+  return a
 }
 
 const getContentFormat = (question?: Question) => {
@@ -28,6 +35,7 @@ const getContentFormat = (question?: Question) => {
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="question" :index="index" />
+    <VaCardTitle>Point: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
     <VaCardContent>
       <div class="mt-2">
         <!-- eslint-disable vue/no-v-html -->
@@ -37,13 +45,15 @@ const getContentFormat = (question?: Question) => {
       <div class="grid xs:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div v-for="(answer, idx) in question.answers" :key="answer.id">
           <span> {{ String.fromCharCode(65 + idx) }}. {{ answer.content }} </span>
-          <VaIcon
-            v-if="getUserAnswer(question.id) === answer.id"
-            :name="answer.isCorrect ? 'check_circle' : 'cancel'"
-            :color="answer.isCorrect ? 'success' : 'danger'"
-            size="small"
-            class="m-2"
-          />
+          <span v-for="(ans, index2) in getUserAnswer(question.id)" :key="index2">
+            <VaIcon
+              v-if="ans === answer.id"
+              :name="answer.isCorrect ? 'check_circle' : 'cancel'"
+              :color="answer.isCorrect ? 'success' : 'danger'"
+              size="small"
+              class="m-2"
+            />
+          </span>
         </div>
       </div>
       <div class="va-text-bold mt-3 va-text-success">Đáp án đúng: {{ getCorrectAnswer(question) }}</div>

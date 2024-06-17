@@ -71,11 +71,17 @@ const getUserAnswer = (questionId: string | undefined) => {
 const isCorrect = (studentAnswer: any, correctAnswers: any[]) => {
   return correctAnswers.find((pair) => pair.A === studentAnswer.A && pair.B === studentAnswer.B)
 }
+
+const getPointAchieve = (questionId: string | undefined) => {
+  const a = props.studentAnswers.find((detail) => detail.questionId === questionId)?.mark || 0
+  return a
+}
 </script>
 
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="question" :index="index" />
+    <VaCardTitle>Point: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
     <VaCardContent>
       <div class="mt-2">
         <!-- eslint-disable vue/no-v-html -->

@@ -66,7 +66,7 @@ const onGroupSaved = async (group: GroupTeacher) => {
       .updateGroupTeacher(group.id, group)
       .then(() => {
         notify({
-          message: `${group.name} has been updated`,
+          message: `'${group.name}' group has been updated`,
           color: 'success',
         })
         getTeacherGroups()
@@ -84,7 +84,7 @@ const onGroupSaved = async (group: GroupTeacher) => {
       .addGroup(group)
       .then(() => {
         notify({
-          message: `${group.name} has been created`,
+          message: `'${group.name}' group has been created`,
           color: 'success',
         })
         getTeacherGroups()
@@ -106,7 +106,7 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
       .updateTeacherInTeam(teacher.id, teacher)
       .then(() => {
         notify({
-          message: `${teacher.teacherName} has been updated`,
+          message: `'${teacher.teacherName}' has been updated`,
           color: 'success',
         })
         getTeacherGroups()
@@ -124,7 +124,7 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
       .addTeacherIntoTeam(teacher)
       .then(() => {
         notify({
-          message: `${teacher.teacherName} has been created`,
+          message: `'${teacher.teacherName}' has been created`,
           color: 'success',
         })
         getTeacherGroups()
@@ -389,7 +389,12 @@ const handlerSearch = (event: Event) => {
 
               <VaListItemSection>
                 <VaListItemLabel>
-                  {{ group.name }}
+                  {{
+                    group.name
+                      .split(' ')
+                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                      .join(' ')
+                  }}
                 </VaListItemLabel>
               </VaListItemSection>
 
@@ -433,13 +438,24 @@ const handlerSearch = (event: Event) => {
             >
               <VaListItemSection avatar class="justify-center">
                 <VaAvatar size="small">
-                  {{ teacher.teacherName.charAt(0).toUpperCase() }}
+                  {{
+                    teacher.teacherName
+                      .split(' ')
+                      .filter((_, index, array) => index === 0 || index === array.length - 1)
+                      .map((w) => w.charAt(0).toUpperCase())
+                      .join('')
+                  }}
                 </VaAvatar>
               </VaListItemSection>
 
               <VaListItemSection>
                 <VaListItemLabel>
-                  {{ teacher.teacherName }}
+                  {{
+                    teacher.teacherName
+                      .split(' ')
+                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                      .join(' ')
+                  }}
                   <VaIcon
                     v-if="teacher.teacherId === '00000000-0000-0000-0000-000000000000'"
                     class="mr-2"
