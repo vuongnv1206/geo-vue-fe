@@ -29,6 +29,7 @@ const paperRequest = ref<CreatePaperRequest>({
   paperFolderId: folderId,
   description: '',
   questions: [],
+  subjectId: '',
 })
 
 const AddQuestionsToPaper = (questions: Question[]) => {

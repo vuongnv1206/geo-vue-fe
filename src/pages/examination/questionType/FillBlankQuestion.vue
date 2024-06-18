@@ -45,11 +45,17 @@ const isCorrect = (correctAnswer: Record<string, string>, userAnswer: Record<str
     return true
   }
 }
+
+const getPointAchieve = (questionId: string | undefined) => {
+  const a = props.studentAnswers.find((detail) => detail.questionId === questionId)?.mark || 0
+  return a
+}
 </script>
 
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="props.question" :index="props.index" />
+    <VaCardTitle>Point: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
     <div class="mt-2">
       <!-- eslint-disable vue/no-v-html -->
       <p style="line-height: initial" v-html="formatContent(props.question?.content || '')"></p>
