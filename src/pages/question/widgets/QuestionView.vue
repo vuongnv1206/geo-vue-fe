@@ -21,11 +21,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <VaCard
-    class="col-span-3 md:col-span-1 min-h-[100px] border border-dashed border-backgroundBorder m-3"
-    :stripe="props.isStripe"
-    stripe-color="success"
-  >
+  <VaCard outlined class="col-span-3 md:col-span-1 min-h-[100px] m-3" :stripe="props.isStripe" stripe-color="success">
     <QuestionSingleChoiceView
       v-if="props.question?.questionType === QuestionType.SingleChoice"
       :question="props.question"
