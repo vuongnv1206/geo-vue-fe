@@ -12,8 +12,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { computed, onMounted, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
-import { SelectableOption } from 'vuestic-ui/dist/types/composables'
-import { useForm, useModal, useToast, ValidationRule } from 'vuestic-ui/web-components'
+import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { Attachment, EmptyAssignment } from '../types'
 
 dayjs.extend(utc)
@@ -23,10 +22,10 @@ const router = useRouter()
 const showSidebar = ref(false)
 const { validate } = useForm('form')
 const subjects = ref<Subject[]>([])
+const classStore = useGroupClassStore()
 const groupClasses = ref<GroupClass[]>([])
 const assignmentStore = useAssignmentStore()
 const subjectStore = useSubjectStore()
-const classStore = useGroupClassStore()
 const filesUploaded = ref<File[]>([])
 const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
 const selectedClasses = ref<string[]>([])
@@ -41,11 +40,12 @@ const defaultNewAssignment: EmptyAssignment = {
   name: '',
   startTime: null,
   endTime: null,
-  attachmentPaths: [] as Attachment[],
   content: '',
   canViewResult: false,
   requireLoginToSubmit: false,
   subjectId: '',
+  attachmentPaths: [] as Attachment[],
+  classIds: [] as string[],
 }
 const newAssignment = ref({ ...defaultNewAssignment })
 
@@ -92,7 +92,7 @@ const getGroupClass = async () => {
   try {
     const response = await classStore.getGroupClasses(dataFilter.value)
     groupClasses.value = response.data
-    // console.log('Group Classes: ', groupClasses.value)
+    console.log('Group Classes: ', groupClasses.value)
   } catch (error) {
     console.error('Error fetching subjects:', error)
   }
@@ -170,8 +170,6 @@ const dateInputFormat = {
 const handleDatePicker = () => {
   newAssignment.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
   newAssignment.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
-  console.log('Date: ', date.value)
-  console.log('Start Time: ', newAssignment.value)
 }
 const handleAttachment = async () => {
   const files = filesUploaded.value
@@ -199,7 +197,9 @@ const handleClickSave = async () => {
     handleDatePicker()
     handleAttachment()
     try {
+      newAssignment.value.classIds = selectedClasses.value
       await assignmentStore.createAssignment(newAssignment.value as EmptyAssignment)
+      console.log('New Assignment: ', newAssignment.value)
       notify({ message: notifications.createSuccessfully(newAssignment.value.name), color: 'success' })
       router.push({ name: 'assignments' })
     } catch (error) {
@@ -248,7 +248,7 @@ onMounted(() => {
           :options="subjectsOptions"
           label="Subject"
           clearable
-          :rules="[(v: string) => (v ? true : 'Please select a subject.')] as ValidationRule<SelectableOption>[]"
+          :rules="[(v) => (v ? true : 'Please select a subject.')]"
         />
         <VaLayout>
           <template #left>

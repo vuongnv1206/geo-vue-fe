@@ -16,11 +16,12 @@ export type EmptyAssignment = {
   name: string
   startTime: Date | null
   endTime: Date | null
-  attachmentPaths: Attachment[] | null
   content: string
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectId: string
+  attachmentPaths: Attachment[] | null
+  classIds: string[]
 }
 
 export type AssignmentDetails = {
