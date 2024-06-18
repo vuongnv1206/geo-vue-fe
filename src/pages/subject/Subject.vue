@@ -17,10 +17,21 @@ const { init: notify } = useToast()
 const editFormRef = ref()
 const { confirm } = useModal()
 
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 10,
+  orderBy: ['id'],
+})
+
 const getSubjects = () => {
   loading.value = true
+  dataFilter.value.advancedSearch.fields = ['name']
   stores
-    .getSubjects()
+    .getSubjects(dataFilter.value)
     .then((response) => {
       subjects.value = response.data
       console.log('Subjects:', subjects.value)
@@ -132,7 +143,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- <h1 class="page-title font-bold">Subject</h1> -->
   <VaCard>
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 justify-end">

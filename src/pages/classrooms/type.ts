@@ -6,10 +6,6 @@ export type GroupClass = {
   classes: Classrooms[]
 }
 
-export type EmptyGroupClass = {
-  name: string
-}
-
 export type Classrooms = {
   id: string
   name: string
@@ -21,6 +17,16 @@ export type Classrooms = {
   assignments: Assignment[]
 }
 
+export type GroupClassResponse = {
+  data: GroupClass[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
 export type ClassResponse = {
   data: Classrooms[]
   currentPage: number
@@ -29,6 +35,10 @@ export type ClassResponse = {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
+}
+
+export type EmptyGroupClass = {
+  name: string
 }
 
 export type EmptyClassrooms = {
