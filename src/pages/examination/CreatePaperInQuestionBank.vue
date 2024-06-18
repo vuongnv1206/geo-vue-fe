@@ -207,7 +207,7 @@ const cancelUpdatePaper = () => {
   />
 </template>
 
-<style scoped>
+<style>
 .geo-add-question-modal .va-modal__dialog {
   max-width: 80vw !important;
 }
