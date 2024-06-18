@@ -380,11 +380,14 @@ const handleBack = () => {
   window.history.back()
 }
 
+const isLoading = ref(false)
+
 const handleSaveBtn = () => {
   console.log(listQuestions.value)
   const request: CreateQuestionsRequest = {
     questions: listQuestions.value,
   }
+  isLoading.value = true
   storesQEdit
     .createQuestion(request)
     .then(() => {
@@ -403,6 +406,9 @@ const handleSaveBtn = () => {
         color: 'danger',
       })
     })
+    .finally(() => {
+      isLoading.value = false
+    })
 }
 
 onMounted(() => {
@@ -420,7 +426,6 @@ onMounted(() => {
     <template #top>
       <AppNavbar :is-mobile="isMobile" class="border-b border-slate-200" />
     </template>
-
     <template #left>
       <div style="width: 50vw" class="h-full border-r border-slate-200 bg-[#f1f5f9]" aria-label="Question Format">
         <div>
@@ -464,89 +469,91 @@ onMounted(() => {
       </div>
     </template>
     <template #content>
-      <div style="width: 50vw" class="h-full border-r border-slate-200 bg-[#f1f5f9]" aria-label="Question Format">
-        <div>
-          <VaCard class="max-h-[41px] border-b border-slate-200 flex items-center justify-between">
-            <div class="flex items-center justify-start">
-              <div>
-                <VaFileUpload v-model="uploadFile" :hide-file-list="true" @fileAdded="handleUploadEvent">
-                  <template #default>
-                    <button class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200">
-                      <div class="mx-2"><VaIcon name="mso-upload" /> <span>Upload file</span></div>
-                    </button>
-                  </template>
-                </VaFileUpload>
+      <VaInnerLoading :loading="isLoading" :size="60">
+        <div style="width: 50vw" class="h-full border-r border-slate-200 bg-[#f1f5f9]" aria-label="Question Format">
+          <div>
+            <VaCard class="max-h-[41px] border-b border-slate-200 flex items-center justify-between">
+              <div class="flex items-center justify-start">
+                <div>
+                  <VaFileUpload v-model="uploadFile" :hide-file-list="true" @fileAdded="handleUploadEvent">
+                    <template #default>
+                      <button class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200">
+                        <div class="mx-2"><VaIcon name="mso-upload" /> <span>Upload file</span></div>
+                      </button>
+                    </template>
+                  </VaFileUpload>
+                </div>
+                <div>
+                  <button
+                    class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200"
+                    @click="handleEditorBtnFormat"
+                  >
+                    <div class="mx-2"><VaIcon name="mso-source_notes" /> <span>Format editor</span></div>
+                  </button>
+                </div>
               </div>
               <div>
                 <button
                   class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200"
-                  @click="handleEditorBtnFormat"
+                  @click="handleSaveBtn"
                 >
-                  <div class="mx-2"><VaIcon name="mso-source_notes" /> <span>Format editor</span></div>
+                  <div class="mx-2"><VaIcon name="mso-save" /> <span>Save</span></div>
                 </button>
               </div>
-            </div>
-            <div>
-              <button
-                class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200"
-                @click="handleSaveBtn"
-              >
-                <div class="mx-2"><VaIcon name="mso-save" /> <span>Save</span></div>
-              </button>
-            </div>
-          </VaCard>
-        </div>
-        <div class="">
-          <div class="flex justify-start p-1">
-            <div class="w-full">
-              <Richer
-                :model-value="editorContent"
-                :buttons="[
-                  {
-                    name: 'AddSingleChoice',
-                    label: 'Add single choice template',
-                    icon: 'i-single_choice',
-                    action: addTemplateSingleChoice,
-                  },
-                  {
-                    name: 'AddMultipleChoice',
-                    label: 'Add multiple choice template',
-                    icon: 'i-multiple_choice',
-                    action: addTemplateMultipleChoice,
-                  },
-                  {
-                    name: 'AddFillBlank',
-                    label: 'Add fill blank template',
-                    icon: 'i-fill_blank',
-                    action: addTemplateFillBlank,
-                  },
-                  {
-                    name: 'AddMatching',
-                    label: 'Add matching template',
-                    icon: 'i-matching',
-                    action: addTemplateMatching,
-                  },
-                  {
-                    name: 'AddReading',
-                    label: 'Add reading template',
-                    icon: 'i-reading',
-                    action: addTemplateReading,
-                  },
-                  {
-                    name: 'AddWriting',
-                    label: 'Add writing template',
-                    icon: 'i-writing',
-                    action: addTemplateWriting,
-                  },
-                ]"
-                class="h-[90vh]"
-                @keyup="handleEditor"
-                @click="handleEditorClick"
-              ></Richer>
+            </VaCard>
+          </div>
+          <div class="">
+            <div class="flex justify-start p-1">
+              <div class="w-full">
+                <Richer
+                  :model-value="editorContent"
+                  :buttons="[
+                    {
+                      name: 'AddSingleChoice',
+                      label: 'Add single choice template',
+                      icon: 'i-single_choice',
+                      action: addTemplateSingleChoice,
+                    },
+                    {
+                      name: 'AddMultipleChoice',
+                      label: 'Add multiple choice template',
+                      icon: 'i-multiple_choice',
+                      action: addTemplateMultipleChoice,
+                    },
+                    {
+                      name: 'AddFillBlank',
+                      label: 'Add fill blank template',
+                      icon: 'i-fill_blank',
+                      action: addTemplateFillBlank,
+                    },
+                    {
+                      name: 'AddMatching',
+                      label: 'Add matching template',
+                      icon: 'i-matching',
+                      action: addTemplateMatching,
+                    },
+                    {
+                      name: 'AddReading',
+                      label: 'Add reading template',
+                      icon: 'i-reading',
+                      action: addTemplateReading,
+                    },
+                    {
+                      name: 'AddWriting',
+                      label: 'Add writing template',
+                      icon: 'i-writing',
+                      action: addTemplateWriting,
+                    },
+                  ]"
+                  class="h-[90vh]"
+                  @keyup="handleEditor"
+                  @click="handleEditorClick"
+                ></Richer>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </VaInnerLoading>
     </template>
   </VaLayout>
 </template>
