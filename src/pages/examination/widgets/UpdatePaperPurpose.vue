@@ -48,11 +48,19 @@ watch(
   },
   { immediate: true },
 )
-
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
 const subjects = ref<Subject[]>([])
 const getSubject = () => {
   storeSubject
-    .getSubjects()
+    .getSubjects(dataFilter.value)
     .then((response) => {
       subjects.value = response.data
     })

@@ -2,6 +2,16 @@ import { GroupClass } from '@/pages/classrooms/type'
 import apiService from '@services/api.service'
 
 class GroupClassService {
+  async getGroupClasses(data: any): Promise<any> {
+    return apiService
+      .post('/v1/groupclasses/search', data)
+      .then((response) => {
+        return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   async getGroupClass(): Promise<GroupClass[]> {
     return apiService
       .get(`/v1/groupclasses`)

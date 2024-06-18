@@ -147,9 +147,7 @@ watchEffect(() => {
 })
 
 onMounted(() => {
-  if (assignmentId) {
-    getAssignment(assignmentId)
-  }
+  getAssignment(assignmentId)
 })
 </script>
 

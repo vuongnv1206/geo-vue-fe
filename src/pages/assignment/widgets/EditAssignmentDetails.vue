@@ -6,36 +6,42 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import { computed, onMounted, ref } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import { notifications, validators } from '@/services/utils'
-import { useModal, useToast } from 'vuestic-ui/web-components'
+import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-
 dayjs.extend(utc)
 
-const formRef = ref()
 const router = useRouter()
 const { confirm } = useModal()
+const { validate } = useForm('form')
 const showSidebar = ref(false)
 const { init: notify } = useToast()
 const stores = useAssignmentStore()
 const assignmentDetails = ref<AssignmentDetails | null>(null)
 const assignmentId = router.currentRoute.value.params.id.toString()
 const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
-const newAssignmentDetails = ref<AssignmentDetails>({
+
+const defaultNewAssignmentDetails: AssignmentDetails = {
   id: '',
   name: '',
   startTime: new Date(),
   endTime: new Date(),
   canViewResult: false,
   requireLoginToSubmit: false,
-  subjectId: '',
-})
+}
+
+const newAssignmentDetails = ref({ ...defaultNewAssignmentDetails })
 
 const isFormHasUnsavedChanges = computed(() => {
   return Object.keys(newAssignmentDetails.value).some((key) => {
     return (
+      console.log(
+        '3',
+        assignmentDetails.value?.[key as keyof EmptyAssignmentDetails],
+        newAssignmentDetails.value[key as keyof EmptyAssignmentDetails],
+      ),
       newAssignmentDetails.value[key as keyof EmptyAssignmentDetails] !==
-      (assignmentDetails.value ?? newAssignmentDetails.value)?.[key as keyof EmptyAssignmentDetails]
+        assignmentDetails.value?.[key as keyof EmptyAssignmentDetails]
     )
   })
 })
@@ -56,7 +62,6 @@ const getAssignment = (id: string) => {
         endTime: response.endTime,
         canViewResult: response.canViewResult,
         requireLoginToSubmit: response.requireLoginToSubmit,
-        subjectId: response.subject.id,
       }
     })
     .catch((error) => {
@@ -76,10 +81,11 @@ const goBack = async () => {
     })
     if (agreed) {
       router.push({ name: 'assignment-details', params: { id: assignmentId } })
+    } else {
+      return
     }
-  } else {
-    router.push({ name: 'assignment-details', params: { id: assignmentId } })
   }
+  router.push({ name: 'assignment-details', params: { id: assignmentId } })
 }
 
 const dateInputFormat = {
@@ -87,11 +93,12 @@ const dateInputFormat = {
 }
 
 const handleClickUpdate = async () => {
-  if (formRef.value?.validate()) {
+  if (validate()) {
     newAssignmentDetails.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
     newAssignmentDetails.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
     try {
       await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
+      console.log(newAssignmentDetails.value)
       notify({ message: notifications.updatedSuccessfully(newAssignmentDetails.value.name), color: 'success' })
       router.push({ name: 'assignment-details', params: { id: assignmentId } })
     } catch (error) {
@@ -112,13 +119,8 @@ onMounted(() => {
     </template>
     <template #content>
       <VaDivider />
-      <VaForm
-        ref="formRef"
-        class="flex flex-col gap-4 mx-auto"
-        style="max-width: 700px"
-        @submit.prevent="handleClickUpdate"
-      >
-        <CardTitle>Global Setting</CardTitle>
+      <VaForm ref="form" class="flex flex-col gap-4 mx-auto" style="max-width: 700px">
+        <VaCardTitle>Global Setting</VaCardTitle>
         <VaInput
           v-model="newAssignmentDetails.name"
           label="Name"
@@ -188,7 +190,7 @@ onMounted(() => {
 
         <div class="flex flex-col-reverse sm:flex-row mt-4 gap-2 justify-end">
           <VaButton preset="secondary" color="secondary" @click="goBack()">Cancel</VaButton>
-          <VaButton type="submit">Save</VaButton>
+          <VaButton type="submit" @click="handleClickUpdate">Save</VaButton>
         </div>
       </VaForm>
     </template>

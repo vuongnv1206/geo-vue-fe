@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import { useSubmitPaperStore } from '@/stores/modules/submitPaper.module'
-import { ref } from 'vue'
-import { useToast, VaButton, VaCard } from 'vuestic-ui'
-import { GetLastResultExamRequest, LastResultExamDto } from './types'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { onMounted } from 'vue'
-import { QuestionType } from '../question/types'
-import { Question } from '../question/types'
+import { useToast, VaButton, VaCard } from 'vuestic-ui'
+import { Question, QuestionType } from '../question/types'
+import { GetLastResultExamRequest, LastResultExamDto } from './types'
 
 import SingleChoiceQuestion from './questionType/SingleChoiceQuestion.vue'
 import MatchingQuestion from './questionType/MatchingQuestion.vue'

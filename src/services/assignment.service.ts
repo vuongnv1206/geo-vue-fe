@@ -2,8 +2,8 @@ import { EmptyAssignment } from '@pages/assignment/types'
 import ApiService from '@services/api.service'
 
 class AssignmentService {
-  async getAssignments(): Promise<any> {
-    return ApiService.post('/v1/assignments/search', { request: {} })
+  async getAssignments(data: any): Promise<any> {
+    return ApiService.post('/v1/assignments/search', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })

@@ -13,7 +13,7 @@ defineEmits<{
   (event: 'close'): void
 }>()
 
-const defaultNewSubject: Subject = {
+const defaultNewSubject: EmptySubject = {
   id: '',
   name: '',
   description: '',
