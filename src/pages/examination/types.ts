@@ -1,4 +1,6 @@
 import { Question } from '../question/types'
+import { UserDetail } from '../user/types'
+
 export interface CreatePaperFolderRequest {
   name: string
   parentId?: string | null
@@ -102,7 +104,7 @@ export interface PaperDto {
   lastModifiedOn: string | null
   paperLable?: PaperLabelDto
   paperFolder?: PaperFolderDto
-  questions?: Question[]
+  questions?: Question[] | null
 }
 
 export interface PaperLabelDto {
@@ -159,6 +161,41 @@ export interface UpdatePaperRequest {
   description?: string
 }
 
+export interface GetLastResultExamRequest {
+  paperId: string
+  userId: string
+  submitPaperId: string
+}
+
+export interface LastResultExamDto {
+  paperId?: string
+  status?: SubmitPaperStatus
+  startTime?: Date
+  endTime?: Date | null
+  totalMark?: number
+  totalQuestion?: number
+  paper: PaperDto
+  submitPaperDetails?: SubmitPaperDetailDto[] | null
+  student?: UserDetail
+}
+
+export interface SubmitPaperDetailDto {
+  submitPaperId: string
+  questionId: string
+  answerRaw: string
+  mark?: number | null
+  isCorrect: boolean
+  createdBy?: string
+  createdOn?: Date
+  lastModifiedBy?: string
+  lastModifiedOn?: Date | null
+}
+
+export enum SubmitPaperStatus {
+  Start = 0,
+  Doing = 1,
+  End = 2,
+}
 export interface SubmitPaperDto {
   id: string
   paperId: string
@@ -179,4 +216,29 @@ export interface SubmitPaperResponse {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
+}
+
+export interface AuditableEntity {
+  createdBy: string
+  createdOn: Date
+  lastModifiedBy?: string
+  lastModifiedOn?: Date | null
+  deletedOn?: Date | null
+  deletedBy?: string | null
+}
+
+export interface CreatePaperRequest {
+  examName: string
+  status: number
+  password: string | undefined
+  type: number
+  paperFolderId?: string | undefined
+  description?: string | undefined
+  questions: QuestionIntoPaperRequest[]
+}
+
+export interface QuestionIntoPaperRequest {
+  questionId: string | null | undefined
+  mark: number | 1
+  rawIndex: number | 1
 }

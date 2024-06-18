@@ -12,6 +12,7 @@ import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { GroupClass } from '../classrooms/type'
 import { PermissionNameInClass } from './PermissionInClass.enum'
 import { useToast } from 'vuestic-ui'
+import { getErrorMessage } from '@/services/utils'
 
 const loading = ref(true)
 
@@ -70,7 +71,11 @@ const getGroupDetail = async () => {
     loading.value = false
   } catch (error) {
     loading.value = false
-    console.error(error)
+    const message = getErrorMessage(error)
+    notify({
+      message: `${message}`,
+      color: 'danger',
+    })
   }
 }
 
@@ -82,8 +87,14 @@ const getTeacherDetail = async () => {
     groupDetail.value = null
     const response = await stores.getTeacherPermissionDetail(props.teacherId)
     teacherDetail.value = response
+    loading.value = false
   } catch (error) {
-    console.error(error)
+    const message = getErrorMessage(error)
+    notify({
+      message: `${message}`,
+      color: 'danger',
+    })
+    loading.value = false
   }
 }
 
@@ -113,8 +124,9 @@ const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
           })
         })
         .catch((error) => {
+          const message = getErrorMessage(error)
           notify({
-            message: `Add ${teacher.label} into group fail \n ${error}`,
+            message: `Add ${teacher.label} into group fail \n ${message}`,
             color: 'danger',
           })
         })
@@ -137,8 +149,9 @@ const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
           })
         })
         .catch((error) => {
+          const message = getErrorMessage(error)
           notify({
-            message: `Remove ${currentSelectedTeacher.value[i].label} into group fail \n ${error}`,
+            message: `Remove ${currentSelectedTeacher.value[i].label} into group fail \n ${message}`,
             color: 'danger',
           })
         })
@@ -156,7 +169,11 @@ const getGroupClasses = async () => {
     groupClasses.value = res
     initializeCheckedPermissions()
   } catch (error) {
-    console.error(error)
+    const message = getErrorMessage(error)
+    notify({
+      message: `${message}`,
+      color: 'danger',
+    })
   }
 }
 
@@ -225,8 +242,9 @@ const updatePermissionGroup = async () => {
       getGroupDetail()
     } catch (error) {
       loading.value = false
+      const message = getErrorMessage(error)
       notify({
-        message: `Update permission failed \n ${error}`,
+        message: `Update permission failed \n ${message}`,
         color: 'danger',
       })
     }
@@ -247,8 +265,9 @@ const updatePermissionGroup = async () => {
       getTeacherDetail()
     } catch (error) {
       loading.value = false
+      const message = getErrorMessage(error)
       notify({
-        message: `Update permission failed \n ${error}`,
+        message: `Update permission failed \n ${message}`,
         color: 'danger',
       })
     }
@@ -300,15 +319,14 @@ const filteredGroupClasses = computed(() => {
 </script>
 
 <template>
-  <VaCard v-if="groupDetail !== null" class="p-2 ml-1 rounded mb-2">
-    <VaCardTitle>
-      Member in group: <span v-if="groupDetail" class="ml-1">{{ groupDetail.name }}</span>
-    </VaCardTitle>
-    <VaDivider />
-    <VaCardContent class="p-0">
-      <VaCardContent class="p-0">
+  <div>
+    <VaCard v-if="groupDetail !== null" class="mb-2">
+      <VaCardTitle class="gap-2">
+        Member in group: <span v-if="groupDetail">{{ groupDetail.name }}</span>
+      </VaCardTitle>
+      <VaCardContent>
         <div class="flex gap-2">
-          <div class="text-center" style="cursor: pointer">
+          <div class="text-center cursor-pointer">
             <VaAvatar color="secondary" size="small" @click="selectTeacherTeam">
               <VaIcon name="add" />
             </VaAvatar>
@@ -327,7 +345,7 @@ const filteredGroupClasses = computed(() => {
                 @update:modelValue="updateTeacherIntoGroup"
               >
                 <template #content="{ value2 }">
-                  <VaChip v-for="chip in value2.slice(0, 3)" :key="chip" size="small" class="mr-1 my-1">
+                  <VaChip v-for="chip in value2" :key="chip" size="small" class="mr-1 my-1">
                     {{ chip.label }}
                   </VaChip>
                 </template>
@@ -348,43 +366,46 @@ const filteredGroupClasses = computed(() => {
           </div>
         </div>
       </VaCardContent>
-    </VaCardContent>
-  </VaCard>
-
-  <VaCard class="p-2 ml-1 rounded">
-    <VaCardTitle>Permission management: {{ groupDetail?.name || teacherDetail?.teacherName }}</VaCardTitle>
-    <VaDivider />
-    <VaInnerLoading v-if="groupDetail !== null || teacherDetail !== null" :loading="loading">
-      <VaCardContent v-if="props.group" class="p-0 mb-2">
-        <VaInput v-model="searchQuery" placeholder="search class" />
+    </VaCard>
+    <VaCard class="min-h-[60vh]">
+      <VaCardTitle>Permission management: {{ groupDetail?.name || teacherDetail?.teacherName }}</VaCardTitle>
+      <VaDivider />
+      <VaCardContent>
+        <VaInnerLoading v-if="groupDetail !== null || teacherDetail !== null" :loading="loading">
+          <VaCardContent v-if="groupDetail !== null || teacherDetail !== null" class="p-0 mb-2">
+            <VaInput v-model="searchQuery" placeholder="search class" />
+          </VaCardContent>
+          <VaScrollContainer vertical>
+            <VaAccordion v-model="value" class="max-W-sm mb-3 max-h-[60vh]" multiple>
+              <VaCollapse v-for="groupClass in filteredGroupClasses" :key="groupClass.id" :header="groupClass.name">
+                <template #content>
+                  <div class="grid md:grid-cols-4 sm:grid-cols-3 gap-3">
+                    <div v-for="classRoom in groupClass.classes" :key="classRoom.id">
+                      <VaCard stripe stripe-color="success" class="border flex flex-col">
+                        <VaCardTitle>{{ classRoom.name }}</VaCardTitle>
+                        <VaCardContent>
+                          <VaOptionList
+                            v-model="checkedPermissions[classRoom.id]"
+                            :options="optionCheckBox"
+                            :text-by="(op: any) => op.value"
+                            :value-by="(op: any) => op.key"
+                          />
+                        </VaCardContent>
+                      </VaCard>
+                    </div>
+                  </div>
+                </template>
+              </VaCollapse>
+            </VaAccordion>
+          </VaScrollContainer>
+          <div v-if="props.group || props.teacherId" class="flex justify-end">
+            <VaButton preset="primary" size="small" class="mr-2" @click="initializeCheckedPermissions">
+              Cancel
+            </VaButton>
+            <VaButton color="success" size="small" @click="updatePermissionGroup"> Save </VaButton>
+          </div>
+        </VaInnerLoading>
       </VaCardContent>
-      <VaScrollContainer vertical>
-        <VaAccordion v-model="value" class="max-W-sm mb-3" multiple style="max-height: 55vh">
-          <VaCollapse v-for="groupClass in filteredGroupClasses" :key="groupClass.id" :header="groupClass.name">
-            <template #content>
-              <div class="grid md:grid-cols-4 sm:grid-cols-3 gap-3">
-                <div v-for="classRoom in groupClass.classes" :key="classRoom.id">
-                  <VaCard stripe stripe-color="success" class="border flex flex-col">
-                    <VaCardTitle>{{ classRoom.name }}</VaCardTitle>
-                    <VaCardContent>
-                      <VaOptionList
-                        v-model="checkedPermissions[classRoom.id]"
-                        :options="optionCheckBox"
-                        :text-by="(op: any) => op.value"
-                        :value-by="(op: any) => op.key"
-                      />
-                    </VaCardContent>
-                  </VaCard>
-                </div>
-              </div>
-            </template>
-          </VaCollapse>
-        </VaAccordion>
-      </VaScrollContainer>
-      <div v-if="props.group || props.teacherId" class="flex justify-end">
-        <VaButton preset="primary" size="small" class="mr-2" @click="initializeCheckedPermissions"> Cancel </VaButton>
-        <VaButton color="success" size="small" @click="updatePermissionGroup"> Save </VaButton>
-      </div>
-    </VaInnerLoading>
-  </VaCard>
+    </VaCard>
+  </div>
 </template>

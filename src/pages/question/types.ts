@@ -88,6 +88,7 @@ export type Question = {
   content: string
   image?: string | null
   audio?: string | null
+  questionFolderId?: string | null
   questionFolder?: QuestionFolder | null
   questionType: QuestionType
   questionLable?: QuestionLable | null
@@ -99,8 +100,10 @@ export type Question = {
   lastModifiedOn?: string | null
   deletedOn?: string | null
   deletedBy?: string | null
-  id?: string | null | undefined
-  index?: number | null | undefined
+  id?: string | undefined
+  rawIndex?: number | null | undefined
+  isSelected?: boolean
+  owner?: UserDetail | null
 }
 
 export type QuestionLable = {
@@ -110,32 +113,33 @@ export type QuestionLable = {
 }
 
 export type QuestionPassage = {
-  id: string
-  content: string
-  answers: Answer[]
+  id?: string
+  content?: string
+  answers?: Answer[]
 }
 
 export type Answer = {
-  id?: string | null
+  id?: string | undefined
   content: string
   questionId?: string | null
   isCorrect?: boolean | null
 }
 
 export type QuestionFolder = {
-  name: string
-  parentId: string | null
+  name?: string
+  parentId?: string | null
+  id?: string | null
 }
 
 export type SearchQuestion = {
   pageNumber?: number | null | undefined
   pageSize?: number | null | undefined
-  sortBy?: string | null | undefined
-  sortingOrder?: 'asc' | 'desc' | null | undefined
+  orderBy?: string[] | null | undefined
   folderId?: string | null | undefined
-  content?: string | null | undefined
+  keyword?: string | null | undefined
   questionType?: number | null | undefined
   questionLableId?: string | null | undefined
+  content?: string | null | undefined
 }
 
 export type Pagination = {
@@ -153,4 +157,8 @@ export enum QuestionType {
   ReadingQuestionPassage = 7,
   Writing = 8,
   Other = 100,
+}
+
+export type CreateQuestionsRequest = {
+  questions: Question[]
 }

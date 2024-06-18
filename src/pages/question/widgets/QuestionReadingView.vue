@@ -7,6 +7,7 @@ import QuestionFooterView from './child/QuestionFooterView.vue'
 const props = defineProps<{
   question: Question | null
   index: number | null
+  showActionButton: boolean
 }>()
 
 const emit = defineEmits<{
@@ -25,6 +26,9 @@ const indexToLetter = (index: number) => {
 const getQuestionPassage = (question: Question) => {
   return question.questionPassages
     ?.map((passage) => {
+      if (!passage || !passage.answers || !passage.content) {
+        return ''
+      }
       const passageAnswers = passage.answers
         .map((answer, index) => {
           const color = answer.isCorrect ? 'text-success' : ''
@@ -93,6 +97,7 @@ onBeforeMount(() => {
     <!-- footer -->
     <QuestionFooterView
       :question="props.question"
+      :show-action-button="props.showActionButton"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
     />
