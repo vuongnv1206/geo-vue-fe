@@ -5,9 +5,9 @@ import assignmentService from '@/services/assignment.service'
 export const useAssignmentStore = defineStore('assignment', {
   state: () => ({}),
   actions: {
-    async getAssignments(): Promise<AssignmentResponse> {
+    async getAssignments(data: any): Promise<AssignmentResponse> {
       return assignmentService
-        .getAssignments()
+        .getAssignments(data)
         .then((response) => {
           return Promise.resolve(response)
         })

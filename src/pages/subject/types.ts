@@ -5,9 +5,9 @@ export type Subject = {
 }
 
 export type EmptySubject = {
-  id: string | null
-  description: string | null
-  name: string | null
+  id: string
+  description: string
+  name: string
 }
 
 export type SubjectResponse = {
