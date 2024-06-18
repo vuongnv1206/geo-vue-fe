@@ -77,7 +77,7 @@ const submit = async () => {
     store
       .login(formData.email, formData.password, captchaToken ?? '')
       .then(() => {
-        init({ message: "You've successfully logged in", color: 'success' })
+        init({ message: "You've successfully logged in", color: 'success', position: 'bottom-right' })
         push({ name: 'dashboard' })
       })
       .catch((error: any) => {
@@ -93,7 +93,7 @@ const submit = async () => {
 onBeforeMount(() => {
   if (store.isAuthenticated) {
     push({ name: 'dashboard' })
-    init({ message: 'You are already logged in', color: 'success' })
+    init({ message: 'You are already logged in', color: 'success', position: 'bottom-right' })
   }
 })
 </script>
