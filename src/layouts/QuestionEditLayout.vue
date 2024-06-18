@@ -161,13 +161,50 @@ const handleEditorBtnFormat = (data: any) => {
 const uploadFile = ref<any>()
 
 const handleUploadEvent = () => {
-  // read the file content
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    console.log(e.target?.result)
+  console.log(uploadFile.value.at(-1))
+
+  // if file extension is txt
+  if (uploadFile.value.at(-1).name.split('.').pop() == 'txt') {
+    // read the file content
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      // /r/n to /n
+      const questions: Question[] = GeoMarkdown2Objects(
+        replaceMultipleNewLines(e.target?.result as string).replace(/\r\n/g, '\n'),
+      )
+      // update listQuestions
+      listQuestions.value = questions
+      const editor = document.querySelector('.richer__content') as any
+      editorContent.value = ''
+      renderEditorContent()
+      editor.innerHTML = editorContent.value
+    }
+    reader.readAsText(uploadFile.value.at(-1))
   }
-  console.log(uploadFile.value)
-  reader.readAsText(uploadFile.value[0])
+
+  // if file extension is docx
+  if (uploadFile.value.at(-1).name.split('.').pop() == 'docx') {
+    // read the file content with api
+    storesQEdit
+      .ReadQuestionFromFile(uploadFile.value.at(-1))
+      .then((res) => {
+        const questions: Question[] = GeoMarkdown2Objects(res.at(0) as string)
+        // update listQuestions
+        listQuestions.value = questions
+        const editor = document.querySelector('.richer__content') as any
+        editorContent.value = ''
+        renderEditorContent()
+        editor.innerHTML = editorContent.value
+      })
+      .catch((error) => {
+        const message = getErrorMessage(error)
+        init({
+          title: 'Error',
+          message: message,
+          color: 'danger',
+        })
+      })
+  }
 }
 
 const addTemplateSingleChoice = () => {
