@@ -35,12 +35,20 @@ const QuestionTypeOptions = [
 
 const QuestionTypeValue = ref(QuestionTypeOptions[0])
 
+const QuestionSortOptions = [
+  { id: 0, name: 'Newest', questionType: 1 },
+  { id: 1, name: 'Oldest', questionType: 2 },
+  { id: 2, name: 'Last Modified', questionType: 4 },
+]
+
+const QuestionSortValue = ref(QuestionSortOptions[0])
+
 const testQuestions = ref<Question[]>([])
 const questionSearchRes = ref<QuestionSearchRes | null>(null)
 
 const pagination = ref<Pagination>({
   page: 1,
-  perPage: 2,
+  perPage: 10,
   total: 0,
 })
 
@@ -87,6 +95,7 @@ watchDebounced(
   filters.value,
   () => {
     searchValue.value.content = filters.value.search
+    pagination.value.page = 1
     searchQuestion(searchValue.value)
   },
   { debounce: 500, maxWait: 1000 },
@@ -214,8 +223,32 @@ const handleExpanded = (expanded: string[]) => {
 watch(
   () => QuestionTypeValue.value.id,
   () => {
+    pagination.value.page = 1
     console.log('Search question with type')
     searchQuestionWithType()
+  },
+  { immediate: true },
+)
+
+watch(
+  () => QuestionSortValue.value.id,
+  () => {
+    pagination.value.page = 1
+
+    if (QuestionSortValue.value.id === 0) {
+      searchValue.value.orderBy = []
+      searchValue.value.orderBy.push('CreatedOn desc')
+      console.log(searchValue.value)
+    }
+    if (QuestionSortValue.value.id === 1) {
+      searchValue.value.orderBy = []
+      searchValue.value.orderBy.push('CreatedOn asc')
+    }
+    if (QuestionSortValue.value.id === 2) {
+      searchValue.value.orderBy = []
+      searchValue.value.orderBy.push('LastModifiedOn desc')
+    }
+    searchQuestion(searchValue.value)
   },
   { immediate: true },
 )
@@ -329,7 +362,7 @@ onMounted(() => {
                   <VaBadge
                     :text="(value as any).name"
                     :color="QuestionTypeColor((value as any).questionType)"
-                    class="mr-2 mt-2"
+                    class="mr-2"
                   />
                 </template>
                 <template #option="{ option, selectOption }">
@@ -344,34 +377,35 @@ onMounted(() => {
                   </button>
                 </template>
               </VaSelect>
-              <VaSelect
-                v-model="QuestionTypeValue"
-                track-by="id"
-                :text-by="(option) => (option as any).name"
-                placeholder="All"
-                label="Question tag"
-                :options="QuestionTypeOptions"
-                class="col-span-1"
-              >
-                <template #content="{ value }">
-                  <VaBadge
-                    :text="(value as any).name"
-                    :color="QuestionTypeColor((value as any).questionType)"
-                    class="mr-2 mt-2"
-                  />
-                </template>
-                <template #option="{ option, selectOption }">
-                  <button class="w-full flex items-center" @click="() => selectOption(option)">
-                    <div class="flex justify-between items-center p-2">
-                      <VaBadge
-                        :text="(option as any).name"
-                        :color="QuestionTypeColor((option as any).questionType)"
-                        class="mr-2"
-                      />
-                    </div>
-                  </button>
-                </template>
-              </VaSelect>
+              <div>
+                <VaSelect
+                  v-model="QuestionSortValue"
+                  track-by="id"
+                  :text-by="(option) => (option as any).name"
+                  placeholder="Newest"
+                  label="Sort by"
+                  :options="QuestionSortOptions"
+                >
+                  <template #content="{ value }">
+                    <VaBadge
+                      :text="(value as any).name"
+                      :color="QuestionTypeColor((value as any).questionType)"
+                      class="mr-2"
+                    />
+                  </template>
+                  <template #option="{ option, selectOption }">
+                    <button class="w-full flex items-center" @click="() => selectOption(option)">
+                      <div class="flex justify-between items-center p-2">
+                        <VaBadge
+                          :text="(option as any).name"
+                          :color="QuestionTypeColor((option as any).questionType)"
+                          class="mr-2"
+                        />
+                      </div>
+                    </button>
+                  </template>
+                </VaSelect>
+              </div>
               <VaInput v-model="filters.search" label="Search content" placeholder="Search" class="col-span-2">
                 <template #prependInner>
                   <VaIcon name="search" color="secondary" size="small" />

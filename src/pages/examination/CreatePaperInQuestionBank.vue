@@ -136,7 +136,14 @@ const cancelUpdatePaper = () => {
           Add question
         </VaButton>
       </div>
-      <VaModal v-slot="{ ok }" v-model="showQuestionBankModal" hide-default-actions size="large" close-button>
+      <VaModal
+        v-slot="{ ok }"
+        v-model="showQuestionBankModal"
+        hide-default-actions
+        size="large"
+        close-button
+        class="geo-add-question-modal"
+      >
         <QuestionBankModal
           @save="
             (questions: Question[]) => {
@@ -199,3 +206,9 @@ const cancelUpdatePaper = () => {
     "
   />
 </template>
+
+<style scoped>
+.geo-add-question-modal .va-modal__dialog {
+  max-width: 80vw !important;
+}
+</style>
