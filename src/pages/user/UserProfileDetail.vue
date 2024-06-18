@@ -73,6 +73,7 @@ const getUserDetail = async () => {
       imageUrl: userProfileStore?.userDetails?.imageUrl,
     }
     Object.assign(formData, userDetail.value)
+    authStores.updateAvatarUrl(userDetail.value.imageUrl ? userDetail.value.imageUrl : undefined)
   } catch (error) {
     console.error(error)
   }
@@ -428,6 +429,7 @@ const handleRemoveAvatar = async () => {
         color: 'success',
       })
       getUserDetail()
+      authStores.updateAvatarUrl(undefined)
     })
     .catch((error) => {
       const message = getErrorMessage(error)

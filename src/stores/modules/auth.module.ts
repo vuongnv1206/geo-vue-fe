@@ -6,6 +6,7 @@ import { Register, ResetPassword } from '@/pages/auth/types'
 export type User = {
   id: string
   fullName: string
+  avatarUrl?: string
   emailaddress: string
   phone: string
   tenant: string
@@ -46,6 +47,7 @@ export const useAuthStore = defineStore('auth', {
     return {
       user: null as User | null,
       isAuthenticated: false,
+      avatarUrl: '',
     }
   },
   actions: {
@@ -56,12 +58,14 @@ export const useAuthStore = defineStore('auth', {
         this.user = {
           id: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
           fullName: userParse.fullName,
+          avatarUrl: userParse.image_url,
           emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
           phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
           roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
           tenant: userParse.tenant,
           permission: userParse.permission,
         }
+        this.avatarUrl = userParse.image_url
       } else {
         this.isAuthenticated = false
         this.user = null
@@ -76,12 +80,14 @@ export const useAuthStore = defineStore('auth', {
           this.user = {
             id: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
             fullName: userParse.fullName,
+            avatarUrl: userParse.image_url,
             emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
             phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
             roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
             tenant: userParse.tenant,
             permission: userParse.permission,
           }
+          this.avatarUrl = userParse.image_url
         } else {
           this.isAuthenticated = false
           this.user = null
@@ -134,12 +140,14 @@ export const useAuthStore = defineStore('auth', {
           this.user = {
             id: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
             fullName: userParse.fullName,
+            avatarUrl: userParse.image_url,
             emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
             phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
             roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
             tenant: userParse.tenant,
             permission: userParse.permission,
           }
+          this.avatarUrl = userParse.image_url
           return response.data.token
         })
         .catch(() => {
@@ -178,6 +186,9 @@ export const useAuthStore = defineStore('auth', {
         return false
       }
       return this.mustHavePermission(splitPermission[1], splitPermission[0])
+    },
+    updateAvatarUrl(avatarUrl: any): void {
+      this.avatarUrl = avatarUrl
     },
   },
 })
