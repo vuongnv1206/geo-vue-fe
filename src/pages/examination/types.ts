@@ -105,6 +105,7 @@ export interface PaperDto {
   paperLable?: PaperLabelDto
   paperFolder?: PaperFolderDto
   questions?: Question[] | null
+  maxPoint?: number | undefined
 }
 
 export interface PaperLabelDto {
@@ -235,6 +236,7 @@ export interface CreatePaperRequest {
   paperFolderId?: string | undefined
   description?: string | undefined
   questions: QuestionIntoPaperRequest[]
+  subjectId: string | undefined
 }
 
 export interface QuestionIntoPaperRequest {

@@ -357,7 +357,13 @@ const filteredGroupClasses = computed(() => {
               <VaDropdown trigger="hover">
                 <template #anchor>
                   <VaAvatar color="info" size="small" class="text-center">
-                    {{ teacher.teacherName.charAt(0).toUpperCase() }}
+                    {{
+                      teacher.teacherName
+                        .split(' ')
+                        .filter((_, index, array) => index === 0 || index === array.length - 1)
+                        .map((w) => w.charAt(0).toUpperCase())
+                        .join('')
+                    }}
                   </VaAvatar>
                 </template>
                 <VaDropdownContent> {{ teacher.teacherName }} </VaDropdownContent>

@@ -5,7 +5,9 @@
         <VaButton preset="secondary" color="textPrimary">
           <span class="profile-dropdown__anchor min-w-max">
             <slot />
-            <VaAvatar :size="32" color="warning"> {{ shortNameLetter }} </VaAvatar>
+            <GeoAvatar :size="32" color="warning" :txt="shortNameLetter">
+              {{ shortNameLetter }}
+            </GeoAvatar>
           </span>
         </VaButton>
       </template>
@@ -38,6 +40,7 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
 import { useAuthStore } from '@/stores/modules/auth.module'
+import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import { useRouter } from 'vue-router'
 
 const { colors, setHSLAColor } = useColors()
@@ -76,6 +79,7 @@ withDefaults(
         list: [
           {
             name: 'profile',
+            to: 'profile',
             icon: 'mso-account_circle',
           },
         ],

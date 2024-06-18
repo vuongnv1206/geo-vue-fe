@@ -164,6 +164,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/subject/Subject.vue'),
       },
+      {
+        name: 'profile',
+        path: 'profile',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/user/UserProfile.vue'),
+      },
     ],
   },
   {

@@ -29,5 +29,16 @@ export const useQuestionEditStore = defineStore('questionEdit', {
 
       return questionService.createQuestion(data)
     },
+
+    async ReadQuestionFromFile(file: any): Promise<string[]> {
+      return questionService
+        .readQuestionFromFile(file)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })
