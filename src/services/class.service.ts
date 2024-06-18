@@ -32,7 +32,7 @@ class ClassService {
 
   async getClassroomByGroupClassId(id: string): Promise<Classrooms[]> {
     return apiService
-      .get(`/v1/class/get-class-by-group-class/${id}`)
+      .get(`/v1/class/get-class-by-group-class?groupClassId=${id}`)
       .then((response) => {
         return Promise.resolve(response.data)
       })

@@ -37,7 +37,7 @@ const formatDate = (isoString: string | undefined, localization: string) => {
   return new Intl.DateTimeFormat(localization, { dateStyle: 'long' }).format(date)
 }
 
-const showSidebar = ref(false)
+const showSidebar = ref(true)
 const valueCollapses = ref([])
 const collapses = ref([
   { title: 'First collapse', content: '12A9' },
