@@ -47,11 +47,6 @@ export type EmptyClassrooms = {
   groupClassId: string
 }
 
-export type AssignmentToClassRequest = {
-  assignmentId: string
-  classesdId: string
-}
-
 export type UserInClassRequest = {
   userId: string
   classesId: string

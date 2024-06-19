@@ -28,7 +28,6 @@ const getAssignmentByClass = () => {
     .getClasses(dataFilter)
     .then((response) => {
       assignmentsByClass.value = response.data
-      // console.log('Response:', response)
       // console.log('ClassAssignment:', assignmentsByClass.value)
       loading.value = false
     })

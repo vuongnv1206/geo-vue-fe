@@ -141,7 +141,7 @@ const routes: Array<RouteRecordRaw> = [
           },
           {
             name: 'assignment-details',
-            path: ':id',
+            path: ':id/:classId',
             component: () => import('../pages/assignment/widgets/AssignmentDetails.vue'),
           },
           {
