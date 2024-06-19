@@ -74,30 +74,29 @@ const groups: { [key: string]: Question[] } = {
 }
 const groupQuestionsByType = (questions: Question[]) => {
   questions.forEach((question) => {
-    switch (question.questionType) {
-      case QuestionType.SingleChoice:
-        groups.singleChoice.push(question)
-        break
-      case QuestionType.MultipleChoice:
-        groups.multipleChoice.push(question)
-        break
-      case QuestionType.FillBlank:
-        groups.fillBlank.push(question)
-        break
-      case QuestionType.Matching:
-        groups.matching.push(question)
-        break
-      case QuestionType.Reading:
-      case QuestionType.ReadingQuestionPassage:
-        groups.reading.push(question)
-        break
-      case QuestionType.Writing:
-        groups.writing.push(question)
-        break
-      default:
-        groups.other.push(question)
-        break
+    if (question.questionType === QuestionType.SingleChoice) {
+      return groups.singleChoice.push(question)
     }
+    if (question.questionType === QuestionType.MultipleChoice) {
+      return groups.multipleChoice.push(question)
+    }
+    if (question.questionType === QuestionType.FillBlank) {
+      return groups.fillBlank.push(question)
+    }
+    if (question.questionType === QuestionType.Matching) {
+      return groups.matching.push(question)
+    }
+    if (
+      question.questionType === QuestionType.Reading ||
+      question.questionType === QuestionType.ReadingQuestionPassage
+    ) {
+      return groups.reading.push(question)
+    }
+    if (question.questionType === QuestionType.Writing) {
+      return groups.writing.push(question)
+    }
+
+    return groups.other.push(question)
   })
 
   for (const label in groups) {
