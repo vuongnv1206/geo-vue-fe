@@ -35,7 +35,7 @@
                   icon="delete"
                   preset="secondary"
                   class="justify-start"
-                  @click="deleteAssignment(assignmentId)"
+                  @click="removeAssignmentFromClass(assignmentClass)"
                 >
                   Delete</VaButton
                 >
@@ -93,30 +93,36 @@
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { Assignment } from '../types'
+import { Assignment, AssignmentClass } from '../types'
 import { useBreakpoint, useToast } from 'vuestic-ui'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { format, notifications } from '@/services/utils'
+import { useClassStore } from '@/stores/modules/class.module'
 
 dayjs.extend(utc)
 
 const router = useRouter()
 const stores = useAssignmentStore()
+const classStores = useClassStore()
 const breakpoints = useBreakpoint()
 const { init: notify } = useToast()
 const showSidebar = ref(breakpoints.smUp)
 const assignment = ref<Assignment | null>(null)
 const assignmentId = router.currentRoute.value.params.id.toString()
+const classId = router.currentRoute.value.params.classId.toString()
+const assignmentClass = ref<AssignmentClass>({
+  assignmentId: assignmentId,
+  classesdId: classId,
+})
 
+console.log('Assignment Class:', assignmentClass.value)
 const getAssignment = (id: string) => {
   stores
     .getAssignment(id)
     .then((response) => {
       assignment.value = response
-      if (assignment.value) {
-        assignment.value.subjectName = response.subject.name
-      }
+      // console.log('Assignment:', assignment.value)
     })
     .catch((error) => {
       console.log('Error:', error)
@@ -127,11 +133,15 @@ const getAssignment = (id: string) => {
     })
 }
 
-const deleteAssignment = (assignmentId: string) => {
-  stores
-    .deleteAssignment(assignmentId)
+const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
+  classStores
+    .removeAssignmentFromClass(assignmentClass)
     .then(() => {
       router.push({ name: 'assignments' })
+      notify({
+        message: notifications.deleteSuccessfully('assignment'),
+        color: 'success',
+      })
     })
     .catch((error) => {
       notify({

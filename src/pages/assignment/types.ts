@@ -8,7 +8,6 @@ export type Assignment = {
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectId: string
-  subjectName: string
   createOn: Date
 }
 
@@ -31,6 +30,7 @@ export type AssignmentDetails = {
   endTime: Date | null
   canViewResult: boolean
   requireLoginToSubmit: boolean
+  classIds: string[]
 }
 
 export type EmptyAssignmentDetails = {
@@ -39,6 +39,7 @@ export type EmptyAssignmentDetails = {
   endTime: Date | null
   canViewResult: boolean
   requireLoginToSubmit: boolean
+  classIds: string[]
 }
 
 export type Attachment = {
@@ -55,4 +56,9 @@ export type AssignmentResponse = {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
+}
+
+export type AssignmentClass = {
+  assignmentId: string
+  classesdId: string
 }

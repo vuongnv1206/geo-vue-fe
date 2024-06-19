@@ -126,19 +126,9 @@ export const useClassStore = defineStore('class', {
           return Promise.reject(error)
         })
     },
-    async AssignAssignmentToClass(data: any): Promise<any> {
+    async removeAssignmentFromClass(data: any): Promise<any> {
       return classService
-        .AssignAssignmentToClass(data)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-    async RemoveAssignmentFromClass(data: any): Promise<any> {
-      return classService
-        .RemoveAssignmentFromClass(data)
+        .removeAssignmentFromClass(data)
         .then((response) => {
           return Promise.resolve(response)
         })

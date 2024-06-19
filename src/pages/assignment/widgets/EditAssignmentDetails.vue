@@ -40,6 +40,7 @@ const defaultNewAssignmentDetails: AssignmentDetails = {
   endTime: new Date(),
   canViewResult: false,
   requireLoginToSubmit: false,
+  classIds: [],
 }
 
 const newAssignmentDetails = ref({ ...defaultNewAssignmentDetails })
@@ -56,6 +57,7 @@ const getAssignment = (id: string) => {
         endTime: response.endTime,
         canViewResult: response.canViewResult,
         requireLoginToSubmit: response.requireLoginToSubmit,
+        classIds: response.classIds,
       }
     })
     .catch((error) => {
@@ -80,7 +82,7 @@ const getGroupClass = async () => {
   try {
     const response = await classStore.getGroupClasses(dataFilter.value)
     groupClasses.value = response.data
-    console.log('Group Classes: ', groupClasses.value)
+    // console.log('Group Classes: ', groupClasses.value)
   } catch (error) {
     console.error('Error fetching subjects:', error)
   }
@@ -141,13 +143,8 @@ const countDepartmentSelectedClasses = (groupClass: GroupClass) => {
 const isFormHasUnsavedChanges = computed(() => {
   return Object.keys(newAssignmentDetails.value).some((key) => {
     return (
-      console.log(
-        '3',
-        assignmentDetails.value?.[key as keyof EmptyAssignmentDetails],
-        newAssignmentDetails.value[key as keyof EmptyAssignmentDetails],
-      ),
       newAssignmentDetails.value[key as keyof EmptyAssignmentDetails] !==
-        assignmentDetails.value?.[key as keyof EmptyAssignmentDetails]
+      assignmentDetails.value?.[key as keyof EmptyAssignmentDetails]
     )
   })
 })
@@ -181,8 +178,9 @@ const handleClickUpdate = async () => {
     newAssignmentDetails.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
     newAssignmentDetails.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
     try {
+      newAssignmentDetails.value.classIds = selectedClasses.value
       await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
-      console.log(newAssignmentDetails.value)
+      console.log('newAssignmentDetails.value: ', newAssignmentDetails.value)
       notify({ message: notifications.updatedSuccessfully(newAssignmentDetails.value.name), color: 'success' })
       router.push({ name: 'assignment-details', params: { id: assignmentId } })
     } catch (error) {
