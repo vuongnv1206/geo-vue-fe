@@ -35,7 +35,7 @@
             <span class="font-semibold">{{ assClass.name }}</span>
             <VaChip v-if="currentUserId != assClass.ownerId" outline class="ml-2" size="small"> Share </VaChip>
             <div class="flex items-center space-x-2 ml-auto">
-              <VaButton preset="plain" size="small">Xem tất cả</VaButton>
+              <VaButton preset="plain" size="small">Show All</VaButton>
             </div>
           </div>
           <VaDivider />

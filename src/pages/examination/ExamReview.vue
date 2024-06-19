@@ -64,30 +64,50 @@ const groupQuestionsByType = (questions: Question[]) => {
     other: [],
   }
 
+  // questions.forEach((question) => {
+  //   switch (question.questionType) {
+  //     case QuestionType.SingleChoice:
+  //       groups.singleChoice.push(question)
+  //       break
+  //     case QuestionType.MultipleChoice:
+  //       groups.multipleChoice.push(question)
+  //       break
+  //     case QuestionType.FillBlank:
+  //       groups.fillBlank.push(question)
+  //       break
+  //     case QuestionType.Matching:
+  //       groups.matching.push(question)
+  //       break
+  //     case QuestionType.Reading:
+  //     case QuestionType.ReadingQuestionPassage:
+  //       groups.reading.push(question)
+  //       break
+  //     case QuestionType.Writing:
+  //       groups.writing.push(question)
+  //       break
+  //     default:
+  //       groups.other.push(question)
+  //       break
+  //   }
+  // })
   questions.forEach((question) => {
-    switch (question.questionType) {
-      case QuestionType.SingleChoice:
-        groups.singleChoice.push(question)
-        break
-      case QuestionType.MultipleChoice:
-        groups.multipleChoice.push(question)
-        break
-      case QuestionType.FillBlank:
-        groups.fillBlank.push(question)
-        break
-      case QuestionType.Matching:
-        groups.matching.push(question)
-        break
-      case QuestionType.Reading:
-      case QuestionType.ReadingQuestionPassage:
-        groups.reading.push(question)
-        break
-      case QuestionType.Writing:
-        groups.writing.push(question)
-        break
-      default:
-        groups.other.push(question)
-        break
+    if (question.questionType === QuestionType.SingleChoice) {
+      groups.singleChoice.push(question)
+    } else if (question.questionType === QuestionType.MultipleChoice) {
+      groups.multipleChoice.push(question)
+    } else if (question.questionType === QuestionType.FillBlank) {
+      groups.fillBlank.push(question)
+    } else if (question.questionType === QuestionType.Matching) {
+      groups.matching.push(question)
+    } else if (
+      question.questionType === QuestionType.Reading ||
+      question.questionType === QuestionType.ReadingQuestionPassage
+    ) {
+      groups.reading.push(question)
+    } else if (question.questionType === QuestionType.Writing) {
+      groups.writing.push(question)
+    } else {
+      groups.other.push(question)
     }
   })
 
