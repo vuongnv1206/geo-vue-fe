@@ -4,12 +4,12 @@ import { usePaperStore } from '@/stores/modules/paper.module'
 import { onMounted, ref } from 'vue'
 import {
   PaperFolderDto,
-  SearchPaperFolderRequest,
-  SearchPaperRequest,
   UpdatePaperFolderRequest,
   CreatePaperFolderRequest,
   PaperInListDto,
   CombinedData,
+  DataFilterFolder,
+  DataFilterPaper,
 } from './types'
 import { useMenu, useModal, useToast } from 'vuestic-ui/web-components'
 import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
@@ -21,8 +21,21 @@ const paperFolderStore = usePaperFolderStore()
 const paperStore = usePaperStore()
 const loading = ref(true)
 
-const searchPaperFolderRequest = ref<SearchPaperFolderRequest>({})
-const searchPaperRequest = ref<SearchPaperRequest>({})
+const dataFilterFolder = ref<DataFilterFolder>({
+  keyword: '',
+  pageNumber: 1,
+  pageSize: 20,
+  orderBy: ['id'],
+  parentId: null,
+})
+
+const dataFilterPaper = ref<DataFilterPaper>({
+  keyword: '',
+  pageNumber: 1,
+  pageSize: 20,
+  orderBy: ['id'],
+  paperFolderId: null,
+})
 
 const paperFolderDtos = ref<PaperFolderDto[]>([])
 const papers = ref<PaperInListDto[]>([])
@@ -101,8 +114,8 @@ const onFolderDelete = async (folder: PaperFolderDto) => {
         message: `${folder.name} has been deleted`,
         color: 'success',
       })
-      getPaperFolders(currentFolderId.value) // Refresh the list of folders under the current parent folder
-      getPapers(currentFolderId.value) // Refresh the list of papers under the current parent folder
+      getPaperFolders(currentFolderId.value)
+      getPapers(currentFolderId.value)
     } catch (err: any) {
       notify({
         message: `Failed to delete folder\n${err.message}`,
@@ -176,12 +189,13 @@ onMounted(() => {
 
 const getPaperFolders = async (parentId?: string | null, name?: string | null) => {
   loading.value = true
-  searchPaperFolderRequest.value = { parentId, name }
+  dataFilterFolder.value.parentId = parentId
+  dataFilterFolder.value.keyword = name ?? ''
   paperFolderStore
-    .searchPaperFolders(searchPaperFolderRequest.value)
+    .searchPaperFolders(dataFilterFolder.value)
     .then((res) => {
       loading.value = false
-      paperFolderDtos.value = res
+      paperFolderDtos.value = res.data
     })
     .catch(() => {
       loading.value = false
@@ -192,12 +206,13 @@ const getPaperFolders = async (parentId?: string | null, name?: string | null) =
 const getPapers = async (folderId?: string | null, name?: string | null) => {
   papers.value = []
   loading.value = true
-  searchPaperRequest.value = { paperFolderId: folderId, name }
+  dataFilterPaper.value.paperFolderId = folderId
+  dataFilterPaper.value.keyword = name ?? ''
   paperStore
-    .searchPapers(searchPaperRequest.value)
+    .searchPapers(dataFilterPaper.value)
     .then((res) => {
       loading.value = false
-      papers.value = res
+      papers.value = res.data
     })
     .catch(() => {
       loading.value = false
@@ -234,14 +249,12 @@ const handleFolderDoubleClick = async (event: any) => {
 
 const showPaperDetail = (paper: PaperInListDto) => {
   router.push({ name: 'admin-exam-detail', params: { id: paper.id } })
-  // For example, you could navigate to a detail page
 }
 const navigateToBreadcrumb = (index: number) => {
   const breadcrumb = breadcrumbs.value[index]
   breadcrumbs.value = breadcrumbs.value.slice(0, index + 1)
   currentFolderId.value = breadcrumb.id
   searchTerm.value = ''
-  //papers.value = []
   getPaperFolders(breadcrumb.id, searchTerm.value)
   getPapers(breadcrumb.id, searchTerm.value)
 }
@@ -259,15 +272,13 @@ const handleSearch = () => {
 const navigateToPath = async (id: string | null) => {
   if (id) {
     if (currentFolderId.value !== id) {
-      const folder = paperFolderDtos.value.find((folder) => folder.id === id)
-      if (folder && folder.parents) {
-        breadcrumbs.value = [
-          { id: null, name: 'Root' },
-          ...folder.parents.map((parent) => ({ id: parent.id, name: parent.name })),
-        ]
-      }
+      const parentFolders = await getListParents(id)
+      breadcrumbs.value = [
+        { id: null, name: 'Root' },
+        ...parentFolders.map((parent) => ({ id: parent.id, name: parent.name })),
+      ]
+
       currentFolderId.value = id
-      //papers.value = []
       searchTerm.value = ''
       getPaperFolders(id, searchTerm.value)
       getPapers(id, searchTerm.value)
@@ -276,11 +287,20 @@ const navigateToPath = async (id: string | null) => {
   } else {
     breadcrumbs.value = [{ id: null, name: 'Root' }]
     currentFolderId.value = null
-    //papers.value = []
     getPaperFolders()
     getPapers()
     showPathColumn.value = false
     searchTerm.value = ''
+  }
+}
+
+const getListParents = async (id: string): Promise<PaperFolderDto[]> => {
+  try {
+    const response = await paperFolderStore.getListParents(id)
+    return response
+  } catch (error) {
+    console.error('Failed to get parent folders:', error)
+    throw error
   }
 }
 
