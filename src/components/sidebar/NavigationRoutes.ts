@@ -25,7 +25,7 @@ export default {
       name: 'questions',
       displayName: 'menu.questions',
       meta: {
-        icon: 'snippet_folder',
+        icon: 'folder',
       },
       children: [
         {
@@ -64,21 +64,21 @@ export default {
       name: 'classroom',
       displayName: 'menu.classroom',
       meta: {
-        icon: 'snippet_folder',
+        icon: 'collections_bookmark',
       },
     },
     {
       name: 'assignments',
       displayName: 'menu.assignments',
       meta: {
-        icon: 'snippet_folder',
+        icon: 'description',
       },
     },
     {
       name: 'subjects',
       displayName: 'menu.subjects',
       meta: {
-        icon: 'snippet_folder',
+        icon: 'play_lesson',
       },
     },
     {
