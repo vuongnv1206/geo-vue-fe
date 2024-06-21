@@ -25,7 +25,7 @@ export default {
       name: 'questions',
       displayName: 'menu.questions',
       meta: {
-        icon: 'folder',
+        icon: 'snippet_folder',
       },
       children: [
         {
@@ -64,37 +64,21 @@ export default {
       name: 'classroom',
       displayName: 'menu.classroom',
       meta: {
-        icon: 'collections_bookmark',
+        icon: 'snippet_folder',
       },
-      children: [
-        {
-          name: 'group-class',
-          displayName: 'menu.group-class',
-          meta: {
-            permission: 'GroupClasses.View',
-          },
-        },
-        {
-          name: 'class',
-          displayName: 'menu.class',
-          meta: {
-            permission: 'Classes.View',
-          },
-        },
-      ],
     },
     {
       name: 'assignments',
       displayName: 'menu.assignments',
       meta: {
-        icon: 'description',
+        icon: 'snippet_folder',
       },
     },
     {
       name: 'subjects',
       displayName: 'menu.subjects',
       meta: {
-        icon: 'play_lesson',
+        icon: 'snippet_folder',
       },
     },
     {

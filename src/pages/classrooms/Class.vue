@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, PropType } from 'vue'
 import { Classrooms, GroupClass } from './type'
+import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useModal, useToast } from 'vuestic-ui'
@@ -9,6 +10,7 @@ import EditGroupClass from './widgets/EditGroupClass.vue'
 
 const loading = ref(true)
 const stores = useClassStore()
+const router = useRouter()
 const classrooms = ref<Classrooms[]>([])
 const classToEdit = ref<Classrooms | null>(null)
 const doShowClassFormModal = ref(false)
@@ -22,6 +24,10 @@ const editClass = (classrooms: Classrooms) => {
 const createNewClass = () => {
   classToEdit.value = null
   doShowClassFormModal.value = true
+}
+
+const selectedClass = (classItem: Classrooms) => {
+  router.push({ name: 'class-details', params: { id: classItem.id } })
 }
 
 const groupClassToEdit = ref<GroupClass | null>(null)
@@ -43,7 +49,6 @@ function getGroupClasses() {
     .getGroupClass()
     .then((res) => {
       listGroupClass.value = res
-      console.log('Department: ', listGroupClass.value)
     })
     .finally(() => {
       loading.value = false
@@ -63,10 +68,10 @@ const editGroupClass = (gc: GroupClass) => {
   doShowGroupClassFormModal.value = true
 }
 
-// const createNewGroupClass = () => {
-//   groupClassToEdit.value = null
-//   doShowGroupClassFormModal.value = true
-// }
+const createNewGroupClass = () => {
+  groupClassToEdit.value = null
+  doShowGroupClassFormModal.value = true
+}
 
 const handleMenuGroupClassClick = (option: any) => {
   if (option.text === 'Edit') {
@@ -129,7 +134,6 @@ function getClassByUser() {
     .getClassroomByUser()
     .then((res) => {
       classrooms.value = res
-      console.log('Class: ', classrooms.value)
     })
     .catch(() => {
       notify({
@@ -194,6 +198,7 @@ const onClassSaved = async (classrooms: Classrooms) => {
           color: 'success',
         })
         getGroupClasses()
+        getClassByUser()
       })
       .catch((err) => {
         notify({
@@ -210,6 +215,7 @@ const onClassSaved = async (classrooms: Classrooms) => {
           color: 'success',
         })
         getGroupClasses()
+        getClassByUser()
       })
       .catch((err) => {
         notify({
@@ -219,6 +225,7 @@ const onClassSaved = async (classrooms: Classrooms) => {
       })
   }
 }
+
 onMounted(() => {
   getGroupClasses()
   getClassByUser()
@@ -228,9 +235,22 @@ onMounted(() => {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <div class="header-container">
     <h2 class="page-title font-bold">Class</h2>
-    <VaButton style="padding: 0.5rem 0.8rem; margin: 0; line-height: 1" icon="add" @click="createNewClass()"
-      >Class</VaButton
-    >
+    <div class="button-container">
+      <VaButton
+        class="add-button"
+        style="padding: 0.5rem 0.8rem; margin: 0; line-height: 1"
+        icon="add"
+        @click="createNewGroupClass()"
+        >Group Class</VaButton
+      >
+      <VaButton
+        class="add-button"
+        style="padding: 0.5rem 0.8rem; margin: 0; line-height: 1"
+        icon="add"
+        @click="createNewClass()"
+        >Class</VaButton
+      >
+    </div>
   </div>
 
   <VaCard>
@@ -263,7 +283,7 @@ onMounted(() => {
                   @selected="(v) => handleMenuGroupClassClick(v)"
                 >
                   <template #anchor>
-                    <div class="group-class-more">
+                    <div class="group-class-more" @click.stop>
                       <span class="material-symbols-outlined more-vert-icon">more_vert</span>
                     </div>
                   </template>
@@ -277,7 +297,7 @@ onMounted(() => {
                 class="class-card"
                 style="margin-left: 20px"
               >
-                <VaCard color="primary" gradient class="card">
+                <VaCard color="primary" gradient class="card" @click="selectedClass(classItem)">
                   <div class="card-header">
                     <VaCardTitle style="font-size: 15px">{{ classItem.name }}</VaCardTitle>
                     <VaMenu
@@ -288,7 +308,7 @@ onMounted(() => {
                       @selected="(v) => handleMenuClassClick(v)"
                     >
                       <template #anchor>
-                        <div class="group-class-more">
+                        <div class="group-class-more" @click.stop>
                           <span class="material-symbols-outlined more-horiz-icon">more_horiz</span>
                         </div>
                       </template>
@@ -369,6 +389,11 @@ onMounted(() => {
 .header-container .page-title {
   margin: 0;
   flex: 1; /* Allow the title to take available space */
+}
+
+.button-container {
+  display: flex;
+  gap: 10px; /* Adjust the gap between buttons */
 }
 
 .group-class {

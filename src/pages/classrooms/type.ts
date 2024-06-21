@@ -55,7 +55,7 @@ export type UserInClassRequest = {
 export type UserInClass = {
   userId: string
   classesId: string
-  isGender: true
+  isGender: boolean
   studentCode: string
   email: string
   phoneNumber: string
