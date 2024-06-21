@@ -122,6 +122,8 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  max-height: 120px;
+  overflow-y: auto;
 }
 
 .radio-item {
