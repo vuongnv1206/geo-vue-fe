@@ -60,3 +60,18 @@ export type UserInClass = {
   email: string
   phoneNumber: string
 }
+export type News = {
+  id: string
+  classesId: string
+  content: string
+  isLockComment:  boolean
+  parentId: string
+  numberLikeInTheNews: number
+}
+
+export type EmptyNews = {
+  classesId: string
+  content: string
+  isLockComment:  boolean
+  parentId: string
+}
