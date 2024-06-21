@@ -64,7 +64,7 @@ export type News = {
   id: string
   classesId: string
   content: string
-  isLockComment:  boolean
+  isLockComment: boolean
   parentId: string
   numberLikeInTheNews: number
 }
@@ -72,6 +72,6 @@ export type News = {
 export type EmptyNews = {
   classesId: string
   content: string
-  isLockComment:  boolean
+  isLockComment: boolean
   parentId: string
 }
