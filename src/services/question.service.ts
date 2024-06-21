@@ -32,6 +32,19 @@ class QuestionService {
         return Promise.reject(error)
       })
   }
+
+  async readQuestionFromFile(file: any): Promise<string[]> {
+    const formData = new FormData()
+    formData.append('Files', file)
+    return apiService
+      .post('/v1/question/read-from-file', formData)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new QuestionService()

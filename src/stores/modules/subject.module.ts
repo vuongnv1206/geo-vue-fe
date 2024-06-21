@@ -5,9 +5,9 @@ import subjectService from '@/services/subject.service'
 export const useSubjectStore = defineStore('subject', {
   state: () => ({}),
   actions: {
-    async getSubjects(): Promise<SubjectResponse> {
+    async getSubjects(data: any): Promise<SubjectResponse> {
       return subjectService
-        .getSubjects()
+        .getSubjects(data)
         .then((response) => {
           return Promise.resolve(response)
         })

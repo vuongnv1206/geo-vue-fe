@@ -2,8 +2,8 @@ import { EmptySubject } from '@/pages/subject/types'
 import ApiService from '@services/api.service'
 
 class SubjectService {
-  async getSubjects(): Promise<any> {
-    return ApiService.post('/v1/subjects/search', { request: {} })
+  async getSubjects(data: any): Promise<any> {
+    return ApiService.post('/v1/subjects/search', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -11,6 +11,7 @@ class SubjectService {
         return Promise.reject(error)
       })
   }
+
   async getSubject(id: string): Promise<any> {
     return ApiService.get(`/v1/subjects/${id}`)
       .then((response) => {

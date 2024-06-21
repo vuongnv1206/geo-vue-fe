@@ -45,5 +45,16 @@ const options = [
         <VaIcon name="mso-delete" color="danger" @click="emit('delete', props.question as Question)" />
       </div>
     </div>
+    <div v-else>
+      <div class="flex gap-2">
+        <VaMenu :options="options">
+          <template #anchor>
+            <div>
+              <VaIcon name="mso-info" color="primary" />
+            </div>
+          </template>
+        </VaMenu>
+      </div>
+    </div>
   </div>
 </template>

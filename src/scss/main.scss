@@ -58,3 +58,7 @@ pre {
   font-size: 0.8125rem;
   line-height: 1rem;
 }
+
+.va-avatar img {
+  object-fit: cover !important;
+}

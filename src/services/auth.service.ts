@@ -51,7 +51,10 @@ class AuthService {
 
   async confirmEmail(tenant: string, userId: string, code: string): Promise<any> {
     return apiService
-      .get(`/users/confirm-email?tenant=${tenant}&userId=${userId}&code=${code}`)
+      .request({
+        url: `/users/confirm-email?tenant=${tenant}&userId=${userId}&code=${code}`,
+        method: 'GET',
+      })
       .then((response) => {
         return Promise.resolve(response)
       })

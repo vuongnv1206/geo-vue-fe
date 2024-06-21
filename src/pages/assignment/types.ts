@@ -8,18 +8,19 @@ export type Assignment = {
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectId: string
-  subjectName: string
+  createOn: Date
 }
 
 export type EmptyAssignment = {
   name: string
   startTime: Date | null
   endTime: Date | null
-  attachmentPaths: Attachment[]
-  content: string | null
+  content: string
   canViewResult: boolean
   requireLoginToSubmit: boolean
-  subjectName: string
+  subjectId: string
+  attachmentPaths: Attachment[] | null
+  classIds: string[]
 }
 
 export type AssignmentDetails = {
@@ -29,15 +30,16 @@ export type AssignmentDetails = {
   endTime: Date | null
   canViewResult: boolean
   requireLoginToSubmit: boolean
-  subjectId: string
+  classIds: string[]
 }
+
 export type EmptyAssignmentDetails = {
   name: string
   startTime: Date | null
   endTime: Date | null
   canViewResult: boolean
   requireLoginToSubmit: boolean
-  subjectId: string
+  classIds: string[]
 }
 
 export type Attachment = {
@@ -48,4 +50,15 @@ export type Attachment = {
 
 export type AssignmentResponse = {
   data: Assignment[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type AssignmentClass = {
+  assignmentId: string
+  classesdId: string
 }

@@ -95,6 +95,7 @@ const searchQuestion = (search: SearchQuestion) => {
 watchDebounced(
   filters.value,
   () => {
+    pagination.value.page = 1
     searchValue.value.keyword = filters.value.keyword
     searchQuestion(searchValue.value)
   },
@@ -272,6 +273,7 @@ const AddNewQuestion = () => {
 watch(
   () => QuestionTypeValue.value.id,
   () => {
+    pagination.value.page = 1
     console.log('Search question with type')
     searchQuestionWithType()
   },
@@ -281,6 +283,8 @@ watch(
 watch(
   () => QuestionSortValue.value.id,
   () => {
+    pagination.value.page = 1
+
     if (QuestionSortValue.value.id === 0) {
       searchValue.value.orderBy = []
       searchValue.value.orderBy.push('CreatedOn desc')

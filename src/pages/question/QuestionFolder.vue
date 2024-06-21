@@ -133,11 +133,14 @@ const AddPermission = (option: TeacherTeamTeacherGroupCombine) => {
       email: option.teacherTeam.email,
       firstName: option.teacherTeam.teacherName,
       emailConfirmed: false,
+      phoneNumberConfirmed: false,
       lastName: '',
       phoneNumber: '',
       imageUrl: '',
       isActive: false,
       userName: '',
+      birthDate: '',
+      gender: true,
     }
   }
 

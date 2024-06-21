@@ -236,6 +236,7 @@ export interface CreatePaperRequest {
   paperFolderId?: string | undefined
   description?: string | undefined
   questions: QuestionIntoPaperRequest[]
+  subjectId: string | undefined
 }
 
 export interface QuestionIntoPaperRequest {

@@ -27,6 +27,7 @@ const paper = ref<CreatePaperRequest>({
   paperFolderId: '' || undefined,
   description: '' || undefined,
   questions: [],
+  subjectId: '' || undefined,
 })
 
 const isPublished = computed({
@@ -47,11 +48,19 @@ watch(
   },
   { immediate: true },
 )
-
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
 const subjects = ref<Subject[]>([])
 const getSubject = () => {
   storeSubject
-    .getSubjects()
+    .getSubjects(dataFilter.value)
     .then((response) => {
       subjects.value = response.data
     })
@@ -90,6 +99,7 @@ onMounted(() => {
         class="col-span-2"
       />
       <VaSelect
+        v-model="paper.subjectId"
         placeholder="Select a subject"
         label="Subject"
         searchable
@@ -98,7 +108,6 @@ onMounted(() => {
         :text-by="(subject: Subject) => subject.name"
         :value-by="(subject: Subject) => subject.id"
       />
-      <VaSelect placeholder="Select a type" label="type" />
       <VaInput v-model="paper.password" placeholder="Enter password" label="Password(optional)" />
       <VaTextarea v-model="paper.description" placeholder="Description..." label="Description" class="col-span-2" />
       <VaSwitch v-model="isPublished" label="Publish" size="small" class="col-span-2 justify-self-end" />

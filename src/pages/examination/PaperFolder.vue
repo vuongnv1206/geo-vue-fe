@@ -418,6 +418,7 @@ const combinedData = computed(() => {
       <VaDataTable
         :items="combinedData"
         :columns="tableColumns"
+        :loading="loading"
         hoverable
         selectable
         clickable

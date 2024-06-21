@@ -1,11 +1,6 @@
-import {
-  AssignmentToClassRequest,
-  Classrooms,
-  EmptyClassrooms,
-  UserInClass,
-  UserInClassRequest,
-} from '@/pages/classrooms/type'
+import { Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/type'
 import apiService from './api.service'
+import { AssignmentClass } from '@/pages/assignment/types'
 
 class ClassService {
   async getClasses(data: any): Promise<any> {
@@ -133,19 +128,7 @@ class ClassService {
         return Promise.reject(error)
       })
   }
-
-  async AssignAssignmentToClass(data: AssignmentToClassRequest): Promise<any> {
-    return apiService
-      .post(`v1/class/assign-assignment-to-class`, data)
-      .then((response) => {
-        return Promise.resolve(response.data)
-      })
-      .catch((error) => {
-        return Promise.reject(error)
-      })
-  }
-
-  async RemoveAssignmentFromClass(data: AssignmentToClassRequest): Promise<any> {
+  async removeAssignmentFromClass(data: AssignmentClass): Promise<any> {
     return apiService
       .post(`v1/class/remove-assignment-from-class`, data)
       .then((response) => {

@@ -1,72 +1,82 @@
 <script setup lang="ts">
+import { GroupClass } from '@/pages/classrooms/type'
+import { notifications, validators } from '@/services/utils'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { useAuthStore } from '@/stores/modules/auth.module'
+import { useGroupClassStore } from '@/stores/modules/groupclass.module'
+import { useSubjectStore } from '@/stores/modules/subject.module'
+import { Subject } from '@pages/subject/types'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { computed, onMounted, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
-import '@vuepic/vue-datepicker/dist/main.css'
-import { computed, onMounted, ref } from 'vue'
-import VueDatePicker from '@vuepic/vue-datepicker'
-import { notifications, validators } from '@/services/utils'
 import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
-import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
-import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { GroupClass } from '@/pages/classrooms/type'
-import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { useAuthStore } from '@/stores/modules/auth.module'
-dayjs.extend(utc)
+import { Attachment, EmptyAssignment } from '../types'
 
-const router = useRouter()
-const { confirm } = useModal()
-const { validate } = useForm('form')
-const showSidebar = ref(false)
+dayjs.extend(utc)
 const { init: notify } = useToast()
-const stores = useAssignmentStore()
-const assignmentDetails = ref<AssignmentDetails | null>(null)
-const assignmentId = router.currentRoute.value.params.id.toString()
-const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
-const authStore = useAuthStore()
-const currentUserId = authStore.user?.id
+const { confirm } = useModal()
+const router = useRouter()
+const showSidebar = ref(false)
+const { validate } = useForm('form')
+const subjects = ref<Subject[]>([])
 const classStore = useGroupClassStore()
 const groupClasses = ref<GroupClass[]>([])
+const assignmentStore = useAssignmentStore()
+const subjectStore = useSubjectStore()
+const filesUploaded = ref<File[]>([])
+const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
 const selectedClasses = ref<string[]>([])
 const selectedDepartment = ref<GroupClass | null>(null)
+const authStore = useAuthStore()
+const currentUserId = authStore.user?.id
 
 const selectAllClassesState = ref(false)
 const selectedClassesByDepartmentState = ref<{ [key: string]: boolean }>({})
 
-const defaultNewAssignmentDetails: AssignmentDetails = {
-  id: '',
+const defaultNewAssignment: EmptyAssignment = {
   name: '',
-  startTime: new Date(),
-  endTime: new Date(),
+  startTime: null,
+  endTime: null,
+  content: '',
   canViewResult: false,
   requireLoginToSubmit: false,
-  classIds: [],
+  subjectId: '',
+  attachmentPaths: [] as Attachment[],
+  classIds: [] as string[],
+}
+const newAssignment = ref({ ...defaultNewAssignment })
+
+const isFormHasUnsavedChanges = computed(() => {
+  return Object.keys(newAssignment.value).some((key) => {
+    return (
+      toRaw(newAssignment.value)[key as keyof EmptyAssignment] !== defaultNewAssignment[key as keyof EmptyAssignment]
+    )
+  })
+})
+
+const goBack = async () => {
+  console.log('Unsaved changes: ', isFormHasUnsavedChanges.value)
+  if (isFormHasUnsavedChanges.value) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: 'You have unsaved changes. Are you sure you want to discard them?',
+      size: 'small',
+    })
+    if (agreed) {
+      router.push({ name: 'assignments' })
+    } else {
+      return
+    }
+  }
+  router.push({ name: 'assignments' })
 }
 
-const newAssignmentDetails = ref({ ...defaultNewAssignmentDetails })
-
-const getAssignment = (id: string) => {
-  stores
-    .getAssignment(id)
-    .then((response) => {
-      assignmentDetails.value = response
-      newAssignmentDetails.value = {
-        id: response.id,
-        name: response.name,
-        startTime: response.startTime,
-        endTime: response.endTime,
-        canViewResult: response.canViewResult,
-        requireLoginToSubmit: response.requireLoginToSubmit,
-        classIds: response.classIds,
-      }
-    })
-    .catch((error) => {
-      notify({
-        message: notifications.getFailed('assignments') + error.message,
-        color: 'error',
-      })
-    })
-}
+defineExpose({
+  isFormHasUnsavedChanges,
+})
 
 const dataFilter = ref({
   advancedSearch: {
@@ -82,11 +92,26 @@ const getGroupClass = async () => {
   try {
     const response = await classStore.getGroupClasses(dataFilter.value)
     groupClasses.value = response.data
-    // console.log('Group Classes: ', groupClasses.value)
+    console.log('Group Classes: ', groupClasses.value)
   } catch (error) {
     console.error('Error fetching subjects:', error)
   }
 }
+
+// Fetch subjects from the store
+const getSubjects = async () => {
+  try {
+    const response = await subjectStore.getSubjects(dataFilter.value)
+    subjects.value = response.data
+  } catch (error) {
+    console.error('Error fetching subjects:', error)
+  }
+}
+
+// Computed property to format subjects for select options
+const subjectsOptions = computed(() => {
+  return subjects.value.map((subject) => ({ text: subject.name, value: subject.id }))
+})
 
 const showAllClassesForAllDepartments = () => {
   selectedDepartment.value = null
@@ -139,59 +164,53 @@ const countDepartmentSelectedClasses = (groupClass: GroupClass) => {
   const selectedClassesInDepartment = groupClass.classes.filter((cls) => selectedClasses.value.includes(cls.id))
   return selectedClassesInDepartment.length
 }
-
-const isFormHasUnsavedChanges = computed(() => {
-  return Object.keys(newAssignmentDetails.value).some((key) => {
-    return (
-      newAssignmentDetails.value[key as keyof EmptyAssignmentDetails] !==
-      assignmentDetails.value?.[key as keyof EmptyAssignmentDetails]
-    )
-  })
-})
-
-defineExpose({
-  isFormHasUnsavedChanges,
-})
-
-const goBack = async () => {
-  if (isFormHasUnsavedChanges.value) {
-    const agreed = await confirm({
-      maxWidth: '380px',
-      message: 'You have unsaved changes. Are you sure you want to discard them?',
-      size: 'small',
-    })
-    if (agreed) {
-      router.push({ name: 'assignment-details', params: { id: assignmentId } })
-    } else {
-      return
-    }
-  }
-  router.push({ name: 'assignment-details', params: { id: assignmentId } })
-}
-
 const dateInputFormat = {
   format: 'MM/dd/yyyy HH:mm',
 }
+const handleDatePicker = () => {
+  newAssignment.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
+  newAssignment.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
+}
+const handleAttachment = async () => {
+  const files = filesUploaded.value
+  newAssignment.value.attachmentPaths = await Promise.all(
+    files.map((file) => {
+      return new Promise<Attachment>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const base64Data = reader.result?.toString() ?? ''
+          resolve({
+            name: file.name,
+            extension: file.type.split('/')[1],
+            data: base64Data,
+          })
+        }
+        reader.onerror = (error) => reject(error)
+        reader.readAsDataURL(file)
+      })
+    }),
+  )
+}
 
-const handleClickUpdate = async () => {
+const handleClickSave = async () => {
   if (validate()) {
-    newAssignmentDetails.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
-    newAssignmentDetails.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
+    handleDatePicker()
+    handleAttachment()
     try {
-      newAssignmentDetails.value.classIds = selectedClasses.value
-      await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
-      console.log('newAssignmentDetails.value: ', newAssignmentDetails.value)
-      notify({ message: notifications.updatedSuccessfully(newAssignmentDetails.value.name), color: 'success' })
-      router.push({ name: 'assignment-details', params: { id: assignmentId } })
+      newAssignment.value.classIds = selectedClasses.value
+      await assignmentStore.createAssignment(newAssignment.value as EmptyAssignment)
+      console.log('New Assignment: ', newAssignment.value)
+      notify({ message: notifications.createSuccessfully(newAssignment.value.name), color: 'success' })
+      router.push({ name: 'assignments' })
     } catch (error) {
-      notify({ message: notifications.updateFailed(newAssignmentDetails.value.name), color: 'error' })
+      notify({ message: notifications.createFailed(newAssignment.value.name), color: 'error' })
     }
   }
 }
 
 onMounted(() => {
+  getSubjects()
   getGroupClass()
-  getAssignment(assignmentId)
 })
 </script>
 
@@ -202,15 +221,12 @@ onMounted(() => {
     </template>
     <template #content>
       <VaDivider />
-      <VaForm ref="form" class="flex flex-col gap-4 mx-auto" style="max-width: 700px">
-        <VaCardTitle>Global Setting</VaCardTitle>
-        <VaInput
-          v-model="newAssignmentDetails.name"
-          label="Name"
-          :rules="[validators.required2('name'), validators.maxLength(50)]"
-        />
+      <VaForm ref="form" class="flex flex-col gap-4 mx-auto" style="max-width: 900px">
+        <VaCardTitle>Create Assignment</VaCardTitle>
+        <VaInput v-model="newAssignment.name" label="Name" :rules="[validators.required, validators.maxLength(50)]" />
         <VueDatePicker
           v-model="date"
+          label="Time To Do"
           range
           model-auto
           :action-row="{ showNow: true }"
@@ -222,8 +238,18 @@ onMounted(() => {
           :month-change-on-arrows="true"
           placeholder="Start choosing or typing date and time"
         />
-        <VaSwitch v-model="newAssignmentDetails.canViewResult" size="small" label="Can View Result" />
-        <VaSwitch v-model="newAssignmentDetails.requireLoginToSubmit" size="small" label="Require Login to Submit" />
+        <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
+        <VaInput v-model="newAssignment.content" label="Content" />
+        <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
+        <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
+        <VaSelect
+          v-model="newAssignment.subjectId"
+          value-by="value"
+          :options="subjectsOptions"
+          label="Subject"
+          clearable
+          :rules="[(v) => (v ? true : 'Please select a subject.')]"
+        />
         <VaLayout>
           <template #left>
             <VaSidebar v-model="showSidebar">
@@ -345,10 +371,9 @@ onMounted(() => {
             </VaLayout>
           </template>
         </VaLayout>
-
-        <div class="flex flex-col-reverse sm:flex-row mt-4 gap-2 justify-end">
-          <VaButton preset="secondary" color="secondary" @click="goBack()">Cancel</VaButton>
-          <VaButton type="submit" @click="handleClickUpdate">Save</VaButton>
+        <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
+          <VaButton preset="secondary" color="secondary" @click="goBack">Cancel</VaButton>
+          <VaButton type="submit" @click="handleClickSave()">Save</VaButton>
         </div>
       </VaForm>
     </template>
