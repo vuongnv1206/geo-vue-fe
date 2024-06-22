@@ -1,6 +1,6 @@
 <template v-for="assClass in props.assignmentsByClass" :key="assClass.id" :loading="props.loading">
   <VaCard>
-    <VaCardContent>Recommend</VaCardContent>
+    <VaCardContent class="font-bold">Recommend</VaCardContent>
     <VaList class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <template v-for="assignment in recentAssignments" :key="assignment.id">
         <VaListItem
@@ -27,7 +27,7 @@
     </VaList>
   </VaCard>
   <VaCard>
-    <VaCardContent>All</VaCardContent>
+    <VaCardContent class="font-bold">All</VaCardContent>
     <VaCard class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <template v-for="assClass in props.assignmentsByClass" :key="assClass.id">
         <VaCard v-if="assClass.assignments.length > 0" class="border p-4 rounded">

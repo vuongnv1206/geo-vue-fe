@@ -242,11 +242,11 @@ onMounted(() => {
               v-for="groupClass in listGroupClass"
               :key="groupClass.id"
               :header="groupClass.name"
-              solids
-              class="py-1"
+              solid
+              class="py-1 font-bold"
             >
               <template #header="{ value, attrs, iconAttrs, text }">
-                <VaCard v-bind="attrs" class="w-full flex border-2 p-2">
+                <VaCard v-bind="attrs" class="w-full flex border-2 p-2 items-center">
                   <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" />
                   <VaCard class="flex justify-between items-center w-full">
                     <VaCard> {{ text }} </VaCard>
