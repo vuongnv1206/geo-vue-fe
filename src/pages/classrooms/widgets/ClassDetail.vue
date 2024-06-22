@@ -17,37 +17,34 @@ const exportStudentList = () => {}
   <div class="main-container">
     <div class="sidebar-container">
       <VaSidebar class="sidebar">
-        <VaAccordion>
-          <VaSidebarItem
-            :active="activeElement === 'List Students'"
-            class="sidebar-item"
-            @click="activeElement = 'List Students'"
-          >
-            <VaSidebarItemContent>
-              <VaIcon name="groups" />
-              <VaSidebarItemTitle>List Students</VaSidebarItemTitle>
-            </VaSidebarItemContent>
-          </VaSidebarItem>
+        <VaSidebarItem
+          :active="activeElement === 'List Students'"
+          class="sidebar-item"
+          @click="activeElement = 'List Students'"
+        >
+          <VaSidebarItemContent>
+            <VaIcon name="groups" />
+            <VaSidebarItemTitle>List Students</VaSidebarItemTitle>
+          </VaSidebarItemContent>
+        </VaSidebarItem>
 
-          <VaSidebarItem
-            :active="activeElement === 'Assignments/Tests'"
-            class="sidebar-item"
-            @click="activeElement = 'Assignments/Tests'"
-          >
-            <VaSidebarItemContent>
-              <VaIcon name="assignment_add" />
-              <VaSidebarItemTitle>Assignments/Tests</VaSidebarItemTitle>
-            </VaSidebarItemContent>
-          </VaSidebarItem>
+        <VaSidebarItem
+          :active="activeElement === 'Assignments/Tests'"
+          class="sidebar-item"
+          @click="activeElement = 'Assignments/Tests'"
+        >
+          <VaSidebarItemContent>
+            <VaIcon name="assignment_add" />
+            <VaSidebarItemTitle>Assignments/Tests</VaSidebarItemTitle>
+          </VaSidebarItemContent>
+        </VaSidebarItem>
 
-          <VaSidebarItem :active="activeElement === 'News'" class="sidebar-item" @click="activeElement = 'News'">
-            <VaSidebarItemContent>
-              <VaIcon name="receipt_long" />
-              <VaSidebarItemTitle>News</VaSidebarItemTitle>
-            </VaSidebarItemContent>
-          </VaSidebarItem>
-        </VaAccordion>
-
+        <VaSidebarItem :active="activeElement === 'News'" class="sidebar-item" @click="activeElement = 'News'">
+          <VaSidebarItemContent>
+            <VaIcon name="receipt_long" />
+            <VaSidebarItemTitle>News</VaSidebarItemTitle>
+          </VaSidebarItemContent>
+        </VaSidebarItem>
         <VaSpacer />
       </VaSidebar>
     </div>

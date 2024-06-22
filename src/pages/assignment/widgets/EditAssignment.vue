@@ -100,10 +100,6 @@ const getSubjects = async () => {
   }
 }
 
-const subjectsOptions = computed(() => {
-  return subjects.value.map((subject) => ({ text: subject.name, value: subject.id }))
-})
-
 const showAllClassesForAllDepartments = () => {
   selectedDepartment.value = null
 }
@@ -229,7 +225,7 @@ onMounted(() => {
         <VaSelect
           v-model="newAssignment.subjectId"
           value-by="value"
-          :options="subjectsOptions"
+          :options="subjects.map((subject) => ({ text: subject.name, value: subject.id }))"
           label="Subject"
           clearable
           :rules="[(v) => (v ? true : 'Please select a subject.')]"
