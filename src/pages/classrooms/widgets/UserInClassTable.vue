@@ -126,14 +126,6 @@ const sampleData = ref<UserInClass[]>([
     email: 'alex@example.com',
     phoneNumber: '555-123-4567',
   },
-  {
-    userId: '00000000-0000-0000-0000-000000000000',
-    classesId: '00000000-0000-0000-0000-000000000000',
-    studentCode: 'S007',
-    isGender: true,
-    email: 'alex@example.com',
-    phoneNumber: '555-123-4567',
-  },
 ])
 
 const columns = defineVaDataTableColumns([
@@ -151,45 +143,43 @@ const handleSelectionChange = (selectedItems: UserInClass[]) => {
 </script>
 
 <template>
-  <div>
-    <VaDataTable
-      hoverable
-      clickable
-      selectable
-      :columns="columns"
-      select-mode="multiple"
-      :items="sampleData"
-      :disable-client-side-sorting="false"
-      @selectionChange="handleSelectionChange($event.currentSelectedItems)"
-    >
-      <template #cell(studentCode)="{ rowData }">
-        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-          <div>{{ rowData.studentCode }}</div>
-        </div>
-      </template>
-      <template #cell(isGender)="{ rowData }">
-        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-          <div>{{ rowData.isGender }}</div>
-        </div>
-      </template>
-      <template #cell(email)="{ rowData }">
-        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-          <div>{{ rowData.email }}</div>
-        </div>
-      </template>
-      <template #cell(phoneNumber)="{ rowData }">
-        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-          <div>{{ rowData.phoneNumber }}</div>
-        </div>
-      </template>
-      <template #cell(actions)="">
-        <div class="flex gap-2 justify-end">
-          <VaButton preset="primary" size="small" color="primary" icon="mso-edit" aria-label="Edit" />
-          <VaButton preset="primary" size="small" icon="mso-delete" color="danger" aria-label="Delete" />
-        </div>
-      </template>
-    </VaDataTable>
-  </div>
+  <VaDataTable
+    hoverable
+    clickable
+    selectable
+    :columns="columns"
+    select-mode="multiple"
+    :items="sampleData"
+    :disable-client-side-sorting="false"
+    @selectionChange="handleSelectionChange($event.currentSelectedItems)"
+  >
+    <template #cell(studentCode)="{ rowData }">
+      <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+        <div>{{ rowData.studentCode }}</div>
+      </div>
+    </template>
+    <template #cell(isGender)="{ rowData }">
+      <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+        <div>{{ rowData.isGender }}</div>
+      </div>
+    </template>
+    <template #cell(email)="{ rowData }">
+      <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+        <div>{{ rowData.email }}</div>
+      </div>
+    </template>
+    <template #cell(phoneNumber)="{ rowData }">
+      <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+        <div>{{ rowData.phoneNumber }}</div>
+      </div>
+    </template>
+    <template #cell(actions)="">
+      <div class="flex gap-2 justify-end">
+        <VaButton preset="primary" size="small" color="primary" icon="mso-edit" aria-label="Edit" />
+        <VaButton preset="primary" size="small" icon="mso-delete" color="danger" aria-label="Delete" />
+      </div>
+    </template>
+  </VaDataTable>
 </template>
 
 <style lang="scss" scoped>

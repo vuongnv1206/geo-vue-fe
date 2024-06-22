@@ -35,7 +35,9 @@
             <span class="font-semibold">{{ assClass.name }}</span>
             <VaChip v-if="currentUserId != assClass.ownerId" outline class="ml-2" size="small"> Share </VaChip>
             <div class="flex items-center space-x-2 ml-auto">
-              <VaButton preset="plain" size="small">Show All</VaButton>
+              <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: assClass.id } }"
+                >Show All</VaButton
+              >
             </div>
           </div>
           <VaDivider />
@@ -93,7 +95,7 @@ const recentAssignments = computed(() => {
   const allAssignmentsWithClassId = props.assignmentsByClass.flatMap((assClass) =>
     assClass.assignments.map((assignment) => ({
       ...assignment,
-      classId: assClass.id, // Attach class ID to each assignment
+      classId: assClass.id,
       className: assClass.name,
     })),
   )

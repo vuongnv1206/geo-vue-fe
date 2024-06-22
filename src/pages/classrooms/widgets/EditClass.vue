@@ -2,6 +2,9 @@
 import { computed, ref, watch, onMounted } from 'vue'
 import { Classrooms, EmptyClassrooms, GroupClass } from '../type'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
+import { validators } from '@/services/utils'
+import { VaSelect } from 'vuestic-ui/web-components'
+
 const props = defineProps<{
   classrooms: Classrooms | null
   saveButtonLabel: string
@@ -36,6 +39,12 @@ const isFormHasUnsavedChanges = computed(() => {
 defineExpose({
   isFormHasUnsavedChanges,
 })
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+})
 
 const loading = ref(true)
 const store = useGroupClassStore()
@@ -43,9 +52,9 @@ const groupClasses = ref<GroupClass[]>([])
 function getGroupClasses() {
   loading.value = true
   store
-    .getGroupClass()
-    .then((res) => {
-      groupClasses.value = res
+    .getGroupClasses(dataFilter)
+    .then((response) => {
+      groupClasses.value = response.data
     })
     .finally(() => {
       loading.value = false
@@ -68,7 +77,6 @@ watch(
     immediate: true,
   },
 )
-
 onMounted(() => {
   getGroupClasses()
 })
@@ -76,79 +84,34 @@ onMounted(() => {
 
 <template>
   <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
-    <VaInput v-model="newClass.name" label="Class name" :rules="[(v) => v.length > 0 || `Class name is required`]" />
+    <VaInput
+      v-model="newClass.name"
+      label="Class name"
+      :rules="[validators.required2('name'), validators.maxLength(50)]"
+    />
     <VaInput
       v-model="newClass.schoolYear"
       label="School Year"
-      :rules="[(v) => v.length > 0 || `School year is required`]"
+      :rules="[
+        validators.required2('school year'),
+        validators.minValue(new Date().getFullYear()),
+        validators.maxValue(new Date().getFullYear() + 10),
+      ]"
     />
-    <div class="radio-group">
-      <div class="font">
-        <span>CHOICE THE GROUPCLASS</span>
-      </div>
-      <div class="radio-buttons">
-        <div v-for="gc in groupClasses" :key="gc.id" class="radio-item">
-          <input id="gc-{{ gc.id }}" v-model="newClass.groupClassId" type="radio" :value="gc.id" />
-          <label :for="'gc-' + gc.id">{{ gc.name }}</label>
-        </div>
-      </div>
-    </div>
-    <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
+    <VaSelect
+      v-model="newClass.groupClassId"
+      value-by="value"
+      :options="groupClasses.map((gc) => ({ text: gc.name, value: gc.id }))"
+      label="Group Class"
+      placeholder="Select a group class"
+      class="w-full"
+      clearable
+    />
+    <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
       <VaButton @click="validate() && $emit('save', newClass as Classrooms)">{{ saveButtonLabel }}</VaButton>
-    </div>
+    </VaCard>
   </VaForm>
 </template>
 
-<style lang="scss" scoped>
-.radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  margin-top: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.25rem;
-}
-
-.radio-group .font {
-  margin-bottom: 0.5rem;
-  font-size: 10px;
-  font-weight: bold;
-  color: var(--va-primary);
-}
-
-.radio-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  max-height: 120px;
-  overflow-y: auto;
-}
-
-.radio-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: calc(50% - 1rem); /* Adjust width for two items per line, accounting for gap */
-}
-
-.radio-item input[type='radio'] {
-  width: 20px;
-  height: 20px;
-  accent-color: #007bff;
-}
-
-.radio-item label {
-  font-size: 1rem;
-  color: #333;
-}
-
-.va-select-content__autocomplete {
-  flex: 1;
-}
-
-.va-input-wrapper__text {
-  gap: 0.2rem;
-}
-</style>
+<style lang="scss" scoped></style>
