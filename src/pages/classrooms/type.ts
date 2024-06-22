@@ -60,6 +60,7 @@ export type UserInClass = {
   email: string
   phoneNumber: string
 }
+
 export type News = {
   id: string
   classesId: string

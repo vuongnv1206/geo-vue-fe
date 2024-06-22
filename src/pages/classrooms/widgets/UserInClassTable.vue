@@ -126,14 +126,6 @@ const sampleData = ref<UserInClass[]>([
     email: 'alex@example.com',
     phoneNumber: '555-123-4567',
   },
-  {
-    userId: '00000000-0000-0000-0000-000000000000',
-    classesId: '00000000-0000-0000-0000-000000000000',
-    studentCode: 'S007',
-    isGender: true,
-    email: 'alex@example.com',
-    phoneNumber: '555-123-4567',
-  },
 ])
 
 const columns = defineVaDataTableColumns([

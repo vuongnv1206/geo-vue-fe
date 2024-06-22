@@ -22,6 +22,8 @@ const { init: notify } = useToast()
 const stores = useAssignmentStore()
 const assignmentDetails = ref<AssignmentDetails | null>(null)
 const assignmentId = router.currentRoute.value.params.id.toString()
+const classId = router.currentRoute.value.params.classId.toString()
+
 const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id
@@ -59,6 +61,8 @@ const getAssignment = (id: string) => {
         requireLoginToSubmit: response.requireLoginToSubmit,
         classIds: response.classIds,
       }
+      console.log('Assignment Details: ', assignmentDetails.value)
+      console.log('New Assignment Details: ', newAssignmentDetails.value)
     })
     .catch((error) => {
       notify({
@@ -160,13 +164,9 @@ const goBack = async () => {
       message: 'You have unsaved changes. Are you sure you want to discard them?',
       size: 'small',
     })
-    if (agreed) {
-      router.push({ name: 'assignment-details', params: { id: assignmentId } })
-    } else {
-      return
-    }
+    if (!agreed) return
   }
-  router.push({ name: 'assignment-details', params: { id: assignmentId } })
+  router.push({ name: 'assignment-details', params: { id: assignmentId, classId: classId } })
 }
 
 const dateInputFormat = {

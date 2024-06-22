@@ -16,6 +16,7 @@ import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { Attachment, EmptyAssignment } from '../types'
 
 dayjs.extend(utc)
+
 const { init: notify } = useToast()
 const { confirm } = useModal()
 const router = useRouter()
@@ -58,25 +59,18 @@ const isFormHasUnsavedChanges = computed(() => {
 })
 
 const goBack = async () => {
-  console.log('Unsaved changes: ', isFormHasUnsavedChanges.value)
   if (isFormHasUnsavedChanges.value) {
     const agreed = await confirm({
       maxWidth: '380px',
       message: 'You have unsaved changes. Are you sure you want to discard them?',
       size: 'small',
     })
-    if (agreed) {
-      router.push({ name: 'assignments' })
-    } else {
-      return
-    }
+    if (!agreed) return
   }
   router.push({ name: 'assignments' })
 }
 
-defineExpose({
-  isFormHasUnsavedChanges,
-})
+defineExpose({ isFormHasUnsavedChanges })
 
 const dataFilter = ref({
   advancedSearch: {
@@ -92,13 +86,11 @@ const getGroupClass = async () => {
   try {
     const response = await classStore.getGroupClasses(dataFilter.value)
     groupClasses.value = response.data
-    console.log('Group Classes: ', groupClasses.value)
   } catch (error) {
     console.error('Error fetching subjects:', error)
   }
 }
 
-// Fetch subjects from the store
 const getSubjects = async () => {
   try {
     const response = await subjectStore.getSubjects(dataFilter.value)
@@ -108,29 +100,23 @@ const getSubjects = async () => {
   }
 }
 
-// Computed property to format subjects for select options
 const subjectsOptions = computed(() => {
   return subjects.value.map((subject) => ({ text: subject.name, value: subject.id }))
 })
 
 const showAllClassesForAllDepartments = () => {
   selectedDepartment.value = null
-  // selectedClasses.value = []
 }
 
-// Select all classes in a department
 const selectAllClasses = (department: GroupClass) => {
   const selectedClassIds = selectedClasses.value
 
-  // Kiểm tra xem tất cả các lớp trong phòng ban đã được chọn chưa
   const allClassesSelected = department.classes.every((cls) => selectedClassIds.includes(cls.id))
 
   if (allClassesSelected) {
-    // Nếu tất cả các lớp đã được chọn, hãy bỏ chọn chúng
     selectedClasses.value = selectedClassIds.filter((id) => !department.classes.some((cls) => cls.id === id))
     selectedClassesByDepartmentState.value[department.id] = false
   } else {
-    // Nếu không, hãy thêm tất cả các lớp vào danh sách chọn
     const newClassIds = department.classes.map((cls) => cls.id)
     selectedClasses.value = [...new Set([...selectedClassIds, ...newClassIds])]
     selectedClassesByDepartmentState.value[department.id] = true
@@ -139,10 +125,8 @@ const selectAllClasses = (department: GroupClass) => {
 
 const showDepartmentClasses = (groupClass: GroupClass) => {
   selectedDepartment.value = groupClass
-  // selectedClasses.value = []
 }
 
-// Select all classes across all departments
 const selectAllClassesForAllDepartments = () => {
   if (selectAllClassesState.value) {
     selectedClasses.value = []
@@ -195,7 +179,7 @@ const handleAttachment = async () => {
 const handleClickSave = async () => {
   if (validate()) {
     handleDatePicker()
-    handleAttachment()
+    await handleAttachment()
     try {
       newAssignment.value.classIds = selectedClasses.value
       await assignmentStore.createAssignment(newAssignment.value as EmptyAssignment)

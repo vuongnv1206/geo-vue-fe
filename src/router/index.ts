@@ -113,7 +113,7 @@ const routes: Array<RouteRecordRaw> = [
           {
             name: 'class-details',
             path: ':id',
-            component: () => import('../pages/classrooms/ClassDetail.vue'),
+            component: () => import('../pages/classrooms/widgets/ClassDetail.vue'),
           },
           {
             name: 'news',
@@ -139,12 +139,12 @@ const routes: Array<RouteRecordRaw> = [
           },
           {
             name: 'assignment-details',
-            path: ':id',
+            path: ':id/:classId',
             component: () => import('../pages/assignment/widgets/AssignmentDetails.vue'),
           },
           {
             name: 'edit-assignment-details',
-            path: '/assignments/:id/edit',
+            path: '/assignments/:id/:classId',
             component: () => import('../pages/assignment/widgets/EditAssignmentDetails.vue'),
           },
         ],

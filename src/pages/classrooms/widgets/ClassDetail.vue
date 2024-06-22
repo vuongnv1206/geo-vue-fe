@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { UserInClass } from './type'
-import UserInClassTable from './widgets/UserInClassTable.vue'
-import News from './News.vue'
+import { UserInClass } from '@pages/classrooms/type'
+import UserInClassTable from '@pages/classrooms/widgets/UserInClassTable.vue'
+import News from '@pages/classrooms/News.vue'
 
 const activeElement = ref('List Students')
 const listUserInClass = ref<UserInClass[]>([])
