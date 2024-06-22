@@ -3,7 +3,7 @@ import { onMounted, ref, PropType } from 'vue'
 import { Classrooms, GroupClass } from './type'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { useModal, useToast } from 'vuestic-ui'
+import { useModal, useToast, VaCard } from 'vuestic-ui'
 import EditClass from './widgets/EditClass.vue'
 import EditGroupClass from './widgets/EditGroupClass.vue'
 
@@ -226,7 +226,6 @@ onMounted(() => {
           </VaInput>
         </VaCard>
       </VaCard>
-
       <VaCard class="flex justify-end items-center">
         <VaCard class="flex gap-2">
           <VaButton icon="add" @click="createNewGroupClass()">Group Class</VaButton>
@@ -239,20 +238,27 @@ onMounted(() => {
       <VaCard v-if="listGroupClass.length > 0" style="margin-top: 20px">
         <VaScrollContainer vertical>
           <VaAccordion class="max-W-sm" multiple>
-            <VaCollapse v-for="groupClass in listGroupClass" :key="groupClass.id" :header="groupClass.name">
-              <template #content>
-                <VaMenu
-                  :options="[
-                    { text: 'Edit', value: groupClass.id, icon: 'edit' },
-                    { text: 'Delete', value: groupClass.id, icon: 'delete' },
-                  ]"
-                  @selected="(v) => handleMenuGroupClassClick(v)"
-                >
-                </VaMenu>
-              </template>
-              <template #anchor>
-                <div @click.stop>
-                  <span class="material-symbols-outlined">more_horiz</span>
+            <VaCollapse v-for="groupClass in listGroupClass" :key="groupClass.id" :header="groupClass.name" solid>
+              <template #header="{ value, attrs, iconAttrs, text }">
+                <div v-bind="attrs" class="w-full flex border-2 p-2">
+                  <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" />
+
+                  <VaCard class="flex justify-between items-center w-full">
+                    <VaCard> {{ text }} </VaCard>
+                    <VaMenu
+                      :options="[
+                        { text: 'Edit', value: groupClass.id, icon: 'edit' },
+                        { text: 'Delete', value: groupClass.id, icon: 'delete' },
+                      ]"
+                      @selected="(v) => handleMenuGroupClassClick(v)"
+                    >
+                      <template #anchor>
+                        <VaCard class="cursor-pointer text-gray-500 hover:text-gray-700" @click.stop>
+                          <span class="material-symbols-outlined">more_horiz</span>
+                        </VaCard>
+                      </template>
+                    </VaMenu>
+                  </VaCard>
                 </div>
               </template>
               <VaCard class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
