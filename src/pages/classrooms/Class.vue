@@ -235,12 +235,12 @@ onMounted(() => {
     </VaCard>
 
     <VaCard>
-      <VaCard v-if="listGroupClass.length > 0" style="margin-top: 20px">
+      <VaCard v-if="listGroupClass.length > 0" class="mt-5 p-2">
         <VaScrollContainer vertical>
           <VaAccordion class="max-W-sm" multiple>
             <VaCollapse v-for="groupClass in listGroupClass" :key="groupClass.id" :header="groupClass.name" solid>
               <template #header="{ value, attrs, iconAttrs, text }">
-                <div v-bind="attrs" class="w-full flex border-2 p-2">
+                <VaCard v-bind="attrs" class="w-full flex border-2 p-2">
                   <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" />
 
                   <VaCard class="flex justify-between items-center w-full">
@@ -259,7 +259,7 @@ onMounted(() => {
                       </template>
                     </VaMenu>
                   </VaCard>
-                </div>
+                </VaCard>
               </template>
               <VaCard class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <VaCard v-for="classItem in groupClass.classes" :key="classItem.id">

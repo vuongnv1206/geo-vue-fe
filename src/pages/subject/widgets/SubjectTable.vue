@@ -59,53 +59,51 @@ const handleSelectionChange = (selectedItems: Subject[]) => {
 </script>
 
 <template>
-  <div>
-    <VaDataTable
-      hoverable
-      clickable
-      selectable
-      :columns="columns"
-      select-mode="multiple"
-      :items="props.subjects"
-      :disable-client-side-sorting="false"
-      @row:dblclick="dblclick($event)"
-      @row:contextmenu="contextmenu($event)"
-      @selectionChange="handleSelectionChange($event.currentSelectedItems)"
-    >
-      <template #cell(name)="{ rowData }">
-        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-          <div>
-            <span>{{ rowData.name }}</span>
-          </div>
+  <VaDataTable
+    hoverable
+    clickable
+    selectable
+    :columns="columns"
+    select-mode="multiple"
+    :items="props.subjects"
+    :disable-client-side-sorting="false"
+    @row:dblclick="dblclick($event)"
+    @row:contextmenu="contextmenu($event)"
+    @selectionChange="handleSelectionChange($event.currentSelectedItems)"
+  >
+    <template #cell(name)="{ rowData }">
+      <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+        <div>
+          <span>{{ rowData.name }}</span>
         </div>
-      </template>
-      <template #cell(description)="{ rowData }">
-        <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
-          <div>{{ rowData.description }}</div>
-        </div>
-      </template>
-      <template #cell(actions)="{ rowData: subject }">
-        <div class="flex gap-2 justify-end">
-          <VaButton
-            preset="primary"
-            size="small"
-            color="primary"
-            icon="mso-edit"
-            aria-label="Edit subject"
-            @click="emit('edit', subject as Subject)"
-          />
-          <VaButton
-            preset="primary"
-            size="small"
-            icon="mso-delete"
-            color="danger"
-            aria-label="Delete subject"
-            @click="emit('delete', subject as Subject)"
-          />
-        </div>
-      </template>
-    </VaDataTable>
-  </div>
+      </div>
+    </template>
+    <template #cell(description)="{ rowData }">
+      <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+        <div>{{ rowData.description }}</div>
+      </div>
+    </template>
+    <template #cell(actions)="{ rowData: subject }">
+      <div class="flex gap-2 justify-end">
+        <VaButton
+          preset="primary"
+          size="small"
+          color="primary"
+          icon="mso-edit"
+          aria-label="Edit subject"
+          @click="emit('edit', subject as Subject)"
+        />
+        <VaButton
+          preset="primary"
+          size="small"
+          icon="mso-delete"
+          color="danger"
+          aria-label="Delete subject"
+          @click="emit('delete', subject as Subject)"
+        />
+      </div>
+    </template>
+  </VaDataTable>
 </template>
 
 <style lang="scss" scoped>
