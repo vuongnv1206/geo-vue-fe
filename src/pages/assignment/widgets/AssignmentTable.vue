@@ -10,7 +10,7 @@
           <VaCard class="border rounded-lg p-3 hover:scale-105 transition-transform duration-200 w-full">
             <div class="flex items-center">
               <VaListItemSection avatar>
-                <VaIcon name="book" size="3rem" />
+                <VaIcon name="description" size="3rem" />
               </VaListItemSection>
               <VaListItemSection>
                 <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
@@ -51,7 +51,7 @@
                   class="flex items-center border rounded-lg p-3 w-full hover:scale-105 transition-transform duration-200"
                 >
                   <VaListItemSection avatar>
-                    <VaIcon name="book" size="3rem" />
+                    <VaIcon name="description" size="3rem" />
                   </VaListItemSection>
                   <VaListItemSection>
                     <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
