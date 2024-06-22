@@ -23,13 +23,6 @@ const getPaperDetail = () => {
     .paperDetail(paperId.toString())
     .then((res) => {
       paperDetail.value = res
-      if (res.paperAccess !== undefined) {
-        res.paperAccess.forEach((item: PaperAccess) => {
-          if (item.classId !== undefined) {
-            checkedPermissionsClassAccess.value.push(item.classId)
-          }
-        })
-      }
     })
     .catch((error) => {
       notify({
@@ -67,9 +60,11 @@ const editPaper = ref<UpdatePaperRequest>({
   type: 0,
   isPublish: false,
   description: '',
-  paperAccess: undefined,
+  paperAccesses: undefined,
   shareType: 1,
 })
+
+const valueOption = ref<AccessType>(AccessType.Everyone)
 
 watch(
   () => paperDetail.value,
@@ -90,8 +85,17 @@ watch(
         type: parseInt(paperDetail.value.type ?? '0'), // Assuming type needs to be converted to a number
         isPublish: paperDetail.value.isPublish ?? false,
         description: paperDetail.value.description ?? '',
-        paperAccess: paperDetail.value.paperAccess,
+        paperAccesses: paperDetail.value.paperAccesses,
         shareType: paperDetail.value.shareType,
+      }
+
+      valueOption.value = paperDetail.value.shareType as AccessType
+      if (paperDetail.value.paperAccesses !== undefined) {
+        paperDetail.value.paperAccesses.forEach((item: PaperAccess) => {
+          if (item.classId !== undefined) {
+            checkedPermissionsClassAccess.value.push(item.classId)
+          }
+        })
       }
     }
   },
@@ -99,8 +103,6 @@ watch(
 )
 
 const valueSwitch = ref(true)
-
-const valueOption = ref<AccessType>(AccessType.Everyone)
 
 const accessOptions = [
   { value: AccessType.Everyone, text: 'Everyone' },

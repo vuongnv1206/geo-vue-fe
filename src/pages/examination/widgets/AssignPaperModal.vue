@@ -5,10 +5,15 @@ import { GroupClass } from '@/pages/classrooms/type'
 import { useClassStore } from '@/stores/modules/class.module'
 import { Classrooms } from '../../classrooms/type'
 import { useToast } from 'vuestic-ui'
+import { AccessType, PaperAccess, PaperDto } from '../types'
 
 const props = defineProps({
   currentAssigned: {
-    type: Object as PropType<string>,
+    type: Object as PropType<AccessType>,
+    default: null,
+  },
+  paper: {
+    type: Object as PropType<PaperDto | null>,
     default: null,
   },
 })
@@ -18,7 +23,7 @@ const { init: notify } = useToast()
 const groupClassStores = useGroupClassStore()
 const classStores = useClassStore()
 
-const valueOption = ref('')
+const valueOption = ref<AccessType>()
 const emit = defineEmits(['close', 'save'])
 
 const groupClasses = ref<GroupClass[] | null>(null)
@@ -31,23 +36,15 @@ const getGroupClasses = async () => {
     console.error(error)
   }
 }
-
+const checkedPermissionsClassAccess = ref<string[]>([])
 const classRoomsInGroup = ref<Classrooms[]>([])
 const selectedGroupClass = ref<string>('')
-const dataFilter = {
-  keyword: '',
-  pageNumber: 0,
-  pageSize: 100,
-  orderBy: ['id'],
-  groupClassId: '',
-}
 
 const getClassByGroupClass = (groupId: string) => {
-  dataFilter.groupClassId = groupId
   classStores
-    .getClassSearch(dataFilter)
+    .getClassroomByGroupClassId(groupId)
     .then((res) => {
-      classRoomsInGroup.value = res.data
+      classRoomsInGroup.value = res
       selectedGroupClass.value = groupId
     })
     .catch((error) => {
@@ -64,6 +61,13 @@ watch(
     if (props.currentAssigned) {
       valueOption.value = props.currentAssigned
     }
+    if (props.paper?.paperAccesses !== undefined) {
+      props.paper.paperAccesses.forEach((item: PaperAccess) => {
+        if (item.classId !== undefined) {
+          checkedPermissionsClassAccess.value.push(item.classId)
+        }
+      })
+    }
   },
   { immediate: true },
 )
@@ -71,6 +75,12 @@ watch(
 const onSave = () => {
   emit('save', valueOption.value)
 }
+
+const accessOptions = [
+  { value: AccessType.Everyone, text: 'Everyone' },
+  { value: AccessType.ByClass, text: 'By Class' },
+  { value: AccessType.ByStudent, text: 'By Student' },
+]
 
 onMounted(() => {
   getGroupClasses()
@@ -80,9 +90,9 @@ onMounted(() => {
 <template>
   <VaCard class="p-0">
     <b class="pr-3 text-xs"> Who is allowed to take the exam </b>
-    <VaRadio v-model="valueOption" :options="['Everyone', 'By Class', 'By Student']" class="assign-radio mb-2" />
+    <VaRadio v-model="valueOption" :options="accessOptions" value-by="value" class="assign-radio mb-2" />
     <div
-      v-if="valueOption == 'By Class' && groupClasses !== null"
+      v-if="valueOption == AccessType.ByClass && groupClasses !== null"
       class="grid grid-cols-1 md:grid-cols-3 gap-2 items-start"
     >
       <VaCard outlined class="border-style col-span-1">
@@ -114,11 +124,11 @@ onMounted(() => {
         </div>
         <VaDivider class="m-0" />
         <VaCardContent class="grid grid-cols-3">
-          <VaCheckbox
-            v-for="classroom in classRoomsInGroup"
-            :key="classroom.id"
-            class="mr-2 mb-2"
-            :label="classroom.name"
+          <VaOptionList
+            v-model="checkedPermissionsClassAccess"
+            :options="classRoomsInGroup"
+            :text-by="(op: Classrooms) => op.name"
+            value-by="id"
           />
         </VaCardContent>
       </VaCard>

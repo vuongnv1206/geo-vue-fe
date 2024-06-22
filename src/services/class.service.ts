@@ -83,9 +83,9 @@ class ClassService {
       })
   }
 
-  async getUserInClass(id: string): Promise<Classrooms> {
+  async getUserInClass(id: string): Promise<any> {
     return apiService
-      .get(`/v1/class/getall-user-in-class/${id}`)
+      .get(`/v1/class/getall-user-in-class?classId=${id}`)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -148,6 +148,17 @@ class ClassService {
   async RemoveAssignmentFromClass(data: AssignmentToClassRequest): Promise<any> {
     return apiService
       .post(`v1/class/remove-assignment-from-class`, data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async GetClassById(id: string): Promise<Classrooms> {
+    return apiService
+      .get(`v1/class/${id}`)
       .then((response) => {
         return Promise.resolve(response.data)
       })
