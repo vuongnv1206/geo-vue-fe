@@ -115,14 +115,6 @@ const routes: Array<RouteRecordRaw> = [
             path: ':id',
             component: () => import('../pages/classrooms/widgets/ClassDetail.vue'),
           },
-          {
-            name: 'news',
-            path: 'news',
-            meta: {
-              requiresAuth: true,
-            },
-            component: () => import('../pages/classrooms/News.vue'),
-          },
         ],
       },
       {
