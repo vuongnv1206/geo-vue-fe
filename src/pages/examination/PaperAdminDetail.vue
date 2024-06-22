@@ -3,32 +3,65 @@ import { ref, onMounted } from 'vue'
 import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto, SubmitPaperDto } from './types'
+import { PaperDto, SubmitPaperDto, AccessType, PaperAccess } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
+import { Classrooms, GroupClass } from '@/pages/classrooms/type'
+import { useGroupClassStore } from '@/stores/modules/groupclass.module'
+import { useClassStore } from '../../stores/modules/class.module'
 
 const route = useRoute()
 const router = useRouter()
 const paperStore = usePaperStore()
 const { init: notify } = useToast()
 const { confirm } = useModal()
-
 const paperDetail = ref<PaperDto | null>(null)
 
-const paperId = route.params.id
-const getPaperDetail = () => {
-  paperStore
-    .paperDetail(paperId.toString())
-    .then((res) => {
-      paperDetail.value = res
-      console.log(res)
+const valueClassInGroupTap = ref<string>(' ')
+
+const paperId = route.params.id as string
+const getPaperDetail = async () => {
+  try {
+    const res = await paperStore.paperDetail(paperId)
+    paperDetail.value = res
+    assignedOptionValue.value = paperDetail.value.shareType
+    if (paperDetail.value.shareType === AccessType.ByClass) {
+      await getGroupClasses()
+      await groupTabFilter()
+    } else if (paperDetail.value.shareType === AccessType.Everyone) {
+      const allSubmit = (await getSubmittedStudents()) || null
+      submittedStudents.value = allSubmit
+    }
+  } catch (error) {
+    notify({
+      message: `Not Found ${error}`,
+      color: 'danger',
     })
-    .catch((error) => {
-      notify({
-        message: `Not Found ${error}`,
-        color: 'danger',
-      })
-    })
+  }
+}
+
+const groupClasses = ref<GroupClass[]>([])
+const groupClassStores = useGroupClassStore()
+const getGroupClasses = async () => {
+  try {
+    const res = await groupClassStores.getGroupClass()
+    if (paperDetail.value?.paperAccesses) {
+      paperDetail.value.paperAccesses
+        .filter((element) => element.classId !== null)
+        .forEach((element) => {
+          res.forEach((groupClass) => {
+            if (groupClass.classes.some((x) => x.id === element.classId)) {
+              if (!groupClasses.value.some((existingGroupClass) => existingGroupClass.id === groupClass.id)) {
+                groupClasses.value.push(groupClass)
+              }
+            }
+          })
+        })
+      await selectClassInGroup(groupClasses.value[0].classes[0].id)
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 const formatDate = (isoString: string | undefined, localization: string) => {
@@ -37,22 +70,26 @@ const formatDate = (isoString: string | undefined, localization: string) => {
   return new Intl.DateTimeFormat(localization, { dateStyle: 'long' }).format(date)
 }
 
-const showSidebar = ref(false)
+const showSidebar = ref(true)
 const valueCollapses = ref([])
-const collapses = ref([
-  { title: 'First collapse', content: '12A9' },
-  { title: 'Second collapse', content: 'SE1644222222' },
-  { title: 'Third collapse', content: 'asdasd asda123' },
-])
-
-const valueTap = ref(0)
 
 const showModalDetail = ref(false)
 const showAssignPaperModal = ref(false)
-const assignedOptionValue = ref('Everyone')
+const assignedOptionValue = ref<AccessType>()
 
-const Clicked = () => {
-  alert('ookokoko')
+const groupTabFilter = async () => {
+  try {
+    const studentsInClass = await classStore.getUserInClass(valueClassInGroupTap.value)
+
+    if (submittedStudents.value) {
+      const allSubmit = await getSubmittedStudents()
+      if (allSubmit !== undefined) {
+        submittedStudents.value = allSubmit.filter((submitPaper) => studentsInClass.includes(submitPaper.createdBy))
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 const deletePaper = async () => {
@@ -64,7 +101,7 @@ const deletePaper = async () => {
   })
 
   if (result && paperDetail.value !== null) {
-    paperStore
+    await paperStore
       .deletePaper(paperDetail.value.id)
       .then(() => {
         notify({
@@ -86,10 +123,13 @@ const paperConfigAction = () => {
   router.push({ name: 'paper-config', params: { id: route.params.id } })
 }
 
-const handleSaveAssigned = (selectedOption: string) => {
-  console.log(selectedOption)
+const handleSaveAssigned = async (selectedOption: AccessType) => {
   assignedOptionValue.value = selectedOption
   showAssignPaperModal.value = false
+  if (assignedOptionValue.value === AccessType.ByClass) {
+    await getGroupClasses()
+    await groupTabFilter()
+  }
 }
 
 const submittedStudents = ref<SubmitPaperDto[] | null>(null)
@@ -98,20 +138,18 @@ const dataFilterSubmittedStudent = ref({
   pageNumber: 0,
   pageSize: 10,
   orderBy: ['id'],
-  paperId: paperId.toString(),
+  paperId: paperId,
 })
-const getSubmittedStudents = () => {
-  paperStore
-    .getSubmittedStudentsInPaper(paperId.toString(), dataFilterSubmittedStudent.value)
-    .then((res) => {
-      submittedStudents.value = res.data
+const getSubmittedStudents = async () => {
+  try {
+    const res = await paperStore.getSubmittedStudentsInPaper(paperId, dataFilterSubmittedStudent.value)
+    return res.data
+  } catch (error) {
+    notify({
+      message: `Failed to get submitted students \n ${error}`,
+      color: 'danger',
     })
-    .catch((error) => {
-      notify({
-        message: `get fail submitted students \n ${error}`,
-        color: 'danger',
-      })
-    })
+  }
 }
 const getFormattedDuration = (startTime: string, endTime: string) => {
   const start = new Date(startTime)
@@ -140,9 +178,27 @@ const navigateToExamReview = (paperId: string, userId: string, submitPaperId: st
   })
 }
 
-onMounted(() => {
-  getPaperDetail()
-  getSubmittedStudents()
+const showSelectClassModal = ref(false)
+const classInSelectedGroup = ref<Classrooms[]>([])
+const selectedGroupClassName = ref('')
+const classStore = useClassStore()
+const selectClassInGroup = async (classId: string) => {
+  valueClassInGroupTap.value = classId
+  try {
+    const classDetail = await classStore.GetClassById(classId)
+    const res = await classStore.getClassroomByGroupClassId(classDetail.groupClassId)
+    classInSelectedGroup.value = res.filter((classroom: Classrooms) =>
+      paperDetail.value?.paperAccesses?.some((x: PaperAccess) => x.classId == classroom.id),
+    )
+    selectedGroupClassName.value = classDetail.groupClassName
+    showSelectClassModal.value = false
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(async () => {
+  await getPaperDetail()
 })
 </script>
 
@@ -213,9 +269,10 @@ onMounted(() => {
             <VaModal v-slot="{ cancel, ok }" v-model="showAssignPaperModal" hide-default-actions>
               <AssignPaperModal
                 :current-assigned="assignedOptionValue"
+                :paper="paperDetail"
                 @close="cancel"
                 @save="
-                  (data: string) => {
+                  (data: AccessType) => {
                     handleSaveAssigned(data)
                     ok()
                   }
@@ -224,7 +281,7 @@ onMounted(() => {
             </VaModal>
             <VaCardContent class="p-0">
               <VaButton
-                v-if="assignedOptionValue == 'Everyone'"
+                v-if="assignedOptionValue == AccessType.Everyone"
                 preset="secondary"
                 border-color="none"
                 size="small"
@@ -234,49 +291,27 @@ onMounted(() => {
               >
                 Everyone
               </VaButton>
-              <div v-if="assignedOptionValue == 'By Class'">
+              <div v-if="assignedOptionValue == AccessType.ByClass">
                 <VaInput placeholder="Search by name" class="mb-1" />
                 <VaCard outlined class="container-groupClass">
                   <VaCardContent class="p-1">
                     <VaAccordion v-model="valueCollapses" class="max-w-sm text-xs" multiple>
-                      <VaCollapse v-for="(collapse, index) in collapses" :key="index" :header="collapse.title">
+                      <VaCollapse v-for="(groupClass, index) in groupClasses" :key="index" :header="groupClass.name">
                         <template #content>
                           <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-2">
                             <VaButton
+                              v-for="classroom in groupClass.classes.filter((classroom: Classrooms) =>
+                                paperDetail?.paperAccesses?.some((x: PaperAccess) => x.classId == classroom.id),
+                              )"
+                              :key="classroom.id"
                               preset="secondary"
                               size="small"
                               border-color="secondary"
                               text-color="secondary"
                               class="class-button"
+                              @click="selectClassInGroup(classroom.id)"
                             >
-                              {{ collapse.content.slice(0, 10) }}
-                            </VaButton>
-                            <VaButton
-                              preset="secondary"
-                              size="small"
-                              border-color="secondary"
-                              text-color="secondary"
-                              class="class-button"
-                            >
-                              {{ collapse.content.slice(0, 10) }}
-                            </VaButton>
-                            <VaButton
-                              preset="secondary"
-                              size="small"
-                              border-color="secondary"
-                              text-color="secondary"
-                              class="class-button"
-                            >
-                              {{ collapse.content.slice(0, 10) }}
-                            </VaButton>
-                            <VaButton
-                              preset="secondary"
-                              size="small"
-                              border-color="secondary"
-                              text-color="secondary"
-                              class="class-button"
-                            >
-                              {{ collapse.content.slice(0, 10) }}
+                              {{ classroom.name.slice(0, 10) }}
                             </VaButton>
                           </div>
                         </template>
@@ -328,25 +363,56 @@ onMounted(() => {
     <template #content>
       <VaCardTitle>Student submit (0/0)</VaCardTitle>
       <VaCard class="mt-2 ml-2" style="height: 60vh">
-        <VaCardContent v-if="assignedOptionValue === 'By Class'" class="p-0">
+        <VaCardContent v-if="assignedOptionValue === AccessType.ByClass" class="p-0">
           <VaCardTitle>
-            <VaButton size="small">Select class group: Khoi 12 (2) </VaButton>
+            <VaButton size="small" @click="showSelectClassModal = !showSelectClassModal"
+              >Select class group: {{ selectedGroupClassName }}
+            </VaButton>
           </VaCardTitle>
-          <VaDivider class="mb-0" />
-          <VaTabs v-model="valueTap">
-            <template #tabs>
-              <VaTab v-for="tab in ['One', 'Two', 'Three']" :key="tab" class="pr-2 pl-2" @click="Clicked">
-                {{ tab }}
-              </VaTab>
-            </template>
+          <VaModal v-model="showSelectClassModal" size="large" hide-default-actions>
             <VaCard outlined>
               <VaCardContent>
-                <p>currentTab.content</p>
+                <VaScrollContainer class="min-h-[80vh] max-h-[90vh]">
+                  <VaCollapse v-for="(groupClass, index) in groupClasses" :key="index" :header="groupClass.name">
+                    <template #content>
+                      <div class="grid md:grid-cols-6 sm:grid-cols-4 gap-2">
+                        <VaButton
+                          v-for="classroom in groupClass.classes.filter((classroom: Classrooms) =>
+                            paperDetail?.paperAccesses?.some((x: PaperAccess) => x.classId == classroom.id),
+                          )"
+                          :key="classroom.id"
+                          preset="secondary"
+                          size="small"
+                          border-color="secondary"
+                          text-color="secondary"
+                          class="class-button"
+                          @click="selectClassInGroup(classroom.id)"
+                        >
+                          {{ classroom.name.slice(0, 10) }}
+                        </VaButton>
+                      </div>
+                    </template>
+                  </VaCollapse>
+                </VaScrollContainer>
               </VaCardContent>
             </VaCard>
+          </VaModal>
+          <VaDivider class="mb-0" />
+          <VaTabs v-model="valueClassInGroupTap">
+            <template #tabs>
+              <VaTab
+                v-for="classroom in classInSelectedGroup"
+                :key="classroom.id"
+                :name="classroom.id"
+                class="pr-2 pl-2"
+                @click="groupTabFilter"
+              >
+                {{ classroom.name }}
+              </VaTab>
+            </template>
           </VaTabs>
         </VaCardContent>
-        <VaCardContent v-if="assignedOptionValue === 'Everyone'" class="p-2 grid md:grid-cols-4 xs:grid-cols-2">
+        <VaCardContent class="p-2 grid md:grid-cols-4 xs:grid-cols-2 mt-3">
           <VaCard
             v-for="submittedStudent in submittedStudents"
             :key="submittedStudent.id"

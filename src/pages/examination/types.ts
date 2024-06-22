@@ -106,6 +106,8 @@ export interface PaperDto {
   paperFolder?: PaperFolderDto
   questions?: Question[] | null
   maxPoint?: number | undefined
+  paperAccesses?: PaperAccess[]
+  shareType?: number
 }
 
 export interface PaperLabelDto {
@@ -160,6 +162,19 @@ export interface UpdatePaperRequest {
   type: number
   isPublish?: boolean
   description?: string
+  shareType?: number
+  paperAccesses?: PaperAccess[]
+}
+
+export interface PaperAccess {
+  classId?: string
+  userId?: string
+}
+
+export enum AccessType {
+  Everyone = 1,
+  ByClass = 3,
+  ByStudent = 2,
 }
 
 export interface GetLastResultExamRequest {
