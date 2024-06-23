@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+// @ts-expect-error Richer is not defined
+import Richer from 'richer-than-rich'
+import 'richer-than-rich/dist/style.css'
 
 interface Comment {
   author: string
@@ -101,6 +104,8 @@ const addComment = (newsId: number, commentContent: string) => {
 </script>
 
 <template>
+  <Richer> </Richer>
+
   <div class="main-container">
     <div class="content-container">
       <div v-if="activeElement === 'News'">
@@ -217,15 +222,18 @@ const addComment = (newsId: number, commentContent: string) => {
   outline: none;
   border-radius: 4px;
   margin-bottom: 8px;
-  min-height: 100px; /* Optional: Adjust the height as needed */
+  min-height: 100px;
+  /* Optional: Adjust the height as needed */
 }
 
 .new-post .post-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  padding-bottom: 8px; /* Adjust as needed */
-  padding-right: 8px; /* Adjust as needed */
+  padding-bottom: 8px;
+  /* Adjust as needed */
+  padding-right: 8px;
+  /* Adjust as needed */
 }
 
 .new-post .post-icon {
