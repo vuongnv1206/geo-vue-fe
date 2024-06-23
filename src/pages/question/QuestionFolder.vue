@@ -3,6 +3,7 @@ import { onMounted, ref, computed, watch } from 'vue'
 import { QuestionTree, QuestionTreeEmpty, QuestionFolderPermission, SharePermission } from './types'
 import QuestionFolder from './widgets/QuestionFolder.vue'
 import EditQuestionTreeForm from './widgets/EditQuestionTreeForm.vue'
+import QuestionBank from './QuestionBank.vue'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
@@ -33,9 +34,12 @@ const props = defineProps({
   },
 })
 
+const totalQuestions = ref(0)
+
 const getCurrentShowFolder = (questionTree: QuestionTree) => {
   if (questionTree.currentShow) {
     questionTrees.value = questionTree.children
+    totalQuestions.value = questionTree.totalQuestions || 0
     return questionTree
   } else {
     questionTree.children.forEach((child) => {
@@ -445,6 +449,14 @@ const onShareQuestionFolderPermission = () => {
       })
     })
 }
+const tabValue = ref(0)
+
+const idf = ref('')
+
+const showQuestions = (id: string) => {
+  tabValue.value = 0
+  idf.value = id
+}
 
 watch(
   () => permissionEdit.value,
@@ -462,10 +474,16 @@ onMounted(() => {
   getQuestionFolders()
 })
 </script>
-
 <template>
-  <VaCard>
-    <VaCardContent>
+  <VaTabs v-model="tabValue">
+    <template #tabs>
+      <VaTab v-for="tab in ['Question', 'Folder']" :key="tab">
+        {{ tab }}
+      </VaTab>
+    </template>
+  </VaTabs>
+  <VaCard v-if="tabValue == 1" class="pb-0">
+    <VaCardContent class="pb-0">
       <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
         <div class="flex flex-col md:flex-row gap-2 justify-start">
           <VaBreadcrumbs>
@@ -495,15 +513,18 @@ onMounted(() => {
         v-model:selectedItemsEmitted="selectedItemsEmitted"
         :question-trees="questionTrees"
         :loading="loading"
+        :total-questions="totalQuestions"
+        :current-show-folder-id="currentShowFolderId"
         :mode="props.mode"
         @edit="editQuestionTree"
         @delete="deleteQuestionTreeOne"
         @selectedFolder="selectedFolder"
         @share="shareQuestionTree"
+        @viewQuestions="showQuestions"
       />
     </VaCardContent>
   </VaCard>
-
+  <QuestionBank v-else :idf="idf" @edit="editQuestionTree" @delete="deleteQuestionTreeOne" @share="shareQuestionTree" />
   <VaModal
     v-slot="{ cancel, ok }"
     v-model="doShowQuestionTreeFormModal"
@@ -548,7 +569,9 @@ onMounted(() => {
       label="Select User or Group"
       :options="options"
       searchable
-      :text-by="(option) => getOptionName(option as TeacherTeamTeacherGroupCombine).data"
+      :text-by="
+        (option: TeacherTeamTeacherGroupCombine) => getOptionName(option as TeacherTeamTeacherGroupCombine).data
+      "
       placeholder="Search user or Group"
       track-by="id"
     >

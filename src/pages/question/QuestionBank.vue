@@ -5,7 +5,7 @@ import { Question, QuestionTree, SearchQuestion, QuestionSearchRes, Pagination }
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useQuestionEditStore } from '@/stores/modules/questionEdit.module'
 import { useQuestionStore } from '@/stores/modules/question.module'
-import { useModal, useToast } from 'vuestic-ui'
+import { useModal, useToast, useMenu } from 'vuestic-ui'
 import { useRouter } from 'vue-router'
 import { getErrorMessage } from '@/services/utils'
 import { QuestionTypeColor } from '@services/utils'
@@ -17,6 +17,7 @@ const storesQuestion = useQuestionStore()
 const storesQEdit = useQuestionEditStore()
 const router = useRouter()
 const { confirm } = useModal()
+const { show } = useMenu()
 
 const loading = ref(false)
 const loadingNode = ref(false)
@@ -42,6 +43,20 @@ const QuestionSortOptions = [
   { id: 1, name: 'Oldest', questionType: 2 },
   { id: 2, name: 'Last Modified', questionType: 4 },
 ]
+
+const props = defineProps({
+  idf: {
+    type: String,
+    required: false,
+    default: '',
+  },
+})
+
+const emit = defineEmits<{
+  (event: 'edit', questionTree: QuestionTree): void
+  (event: 'delete', questionTree: QuestionTree): void
+  (event: 'share', questionTree: QuestionTree): void
+}>()
 
 const QuestionTypeValue = ref(QuestionTypeOptions[0])
 
@@ -303,6 +318,72 @@ watch(
   { immediate: true },
 )
 
+watch(
+  () => props.idf,
+  () => {
+    console.log('props.idf', props.idf)
+    if (props.idf) {
+      const node = findNode(nodes.value, props.idf)
+      if (node) {
+        handleSelectFolder(node)
+      }
+    }
+  },
+  { immediate: true },
+)
+
+const contextmenu = (event: any, node: QuestionTree) => {
+  event.preventDefault()
+  show({
+    event: event,
+    options: [
+      { text: 'Rename', icon: 'edit' },
+      { text: 'Share', icon: 'share' },
+      { text: 'Delete', icon: 'delete' },
+    ],
+    onSelected(option) {
+      if (option.text === 'Rename') {
+        emit('edit', node)
+        setTimeout(() => {
+          loading.value = true
+          stores
+            .getQuestionFolders('')
+            .then((res) => {
+              nodes.value = res.children
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+            .finally(() => {
+              loading.value = false
+            })
+        }, 1000)
+      }
+      if (option.text === 'Share') {
+        emit('share', node)
+      }
+      if (option.text === 'Delete') {
+        emit('delete', node)
+        // delay to reload the tree
+        setTimeout(() => {
+          loading.value = true
+          stores
+            .getQuestionFolders('')
+            .then((res) => {
+              nodes.value = res.children
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+            .finally(() => {
+              loading.value = false
+            })
+        }, 1000)
+      }
+    },
+  })
+}
+
 onMounted(() => {
   loading.value = true
   stores
@@ -336,7 +417,7 @@ onMounted(() => {
                 </VaCardContent>
               </VaCard>
             </VaSkeletonGroup>
-            <VaScrollContainer v-else class="max-h-[1000px]" horizontal vertical>
+            <VaScrollContainer v-else class="max-h-[75vh]" horizontal vertical>
               <VaTreeView :nodes="nodes" children-by="children" track-by="id" @update:expanded="handleExpanded">
                 <template #content="node">
                   <VaInnerLoading v-if="node.id === currentLoadingNodeId" :loading="loadingNode" :size="32">
@@ -348,7 +429,13 @@ onMounted(() => {
                       </div>
                     </button>
                   </VaInnerLoading>
-                  <button v-else type="button" style="width: 100%" @click="handleSelectFolder(node)">
+                  <button
+                    v-else
+                    style="width: 100%"
+                    type="button"
+                    @contextmenu="contextmenu($event, node)"
+                    @click="handleSelectFolder(node)"
+                  >
                     <div class="flex items-start justify-between">
                       <div class="flex items-center">
                         <VaIcon v-if="isNodeExpanded(node.id)" name="folder_open" class="mr-2" />
@@ -367,7 +454,7 @@ onMounted(() => {
         </VaInnerLoading>
       </div>
       <div class="flex flex-col gap-4 w-full sm:w-[75%]">
-        <VaCard class="flex flex-col min-h-[80vh]">
+        <VaCard class="flex flex-col min-h-[75vh]">
           <VaCardTitle class="flex items-start justify-between">
             <h1 class="card-title text-secondary font-bold uppercase">
               List question of <b>{{ currentSelectedFolder?.name || '?' }}</b>
@@ -381,7 +468,7 @@ onMounted(() => {
               <VaSelect
                 v-model="QuestionTypeValue"
                 track-by="id"
-                :text-by="(option) => (option as any).name"
+                :text-by="(option: any) => (option as any).name"
                 placeholder="All"
                 label="Question Type"
                 :options="QuestionTypeOptions"
@@ -417,7 +504,7 @@ onMounted(() => {
               <VaSelect
                 v-model="QuestionSortValue"
                 track-by="id"
-                :text-by="(option) => (option as any).name"
+                :text-by="(option: any) => (option as any).name"
                 placeholder="Newest"
                 label="Sort by"
                 :options="QuestionSortOptions"
@@ -452,7 +539,7 @@ onMounted(() => {
             </div>
           </VaCard>
           <VaInnerLoading v-else :loading="loadingQuestion" :size="60">
-            <VaScrollContainer class="min-h-[600px] max-h-[70vh]" vertical>
+            <VaScrollContainer class="min-h-[60vh] max-h-[60vh]" vertical>
               <VaSkeletonGroup v-if="loadingQuestion" animation="wave" :delay="0">
                 <VaCard>
                   <VaCardContent class="flex items-center">
