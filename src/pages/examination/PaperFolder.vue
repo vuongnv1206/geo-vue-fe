@@ -445,7 +445,7 @@ const handlePageChange = async (page: number) => {
 
 <template>
   <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px">
-    <VaInput v-model="searchTerm" placeholder="Search..." />
+    <VaInput v-model="searchTerm" style="background-color: white" placeholder="Search..." />
     <VaButton @click="handleSearch">Search</VaButton>
   </div>
   <VaCard>
