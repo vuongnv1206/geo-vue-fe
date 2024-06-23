@@ -64,6 +64,7 @@ const routes: Array<RouteRecordRaw> = [
             path: 'create-paper/:folderId?/question-bank',
             component: () => import('../pages/examination/CreatePaperInQuestionBank.vue'),
           },
+
           {
             name: 'admin-exam-detail',
             path: 'admin/exam-detail/:id',
@@ -74,6 +75,7 @@ const routes: Array<RouteRecordRaw> = [
             path: 'admin/exam-review/:paperId/:userId/:submitPaperId',
             component: () => import('../pages/examination/ExamReview.vue'),
           },
+
           {
             name: 'paper-config',
             path: 'admin/paper-config/:id',
@@ -109,21 +111,29 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/teacher-group/TeacherGroup.vue'),
       },
       {
-        name: 'classroom',
-        path: 'classroom',
+        name: 'classrooms',
+        path: '/classroom',
         meta: {
           requiresAuth: true,
         },
         children: [
           {
-            name: 'group-class',
-            path: 'group-class',
-            component: () => import('../pages/classrooms/GroupClassPage.vue'),
+            name: 'classroom',
+            path: '',
+            component: () => import('../pages/classrooms/Class.vue'),
           },
           {
-            name: 'class',
-            path: 'class',
-            component: () => import('../pages/classrooms/Class.vue'),
+            name: 'class-details',
+            path: ':id',
+            component: () => import('../pages/classrooms/widgets/ClassDetail.vue'),
+          },
+          {
+            name: 'news',
+            path: 'news',
+            meta: {
+              requiresAuth: true,
+            },
+            component: () => import('../pages/classrooms/News.vue'),
           },
         ],
       },
@@ -146,7 +156,7 @@ const routes: Array<RouteRecordRaw> = [
           },
           {
             name: 'edit-assignment-details',
-            path: '/assignments/:id/edit',
+            path: '/assignments/:id/:classId',
             component: () => import('../pages/assignment/widgets/EditAssignmentDetails.vue'),
           },
           {
@@ -171,6 +181,14 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: () => import('../pages/user/UserProfile.vue'),
+      },
+      {
+        name: 'notifications',
+        path: 'notification',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/notification/Notification.vue'),
       },
     ],
   },

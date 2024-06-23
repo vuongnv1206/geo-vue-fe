@@ -6,7 +6,7 @@ class GroupClassService {
     return apiService
       .post('/v1/groupclasses/search', data)
       .then((response) => {
-        return Promise.resolve(response)
+        return Promise.resolve(response.data)
       })
       .catch((error) => {
         return Promise.reject(error)

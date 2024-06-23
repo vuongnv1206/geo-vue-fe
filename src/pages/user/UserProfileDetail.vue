@@ -151,6 +151,8 @@ const isInValidField = (value: string, rules: any[]) => {
   return rules.some((rule) => typeof rule(value) === 'string')
 }
 
+const shortNameLetter = computed(() => userProfileStore?.userDetails?.firstName?.charAt(0).toUpperCase())
+
 const isFormHasNotChanged = computed(() => {
   return Object.entries(userDetail.value).every(([key, value]) => {
     return (formData as { [key: string]: any })[key] === value
@@ -547,7 +549,7 @@ const verifyEmail = async () => {
             <VaAvatar :src="getSrcAvatar()" size="large" />
           </VaBadge>
           <VaAvatar v-if="!formData?.imageUrl" color="warning" size="large" class="font-bold">{{
-            formData?.firstName?.slice(0, 1)
+            shortNameLetter
           }}</VaAvatar>
         </div>
         <div class="relative">

@@ -27,7 +27,7 @@
                 <VaButton
                   icon="edit"
                   preset="secondary"
-                  :to="{ name: 'edit-assignment-details', params: { id: assignmentId } }"
+                  :to="{ name: 'edit-assignment-details', params: { id: assignmentId, classId: classId } }"
                   class="justify-start"
                   >Setting
                 </VaButton>

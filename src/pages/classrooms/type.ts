@@ -55,8 +55,24 @@ export type UserInClassRequest = {
 export type UserInClass = {
   userId: string
   classesId: string
-  isGender: true
+  isGender: boolean
   studentCode: string
   email: string
   phoneNumber: string
+}
+
+export type News = {
+  id: string
+  classesId: string
+  content: string
+  isLockComment: boolean
+  parentId: string
+  numberLikeInTheNews: number
+}
+
+export type EmptyNews = {
+  classesId: string
+  content: string
+  isLockComment: boolean
+  parentId: string
 }

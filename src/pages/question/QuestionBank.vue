@@ -320,7 +320,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1 class="h1">Question Bank</h1>
   <section class="flex flex-col gap-4">
     <div class="flex flex-col sm:flex-row gap-4">
       <div class="w-full sm:w-[25%]">

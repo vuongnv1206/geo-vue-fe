@@ -66,22 +66,6 @@ export default {
       meta: {
         icon: 'collections_bookmark',
       },
-      children: [
-        {
-          name: 'group-class',
-          displayName: 'menu.group-class',
-          meta: {
-            permission: 'GroupClasses.View',
-          },
-        },
-        {
-          name: 'class',
-          displayName: 'menu.class',
-          meta: {
-            permission: 'Classes.View',
-          },
-        },
-      ],
     },
     {
       name: 'assignments',

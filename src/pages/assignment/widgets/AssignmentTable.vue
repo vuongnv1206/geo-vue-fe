@@ -1,6 +1,6 @@
 <template v-for="assClass in props.assignmentsByClass" :key="assClass.id" :loading="props.loading">
   <VaCard>
-    <VaCardContent>Recommend</VaCardContent>
+    <VaCardContent class="font-bold">Recommend</VaCardContent>
     <VaList class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <template v-for="assignment in recentAssignments" :key="assignment.id">
         <VaListItem
@@ -10,7 +10,7 @@
           <VaCard class="border rounded-lg p-3 hover:scale-105 transition-transform duration-200 w-full">
             <div class="flex items-center">
               <VaListItemSection avatar>
-                <VaIcon name="book" size="3rem" />
+                <VaIcon name="description" size="3rem" />
               </VaListItemSection>
               <VaListItemSection>
                 <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
@@ -27,7 +27,7 @@
     </VaList>
   </VaCard>
   <VaCard>
-    <VaCardContent>All</VaCardContent>
+    <VaCardContent class="font-bold">All</VaCardContent>
     <VaCard class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <template v-for="assClass in props.assignmentsByClass" :key="assClass.id">
         <VaCard v-if="assClass.assignments.length > 0" class="border p-4 rounded">
@@ -35,7 +35,9 @@
             <span class="font-semibold">{{ assClass.name }}</span>
             <VaChip v-if="currentUserId != assClass.ownerId" outline class="ml-2" size="small"> Share </VaChip>
             <div class="flex items-center space-x-2 ml-auto">
-              <VaButton preset="plain" size="small">Show All</VaButton>
+              <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: assClass.id } }"
+                >Show All</VaButton
+              >
             </div>
           </div>
           <VaDivider />
@@ -49,7 +51,7 @@
                   class="flex items-center border rounded-lg p-3 w-full hover:scale-105 transition-transform duration-200"
                 >
                   <VaListItemSection avatar>
-                    <VaIcon name="book" size="3rem" />
+                    <VaIcon name="description" size="3rem" />
                   </VaListItemSection>
                   <VaListItemSection>
                     <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
@@ -93,7 +95,7 @@ const recentAssignments = computed(() => {
   const allAssignmentsWithClassId = props.assignmentsByClass.flatMap((assClass) =>
     assClass.assignments.map((assignment) => ({
       ...assignment,
-      classId: assClass.id, // Attach class ID to each assignment
+      classId: assClass.id,
       className: assClass.name,
     })),
   )
