@@ -452,7 +452,7 @@ onMounted(() => {
             </div>
           </VaCard>
           <VaInnerLoading v-else :loading="loadingQuestion" :size="60">
-            <VaScrollContainer class="min-h-[600px] max-h-[500px]" vertical>
+            <VaScrollContainer class="min-h-[600px] max-h-[70vh]" vertical>
               <VaSkeletonGroup v-if="loadingQuestion" animation="wave" :delay="0">
                 <VaCard>
                   <VaCardContent class="flex items-center">
