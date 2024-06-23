@@ -30,20 +30,12 @@ export default {
       },
     },
     {
-      name: 'examinations',
+      name: 'paper-folder',
       displayName: 'menu.examinations',
       meta: {
         icon: 'menu_book',
+        permission: 'QuestionFolders.View',
       },
-      children: [
-        {
-          name: 'paper-folder',
-          displayName: 'menu.paper-folder',
-          meta: {
-            permission: 'QuestionFolders.View',
-          },
-        },
-      ],
     },
     {
       name: 'classroom',
