@@ -4,7 +4,6 @@ import { UserDetail } from '../user/types'
 export interface CreatePaperFolderRequest {
   name: string
   parentId?: string | null
-  subjectId?: string | null
 }
 
 export interface PaperFolderDto {

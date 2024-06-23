@@ -10,10 +10,11 @@ import {
   CombinedData,
   DataFilterFolder,
   DataFilterPaper,
+  PaperFolderResponse,
 } from './types'
-import { useMenu, useModal, useToast } from 'vuestic-ui/web-components'
+import { useMenu, useModal, useToast } from 'vuestic-ui'
 import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -35,6 +36,13 @@ const dataFilterPaper = ref<DataFilterPaper>({
   pageSize: 20,
   orderBy: ['id'],
   paperFolderId: null,
+})
+
+const pagination = ref({
+  pageNumber: 1,
+  pageSize: 3,
+  totalPages: 0,
+  totalItems: 0,
 })
 
 const paperFolderDtos = ref<PaperFolderDto[]>([])
@@ -65,7 +73,7 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
           message: `${request.name} has been updated`,
           color: 'success',
         })
-        getPaperFolders(currentFolderId.value) // Refresh the list of folders under the current parent folder
+        getPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
       .catch((err: any) => {
@@ -78,7 +86,6 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
     const createRequest: CreatePaperFolderRequest = {
       name: request.name!,
       parentId: currentFolderId.value,
-      subjectId: request.subjectId ?? null,
     }
     paperFolderStore
       .createPaperFolder(createRequest)
@@ -87,7 +94,7 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
           message: `${request.name} has been created`,
           color: 'success',
         })
-        getPaperFolders(currentFolderId.value) // Refresh the list of folders under the current parent folder
+        getPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
       .catch((err: any) => {
@@ -128,7 +135,7 @@ const onFolderDelete = async (folder: PaperFolderDto) => {
 const onPaperDelete = async (paper: PaperInListDto) => {
   const result = await confirm({
     message: `Are you sure you want to delete "${paper.examName}"?`,
-    title: 'Delete Folder',
+    title: 'Delete Paper',
     okText: 'Confirm',
     cancelText: 'Cancel',
     size: 'small',
@@ -193,7 +200,7 @@ const getPaperFolders = async (parentId?: string | null, name?: string | null) =
   dataFilterFolder.value.keyword = name ?? ''
   paperFolderStore
     .searchPaperFolders(dataFilterFolder.value)
-    .then((res) => {
+    .then((res: PaperFolderResponse) => {
       loading.value = false
       paperFolderDtos.value = res.data
     })
@@ -219,6 +226,7 @@ const getPapers = async (folderId?: string | null, name?: string | null) => {
       notify({ message: 'Failed to get papers', color: 'error' })
     })
 }
+
 const handleFolderDoubleClick = async (event: any) => {
   const item = event.item
   if (item.type === 'folder') {
@@ -237,6 +245,7 @@ const handleFolderDoubleClick = async (event: any) => {
         breadcrumbs.value.pop()
       }
       searchTerm.value = ''
+      pagination.value.pageNumber = 1
       showPathColumn.value = false
       getPaperFolders(folderId, searchTerm.value)
 
@@ -255,6 +264,7 @@ const navigateToBreadcrumb = (index: number) => {
   breadcrumbs.value = breadcrumbs.value.slice(0, index + 1)
   currentFolderId.value = breadcrumb.id
   searchTerm.value = ''
+  pagination.value.pageNumber = 1
   getPaperFolders(breadcrumb.id, searchTerm.value)
   getPapers(breadcrumb.id, searchTerm.value)
 }
@@ -265,6 +275,7 @@ const handleSearch = () => {
     showPathColumn.value = false
   }
   papers.value = []
+  pagination.value.pageNumber = 1
   getPaperFolders(currentFolderId.value, searchTerm.value)
   getPapers(currentFolderId.value, searchTerm.value)
 }
@@ -280,6 +291,7 @@ const navigateToPath = async (id: string | null) => {
 
       currentFolderId.value = id
       searchTerm.value = ''
+      pagination.value.pageNumber = 1
       getPaperFolders(id, searchTerm.value)
       getPapers(id, searchTerm.value)
       showPathColumn.value = false
@@ -403,9 +415,32 @@ const combinedData = computed(() => {
     createdBy: paper.createdBy || '',
     lastModifiedBy: paper.lastModifiedBy || null,
   }))
-
+  console.log(combinedData.value)
   return [...resolvedFolders, ...resolvedPapers]
 })
+
+// Tính lại totalPages khi combinedData thay đổi
+const calculateTotalPages = () => {
+  pagination.value.totalPages = Math.ceil(combinedData.value.length / pagination.value.pageSize)
+}
+
+watchEffect(() => {
+  calculateTotalPages()
+})
+
+// Computed property để lấy ra dữ liệu cho trang hiện tại
+const currentItems = computed(() => {
+  const startIndex = (pagination.value.pageNumber - 1) * pagination.value.pageSize
+  const endIndex = startIndex + pagination.value.pageSize
+  return combinedData.value.slice(startIndex, endIndex)
+})
+
+// Hàm xử lý khi thay đổi trang
+const handlePageChange = async (page: number) => {
+  pagination.value.pageNumber = page
+  await getPaperFolders(currentFolderId.value, searchTerm.value)
+  await getPapers(currentFolderId.value, searchTerm.value)
+}
 </script>
 
 <template>
@@ -436,7 +471,7 @@ const combinedData = computed(() => {
       </div>
 
       <VaDataTable
-        :items="combinedData"
+        :items="currentItems"
         :columns="tableColumns"
         :loading="loading"
         hoverable
@@ -511,6 +546,15 @@ const combinedData = computed(() => {
           </div>
         </template>
       </VaDataTable>
+      <VaPagination
+        v-if="pagination.totalPages > 1"
+        v-model="pagination.pageNumber"
+        :pages="pagination.totalPages"
+        :visible-pages="3"
+        buttons-preset="secondary"
+        class="justify-center sm:justify-end"
+        @update:modelValue="handlePageChange"
+      />
     </VaCardContent>
   </VaCard>
 
