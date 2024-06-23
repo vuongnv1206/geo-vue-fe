@@ -65,6 +65,7 @@ export default {
       displayName: 'menu.classroom',
       meta: {
         icon: 'collections_bookmark',
+        permission: 'Classes.View',
       },
     },
     {
@@ -72,6 +73,7 @@ export default {
       displayName: 'menu.assignments',
       meta: {
         icon: 'description',
+        permission: 'Assignments.View',
       },
     },
     {
@@ -79,6 +81,7 @@ export default {
       displayName: 'menu.subjects',
       meta: {
         icon: 'play_lesson',
+        permission: 'Subjects.View',
       },
     },
     {
@@ -86,6 +89,7 @@ export default {
       displayName: 'menu.teacher-group',
       meta: {
         icon: 'group',
+        permission: 'GroupTeachers.View',
       },
     },
   ] as INavigationRoute[],
