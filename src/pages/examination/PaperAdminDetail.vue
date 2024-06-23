@@ -97,6 +97,7 @@ const deletePaper = async () => {
     message: `Are you sure want to delete "${paperDetail.value?.examName}"?`,
     title: 'Delete Paper',
     okText: 'Confirm',
+    cancelText: 'Cancel',
     size: 'small',
   })
 

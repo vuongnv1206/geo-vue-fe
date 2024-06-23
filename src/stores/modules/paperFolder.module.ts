@@ -2,73 +2,68 @@ import PaperFoldersService from '@/services/paperFolder.service'
 import {
   CreatePaperFolderRequest,
   PaperFolderDto,
-  SearchPaperFolderRequest,
+  PaperFolderResponse,
   SharePaperFolderRequest,
   UpdatePaperFolderRequest,
 } from '@/pages/examination/types'
 import { defineStore } from 'pinia'
 
 export const usePaperFolderStore = defineStore('paperFolder', {
-  state: () => ({
-    error: null as string | null,
-    paperFolders: [] as PaperFolderDto[],
-  }),
+  state: () => ({}),
   actions: {
     async createPaperFolder(request: CreatePaperFolderRequest): Promise<string> {
-      try {
-        const response = await PaperFoldersService.paperFolders_Create(request)
-        return response
-      } catch (error) {
-        this.error = error as string
-        throw error
-      }
+      return await PaperFoldersService.paperFolders_Create(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
     },
-    async searchPaperFolders(request: SearchPaperFolderRequest): Promise<PaperFolderDto[]> {
-      try {
-        const response = await PaperFoldersService.paperFolders_Search(request)
-        this.paperFolders = response
-        return response
-      } catch (error) {
-        this.error = error as string
-        throw error
-      }
+    async searchPaperFolders(dataFilter: any): Promise<PaperFolderResponse> {
+      return await PaperFoldersService.paperFolders_Search(dataFilter)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
     },
     async deletePaperFolder(id: string): Promise<string> {
-      try {
-        const response = await PaperFoldersService.paperFolders_Delete(id)
-        return response
-      } catch (error) {
-        this.error = error as string
-        throw error
-      }
+      return await PaperFoldersService.paperFolders_Delete(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
     },
     async updatePaperFolder(request: UpdatePaperFolderRequest, id: string): Promise<string> {
-      try {
-        const response = await PaperFoldersService.paperFolders_Update(request, id)
-        return response
-      } catch (error) {
-        this.error = error as string
-        throw error
-      }
+      return await PaperFoldersService.paperFolders_Update(request, id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
     },
     async sharePaperFolder(id: string, request: SharePaperFolderRequest): Promise<string> {
-      try {
-        const response = await PaperFoldersService.paperFolders_Share(id, request)
-        return response
-      } catch (error) {
-        this.error = error as string
-        throw error
-      }
+      return await PaperFoldersService.paperFolders_Share(id, request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
     },
     async getListParents(id: string): Promise<PaperFolderDto[]> {
-      try {
-        const response = await PaperFoldersService.papers_GetParents(id)
-        this.paperFolders = response
-        return response
-      } catch (error) {
-        this.error = error as string
-        throw error
-      }
+      return await PaperFoldersService.paperFolders_GetParents(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
     },
   },
 })
