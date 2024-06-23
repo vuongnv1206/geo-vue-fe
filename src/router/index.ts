@@ -60,19 +60,9 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/examination/CreatePaper.vue'),
           },
           {
-            name: 'create-paper-question-bank',
-            path: 'create-paper/:folderId?/question-bank',
-            component: () => import('../pages/examination/CreatePaperInQuestionBank.vue'),
-          },
-          {
             name: 'admin-exam-detail',
             path: 'admin/exam-detail/:id',
             component: () => import('../pages/examination/PaperAdminDetail.vue'),
-          },
-          {
-            name: 'exam-review',
-            path: 'admin/exam-review/:paperId/:userId/:submitPaperId',
-            component: () => import('../pages/examination/ExamReview.vue'),
           },
           {
             name: 'paper-config',
@@ -109,21 +99,21 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/teacher-group/TeacherGroup.vue'),
       },
       {
-        name: 'classroom',
-        path: 'classroom',
+        name: 'classrooms',
+        path: '/classroom',
         meta: {
           requiresAuth: true,
         },
         children: [
           {
-            name: 'group-class',
-            path: 'group-class',
-            component: () => import('../pages/classrooms/GroupClassPage.vue'),
+            name: 'classroom',
+            path: '',
+            component: () => import('../pages/classrooms/Class.vue'),
           },
           {
-            name: 'class',
-            path: 'class',
-            component: () => import('../pages/classrooms/Class.vue'),
+            name: 'class-details',
+            path: ':id',
+            component: () => import('../pages/classrooms/widgets/ClassDetail.vue'),
           },
         ],
       },
@@ -146,7 +136,7 @@ const routes: Array<RouteRecordRaw> = [
           },
           {
             name: 'edit-assignment-details',
-            path: '/assignments/:id/edit',
+            path: '/assignments/:id/:classId',
             component: () => import('../pages/assignment/widgets/EditAssignmentDetails.vue'),
           },
           {
@@ -164,19 +154,11 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/subject/Subject.vue'),
       },
-      {
-        name: 'profile',
-        path: 'profile',
-        meta: {
-          requiresAuth: true,
-        },
-        component: () => import('../pages/user/UserProfile.vue'),
-      },
     ],
   },
   {
     name: 'question-edit',
-    path: '/question-edit',
+    path: '/question-edit/:id',
     component: QuestionEditLayout,
   },
   {

@@ -9,7 +9,7 @@ import { notifications, validators } from '@/services/utils'
 import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { GroupClass } from '@/pages/classrooms/type'
+import { GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
 dayjs.extend(utc)
@@ -22,6 +22,8 @@ const { init: notify } = useToast()
 const stores = useAssignmentStore()
 const assignmentDetails = ref<AssignmentDetails | null>(null)
 const assignmentId = router.currentRoute.value.params.id.toString()
+const classId = router.currentRoute.value.params.classId.toString()
+
 const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id
@@ -59,6 +61,8 @@ const getAssignment = (id: string) => {
         requireLoginToSubmit: response.requireLoginToSubmit,
         classIds: response.classIds,
       }
+      console.log('Assignment Details: ', assignmentDetails.value)
+      console.log('New Assignment Details: ', newAssignmentDetails.value)
     })
     .catch((error) => {
       notify({
@@ -160,13 +164,9 @@ const goBack = async () => {
       message: 'You have unsaved changes. Are you sure you want to discard them?',
       size: 'small',
     })
-    if (agreed) {
-      router.push({ name: 'assignment-details', params: { id: assignmentId } })
-    } else {
-      return
-    }
+    if (!agreed) return
   }
-  router.push({ name: 'assignment-details', params: { id: assignmentId } })
+  router.push({ name: 'assignment-details', params: { id: assignmentId, classId: classId } })
 }
 
 const dateInputFormat = {
@@ -237,11 +237,11 @@ onMounted(() => {
               <VaDivider />
               <VaScrollContainer class="max-h-80" vertical>
                 <div class="mx-1">
-                  <VaSidebarItem class="cursor-pointer" @click="showAllClassesForAllDepartments"
-                    >All ({{ countAllSelectedClasses }}/{{ countAllClasses }})</VaSidebarItem
-                  >
+                  <VaSidebarItem class="cursor-pointer font-bold" @click="showAllClassesForAllDepartments">
+                    All ({{ countAllSelectedClasses }}/{{ countAllClasses }})
+                  </VaSidebarItem>
                   <div v-for="(groupClass, index) in groupClasses" :key="index">
-                    <VaSidebarItem class="cursor-pointer" @click="showDepartmentClasses(groupClass)"
+                    <VaSidebarItem class="cursor-pointer font-bold" @click="showDepartmentClasses(groupClass)"
                       >{{ groupClass.name }} ({{ countDepartmentSelectedClasses(groupClass) }}/{{
                         groupClass.classes.length
                       }})

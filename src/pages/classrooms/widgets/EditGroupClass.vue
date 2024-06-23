@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmptyGroupClass, GroupClass } from '../type'
+import { EmptyGroupClass, GroupClass } from '../types'
+import { validators } from '@/services/utils'
 
 const props = defineProps<{
   groupClass: GroupClass | null
@@ -23,7 +24,6 @@ const isFormHasUnsavedChanges = computed(() => {
     if (key === 'team') {
       return false
     }
-
     return (
       newGroupClass.value[key as keyof EmptyGroupClass] !==
       (props.groupClass ?? defaultNewGroupClass)?.[key as keyof EmptyGroupClass]
@@ -48,27 +48,20 @@ watch(
   },
   { immediate: true },
 )
-
-const required = (v: string) => !!v || 'This field is required'
 </script>
 
 <template>
   <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
-    <VaInput v-model="newGroupClass.name" label="GroupClass name" :rules="[required]" />
-
-    <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
+    <VaInput
+      v-model="newGroupClass.name"
+      label="GroupClass name"
+      :rules="[validators.required2('group class name'), validators.maxLength(50)]"
+    />
+    <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
       <VaButton @click="validate() && $emit('save', newGroupClass as GroupClass)">{{ saveButtonLabel }}</VaButton>
-    </div>
+    </VaCard>
   </VaForm>
 </template>
 
-<style lang="scss" scoped>
-.va-select-content__autocomplete {
-  flex: 1;
-}
-
-.va-input-wrapper__text {
-  gap: 0.2rem;
-}
-</style>
+<style lang="scss" scoped></style>
