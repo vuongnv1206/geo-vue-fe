@@ -15,7 +15,7 @@ const tabs = [
 
 // const router = useRouter()
 // const classStore = useClassStore()
-// const classDetails = (ref < Classrooms) | (null > null)
+// const classDetails = ref<Classrooms | null>(null)
 
 // const classId = router.currentRoute.value.params.id.toString()
 const selectedTab = ref(tabs[0].title)
