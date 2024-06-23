@@ -9,7 +9,7 @@ import { notifications, validators } from '@/services/utils'
 import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { GroupClass } from '@/pages/classrooms/type'
+import { GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
 dayjs.extend(utc)

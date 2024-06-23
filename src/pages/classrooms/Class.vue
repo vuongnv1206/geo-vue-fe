@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, PropType } from 'vue'
-import { Classrooms, GroupClass } from './type'
+import { Classrooms, GroupClass } from './types'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useModal, useToast, VaCard } from 'vuestic-ui'

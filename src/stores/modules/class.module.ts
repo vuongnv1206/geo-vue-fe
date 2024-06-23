@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import classService from '@/services/class.service'
-import { ClassResponse, Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/type'
+import { ClassResponse, Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/types'
 
 export const useClassStore = defineStore('class', {
   state: () => ({}),
@@ -8,6 +8,16 @@ export const useClassStore = defineStore('class', {
     async getClasses(data: any): Promise<ClassResponse> {
       return classService
         .getClasses(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getClassroomById(id: string): Promise<Classrooms> {
+      return classService
+        .getClassroomById(id)
         .then((response) => {
           return Promise.resolve(response)
         })

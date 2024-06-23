@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { EmptyGroupClass, GroupClass } from '../type'
+import { EmptyGroupClass, GroupClass } from '../types'
 import { validators } from '@/services/utils'
 
 const props = defineProps<{

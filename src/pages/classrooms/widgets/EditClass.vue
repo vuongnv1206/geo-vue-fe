@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue'
-import { Classrooms, EmptyClassrooms, GroupClass } from '../type'
+import { Classrooms, EmptyClassrooms, GroupClass } from '../types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { validators } from '@/services/utils'
 import { VaSelect } from 'vuestic-ui/web-components'

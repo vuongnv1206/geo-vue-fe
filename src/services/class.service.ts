@@ -1,4 +1,4 @@
-import { Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/type'
+import { Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/types'
 import apiService from './api.service'
 import { AssignmentClass } from '@/pages/assignment/types'
 
@@ -6,6 +6,17 @@ class ClassService {
   async getClasses(data: any): Promise<any> {
     return apiService
       .post('/v1/class/search', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async getClassroomById(id: string): Promise<any> {
+    return apiService
+      .get(`/v1/class/${id}`)
       .then((response) => {
         return Promise.resolve(response.data)
       })
