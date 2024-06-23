@@ -6,7 +6,7 @@ import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto, SubmitPaperDto, AccessType, PaperAccess } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
-import { Classrooms, GroupClass } from '@/pages/classrooms/type'
+import { Classrooms, GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useClassStore } from '../../stores/modules/class.module'
 

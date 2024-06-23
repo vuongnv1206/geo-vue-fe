@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GroupClass } from '@/pages/classrooms/type'
+import { GroupClass } from '@/pages/classrooms/types'
 import { notifications, validators } from '@/services/utils'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { useAuthStore } from '@/stores/modules/auth.module'

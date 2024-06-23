@@ -9,7 +9,7 @@ import {
 } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { GroupClass } from '../classrooms/type'
+import { GroupClass } from '../classrooms/types'
 import { PermissionNameInClass } from './PermissionInClass.enum'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage } from '@/services/utils'

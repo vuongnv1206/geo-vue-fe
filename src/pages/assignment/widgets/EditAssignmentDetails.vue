@@ -9,7 +9,7 @@ import { notifications, validators } from '@/services/utils'
 import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { GroupClass } from '@/pages/classrooms/type'
+import { GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
 dayjs.extend(utc)
@@ -237,11 +237,11 @@ onMounted(() => {
               <VaDivider />
               <VaScrollContainer class="max-h-80" vertical>
                 <div class="mx-1">
-                  <VaSidebarItem class="cursor-pointer" @click="showAllClassesForAllDepartments"
-                    >All ({{ countAllSelectedClasses }}/{{ countAllClasses }})</VaSidebarItem
-                  >
+                  <VaSidebarItem class="cursor-pointer font-bold" @click="showAllClassesForAllDepartments">
+                    All ({{ countAllSelectedClasses }}/{{ countAllClasses }})
+                  </VaSidebarItem>
                   <div v-for="(groupClass, index) in groupClasses" :key="index">
-                    <VaSidebarItem class="cursor-pointer" @click="showDepartmentClasses(groupClass)"
+                    <VaSidebarItem class="cursor-pointer font-bold" @click="showDepartmentClasses(groupClass)"
                       >{{ groupClass.name }} ({{ countDepartmentSelectedClasses(groupClass) }}/{{
                         groupClass.classes.length
                       }})

@@ -1,4 +1,4 @@
-import { News } from '@/pages/classrooms/type'
+import { News } from '@/pages/classrooms/types'
 import apiService from './api.service'
 
 class NewsService {
