@@ -3,7 +3,7 @@
     <VaAccordion class="w-full" multiple>
       <!-- Loop through grouped assignments and papers -->
       <template v-for="(group, index) in groupedData" :key="index">
-        <VaCollapse :header="format.formatDate(group.createdOn)" solid class="py-1 font-bold">
+        <VaCollapse :header="format.formatDate(group.createOn)" solid class="py-1 font-bold">
           <template #header="{ value, attrs, iconAttrs, text }">
             <VaCard v-bind="attrs" class="w-full flex border-2 p-2 items-center">
               <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" />
@@ -31,7 +31,7 @@
                 <VaIcon name="article" size="3rem" class="text-gray-500" />
                 <div>
                   <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>
-                  <VaCard>Created On: {{ format.formatDate(paper.createdOn) }}</VaCard>
+                  <VaCard>Created On: {{ format.formatDate(paper.createOn) }}</VaCard>
                 </div>
               </VaCard>
             </template>
@@ -42,101 +42,54 @@
   </VaScrollContainer>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup lang="ts">
+import { ref, computed, PropType } from 'vue'
 import { format } from '@/services/utils'
+import { Classrooms } from '../types'
 
-// Assignments data
-const assignments = ref([
-  {
-    id: '1',
-    name: 'Assignment 1',
-    content: 'Content for assignment 1',
-    createdOn: '2024-06-23T03:59:17.437Z',
+const props = defineProps({
+  classDetails: {
+    type: Object as PropType<Classrooms>,
+    required: true,
   },
-  {
-    id: '2',
-    name: 'Assignment 2',
-    content: 'Content for assignment 2',
-    createdOn: '2024-06-23T03:59:17.437Z',
-  },
-  {
-    id: '3',
-    name: 'Assignment 3',
-    content: 'Content for assignment 3',
-    createdOn: '2024-06-23T03:59:17.437Z',
-  },
-  {
-    id: '4',
-    name: 'Assignment 4',
-    content: 'Content for assignment 4',
-    createdOn: '2024-06-24T03:59:17.437Z',
-  },
-  {
-    id: '5',
-    name: 'Assignment 5',
-    content: 'Content for assignment 5',
-    createdOn: '2024-06-25T03:59:17.437Z',
-  },
-])
+})
 
 // Papers data
 const papers = ref([
-  {
-    id: '1',
-    examName: 'Paper 1',
-    createdOn: '2024-06-23T03:59:17.437Z',
-  },
-  {
-    id: '2',
-    examName: 'Paper 2',
-    createdOn: '2024-06-24T03:59:17.437Z',
-  },
-  {
-    id: '3',
-    examName: 'Paper 3',
-    createdOn: '2024-06-25T03:59:17.437Z',
-  },
-  {
-    id: '4',
-    examName: 'Paper 4',
-    createdOn: '2024-06-26T03:59:17.437Z',
-  },
-  {
-    id: '5',
-    examName: 'Paper 5',
-    createdOn: '2024-06-27T03:59:17.437Z',
-  },
+  { id: '1', examName: 'Paper 1', createOn: new Date('2024-06-23T03:59:17.437Z') },
+  { id: '2', examName: 'Paper 2', createOn: new Date('2024-06-24T03:59:17.437Z') },
+  { id: '3', examName: 'Paper 3', createOn: new Date('2024-06-25T03:59:17.437Z') },
+  { id: '4', examName: 'Paper 4', createOn: new Date('2024-06-26T03:59:17.437Z') },
+  { id: '5', examName: 'Paper 5', createOn: new Date('2024-06-27T03:59:17.437Z') },
 ])
 
 // Combined and grouped data
 const groupedData = computed(() => {
-  const groups = {}
-
+  const groups: { [key: string]: any } = {}
   // Add assignments to groups
-  assignments.value.forEach((assignment) => {
-    const createdOn = format.formatDate(assignment.createdOn)
-    if (!groups[createdOn]) {
-      groups[createdOn] = {
-        createdOn: assignment.createdOn,
+  props.classDetails.assignments.forEach((assignment) => {
+    const createOn = format.formatDate(assignment.createOn)
+    if (!groups[createOn]) {
+      groups[createOn] = {
+        createOn: assignment.createOn,
         assignments: [],
         papers: [],
       }
     }
-    groups[createdOn].assignments.push(assignment)
+    groups[createOn].assignments.push(assignment)
   })
 
   // Add papers to groups
   papers.value.forEach((paper) => {
-    const createdOn = format.formatDate(paper.createdOn)
-    if (!groups[createdOn]) {
-      groups[createdOn] = {
-        createdOn: paper.createdOn,
+    const createOn = format.formatDate(paper.createOn)
+    if (!groups[createOn]) {
+      groups[createOn] = {
+        createOn: paper.createOn,
         assignments: [],
         papers: [],
       }
     }
-    groups[createdOn].papers.push(paper)
+    groups[createOn].papers.push(paper)
   })
 
   return Object.values(groups)
