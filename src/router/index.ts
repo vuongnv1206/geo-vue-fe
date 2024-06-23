@@ -60,10 +60,22 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/examination/CreatePaper.vue'),
           },
           {
+            name: 'create-paper-question-bank',
+            path: 'create-paper/:folderId?/question-bank',
+            component: () => import('../pages/examination/CreatePaperInQuestionBank.vue'),
+          },
+
+          {
             name: 'admin-exam-detail',
             path: 'admin/exam-detail/:id',
             component: () => import('../pages/examination/PaperAdminDetail.vue'),
           },
+          {
+            name: 'exam-review',
+            path: 'admin/exam-review/:paperId/:userId/:submitPaperId',
+            component: () => import('../pages/examination/ExamReview.vue'),
+          },
+
           {
             name: 'paper-config',
             path: 'admin/paper-config/:id',
@@ -154,11 +166,27 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/subject/Subject.vue'),
       },
+      {
+        name: 'profile',
+        path: 'profile',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/user/UserProfile.vue'),
+      },
+      {
+        name: 'notifications',
+        path: 'notification',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/notification/Notification.vue'),
+      },
     ],
   },
   {
     name: 'question-edit',
-    path: '/question-edit/:id',
+    path: '/question-edit',
     component: QuestionEditLayout,
   },
   {

@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router'
 import { Classrooms, GroupClass } from '@/pages/classrooms/types'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { UpdatePaperRequest } from './types'
+import { UpdatePaperRequest, PaperAccess, AccessType } from './types'
 import DatePickerModal from '@/pages/examination/widgets/DatePickerModal.vue'
 
 const paperDetail = ref<PaperDto | null>(null)
@@ -60,7 +60,11 @@ const editPaper = ref<UpdatePaperRequest>({
   type: 0,
   isPublish: false,
   description: '',
+  paperAccesses: undefined,
+  shareType: 1,
 })
+
+const valueOption = ref<AccessType>(AccessType.Everyone)
 
 watch(
   () => paperDetail.value,
@@ -81,6 +85,17 @@ watch(
         type: parseInt(paperDetail.value.type ?? '0'), // Assuming type needs to be converted to a number
         isPublish: paperDetail.value.isPublish ?? false,
         description: paperDetail.value.description ?? '',
+        paperAccesses: paperDetail.value.paperAccesses,
+        shareType: paperDetail.value.shareType,
+      }
+
+      valueOption.value = paperDetail.value.shareType as AccessType
+      if (paperDetail.value.paperAccesses !== undefined) {
+        paperDetail.value.paperAccesses.forEach((item: PaperAccess) => {
+          if (item.classId !== undefined) {
+            checkedPermissionsClassAccess.value.push(item.classId)
+          }
+        })
       }
     }
   },
@@ -89,25 +104,21 @@ watch(
 
 const valueSwitch = ref(true)
 
-const valueOption = ref('Everyone')
+const accessOptions = [
+  { value: AccessType.Everyone, text: 'Everyone' },
+  { value: AccessType.ByClass, text: 'By Class' },
+  { value: AccessType.ByStudent, text: 'By Student' },
+]
 
 const groupClasses = ref<GroupClass[] | null>(null)
 const classRoomsInGroup = ref<Classrooms[]>([])
 const selectedGroupClass = ref<string>('')
-const dataFilter = {
-  keyword: '',
-  pageNumber: 0,
-  pageSize: 100,
-  orderBy: ['id'],
-  groupClassId: '',
-}
 
 const getClassByGroupClass = (groupId: string) => {
-  dataFilter.groupClassId = groupId
   classStores
-    .getClassSearch(dataFilter)
+    .getClassroomByGroupClassId(groupId)
     .then((res) => {
-      classRoomsInGroup.value = res.data
+      classRoomsInGroup.value = res
       selectedGroupClass.value = groupId
     })
     .catch((error) => {
@@ -150,6 +161,8 @@ const saveDraffPaper = (isPublish: boolean) => {
     startTime: editPaper.value.startTime,
     endTime: editPaper.value.endTime,
     isPublish: editPaper.value.isPublish,
+    paperAccess: checkedPermissionsClassAccess.value.map((classId) => ({ classId: classId })),
+    shareType: valueOption.value,
   }
   paperStore
     .paperUpdate(paperId.toString(), payload)
@@ -173,6 +186,8 @@ const resetAccessTime = () => {
   editPaper.value.startTime = undefined
   editPaper.value.endTime = undefined
 }
+
+const checkedPermissionsClassAccess = ref<string[]>([])
 
 onMounted(() => {
   getPaperDetail()
@@ -268,13 +283,9 @@ onMounted(() => {
               >
             </div>
             <p class="mt-2 text-xs va-text-bold">Who is allowed to take the exam?</p>
-            <VaRadio
-              v-model="valueOption"
-              :options="['Everyone', 'By Class', 'By Student']"
-              class="assign-radio mb-2"
-            />
+            <VaRadio v-model="valueOption" :options="accessOptions" class="assign-radio mb-2" value-by="value" />
             <div
-              v-if="valueOption === 'By Class' && groupClasses !== null"
+              v-if="valueOption === AccessType.ByClass && groupClasses !== null"
               class="grid grid-cols-3 gap-2 items-start col-span-2"
             >
               <VaCard outlined class="border-style col-span-1">
@@ -305,12 +316,12 @@ onMounted(() => {
                   </div>
                 </div>
                 <VaDivider class="m-0" />
-                <VaCardContent class="grid grid-cols-3">
-                  <VaCheckbox
-                    v-for="classroom in classRoomsInGroup"
-                    :key="classroom.id"
-                    class="mr-2 mb-2"
-                    :label="classroom.name"
+                <VaCardContent>
+                  <VaOptionList
+                    v-model="checkedPermissionsClassAccess"
+                    :options="classRoomsInGroup"
+                    :text-by="(op: Classrooms) => op.name"
+                    value-by="id"
                   />
                 </VaCardContent>
               </VaCard>

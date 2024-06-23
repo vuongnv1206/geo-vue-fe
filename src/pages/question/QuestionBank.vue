@@ -320,7 +320,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1 class="h1">Question Bank</h1>
   <section class="flex flex-col gap-4">
     <div class="flex flex-col sm:flex-row gap-4">
       <div class="w-full sm:w-[25%]">
@@ -368,7 +367,7 @@ onMounted(() => {
         </VaInnerLoading>
       </div>
       <div class="flex flex-col gap-4 w-full sm:w-[75%]">
-        <VaCard class="flex flex-col min-h-[800px]">
+        <VaCard class="flex flex-col min-h-[80vh]">
           <VaCardTitle class="flex items-start justify-between">
             <h1 class="card-title text-secondary font-bold uppercase">
               List question of <b>{{ currentSelectedFolder?.name || '?' }}</b>
@@ -453,7 +452,7 @@ onMounted(() => {
             </div>
           </VaCard>
           <VaInnerLoading v-else :loading="loadingQuestion" :size="60">
-            <VaScrollContainer class="min-h-[600px] max-h-[500px]" vertical>
+            <VaScrollContainer class="min-h-[600px] max-h-[70vh]" vertical>
               <VaSkeletonGroup v-if="loadingQuestion" animation="wave" :delay="0">
                 <VaCard>
                   <VaCardContent class="flex items-center">

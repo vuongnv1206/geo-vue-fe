@@ -80,6 +80,7 @@
   },
   "notifications": {
     "all": "See all notifications",
+    "more": "See more notifications",
     "less": "See less notifications",
     "mark_as_read": "Mark as read",
     "sentMessage": "sent you a message",

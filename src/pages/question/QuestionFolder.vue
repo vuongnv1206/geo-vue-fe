@@ -268,6 +268,14 @@ const deleteQuestionTree = (questionTree: QuestionTree) => {
   }
 }
 
+const deleteQuestionTreeOne = (questionTree: QuestionTree) => {
+  confirm('Are you sure you want to delete ' + questionTree.name + '?').then((agreed) => {
+    if (agreed) {
+      deleteQuestionTree(questionTree)
+    }
+  })
+}
+
 const deleteSelectedFolder = () => {
   confirm('Are you sure you want to delete selected folders?').then((agreed) => {
     if (agreed) {
@@ -456,7 +464,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1 v-if="props.showTitle" class="page-title font-bold">Question Folder</h1>
   <VaCard>
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
@@ -481,7 +488,7 @@ onMounted(() => {
           >
             Delete</VaButton
           >
-          <VaButton v-if="props.mode == 'full'" icon="add" @click="createNewQuestionFolder()">Question Folder</VaButton>
+          <VaButton v-if="props.mode == 'full'" icon="add" @click="createNewQuestionFolder()">Folder</VaButton>
         </div>
       </div>
       <QuestionFolder
@@ -490,7 +497,7 @@ onMounted(() => {
         :loading="loading"
         :mode="props.mode"
         @edit="editQuestionTree"
-        @delete="deleteQuestionTree"
+        @delete="deleteQuestionTreeOne"
         @selectedFolder="selectedFolder"
         @share="shareQuestionTree"
       />

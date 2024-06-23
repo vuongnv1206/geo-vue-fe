@@ -16,8 +16,10 @@
           <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
             <!-- Loop through assignments -->
             <template v-for="assignment in group.assignments" :key="assignment.id">
-              <VaCard class="border border-gray-200 rounded-lg overflow-hidden p-4 mb-4 flex space-x-4">
-                <!-- :to="{ name: 'assignment-details', params: { id: assignment.id, classId: assignment.classId } }"> -->
+              <VaCard
+                class="border border-gray-200 rounded-lg overflow-hidden p-4 mb-4 flex space-x-4"
+                :to="{ name: 'assignment-details', params: { id: assignment.id, classId: props.classDetails.id } }"
+              >
                 <VaIcon name="description" size="3rem" class="text-gray-500" />
                 <div>
                   <VaCardTitle class="font-medium text-lg">{{ assignment.name }}</VaCardTitle>

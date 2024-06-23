@@ -70,8 +70,8 @@ const formData = reactive({
 const store = useAuthStore()
 
 const submit = async () => {
-  isLoading.value = true
   if (validate()) {
+    isLoading.value = true
     await reCaptcha?.recaptchaLoaded()
     const captchaToken = await reCaptcha?.executeRecaptcha('login')
     store

@@ -17,7 +17,7 @@
       </div>
     </template>
     <template #right>
-      <AppNavbarActions class="app-navbar__actions" :is-mobile="isMobile" />
+      <AppNavbarActions ref="navbarActionsRef" class="app-navbar__actions" :is-mobile="isMobile" />
     </template>
   </VaNavbar>
 </template>

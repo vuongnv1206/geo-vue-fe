@@ -5,7 +5,7 @@
     @leftOverlayClick="isSidebarMinimized = true"
   >
     <template #top>
-      <AppNavbar :is-mobile="isMobile" />
+      <AppNavbar ref="navbarRef" :is-mobile="isMobile" />
     </template>
 
     <template #left>
@@ -21,7 +21,10 @@
       <AppLayoutNavigation v-if="!isMobile" class="p-4" />
       <main class="p-4 pt-0">
         <article>
-          <RouterView />
+          <!-- <RouterView /> -->
+          <RouterView v-slot="{ Component }">
+            <component :is="Component" ref="notificationRef" />
+          </RouterView>
         </article>
       </main>
     </template>
@@ -39,6 +42,7 @@ import { useGlobalStore } from '../stores/global-store'
 import AppLayoutNavigation from '../components/app-layout-navigation/AppLayoutNavigation.vue'
 import AppNavbar from '../components/navbar/AppNavbar.vue'
 import AppSidebar from '../components/sidebar/AppSidebar.vue'
+import signalRService from '@/signalR'
 
 const GlobalStore = useGlobalStore()
 
@@ -80,6 +84,30 @@ const isFullScreenSidebar = computed(() => isTablet.value && !isSidebarMinimized
 const onCloseSidebarButtonClick = () => {
   isSidebarMinimized.value = true
 }
+
+const notificationRef = ref(null)
+const navbarRef = ref(null)
+
+const handleReceiveNotification = (type, notification) => {
+  if (notificationRef.value?.receiveNotification) {
+    notificationRef.value.receiveNotification(type, notification)
+  }
+  const notificationDropdownRef = navbarRef.value?.$refs?.navbarActionsRef?.$refs?.notificationDropdownRef
+  if (notificationDropdownRef?.receiveNotificationFromServer) {
+    notificationDropdownRef.receiveNotificationFromServer(type, notification)
+  }
+}
+onMounted(async () => {
+  const url = import.meta.env.VITE_APP_BASE_URL
+  const path = url.replace('/api', '/') + 'notifications'
+  await signalRService.connect(`${path}`)
+  signalRService.on('NotificationFromServer', handleReceiveNotification)
+})
+
+onBeforeUnmount(() => {
+  signalRService.off('receiveNotificationFromServer')
+  signalRService.disconnect()
+})
 </script>
 
 <style lang="scss" scoped>

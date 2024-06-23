@@ -86,7 +86,7 @@ export const useClassStore = defineStore('class', {
           return Promise.reject(error)
         })
     },
-    async getUserInClass(id: string): Promise<Classrooms> {
+    async getUserInClass(id: string): Promise<any> {
       return classService
         .getUserInClass(id)
         .then((response) => {
@@ -139,6 +139,16 @@ export const useClassStore = defineStore('class', {
     async removeAssignmentFromClass(data: any): Promise<any> {
       return classService
         .removeAssignmentFromClass(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async GetClassById(id: string): Promise<Classrooms> {
+      return classService
+        .GetClassById(id)
         .then((response) => {
           return Promise.resolve(response)
         })
