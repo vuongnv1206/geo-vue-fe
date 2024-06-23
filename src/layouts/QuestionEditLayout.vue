@@ -539,7 +539,7 @@ onMounted(() => {
               </div>
             </VaCard>
           </div>
-          <div class="">
+          <div class="geo-editor">
             <div class="flex justify-start p-1">
               <div class="w-full">
                 <Richer
@@ -596,83 +596,83 @@ onMounted(() => {
 </template>
 
 <style>
-.i-single_choice::before {
+.geo-editor .i-single_choice::before {
   content: '\2688';
   margin-bottom: 4px;
 }
 
-.i-multiple_choice::before {
+.geo-editor .i-multiple_choice::before {
   content: '\2689';
   margin-bottom: 4px;
 }
 
-.i-fill_blank::before {
+.geo-editor .i-fill_blank::before {
   content: '\268A';
   margin-bottom: 4px;
 }
 
-.i-matching::before {
+.geo-editor .i-matching::before {
   content: '\268B';
   margin-bottom: 4px;
 }
 
-.i-reading::before {
+.geo-editor .i-reading::before {
   content: '\268C';
   margin-bottom: 4px;
 }
 
-.i-writing::before {
+.geo-editor .i-writing::before {
   content: '\268D';
   margin-bottom: 4px;
 }
 
-.richer__content {
+.geo-editor .richer__content {
   padding: 12px;
   outline: none;
   flex-grow: 1;
   font-size: 14px;
 }
 
-.richer__placeholder {
+.geo-editor .richer__placeholder {
   display: none;
 }
 
-.richer__content strong {
+.geo-editor .richer__content strong {
   font-family: Consolas, 'Courier New', monospace;
 }
 
-.richer__content p {
+.geo-editor .richer__content p {
   font-family: Consolas, 'Courier New', monospace;
   counter-increment: line;
   position: relative;
 }
 
-.richer__content br {
+.geo-editor .richer__content br {
   counter-increment: line;
   position: relative;
 }
 
-.richer__content span {
+.geo-editor .richer__content span {
   font-family: Consolas, 'Courier New', monospace;
 }
 
-.richer__content {
+.geo-editor .richer__content {
   counter-reset: line;
   position: relative;
   padding-left: 70px;
   /* Adjust the left padding as needed */
 }
 
-.richer__content > * {
+.geo-editor .richer__content > * {
   counter-increment: line;
   position: relative;
 }
 
-.passage_q {
+.geo-editor .passage_q {
   margin-left: 25px;
 }
 
-.passage_q::before {
+.geo-editor .passage_q::before {
   content: counter(line);
   position: absolute;
   left: -75px !important;
@@ -681,7 +681,7 @@ onMounted(() => {
   color: #237893;
 }
 
-.richer__content > *::before {
+.geo-editor .richer__content > *::before {
   content: counter(line);
   position: absolute;
   left: -50px;
