@@ -21,11 +21,13 @@ import {
 } from '@services/geo-markdown/geo-markdown'
 import { useRouter } from 'vue-router'
 import { getErrorMessage } from '@/services/utils'
+import { useQuestionStore } from '@/stores/modules/question.module'
+import { storeToRefs } from 'pinia'
 
 const breakpoints = useBreakpoint()
 const storesQEdit = useQuestionEditStore()
 const isMobile = ref(false)
-
+const storesQuestion = useQuestionStore()
 const onResize = () => {
   isMobile.value = breakpoints.smDown
 }
@@ -412,8 +414,9 @@ const addTemplateWriting = () => {
   renderEditorContent()
   editor.innerHTML = editorContent.value
 }
-
+const { sellectedQuestionFolderId } = storeToRefs(storesQuestion)
 const handleBack = () => {
+  sellectedQuestionFolderId.value = storesQEdit.folder?.id
   window.history.back()
 }
 

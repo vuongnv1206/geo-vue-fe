@@ -12,6 +12,8 @@ import { getErrorMessage } from '@/services/utils'
 import { GroupTeacher, TeacherTeam, TeacherTeamTeacherGroupCombine } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
 import { avatarColor } from '@/services/utils'
+import { useQuestionStore } from '@/stores/modules/question.module'
+import { storeToRefs } from 'pinia'
 
 const loading = ref(true)
 const currentShowFolderId = ref<string>('')
@@ -82,6 +84,9 @@ const doShowQuestionTreeFormModal = ref(false)
 const doShowShareQuestionTreeFormModal = ref(false)
 const doShowQuestionTreePermisionFormModal = ref(false)
 const doShowQuestionTreePermisionFormAddModal = ref(false)
+
+const storesQuestion = useQuestionStore()
+const { needReloadQuestionFolder } = storeToRefs(storesQuestion)
 
 const editQuestionTree = (questionTree: QuestionTree) => {
   QuestionTreeToEdit.value = questionTree
@@ -268,6 +273,7 @@ const deleteQuestionTree = (questionTree: QuestionTree) => {
       })
       .finally(() => {
         loading.value = false
+        needReloadQuestionFolder.value = true
       })
   }
 }
@@ -358,6 +364,7 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
       })
       .finally(() => {
         loading.value = false
+        needReloadQuestionFolder.value = true
       })
   } else {
     if (currentShowFolderId.value != '') {
@@ -451,11 +458,10 @@ const onShareQuestionFolderPermission = () => {
 }
 const tabValue = ref(0)
 
-const idf = ref('')
-
+const { sellectedQuestionFolderId } = storeToRefs(storesQuestion)
 const showQuestions = (id: string) => {
   tabValue.value = 0
-  idf.value = id
+  sellectedQuestionFolderId.value = id
 }
 
 watch(
@@ -524,7 +530,7 @@ onMounted(() => {
       />
     </VaCardContent>
   </VaCard>
-  <QuestionBank v-else :idf="idf" @edit="editQuestionTree" @delete="deleteQuestionTreeOne" @share="shareQuestionTree" />
+  <QuestionBank v-else @edit="editQuestionTree" @delete="deleteQuestionTreeOne" @share="shareQuestionTree" />
   <VaModal
     v-slot="{ cancel, ok }"
     v-model="doShowQuestionTreeFormModal"

@@ -3,7 +3,10 @@ import questionService from '@/services/question.service'
 import { QuestionSearchRes, SearchQuestion } from '@pages/question/types'
 
 export const useQuestionStore = defineStore('question', {
-  state: () => ({}),
+  state: () => ({
+    sellectedQuestionFolderId: '',
+    needReloadQuestionFolder: false,
+  }),
   actions: {
     async SearchQuestion(data: SearchQuestion): Promise<QuestionSearchRes> {
       return questionService

@@ -10,6 +10,7 @@ import { useRouter } from 'vue-router'
 import { getErrorMessage } from '@/services/utils'
 import { QuestionTypeColor } from '@services/utils'
 import QuestionView from './widgets/QuestionView.vue'
+import { storeToRefs } from 'pinia'
 
 const nodes = ref<QuestionTree[]>([])
 const stores = useQuestionFolderStore()
@@ -43,14 +44,6 @@ const QuestionSortOptions = [
   { id: 1, name: 'Oldest', questionType: 2 },
   { id: 2, name: 'Last Modified', questionType: 4 },
 ]
-
-const props = defineProps({
-  idf: {
-    type: String,
-    required: false,
-    default: '',
-  },
-})
 
 const emit = defineEmits<{
   (event: 'edit', questionTree: QuestionTree): void
@@ -318,20 +311,6 @@ watch(
   { immediate: true },
 )
 
-watch(
-  () => props.idf,
-  () => {
-    console.log('props.idf', props.idf)
-    if (props.idf) {
-      const node = findNode(nodes.value, props.idf)
-      if (node) {
-        handleSelectFolder(node)
-      }
-    }
-  },
-  { immediate: true },
-)
-
 const contextmenu = (event: any, node: QuestionTree) => {
   event.preventDefault()
   show({
@@ -344,45 +323,40 @@ const contextmenu = (event: any, node: QuestionTree) => {
     onSelected(option) {
       if (option.text === 'Rename') {
         emit('edit', node)
-        setTimeout(() => {
-          loading.value = true
-          stores
-            .getQuestionFolders('')
-            .then((res) => {
-              nodes.value = res.children
-            })
-            .catch((err) => {
-              console.log(err)
-            })
-            .finally(() => {
-              loading.value = false
-            })
-        }, 1000)
       }
       if (option.text === 'Share') {
         emit('share', node)
       }
       if (option.text === 'Delete') {
         emit('delete', node)
-        // delay to reload the tree
-        setTimeout(() => {
-          loading.value = true
-          stores
-            .getQuestionFolders('')
-            .then((res) => {
-              nodes.value = res.children
-            })
-            .catch((err) => {
-              console.log(err)
-            })
-            .finally(() => {
-              loading.value = false
-            })
-        }, 1000)
       }
     },
   })
 }
+
+const { needReloadQuestionFolder, sellectedQuestionFolderId } = storeToRefs(storesQuestion)
+
+watch(
+  () => needReloadQuestionFolder.value,
+  () => {
+    if (needReloadQuestionFolder.value) {
+      loading.value = true
+      stores
+        .getQuestionFolders('')
+        .then((res) => {
+          nodes.value = res.children
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          loading.value = false
+          needReloadQuestionFolder.value = false
+        })
+    }
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
   loading.value = true
@@ -390,6 +364,14 @@ onMounted(() => {
     .getQuestionFolders('')
     .then((res) => {
       nodes.value = res.children
+
+      if (sellectedQuestionFolderId.value !== '') {
+        const node = findNode(nodes.value, sellectedQuestionFolderId.value)
+        if (node) {
+          handleSelectFolder(node)
+        }
+        sellectedQuestionFolderId.value = ''
+      }
     })
     .catch((err) => {
       console.log(err)
