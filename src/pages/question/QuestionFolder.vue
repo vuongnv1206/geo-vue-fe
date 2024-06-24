@@ -459,10 +459,28 @@ const onShareQuestionFolderPermission = () => {
 const tabValue = ref(0)
 
 const { sellectedQuestionFolderId } = storeToRefs(storesQuestion)
-const showQuestions = (id: string) => {
+const showQuestions = () => {
   tabValue.value = 0
-  sellectedQuestionFolderId.value = id
+  sellectedQuestionFolderId.value = currentShowFolderId.value
 }
+
+const getTotalQuestions = () => {
+  if (currentShowFolderId.value === '') {
+    let total = 0
+    questionTrees.value.forEach((folder) => {
+      total += folder.totalQuestions || 0
+    })
+    return total
+  } else {
+    return totalQuestions.value
+  }
+}
+
+const searchTerm = ref('')
+
+const handleSearch = () => {}
+
+const folderPermissionType = ref(0) // 0: all, 1: my documents, 2: shared documents
 
 watch(
   () => permissionEdit.value,
@@ -489,39 +507,85 @@ onMounted(() => {
     </template>
   </VaTabs>
   <VaCard v-if="tabValue == 1" class="pb-0">
-    <VaCardContent class="pb-0">
-      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
-        <div class="flex flex-col md:flex-row gap-2 justify-start">
-          <VaBreadcrumbs>
-            <VaBreadcrumbsItem
-              v-for="item in QuestionFolderBreadcrumb"
-              :key="item.label"
-              :label="item.label"
-              @click="handleBreadcrumbClick(item)"
+    <VaCard class="flex flex-col sm:flex-row gap-2 p-2 mb-2">
+      <VaInput v-model="searchTerm" placeholder="Search" class="flex-grow">
+        <template #appendInner>
+          <VaIcon color="secondary" class="material-icons" @click="handleSearch">search</VaIcon>
+        </template>
+      </VaInput>
+      <VaCard class="flex justify-end items-center">
+        <VaCard class="flex gap-2">
+          <div class="flex flex-row gap-2 justify-end">
+            <VaButton
+              v-if="selectedItemsEmitted.length != 0 && props.mode == 'full'"
+              icon="delete"
+              color="danger"
+              @click="deleteSelectedFolder()"
             >
-              <a href="#" class="text-blue-500">{{ item.label }}</a>
-            </VaBreadcrumbsItem>
-          </VaBreadcrumbs>
-        </div>
-        <div class="flex flex-col md:flex-row gap-2 justify-end">
-          <VaButton
-            v-if="selectedItemsEmitted.length != 0 && props.mode == 'full'"
-            icon="delete"
-            color="danger"
-            @click="deleteSelectedFolder()"
-          >
-            Delete</VaButton
-          >
-          <VaButton
-            v-if="props.mode == 'full'"
-            icon="add"
-            size="small"
-            class="uppercase"
-            @click="createNewQuestionFolder()"
-            >Add Folder</VaButton
-          >
-        </div>
-      </div>
+              Delete</VaButton
+            >
+            <VaButton v-if="props.mode == 'full'" class="w-[150px]" icon="add" @click="createNewQuestionFolder()"
+              >Add Folder</VaButton
+            >
+          </div>
+          <VaDropdown placement="bottom-end">
+            <template #anchor>
+              <VaButton icon="filter_alt" />
+            </template>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="folderPermissionType == 0 ? 'check' : ''"
+                @click="folderPermissionType = 0"
+                >All</VaButton
+              >
+            </VaDropdownContent>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="folderPermissionType == 1 ? 'check' : ''"
+                @click="folderPermissionType = 1"
+                >My Documents</VaButton
+              >
+            </VaDropdownContent>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="folderPermissionType == 2 ? 'check' : ''"
+                >Shared Documents</VaButton
+              >
+            </VaDropdownContent>
+          </VaDropdown>
+        </VaCard>
+      </VaCard>
+    </VaCard>
+    <VaCardTitle class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
+      <VaBreadcrumbs>
+        <VaBreadcrumbsItem
+          v-for="item in QuestionFolderBreadcrumb"
+          :key="item.label"
+          :label="item.label"
+          @click="handleBreadcrumbClick(item)"
+        >
+          <a href="#" class="text-blue-500">{{ item.label }}</a>
+        </VaBreadcrumbsItem>
+      </VaBreadcrumbs>
+      <VaCard class="flex justify-end w-[180px]">
+        <VaButton preset="primary" size="small" color="primary" @click="showQuestions">
+          View {{ getTotalQuestions() }} Questions
+        </VaButton>
+      </VaCard>
+    </VaCardTitle>
+    <VaCardContent class="pb-0">
       <QuestionFolder
         v-model:selectedItemsEmitted="selectedItemsEmitted"
         :question-trees="questionTrees"

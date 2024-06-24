@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onBeforeMount, PropType } from 'vue'
+import { computed, onBeforeMount, PropType, ref } from 'vue'
 import { defineVaDataTableColumns, useMenu } from 'vuestic-ui'
-import { QuestionTree } from '../types'
+import { Pagination, QuestionTree } from '../types'
 
 const { show } = useMenu()
 
@@ -83,26 +83,17 @@ const handleSelectionChange = (selectedItems: QuestionTree[]) => {
   selectedItemsEmitted.value = selectedItems
 }
 
-const showQuestions = () => {
-  console.log(props.currentShowFolderId)
-  emit('viewQuestions', props.currentShowFolderId)
-}
-
 const hasChildren = (node: QuestionTree) => {
   return node.children && node.children.length > 0
 }
 
-const getTotalQuestions = () => {
-  if (props.currentShowFolderId === '') {
-    let total = 0
-    props.questionTrees.forEach((folder) => {
-      total += folder.totalQuestions || 0
-    })
-    return total
-  } else {
-    return props.totalQuestions
-  }
-}
+const pagination = ref<Pagination>({
+  page: 1,
+  perPage: 20,
+  total: 0,
+})
+
+const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.value.perPage))
 
 onBeforeMount(() => {
   // edit column if mode is lite
@@ -181,15 +172,42 @@ onBeforeMount(() => {
         </div>
       </template>
     </VaDataTable>
-    <VaCard class="flex justify-center pb-0">
-      <div class="flex flex-col w-full">
-        <VaCardContent class="flex flex-col items-center justify-center pb-2">
-          <VaButton preset="primary" size="small" color="primary" class="mt-2" @click="showQuestions">
-            View {{ getTotalQuestions() }} Questions
-          </VaButton>
-        </VaCardContent>
+
+    <VaCardContent>
+      <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center pt-0 pb-0">
+        <div>
+          <b>{{ pagination.total }} results.</b>
+          Results per page
+          <VaSelect v-model="pagination.perPage" class="!w-20" :options="[20, 50, 100]" />
+        </div>
+
+        <div v-if="totalPages > 1" class="flex">
+          <VaButton
+            preset="secondary"
+            icon="va-arrow-left"
+            aria-label="Previous page"
+            :disabled="pagination.page === 1"
+            @click="pagination.page--"
+          />
+          <VaButton
+            class="mr-2"
+            preset="secondary"
+            icon="va-arrow-right"
+            aria-label="Next page"
+            :disabled="pagination.page === totalPages"
+            @click="pagination.page++"
+          />
+          <VaPagination
+            v-model="pagination.page"
+            buttons-preset="secondary"
+            :pages="totalPages"
+            :visible-pages="5"
+            :boundary-links="false"
+            :direction-links="false"
+          />
+        </div>
       </div>
-    </VaCard>
+    </VaCardContent>
   </div>
 </template>
 

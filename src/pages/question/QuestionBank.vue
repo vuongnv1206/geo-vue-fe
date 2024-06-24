@@ -409,7 +409,7 @@ onMounted(() => {
     @leftOverlayClick="isSidebarVisibleChild = false"
   >
     <template #top>
-      <VaNavbar class="py-2 mt-2">
+      <VaNavbar class="py-2">
         <template #left>
           <VaButton
             size="small"
@@ -424,7 +424,7 @@ onMounted(() => {
         </template>
         <template #right>
           <div class="flex gap-2">
-            <VaButton icon="add" size="small" class="uppercase" @click="AddNewQuestion">Add question</VaButton>
+            <VaButton icon="add" @click="AddNewQuestion">Add question</VaButton>
           </div>
         </template>
       </VaNavbar>
