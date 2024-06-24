@@ -58,5 +58,15 @@ export const useGroupClassStore = defineStore('groupClass', {
           return Promise.reject(error)
         })
     },
+    async sharedGroupClass(dataFilter: any): Promise<GroupClassResponse> {
+      return groupClassService
+        .sharedGroupClass(dataFilter)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })
