@@ -4,6 +4,8 @@ import {
   PaperStudentDto,
   CreatePaperRequest,
   PaperResponse,
+  SearchSharedPaperRequest,
+  PaperInListDto,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -15,6 +17,8 @@ export interface IPapersService {
   paperDetail(id: string): Promise<PaperDto>
 
   paperUpdate(id: string, request: UpdatePaperRequest): Promise<any>
+
+  papers_SearchSharedPaper(request: SearchSharedPaperRequest): Promise<PaperInListDto[]>
 }
 
 export class PapersService implements IPapersService {
@@ -89,6 +93,19 @@ export class PapersService implements IPapersService {
       })
       .catch((error) => {
         return Promise.reject(error)
+      })
+  }
+
+  async papers_SearchSharedPaper(request: SearchSharedPaperRequest): Promise<PaperInListDto[]> {
+    const url = '/v1/papers/shared'
+
+    return apiService
+      .post(url, request)
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
       })
   }
 }

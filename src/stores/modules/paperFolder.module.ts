@@ -3,6 +3,7 @@ import {
   CreatePaperFolderRequest,
   PaperFolderDto,
   PaperFolderResponse,
+  SearchSharedPaperFolderRequest,
   SharePaperFolderRequest,
   UpdatePaperFolderRequest,
 } from '@/pages/examination/types'
@@ -58,6 +59,15 @@ export const usePaperFolderStore = defineStore('paperFolder', {
     },
     async getListParents(id: string): Promise<PaperFolderDto[]> {
       return await PaperFoldersService.paperFolders_GetParents(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async searchSharedPaperFolders(request: SearchSharedPaperFolderRequest): Promise<PaperFolderDto[]> {
+      return await PaperFoldersService.paperFolders_SearchShared(request)
         .then((response) => {
           return Promise.resolve(response)
         })
