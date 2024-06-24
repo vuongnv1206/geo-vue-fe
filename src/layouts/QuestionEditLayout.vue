@@ -414,7 +414,12 @@ const addTemplateWriting = () => {
   renderEditorContent()
   editor.innerHTML = editorContent.value
 }
-const { sellectedQuestionFolderId } = storeToRefs(storesQuestion)
+
+const infoEditQ = () => {
+  console.log('info')
+}
+
+const { sellectedQuestionFolderId, editMode, questionToEdit } = storeToRefs(storesQuestion)
 const handleBack = () => {
   sellectedQuestionFolderId.value = storesQEdit.folder?.id
   window.history.back()
@@ -423,33 +428,132 @@ const handleBack = () => {
 const isLoading = ref(false)
 
 const handleSaveBtn = () => {
-  console.log(listQuestions.value)
-  const request: CreateQuestionsRequest = {
-    questions: listQuestions.value,
-  }
-  isLoading.value = true
-  storesQEdit
-    .createQuestion(request)
-    .then(() => {
-      init({
-        title: 'Success',
-        message: 'Questions created successfully',
-        color: 'success',
-      })
-      router.push({ name: 'question-bank' })
-    })
-    .catch((error) => {
-      const message = getErrorMessage(error)
+  if (editMode.value) {
+    console.log('edit')
+    if (listQuestions.value.length === 0) {
       init({
         title: 'Error',
-        message: message,
+        message: 'Please add questions',
         color: 'danger',
       })
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
+    } else {
+      const q = listQuestions.value.at(-1)
+      questionToEdit.value.questionFolderId = storesQEdit.folder?.id
+      questionToEdit.value.content = q?.content || ''
+      questionToEdit.value.image = q?.image || null
+      questionToEdit.value.audio = q?.audio || null
+      questionToEdit.value.questionType = q?.questionType || QuestionType.Other
+      questionToEdit.value.questionPassages = q?.questionPassages || []
+      for (let i = 0; i < questionToEdit.value.answers.length; i++) {
+        questionToEdit.value.answers[i].content = q?.answers[i].content || ''
+        questionToEdit.value.answers[i].isCorrect = q?.answers[i].isCorrect || false
+      }
+      if (q?.answers?.length) {
+        if (q?.answers?.length > questionToEdit.value.answers.length) {
+          for (let i = questionToEdit.value.answers.length; i < q?.answers.length; i++) {
+            questionToEdit.value.answers.push({
+              content: q?.answers[i].content || '',
+              isCorrect: q?.answers[i].isCorrect || false,
+            })
+          }
+        }
+      }
+      questionToEdit.value.questionLable = q?.questionLable || null
+      if (q) {
+        isLoading.value = true
+        storesQuestion
+          .updateQuestion(questionToEdit.value)
+          .then(() => {
+            init({
+              title: 'Success',
+              message: 'Question updated successfully',
+              color: 'success',
+            })
+            sellectedQuestionFolderId.value = storesQEdit.folder?.id
+            router.push({ name: 'question-bank' })
+          })
+          .catch((error) => {
+            const message = getErrorMessage(error)
+            init({
+              title: 'Error',
+              message: message,
+              color: 'danger',
+            })
+          })
+          .finally(() => {
+            isLoading.value = false
+          })
+      }
+    }
+  } else {
+    console.log(listQuestions.value)
+    const request: CreateQuestionsRequest = {
+      questions: listQuestions.value,
+    }
+    isLoading.value = true
+    storesQEdit
+      .createQuestion(request)
+      .then(() => {
+        init({
+          title: 'Success',
+          message: 'Questions created successfully',
+          color: 'success',
+        })
+        sellectedQuestionFolderId.value = storesQEdit.folder?.id
+        router.push({ name: 'question-bank' })
+      })
+      .catch((error) => {
+        const message = getErrorMessage(error)
+        init({
+          title: 'Error',
+          message: message,
+          color: 'danger',
+        })
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
+  }
 }
+
+const button = [
+  {
+    name: 'AddSingleChoice',
+    label: 'Add single choice template',
+    icon: 'i-single_choice',
+    action: addTemplateSingleChoice,
+  },
+  {
+    name: 'AddMultipleChoice',
+    label: 'Add multiple choice template',
+    icon: 'i-multiple_choice',
+    action: addTemplateMultipleChoice,
+  },
+  {
+    name: 'AddFillBlank',
+    label: 'Add fill blank template',
+    icon: 'i-fill_blank',
+    action: addTemplateFillBlank,
+  },
+  {
+    name: 'AddMatching',
+    label: 'Add matching template',
+    icon: 'i-matching',
+    action: addTemplateMatching,
+  },
+  {
+    name: 'AddReading',
+    label: 'Add reading template',
+    icon: 'i-reading',
+    action: addTemplateReading,
+  },
+  {
+    name: 'AddWriting',
+    label: 'Add writing template',
+    icon: 'i-writing',
+    action: addTemplateWriting,
+  },
+]
 
 onMounted(() => {
   window.addEventListener('resize', onResize)
@@ -537,7 +641,9 @@ onMounted(() => {
                   class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200"
                   @click="handleSaveBtn"
                 >
-                  <div class="mx-2"><VaIcon name="mso-save" /> <span>Save</span></div>
+                  <div class="mx-2">
+                    <VaIcon name="mso-save" /> <span> {{ editMode ? 'Update' : 'Save' }}</span>
+                  </div>
                 </button>
               </div>
             </VaCard>
@@ -546,46 +652,25 @@ onMounted(() => {
             <div class="flex justify-start p-1">
               <div class="w-full">
                 <Richer
+                  v-if="!editMode"
                   :model-value="editorContent"
+                  :buttons="button"
+                  class="h-[90vh]"
+                  @keyup="handleEditor"
+                  @click="handleEditorClick"
+                ></Richer>
+                <Richer
+                  v-else
+                  :model-value="editorContent"
+                  class="h-[90vh]"
                   :buttons="[
                     {
-                      name: 'AddSingleChoice',
-                      label: 'Add single choice template',
-                      icon: 'i-single_choice',
-                      action: addTemplateSingleChoice,
-                    },
-                    {
-                      name: 'AddMultipleChoice',
-                      label: 'Add multiple choice template',
-                      icon: 'i-multiple_choice',
-                      action: addTemplateMultipleChoice,
-                    },
-                    {
-                      name: 'AddFillBlank',
-                      label: 'Add fill blank template',
-                      icon: 'i-fill_blank',
-                      action: addTemplateFillBlank,
-                    },
-                    {
-                      name: 'AddMatching',
-                      label: 'Add matching template',
-                      icon: 'i-matching',
-                      action: addTemplateMatching,
-                    },
-                    {
-                      name: 'AddReading',
-                      label: 'Add reading template',
-                      icon: 'i-reading',
-                      action: addTemplateReading,
-                    },
-                    {
-                      name: 'AddWriting',
-                      label: 'Add writing template',
-                      icon: 'i-writing',
-                      action: addTemplateWriting,
+                      name: 'Info',
+                      label: 'Info',
+                      icon: 'i-info',
+                      action: infoEditQ,
                     },
                   ]"
-                  class="h-[90vh]"
                   @keyup="handleEditor"
                   @click="handleEditorClick"
                 ></Richer>
@@ -626,6 +711,11 @@ onMounted(() => {
 
 .geo-editor .i-writing::before {
   content: '\268D';
+  margin-bottom: 4px;
+}
+
+.geo-editor .i-info::before {
+  content: '\2690';
   margin-bottom: 4px;
 }
 

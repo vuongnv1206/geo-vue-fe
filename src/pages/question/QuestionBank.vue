@@ -229,8 +229,18 @@ const handleExpanded = (expanded: string[]) => {
   }
 }
 
+const { editMode, questionToEdit } = storeToRefs(storesQuestion)
+
 const editQuestion = (question: Question) => {
   console.log('Edit question', question)
+  editMode.value = true
+  questionToEdit.value = question
+  if (currentSelectedFolder.value?.id) {
+    storesQEdit.clearQuestions()
+    storesQEdit.addQuestion(question)
+    storesQEdit.setFolder(currentSelectedFolder.value)
+    router.push({ name: 'question-edit' })
+  }
 }
 
 const deleteQuestion = (question: Question) => {
@@ -265,6 +275,7 @@ const deleteQuestion = (question: Question) => {
 const AddNewQuestion = () => {
   // push to add new question page
   console.log('Add new question')
+  editMode.value = false
   if (currentSelectedFolder.value?.id) {
     storesQEdit.clearQuestions()
     storesQEdit.setFolder(currentSelectedFolder.value)

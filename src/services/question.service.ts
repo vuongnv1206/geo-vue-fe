@@ -32,6 +32,16 @@ class QuestionService {
         return Promise.reject(error)
       })
   }
+  async updateQuestion(data: any, id: string): Promise<void> {
+    return apiService
+      .put('/v1/question/' + id, data)
+      .then(() => {
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 
   async readQuestionFromFile(file: any): Promise<string[]> {
     const formData = new FormData()
