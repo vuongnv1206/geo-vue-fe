@@ -282,3 +282,13 @@ export type DataFilterPaper = {
   orderBy: string[]
   paperFolderId: string | null | undefined
 }
+
+export interface SearchSharedPaperFolderRequest {
+  parentId?: string | null
+  name?: string | null
+}
+
+export interface SearchSharedPaperRequest {
+  paperFolderId?: string | null | undefined
+  name?: string | null | undefined
+}

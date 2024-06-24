@@ -1,3 +1,4 @@
+import { PaperInListDto, SearchSharedPaperRequest } from './../../pages/examination/types'
 import papersService from '@/services/paper.service'
 import {
   PaperDto,
@@ -6,6 +7,7 @@ import {
   SubmitPaperResponse,
   CreatePaperRequest,
   PaperResponse,
+  SearchSharedPaperRequest,
 } from '@/pages/examination/types'
 
 import { defineStore } from 'pinia'
@@ -77,6 +79,16 @@ export const usePaperStore = defineStore('paper', {
     async createPaper(request: CreatePaperRequest): Promise<any> {
       return await papersService
         .createPaper(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async searchSharedPapers(request: SearchSharedPaperRequest): Promise<PaperInListDto[]> {
+      return await papersService
+        .papers_SearchSharedPaper(request)
         .then((response) => {
           return Promise.resolve(response)
         })
