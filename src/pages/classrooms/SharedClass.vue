@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { GroupClass } from '@/pages/classrooms/type'
+import { GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 
 const store = useGroupClassStore()
