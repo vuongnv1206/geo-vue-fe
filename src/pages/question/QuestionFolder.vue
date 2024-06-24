@@ -512,7 +512,14 @@ onMounted(() => {
           >
             Delete</VaButton
           >
-          <VaButton v-if="props.mode == 'full'" icon="add" @click="createNewQuestionFolder()">Folder</VaButton>
+          <VaButton
+            v-if="props.mode == 'full'"
+            icon="add"
+            size="small"
+            class="uppercase"
+            @click="createNewQuestionFolder()"
+            >Add Folder</VaButton
+          >
         </div>
       </div>
       <QuestionFolder

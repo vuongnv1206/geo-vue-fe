@@ -19,12 +19,17 @@
     <template #left>
       <TeacherGroupList
         v-if="isSidebarVisibleChild"
+        class="max-h-[calc(100vh-64px)] overflow-y-auto"
         @selectGroup="handleSelectedGroup"
         @selectTeacher="handleSelectedTeacher"
       />
     </template>
     <template #content>
-      <TeacherGroupDetail :group="selectedGroupTeacher" :teacher-id="selectedTeacher" />
+      <TeacherGroupDetail
+        class="max-h-[calc(100vh-64px)] overflow-y-auto"
+        :group="selectedGroupTeacher"
+        :teacher-id="selectedTeacher"
+      />
     </template>
   </VaLayout>
 </template>
