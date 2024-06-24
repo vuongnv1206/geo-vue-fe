@@ -3,7 +3,8 @@ import i18n from './i18n'
 import { createVuestic } from 'vuestic-ui'
 import { createGtm } from '@gtm-support/vue-gtm'
 import { VueReCaptcha } from 'vue-recaptcha-v3'
-
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import stores from './stores'
 import router from './router'
 import vuesticGlobalConfig from '@services/vuestic-ui/global-config'
@@ -16,6 +17,8 @@ app.use(stores)
 app.use(router)
 app.use(i18n)
 app.use(createVuestic({ config: vuesticGlobalConfig }))
+
+app.component('QuillEditor', QuillEditor)
 
 const authStore = useAuthStore()
 authStore.checkAuth()

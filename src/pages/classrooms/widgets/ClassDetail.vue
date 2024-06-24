@@ -30,7 +30,7 @@ const defaultClassDetails: Classrooms = {
 const classDetails = ref<Classrooms>(defaultClassDetails)
 
 const classId = router.currentRoute.value.params.id.toString()
-const selectedTab = ref(tabs[0].title)
+const selectedTab = ref(tabs[1].title)
 const currentTab = computed(() => tabs.find((tab) => tab.title === selectedTab.value) || tabs[0])
 
 const getClassById = async () => {
