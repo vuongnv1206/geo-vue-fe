@@ -464,9 +464,10 @@ const handlePageChange = async (page: number) => {
           <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
             Delete
           </VaButton>
-          <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
-
-          <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
+          <VaButton icon="add" color="warning" size="small" class="uppercase" @click="showCreatePaper()"
+            >Add Paper</VaButton
+          >
+          <VaButton icon="add" size="small" class="uppercase" @click="showAddPaperFolderModal()">Add Folder</VaButton>
         </div>
       </div>
 
