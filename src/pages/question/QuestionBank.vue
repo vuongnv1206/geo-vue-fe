@@ -413,7 +413,8 @@ onMounted(() => {
                   </VaInnerLoading>
                   <button
                     v-else
-                    style="width: 100%"
+                    :style="node.id === currentSelectedFolder?.id ? 'color: #154ec1' : ''"
+                    class="w-full"
                     type="button"
                     @contextmenu="contextmenu($event, node)"
                     @click="handleSelectFolder(node)"
