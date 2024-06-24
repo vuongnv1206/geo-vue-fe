@@ -67,7 +67,27 @@ const deleteSubject = (subject: Subject) => {
 }
 
 const deleteSelectedSubject = () => {
-  selectedItemsEmitted.value.forEach((subject) => {
+  confirm({
+    title: 'Delete Subject',
+    message: `Are you sure you want to delete ${selectedItemsEmitted.value.length} selected subject(s)?`,
+  }).then((agreed) => {
+    if (!agreed) {
+      return
+    }
+    selectedItemsEmitted.value.forEach((subject) => {
+      deleteSubject(subject)
+    })
+  })
+}
+
+const deleteSubjectWithConfirm = (subject: Subject) => {
+  confirm({
+    title: 'Delete Subject',
+    message: `Are you sure you want to delete ${subject.name}?`,
+  }).then((agreed) => {
+    if (!agreed) {
+      return
+    }
     deleteSubject(subject)
   })
 }
@@ -156,7 +176,7 @@ onMounted(() => {
         :loading="loading"
         :subjects="subjects"
         @edit="editSubject"
-        @delete="deleteSubject"
+        @delete="deleteSubjectWithConfirm"
       />
     </VaCardContent>
   </VaCard>

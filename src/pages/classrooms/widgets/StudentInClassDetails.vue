@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { defineVaDataTableColumns } from 'vuestic-ui'
-import { UserInClass } from '../type'
+import { UserInClass } from '../types'
 // const props = defineProps({
 //   userInClass: {
 //     type: Array as PropType<UserInClass[]>,

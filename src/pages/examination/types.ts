@@ -4,7 +4,6 @@ import { UserDetail } from '../user/types'
 export interface CreatePaperFolderRequest {
   name: string
   parentId?: string | null
-  subjectId?: string | null
 }
 
 export interface PaperFolderDto {
@@ -25,12 +24,6 @@ export interface PaperFolderParentDto {
   id: string
   name: string
 }
-
-export interface SearchPaperFolderRequest {
-  parentId?: string | null
-  name?: string | null
-}
-
 export interface UpdatePaperFolderRequest {
   id: string
   name?: string
@@ -47,12 +40,6 @@ export interface SharePaperFolderRequest {
   canUpdate?: boolean
   canDelete?: boolean
 }
-
-export interface SearchPaperRequest {
-  paperFolderId?: string | null
-  name?: string | null
-}
-
 export interface PaperInListDto {
   id: string
   examName: string
@@ -258,4 +245,40 @@ export interface QuestionIntoPaperRequest {
   questionId: string | null | undefined
   mark: number | 1
   rawIndex: number | 1
+}
+
+export type PaperFolderResponse = {
+  data: PaperFolderDto[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type PaperResponse = {
+  data: PaperInListDto[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type DataFilterFolder = {
+  keyword: string
+  pageNumber: number
+  pageSize: number
+  orderBy: string[]
+  parentId: string | null | undefined
+}
+
+export type DataFilterPaper = {
+  keyword: string
+  pageNumber: number
+  pageSize: number
+  orderBy: string[]
+  paperFolderId: string | null | undefined
 }

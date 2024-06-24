@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref, PropType, watch, onMounted } from 'vue'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { GroupClass } from '@/pages/classrooms/type'
+import { GroupClass } from '@/pages/classrooms/types'
 import { useClassStore } from '@/stores/modules/class.module'
-import { Classrooms } from '../../classrooms/type'
+import { Classrooms } from '../../classrooms/types'
 import { useToast } from 'vuestic-ui'
 import { AccessType, PaperAccess, PaperDto } from '../types'
 

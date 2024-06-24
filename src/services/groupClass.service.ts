@@ -1,4 +1,4 @@
-import { GroupClass, GroupClassResponse } from '@/pages/classrooms/type'
+import { GroupClass, GroupClassResponse } from '@/pages/classrooms/types'
 import apiService from '@services/api.service'
 
 class GroupClassService {

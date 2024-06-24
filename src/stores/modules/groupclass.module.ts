@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import groupClassService from '@/services/groupClass.service'
-import { GroupClass, GroupClassResponse } from '@/pages/classrooms/type'
+import { GroupClass, GroupClassResponse } from '@/pages/classrooms/types'
 
 export const useGroupClassStore = defineStore('groupClass', {
   state: () => ({}),
