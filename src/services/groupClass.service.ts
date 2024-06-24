@@ -1,4 +1,4 @@
-import { GroupClass } from '@/pages/classrooms/type'
+import { GroupClass, GroupClassResponse } from '@/pages/classrooms/type'
 import apiService from '@services/api.service'
 
 class GroupClassService {
@@ -48,6 +48,16 @@ class GroupClassService {
   async deleteGroupClass(id: string): Promise<GroupClass> {
     return apiService
       .delete(`/v1/groupclasses/${id}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  async sharedGroupClass(dataFilter: any): Promise<GroupClassResponse> {
+    return apiService
+      .post('/v1/class/shared-classes', dataFilter)
       .then((response) => {
         return Promise.resolve(response.data)
       })
