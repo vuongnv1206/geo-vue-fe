@@ -7,7 +7,6 @@ import {
   SubmitPaperResponse,
   CreatePaperRequest,
   PaperResponse,
-  SearchSharedPaperRequest,
 } from '@/pages/examination/types'
 
 import { defineStore } from 'pinia'
