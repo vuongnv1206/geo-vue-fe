@@ -75,7 +75,7 @@ const submit = async () => {
     await reCaptcha?.recaptchaLoaded()
     const captchaToken = await reCaptcha?.executeRecaptcha('login')
     store
-      .login(formData.email, formData.password, captchaToken ?? '')
+      .login(formData.email, formData.password, captchaToken ?? '', formData.keepLoggedIn)
       .then(() => {
         init({ message: "You've successfully logged in", color: 'success', position: 'bottom-right' })
         push({ name: 'dashboard' })
