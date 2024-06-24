@@ -241,17 +241,20 @@ const handleMarkAllAsRead = async () => {
 }
 
 const getIconType = (lableType: number) => {
-  switch (lableType) {
-    case LabelType.Information:
-      return { iconName: IconType.Information, color: IconColor.Information }
-    case LabelType.Success:
-      return { iconName: IconType.Success, color: IconColor.Success }
-    case LabelType.Warning:
-      return { iconName: IconType.Warning, color: IconColor.Warning }
-    case LabelType.Error:
-      return { iconName: IconType.Error, color: IconColor.Error }
-    case LabelType.Reminder:
-      return { iconName: IconType.Reminder, color: IconColor.Reminder }
+  if (lableType === LabelType.Information) {
+    return { iconName: IconType.Information, color: IconColor.Information }
+  }
+  if (lableType === LabelType.Success) {
+    return { iconName: IconType.Success, color: IconColor.Success }
+  }
+  if (lableType === LabelType.Warning) {
+    return { iconName: IconType.Warning, color: IconColor.Warning }
+  }
+  if (lableType === LabelType.Error) {
+    return { iconName: IconType.Error, color: IconColor.Error }
+  }
+  if (lableType === LabelType.Reminder) {
+    return { iconName: IconType.Reminder, color: IconColor.Reminder }
   }
 }
 

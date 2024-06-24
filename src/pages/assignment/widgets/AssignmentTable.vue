@@ -74,7 +74,7 @@
 <script lang="ts" setup>
 import { computed, PropType } from 'vue'
 import { format } from '@/services/utils'
-import { Classrooms } from '@/pages/classrooms/type'
+import { Classrooms } from '@/pages/classrooms/types'
 import { useAuthStore } from '@/stores/modules/auth.module'
 
 const authStore = useAuthStore()

@@ -4,7 +4,7 @@ import AssignmentTable from '@pages/assignment/widgets/AssignmentTable.vue'
 import { useToast } from 'vuestic-ui'
 import { notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
-import { Classrooms } from '../classrooms/type'
+import { Classrooms } from '../classrooms/types'
 
 const loading = ref(true)
 const { init: notify } = useToast()

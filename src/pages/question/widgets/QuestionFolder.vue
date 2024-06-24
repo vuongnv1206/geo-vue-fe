@@ -27,6 +27,16 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  totalQuestions: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  currentShowFolderId: {
+    type: String,
+    required: false,
+    default: '',
+  },
 })
 
 const selectedItemsEmitted = defineModel('selectedItemsEmitted', {
@@ -39,6 +49,7 @@ const emit = defineEmits<{
   (event: 'delete', questionTree: QuestionTree): void
   (event: 'selectedFolder', questionTree: QuestionTree): void
   (event: 'share', questionTree: QuestionTree): void
+  (event: 'viewQuestions', id: string): void
 }>()
 
 const contextmenu = (event: any) => {
@@ -72,8 +83,25 @@ const handleSelectionChange = (selectedItems: QuestionTree[]) => {
   selectedItemsEmitted.value = selectedItems
 }
 
+const showQuestions = () => {
+  console.log(props.currentShowFolderId)
+  emit('viewQuestions', props.currentShowFolderId)
+}
+
 const hasChildren = (node: QuestionTree) => {
   return node.children && node.children.length > 0
+}
+
+const getTotalQuestions = () => {
+  if (props.currentShowFolderId === '') {
+    let total = 0
+    props.questionTrees.forEach((folder) => {
+      total += folder.totalQuestions || 0
+    })
+    return total
+  } else {
+    return props.totalQuestions
+  }
 }
 
 onBeforeMount(() => {
@@ -93,6 +121,8 @@ onBeforeMount(() => {
       hoverable
       clickable
       selectable
+      height="63vh"
+      sticky-header
       select-mode="multiple"
       :disable-client-side-sorting="false"
       @row:contextmenu="contextmenu($event)"
@@ -151,6 +181,15 @@ onBeforeMount(() => {
         </div>
       </template>
     </VaDataTable>
+    <VaCard class="flex justify-center pb-0">
+      <div class="flex flex-col w-full">
+        <VaCardContent class="flex flex-col items-center justify-center pb-2">
+          <VaButton preset="primary" size="small" color="primary" class="mt-2" @click="showQuestions">
+            View {{ getTotalQuestions() }} Questions
+          </VaButton>
+        </VaCardContent>
+      </div>
+    </VaCard>
   </div>
 </template>
 

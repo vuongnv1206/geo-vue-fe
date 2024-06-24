@@ -1,15 +1,16 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, watchEffect } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import { Question, QuestionTree, SearchQuestion, QuestionSearchRes, Pagination } from './types'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useQuestionEditStore } from '@/stores/modules/questionEdit.module'
 import { useQuestionStore } from '@/stores/modules/question.module'
-import { useModal, useToast } from 'vuestic-ui'
+import { useModal, useToast, useMenu, useBreakpoint } from 'vuestic-ui'
 import { useRouter } from 'vue-router'
 import { getErrorMessage } from '@/services/utils'
 import { QuestionTypeColor } from '@services/utils'
 import QuestionView from './widgets/QuestionView.vue'
+import { storeToRefs } from 'pinia'
 
 const nodes = ref<QuestionTree[]>([])
 const stores = useQuestionFolderStore()
@@ -17,6 +18,7 @@ const storesQuestion = useQuestionStore()
 const storesQEdit = useQuestionEditStore()
 const router = useRouter()
 const { confirm } = useModal()
+const { show } = useMenu()
 
 const loading = ref(false)
 const loadingNode = ref(false)
@@ -42,6 +44,12 @@ const QuestionSortOptions = [
   { id: 1, name: 'Oldest', questionType: 2 },
   { id: 2, name: 'Last Modified', questionType: 4 },
 ]
+
+const emit = defineEmits<{
+  (event: 'edit', questionTree: QuestionTree): void
+  (event: 'delete', questionTree: QuestionTree): void
+  (event: 'share', questionTree: QuestionTree): void
+}>()
 
 const QuestionTypeValue = ref(QuestionTypeOptions[0])
 
@@ -221,8 +229,18 @@ const handleExpanded = (expanded: string[]) => {
   }
 }
 
+const { editMode, questionToEdit } = storeToRefs(storesQuestion)
+
 const editQuestion = (question: Question) => {
   console.log('Edit question', question)
+  editMode.value = true
+  questionToEdit.value = question
+  if (currentSelectedFolder.value?.id) {
+    storesQEdit.clearQuestions()
+    storesQEdit.addQuestion(question)
+    storesQEdit.setFolder(currentSelectedFolder.value)
+    router.push({ name: 'question-edit' })
+  }
 }
 
 const deleteQuestion = (question: Question) => {
@@ -257,6 +275,7 @@ const deleteQuestion = (question: Question) => {
 const AddNewQuestion = () => {
   // push to add new question page
   console.log('Add new question')
+  editMode.value = false
   if (currentSelectedFolder.value?.id) {
     storesQEdit.clearQuestions()
     storesQEdit.setFolder(currentSelectedFolder.value)
@@ -303,12 +322,75 @@ watch(
   { immediate: true },
 )
 
+const contextmenu = (event: any, node: QuestionTree) => {
+  event.preventDefault()
+  show({
+    event: event,
+    options: [
+      { text: 'Rename', icon: 'edit' },
+      { text: 'Share', icon: 'share' },
+      { text: 'Delete', icon: 'delete' },
+    ],
+    onSelected(option) {
+      if (option.text === 'Rename') {
+        emit('edit', node)
+      }
+      if (option.text === 'Share') {
+        emit('share', node)
+      }
+      if (option.text === 'Delete') {
+        emit('delete', node)
+      }
+    },
+  })
+}
+
+const { needReloadQuestionFolder, sellectedQuestionFolderId } = storeToRefs(storesQuestion)
+
+watch(
+  () => needReloadQuestionFolder.value,
+  () => {
+    if (needReloadQuestionFolder.value) {
+      loading.value = true
+      stores
+        .getQuestionFolders('')
+        .then((res) => {
+          nodes.value = res.children
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          loading.value = false
+          needReloadQuestionFolder.value = false
+        })
+    }
+  },
+  { immediate: true },
+)
+
+const breakpoints = useBreakpoint()
+
+const isSidebarVisibleChild = ref(breakpoints.smUp)
+
+watchEffect(() => {
+  isSidebarVisibleChild.value = breakpoints.smUp
+})
+
 onMounted(() => {
   loading.value = true
   stores
     .getQuestionFolders('')
     .then((res) => {
       nodes.value = res.children
+
+      if (sellectedQuestionFolderId.value !== '') {
+        const node = findNode(nodes.value, sellectedQuestionFolderId.value)
+        if (node) {
+          handleSelectFolder(node)
+        }
+        sellectedQuestionFolderId.value = ''
+      }
     })
     .catch((err) => {
       console.log(err)
@@ -320,203 +402,234 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-[25%]">
-        <VaInnerLoading :loading="loading" :size="60">
-          <VaCard class="flex flex-col">
-            <VaCardTitle class="flex items-start justify-between">
-              <h1 class="card-title text-secondary font-bold uppercase">Folders</h1>
-              <div class="flex gap-2"></div>
-            </VaCardTitle>
-            <VaSkeletonGroup v-if="loading" animation="wave" :delay="0">
-              <VaCard>
-                <VaCardContent class="flex items-center">
-                  <VaSkeleton variant="text" class="ml-2 va-text" :lines="10" />
-                </VaCardContent>
-              </VaCard>
-            </VaSkeletonGroup>
-            <VaScrollContainer v-else class="max-h-[1000px]" horizontal vertical>
-              <VaTreeView :nodes="nodes" children-by="children" track-by="id" @update:expanded="handleExpanded">
-                <template #content="node">
-                  <VaInnerLoading v-if="node.id === currentLoadingNodeId" :loading="loadingNode" :size="32">
-                    <button type="button" style="width: 100%" @click="handleSelectFolder(node)">
-                      <div class="flex items-center">
-                        <VaIcon v-if="isNodeExpanded(node.id)" name="folder_open" class="mr-2" />
-                        <VaIcon v-else name="folder" class="mr-2" />
-                        <span>{{ node.name }}</span>
-                      </div>
-                    </button>
-                  </VaInnerLoading>
-                  <button v-else type="button" style="width: 100%" @click="handleSelectFolder(node)">
-                    <div class="flex items-start justify-between">
-                      <div class="flex items-center">
-                        <VaIcon v-if="isNodeExpanded(node.id)" name="folder_open" class="mr-2" />
-                        <VaIcon v-else name="folder" class="mr-2" />
-                        <span>{{ node.name }}</span>
-                      </div>
-                      <div class="flex gap-2">
-                        {{ node.totalQuestions }}
-                      </div>
-                    </div>
-                  </button>
-                </template>
-              </VaTreeView>
-            </VaScrollContainer>
-          </VaCard>
-        </VaInnerLoading>
-      </div>
-      <div class="flex flex-col gap-4 w-full sm:w-[75%]">
-        <VaCard class="flex flex-col min-h-[80vh]">
-          <VaCardTitle class="flex items-start justify-between">
-            <h1 class="card-title text-secondary font-bold uppercase">
-              List question of <b>{{ currentSelectedFolder?.name || '?' }}</b>
-            </h1>
-            <div class="flex gap-2">
-              <VaButton icon="add" @click="AddNewQuestion">Add Question</VaButton>
-            </div>
-          </VaCardTitle>
-          <div class="flex flex-wrap gap-2 mb-2 p-3 justify-start">
-            <div>
-              <VaSelect
-                v-model="QuestionTypeValue"
-                track-by="id"
-                :text-by="(option) => (option as any).name"
-                placeholder="All"
-                label="Question Type"
-                :options="QuestionTypeOptions"
-              >
-                <template #content="{ value }">
-                  <VaBadge
-                    :text="(value as any).name"
-                    :color="QuestionTypeColor((value as any).questionType)"
-                    class="mr-2"
-                  />
-                </template>
-                <template #option="{ option, selectOption }">
-                  <button class="w-full flex items-center" @click="() => selectOption(option)">
-                    <div class="flex justify-between items-center p-2">
-                      <VaBadge
-                        :text="(option as any).name"
-                        :color="QuestionTypeColor((option as any).questionType)"
-                        class="mr-2"
-                      />
-                    </div>
-                  </button>
-                </template>
-              </VaSelect>
-            </div>
-            <div>
-              <VaInput v-model="filters.keyword" label="Search content" placeholder="Search">
-                <template #prependInner>
-                  <VaIcon name="search" color="secondary" size="small" />
-                </template>
-              </VaInput>
-            </div>
-            <div>
-              <VaSelect
-                v-model="QuestionSortValue"
-                track-by="id"
-                :text-by="(option) => (option as any).name"
-                placeholder="Newest"
-                label="Sort by"
-                :options="QuestionSortOptions"
-              >
-                <template #content="{ value }">
-                  <VaBadge
-                    :text="(value as any).name"
-                    :color="QuestionTypeColor((value as any).questionType)"
-                    class="mr-2"
-                  />
-                </template>
-                <template #option="{ option, selectOption }">
-                  <button class="w-full flex items-center" @click="() => selectOption(option)">
-                    <div class="flex justify-between items-center p-2">
-                      <VaBadge
-                        :text="(option as any).name"
-                        :color="QuestionTypeColor((option as any).questionType)"
-                        class="mr-2"
-                      />
-                    </div>
-                  </button>
-                </template>
-              </VaSelect>
-            </div>
+  <VaLayout
+    :top="{ order: 1 }"
+    class="gap-2"
+    :left="{ absolute: breakpoints.smDown, order: 2, overlay: breakpoints.smDown && isSidebarVisibleChild }"
+    @leftOverlayClick="isSidebarVisibleChild = false"
+  >
+    <template #top>
+      <VaNavbar class="py-2 mt-2">
+        <template #left>
+          <VaButton
+            size="small"
+            :icon="isSidebarVisibleChild ? 'menu_open' : 'menu'"
+            @click="isSidebarVisibleChild = !isSidebarVisibleChild"
+          />
+          <div style="font-size: smaller" class="text-secondary font-bold uppercase ml-2 flex items-center">
+            <span class="inline-block align-middle">
+              Folder <b>{{ currentSelectedFolder?.name || '?' }}</b>
+            </span>
           </div>
-          <VaCard v-if="currentSelectedFolder == null" class="mb-5 pr-4 flex justify-center">
-            <div class="flex flex-col gap-4 w-full">
-              <VaCardContent class="flex flex-col items-center justify-center">
-                <h2 class="va-h5">No question folder selected</h2>
-                <p class="text-base leading-5">Please select a question folder to view its questions</p>
-              </VaCardContent>
-            </div>
-          </VaCard>
-          <VaInnerLoading v-else :loading="loadingQuestion" :size="60">
-            <VaScrollContainer class="min-h-[600px] max-h-[70vh]" vertical>
-              <VaSkeletonGroup v-if="loadingQuestion" animation="wave" :delay="0">
+        </template>
+        <template #right>
+          <div class="flex gap-2">
+            <VaButton icon="add" size="small" class="uppercase" @click="AddNewQuestion">Add question</VaButton>
+          </div>
+        </template>
+      </VaNavbar>
+    </template>
+    <template #left>
+      <div v-if="isSidebarVisibleChild" class="max-h-[calc(100vh-64px)] min-w-[calc(300px)] overflow-y-auto">
+        <div class="w-full">
+          <VaInnerLoading :loading="loading" :size="60">
+            <VaCard class="flex flex-col">
+              <VaCardTitle class="flex items-start justify-between">
+                <h1 class="card-title text-secondary font-bold uppercase">Folders</h1>
+                <div class="flex gap-2"></div>
+              </VaCardTitle>
+              <VaSkeletonGroup v-if="loading" animation="wave" :delay="0">
                 <VaCard>
                   <VaCardContent class="flex items-center">
                     <VaSkeleton variant="text" class="ml-2 va-text" :lines="10" />
                   </VaCardContent>
                 </VaCard>
               </VaSkeletonGroup>
-              <div v-for="testQuestion in testQuestions" :key="testQuestion.id || ''">
-                <QuestionView
-                  :question="testQuestion"
-                  :index="null"
-                  :is-stripe="false"
-                  :show-action-button="true"
-                  @edit="editQuestion"
-                  @delete="deleteQuestion"
-                />
-              </div>
-              <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
-                <div class="flex flex-col gap-4 w-full">
-                  <VaCardContent class="flex flex-col items-center justify-center">
-                    <h2 class="va-h5">No question in this folder</h2>
-                    <p class="text-base leading-5">Please select another folder</p>
-                  </VaCardContent>
-                </div>
-              </VaCard>
-            </VaScrollContainer>
+              <VaScrollContainer v-else class="max-h-[75vh]" horizontal vertical>
+                <VaTreeView :nodes="nodes" children-by="children" track-by="id" @update:expanded="handleExpanded">
+                  <template #content="node">
+                    <VaInnerLoading v-if="node.id === currentLoadingNodeId" :loading="loadingNode" :size="32">
+                      <button type="button" style="width: 100%" @click="handleSelectFolder(node)">
+                        <div class="flex items-center">
+                          <VaIcon v-if="isNodeExpanded(node.id)" name="folder_open" class="mr-2" />
+                          <VaIcon v-else name="folder" class="mr-2" />
+                          <span>{{ node.name }}</span>
+                        </div>
+                      </button>
+                    </VaInnerLoading>
+                    <button
+                      v-else
+                      :style="node.id === currentSelectedFolder?.id ? 'color: #154ec1' : ''"
+                      class="w-full"
+                      type="button"
+                      @contextmenu="contextmenu($event, node)"
+                      @click="handleSelectFolder(node)"
+                    >
+                      <div class="flex items-start justify-between">
+                        <div class="flex items-center">
+                          <VaIcon v-if="isNodeExpanded(node.id)" name="folder_open" class="mr-2" />
+                          <VaIcon v-else name="folder" class="mr-2" />
+                          <span>{{ node.name }}</span>
+                        </div>
+                        <div class="flex gap-2">
+                          {{ node.totalQuestions }}
+                        </div>
+                      </div>
+                    </button>
+                  </template>
+                </VaTreeView>
+              </VaScrollContainer>
+            </VaCard>
           </VaInnerLoading>
-          <VaCardContent>
-            <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center p-2">
+        </div>
+      </div>
+    </template>
+    <template #content>
+      <div class="max-h-[calc(100vh-64px)] overflow-y-auto">
+        <div class="flex flex-col gap-4">
+          <VaCard class="flex flex-col min-h-[75vh]">
+            <div class="flex flex-wrap gap-2 mb-2 p-3 justify-start">
               <div>
-                <b>{{ pagination.total }} results.</b>
-                Results per page
-                <VaSelect v-model="pagination.perPage" class="!w-20" :options="[10, 50, 100]" />
+                <VaSelect
+                  v-model="QuestionTypeValue"
+                  track-by="id"
+                  :text-by="(option: any) => (option as any).name"
+                  placeholder="All"
+                  label="Question Type"
+                  :options="QuestionTypeOptions"
+                >
+                  <template #content="{ value }">
+                    <VaBadge
+                      :text="(value as any).name"
+                      :color="QuestionTypeColor((value as any).questionType)"
+                      class="mr-2"
+                    />
+                  </template>
+                  <template #option="{ option, selectOption }">
+                    <button class="w-full flex items-center" @click="() => selectOption(option)">
+                      <div class="flex justify-between items-center p-2">
+                        <VaBadge
+                          :text="(option as any).name"
+                          :color="QuestionTypeColor((option as any).questionType)"
+                          class="mr-2"
+                        />
+                      </div>
+                    </button>
+                  </template>
+                </VaSelect>
               </div>
-
-              <div v-if="totalPages > 1" class="flex">
-                <VaButton
-                  preset="secondary"
-                  icon="va-arrow-left"
-                  aria-label="Previous page"
-                  :disabled="pagination.page === 1"
-                  @click="pagination.page--"
-                />
-                <VaButton
-                  class="mr-2"
-                  preset="secondary"
-                  icon="va-arrow-right"
-                  aria-label="Next page"
-                  :disabled="pagination.page === totalPages"
-                  @click="pagination.page++"
-                />
-                <VaPagination
-                  v-model="pagination.page"
-                  buttons-preset="secondary"
-                  :pages="totalPages"
-                  :visible-pages="5"
-                  :boundary-links="false"
-                  :direction-links="false"
-                />
+              <div>
+                <VaInput v-model="filters.keyword" label="Search content" placeholder="Search">
+                  <template #prependInner>
+                    <VaIcon name="search" color="secondary" size="small" />
+                  </template>
+                </VaInput>
+              </div>
+              <div>
+                <VaSelect
+                  v-model="QuestionSortValue"
+                  track-by="id"
+                  :text-by="(option: any) => (option as any).name"
+                  placeholder="Newest"
+                  label="Sort by"
+                  :options="QuestionSortOptions"
+                >
+                  <template #content="{ value }">
+                    <VaBadge
+                      :text="(value as any).name"
+                      :color="QuestionTypeColor((value as any).questionType)"
+                      class="mr-2"
+                    />
+                  </template>
+                  <template #option="{ option, selectOption }">
+                    <button class="w-full flex items-center" @click="() => selectOption(option)">
+                      <div class="flex justify-between items-center p-2">
+                        <VaBadge
+                          :text="(option as any).name"
+                          :color="QuestionTypeColor((option as any).questionType)"
+                          class="mr-2"
+                        />
+                      </div>
+                    </button>
+                  </template>
+                </VaSelect>
               </div>
             </div>
-          </VaCardContent>
-        </VaCard>
+            <VaCard v-if="currentSelectedFolder == null" class="mb-5 pr-4 flex justify-center">
+              <div class="flex flex-col gap-4 w-full">
+                <VaCardContent class="flex flex-col items-center justify-center">
+                  <h2 class="va-h5">No question folder selected</h2>
+                  <p class="text-base leading-5">Please select a question folder to view its questions</p>
+                </VaCardContent>
+              </div>
+            </VaCard>
+            <VaInnerLoading v-else :loading="loadingQuestion" :size="60">
+              <VaScrollContainer class="min-h-[60vh] max-h-[60vh]" vertical>
+                <VaSkeletonGroup v-if="loadingQuestion" animation="wave" :delay="0">
+                  <VaCard>
+                    <VaCardContent class="flex items-center">
+                      <VaSkeleton variant="text" class="ml-2 va-text" :lines="10" />
+                    </VaCardContent>
+                  </VaCard>
+                </VaSkeletonGroup>
+                <div v-for="testQuestion in testQuestions" :key="testQuestion.id || ''">
+                  <QuestionView
+                    :question="testQuestion"
+                    :index="null"
+                    :is-stripe="false"
+                    :show-action-button="true"
+                    @edit="editQuestion"
+                    @delete="deleteQuestion"
+                  />
+                </div>
+                <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
+                  <div class="flex flex-col gap-4 w-full">
+                    <VaCardContent class="flex flex-col items-center justify-center">
+                      <h2 class="va-h5">No question in this folder</h2>
+                      <p class="text-base leading-5">Please select another folder</p>
+                    </VaCardContent>
+                  </div>
+                </VaCard>
+              </VaScrollContainer>
+            </VaInnerLoading>
+            <VaCardContent>
+              <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center p-2">
+                <div>
+                  <b>{{ pagination.total }} results.</b>
+                  Results per page
+                  <VaSelect v-model="pagination.perPage" class="!w-20" :options="[10, 50, 100]" />
+                </div>
+
+                <div v-if="totalPages > 1" class="flex">
+                  <VaButton
+                    preset="secondary"
+                    icon="va-arrow-left"
+                    aria-label="Previous page"
+                    :disabled="pagination.page === 1"
+                    @click="pagination.page--"
+                  />
+                  <VaButton
+                    class="mr-2"
+                    preset="secondary"
+                    icon="va-arrow-right"
+                    aria-label="Next page"
+                    :disabled="pagination.page === totalPages"
+                    @click="pagination.page++"
+                  />
+                  <VaPagination
+                    v-model="pagination.page"
+                    buttons-preset="secondary"
+                    :pages="totalPages"
+                    :visible-pages="5"
+                    :boundary-links="false"
+                    :direction-links="false"
+                  />
+                </div>
+              </div>
+            </VaCardContent>
+          </VaCard>
+        </div>
       </div>
-    </div>
-  </section>
+    </template>
+  </VaLayout>
 </template>
