@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, PropType, ref } from 'vue'
+import { computed, onBeforeMount, PropType, ref, watch } from 'vue'
 import { defineVaDataTableColumns, useMenu } from 'vuestic-ui'
 import { Pagination, QuestionTree } from '../types'
 
@@ -95,18 +95,33 @@ const pagination = ref<Pagination>({
 
 const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.value.perPage))
 
+const questionTreesPagination = computed(() => {
+  const start = (pagination.value.page - 1) * pagination.value.perPage
+  const end = start + pagination.value.perPage
+  return props.questionTrees.slice(start, end)
+})
+
+watch(
+  () => props.questionTrees,
+  () => {
+    console.log('props.questionTrees', props.questionTrees)
+    pagination.value.total = props.questionTrees.length
+  },
+)
+
 onBeforeMount(() => {
   // edit column if mode is lite
   if (props.mode == 'lite') {
     columns.splice(2, 3)
   }
+  pagination.value.total = props.questionTrees.length
 })
 </script>
 
 <template>
   <div>
     <VaDataTable
-      :items="questionTrees"
+      :items="questionTreesPagination"
       :columns="columns"
       :loading="props.loading"
       hoverable

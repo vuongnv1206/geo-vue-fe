@@ -482,6 +482,30 @@ const handleSearch = () => {}
 
 const folderPermissionType = ref(0) // 0: all, 1: my documents, 2: shared documents
 
+const questionTreesFiltered = computed(() => {
+  const search = questionTrees.value.filter((questionTree) => {
+    const name = questionTree.name.toLowerCase().includes(searchTerm.value.toLowerCase())
+    return name
+  })
+  const filtered = search.filter((questionTree) => {
+    const permission = questionTree.permission.some((permission) => {
+      if (folderPermissionType.value == 0) {
+        return true
+      }
+      if (folderPermissionType.value == 2) {
+        const share = permission.canView && permission.user?.id == authStore.user?.id
+        const owner = questionTree?.owner?.id == authStore.user?.id
+        return share && !owner
+      }
+      if (folderPermissionType.value == 1) {
+        return questionTree?.owner?.id == authStore.user?.id
+      }
+    })
+    return permission
+  })
+  return filtered
+})
+
 watch(
   () => permissionEdit.value,
   (value) => {
@@ -561,6 +585,7 @@ onMounted(() => {
                 style="width: 100%"
                 class="p-2"
                 :icon="folderPermissionType == 2 ? 'check' : ''"
+                @click="folderPermissionType = 2"
                 >Shared Documents</VaButton
               >
             </VaDropdownContent>
@@ -588,7 +613,7 @@ onMounted(() => {
     <VaCardContent class="pb-0">
       <QuestionFolder
         v-model:selectedItemsEmitted="selectedItemsEmitted"
-        :question-trees="questionTrees"
+        :question-trees="questionTreesFiltered"
         :loading="loading"
         :total-questions="totalQuestions"
         :current-show-folder-id="currentShowFolderId"
