@@ -571,7 +571,11 @@ onMounted(() => {
       <AppNavbar :is-mobile="isMobile" class="border-b border-slate-200" />
     </template>
     <template #left>
-      <div style="width: 49vw" class="h-full border-r border-slate-200 bg-[#f1f5f9]" aria-label="Question Format">
+      <div
+        style="width: 49vw"
+        class="h-full border-r border-slate-200 bg-[var(--va-background-border)]"
+        aria-label="Question Format"
+      >
         <div>
           <VaCard class="min-h-[41px] border-b border-slate-200 flex items-center justify-between">
             <div class="flex items-center justify-start">
@@ -614,7 +618,11 @@ onMounted(() => {
     </template>
     <template #content>
       <VaInnerLoading :loading="isLoading" :size="60">
-        <div style="width: 50vw" class="h-full border-r border-slate-200 bg-[#f1f5f9]" aria-label="Question Format">
+        <div
+          style="width: 50vw"
+          class="h-full border-r border-slate-200 bg-[var(--va-background-border)]"
+          aria-label="Question Format"
+        >
           <div>
             <VaCard class="max-h-[41px] border-b border-slate-200 flex items-center justify-between">
               <div class="flex items-center justify-start">
@@ -682,6 +690,12 @@ onMounted(() => {
     </template>
   </VaLayout>
 </template>
+
+<style scoped>
+.border-slate-200 {
+  border-color: var(--va-background-element);
+}
+</style>
 
 <style>
 .geo-editor .i-single_choice::before {

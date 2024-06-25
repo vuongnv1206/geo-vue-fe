@@ -2,12 +2,14 @@
 import ProfileDropdown from './dropdowns/ProfileDropdown.vue'
 import NotificationDropdown from './dropdowns/NotificationDropdown.vue'
 import LanguageSwitcher from '@/pages/settings/language-switcher/LanguageSwitcher.vue'
+import ThemeSwitcher from '@/pages/settings/theme-switcher/ThemeSwitcher.vue'
 defineProps({
   isMobile: { type: Boolean, default: false },
 })
 </script>
 <template>
   <div class="app-navbar-actions">
+    <ThemeSwitcher class="app-navbar-actions__item" />
     <LanguageSwitcher class="app-navbar-actions__item" />
     <NotificationDropdown ref="notificationDropdownRef" class="app-navbar-actions__item" />
     <ProfileDropdown class="app-navbar-actions__item app-navbar-actions__item--profile mr-1" />
