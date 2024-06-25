@@ -2,7 +2,7 @@
   <VaButtonToggle v-model="theme" color="background-element" border-color="background-element" :options="options" />
 </template>
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import { useI18n } from 'vue-i18n'
 
@@ -16,6 +16,7 @@ const theme = computed({
   },
   set(value) {
     applyPreset(value)
+    localStorage.setItem('theme', value)
   },
 })
 
@@ -25,4 +26,11 @@ const options = [
   { label: t('buttonSelect.dark'), value: 'dark' },
   { label: t('buttonSelect.light'), value: 'light' },
 ]
+
+onMounted(() => {
+  const theme = localStorage.getItem('theme')
+  if (theme) {
+    applyPreset(theme)
+  }
+})
 </script>
