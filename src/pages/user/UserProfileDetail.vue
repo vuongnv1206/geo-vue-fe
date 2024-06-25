@@ -95,11 +95,8 @@ watch(
 )
 
 onMounted(() => {
-  const showProfile = props.settingOption?.id == '1'
-  if (showProfile) {
-    getUserDetail()
-  }
-  isShowProfile.value = showProfile
+  getUserDetail()
+  isShowProfile.value = props.settingOption?.id == '1'
 })
 
 const formData = reactive({ ...userDetail.value })

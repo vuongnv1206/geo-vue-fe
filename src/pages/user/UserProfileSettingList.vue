@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { SettingProfile } from './types'
 import { SettingProfileOptions } from './UserProfile.enum'
 import { useI18n } from 'vue-i18n'
@@ -25,6 +25,10 @@ function selectSettingOption(item: SettingProfile) {
   emit('select-setting-option', item)
   activeOption.value = item.name
 }
+
+onMounted(() => {
+  selectSettingOption(listSettings.value[0])
+})
 </script>
 
 <template>

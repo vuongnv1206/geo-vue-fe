@@ -13,9 +13,15 @@ import UserProfileSettingList from './UserProfileSettingList.vue'
 import UserProfileDetail from './UserProfileDetail.vue'
 import { ref } from 'vue'
 import { SettingProfile } from './types'
-const selectedSettingOption = ref<SettingProfile | null>(null)
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+const selectedSettingOption = ref<SettingProfile | null>({
+  id: '1',
+  name: t('settings.general'),
+  icon: 'person',
+})
 function handleSelectedSettingOption(item: SettingProfile) {
-  console.log('item', item)
   selectedSettingOption.value = item
 }
 </script>
