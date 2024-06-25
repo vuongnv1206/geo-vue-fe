@@ -21,11 +21,13 @@ import {
 } from '@services/geo-markdown/geo-markdown'
 import { useRouter } from 'vue-router'
 import { getErrorMessage } from '@/services/utils'
+import { useQuestionStore } from '@/stores/modules/question.module'
+import { storeToRefs } from 'pinia'
 
 const breakpoints = useBreakpoint()
 const storesQEdit = useQuestionEditStore()
 const isMobile = ref(false)
-
+const storesQuestion = useQuestionStore()
 const onResize = () => {
   isMobile.value = breakpoints.smDown
 }
@@ -413,40 +415,145 @@ const addTemplateWriting = () => {
   editor.innerHTML = editorContent.value
 }
 
+const infoEditQ = () => {
+  console.log('info')
+}
+
+const { sellectedQuestionFolderId, editMode, questionToEdit } = storeToRefs(storesQuestion)
 const handleBack = () => {
+  sellectedQuestionFolderId.value = storesQEdit.folder?.id
   window.history.back()
 }
 
 const isLoading = ref(false)
 
 const handleSaveBtn = () => {
-  console.log(listQuestions.value)
-  const request: CreateQuestionsRequest = {
-    questions: listQuestions.value,
-  }
-  isLoading.value = true
-  storesQEdit
-    .createQuestion(request)
-    .then(() => {
-      init({
-        title: 'Success',
-        message: 'Questions created successfully',
-        color: 'success',
-      })
-      router.push({ name: 'question-bank' })
-    })
-    .catch((error) => {
-      const message = getErrorMessage(error)
+  if (editMode.value) {
+    console.log('edit')
+    if (listQuestions.value.length === 0) {
       init({
         title: 'Error',
-        message: message,
+        message: 'Please add questions',
         color: 'danger',
       })
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
+    } else {
+      const q = listQuestions.value.at(-1)
+      questionToEdit.value.questionFolderId = storesQEdit.folder?.id
+      questionToEdit.value.content = q?.content || ''
+      questionToEdit.value.image = q?.image || null
+      questionToEdit.value.audio = q?.audio || null
+      questionToEdit.value.questionType = q?.questionType || QuestionType.Other
+      questionToEdit.value.questionPassages = q?.questionPassages || []
+      for (let i = 0; i < questionToEdit.value.answers.length; i++) {
+        questionToEdit.value.answers[i].content = q?.answers[i].content || ''
+        questionToEdit.value.answers[i].isCorrect = q?.answers[i].isCorrect || false
+      }
+      if (q?.answers?.length) {
+        if (q?.answers?.length > questionToEdit.value.answers.length) {
+          for (let i = questionToEdit.value.answers.length; i < q?.answers.length; i++) {
+            questionToEdit.value.answers.push({
+              content: q?.answers[i].content || '',
+              isCorrect: q?.answers[i].isCorrect || false,
+            })
+          }
+        }
+      }
+      questionToEdit.value.questionLable = q?.questionLable || null
+      if (q) {
+        isLoading.value = true
+        storesQuestion
+          .updateQuestion(questionToEdit.value)
+          .then(() => {
+            init({
+              title: 'Success',
+              message: 'Question updated successfully',
+              color: 'success',
+            })
+            sellectedQuestionFolderId.value = storesQEdit.folder?.id
+            router.push({ name: 'question-bank' })
+          })
+          .catch((error) => {
+            const message = getErrorMessage(error)
+            init({
+              title: 'Error',
+              message: message,
+              color: 'danger',
+            })
+          })
+          .finally(() => {
+            isLoading.value = false
+          })
+      }
+    }
+  } else {
+    console.log(listQuestions.value)
+    const request: CreateQuestionsRequest = {
+      questions: listQuestions.value,
+    }
+    isLoading.value = true
+    storesQEdit
+      .createQuestion(request)
+      .then(() => {
+        init({
+          title: 'Success',
+          message: 'Questions created successfully',
+          color: 'success',
+        })
+        sellectedQuestionFolderId.value = storesQEdit.folder?.id
+        router.push({ name: 'question-bank' })
+      })
+      .catch((error) => {
+        const message = getErrorMessage(error)
+        init({
+          title: 'Error',
+          message: message,
+          color: 'danger',
+        })
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
+  }
 }
+
+const button = [
+  {
+    name: 'AddSingleChoice',
+    label: 'Add single choice template',
+    icon: 'i-single_choice',
+    action: addTemplateSingleChoice,
+  },
+  {
+    name: 'AddMultipleChoice',
+    label: 'Add multiple choice template',
+    icon: 'i-multiple_choice',
+    action: addTemplateMultipleChoice,
+  },
+  {
+    name: 'AddFillBlank',
+    label: 'Add fill blank template',
+    icon: 'i-fill_blank',
+    action: addTemplateFillBlank,
+  },
+  {
+    name: 'AddMatching',
+    label: 'Add matching template',
+    icon: 'i-matching',
+    action: addTemplateMatching,
+  },
+  {
+    name: 'AddReading',
+    label: 'Add reading template',
+    icon: 'i-reading',
+    action: addTemplateReading,
+  },
+  {
+    name: 'AddWriting',
+    label: 'Add writing template',
+    icon: 'i-writing',
+    action: addTemplateWriting,
+  },
+]
 
 onMounted(() => {
   window.addEventListener('resize', onResize)
@@ -464,7 +571,7 @@ onMounted(() => {
       <AppNavbar :is-mobile="isMobile" class="border-b border-slate-200" />
     </template>
     <template #left>
-      <div style="width: 50vw" class="h-full border-r border-slate-200 bg-[#f1f5f9]" aria-label="Question Format">
+      <div style="width: 49vw" class="h-full border-r border-slate-200 bg-[#f1f5f9]" aria-label="Question Format">
         <div>
           <VaCard class="min-h-[41px] border-b border-slate-200 flex items-center justify-between">
             <div class="flex items-center justify-start">
@@ -534,55 +641,36 @@ onMounted(() => {
                   class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200"
                   @click="handleSaveBtn"
                 >
-                  <div class="mx-2"><VaIcon name="mso-save" /> <span>Save</span></div>
+                  <div class="mx-2">
+                    <VaIcon name="mso-save" /> <span> {{ editMode ? 'Update' : 'Save' }}</span>
+                  </div>
                 </button>
               </div>
             </VaCard>
           </div>
-          <div class="">
+          <div class="geo-editor">
             <div class="flex justify-start p-1">
               <div class="w-full">
                 <Richer
+                  v-if="!editMode"
                   :model-value="editorContent"
+                  :buttons="button"
+                  class="h-[90vh]"
+                  @keyup="handleEditor"
+                  @click="handleEditorClick"
+                ></Richer>
+                <Richer
+                  v-else
+                  :model-value="editorContent"
+                  class="h-[90vh]"
                   :buttons="[
                     {
-                      name: 'AddSingleChoice',
-                      label: 'Add single choice template',
-                      icon: 'i-single_choice',
-                      action: addTemplateSingleChoice,
-                    },
-                    {
-                      name: 'AddMultipleChoice',
-                      label: 'Add multiple choice template',
-                      icon: 'i-multiple_choice',
-                      action: addTemplateMultipleChoice,
-                    },
-                    {
-                      name: 'AddFillBlank',
-                      label: 'Add fill blank template',
-                      icon: 'i-fill_blank',
-                      action: addTemplateFillBlank,
-                    },
-                    {
-                      name: 'AddMatching',
-                      label: 'Add matching template',
-                      icon: 'i-matching',
-                      action: addTemplateMatching,
-                    },
-                    {
-                      name: 'AddReading',
-                      label: 'Add reading template',
-                      icon: 'i-reading',
-                      action: addTemplateReading,
-                    },
-                    {
-                      name: 'AddWriting',
-                      label: 'Add writing template',
-                      icon: 'i-writing',
-                      action: addTemplateWriting,
+                      name: 'Info',
+                      label: 'Info',
+                      icon: 'i-info',
+                      action: infoEditQ,
                     },
                   ]"
-                  class="h-[90vh]"
                   @keyup="handleEditor"
                   @click="handleEditorClick"
                 ></Richer>
@@ -596,83 +684,88 @@ onMounted(() => {
 </template>
 
 <style>
-.i-single_choice::before {
+.geo-editor .i-single_choice::before {
   content: '\2688';
   margin-bottom: 4px;
 }
 
-.i-multiple_choice::before {
+.geo-editor .i-multiple_choice::before {
   content: '\2689';
   margin-bottom: 4px;
 }
 
-.i-fill_blank::before {
+.geo-editor .i-fill_blank::before {
   content: '\268A';
   margin-bottom: 4px;
 }
 
-.i-matching::before {
+.geo-editor .i-matching::before {
   content: '\268B';
   margin-bottom: 4px;
 }
 
-.i-reading::before {
+.geo-editor .i-reading::before {
   content: '\268C';
   margin-bottom: 4px;
 }
 
-.i-writing::before {
+.geo-editor .i-writing::before {
   content: '\268D';
   margin-bottom: 4px;
 }
 
-.richer__content {
+.geo-editor .i-info::before {
+  content: '\2690';
+  margin-bottom: 4px;
+}
+
+.geo-editor .richer__content {
   padding: 12px;
   outline: none;
   flex-grow: 1;
   font-size: 14px;
 }
 
-.richer__placeholder {
+.geo-editor .richer__placeholder {
   display: none;
 }
 
-.richer__content strong {
+.geo-editor .richer__content strong {
   font-family: Consolas, 'Courier New', monospace;
 }
 
-.richer__content p {
+.geo-editor .richer__content p {
   font-family: Consolas, 'Courier New', monospace;
   counter-increment: line;
   position: relative;
 }
 
-.richer__content br {
+.geo-editor .richer__content br {
   counter-increment: line;
   position: relative;
 }
 
-.richer__content span {
+.geo-editor .richer__content span {
   font-family: Consolas, 'Courier New', monospace;
 }
 
-.richer__content {
+.geo-editor .richer__content {
   counter-reset: line;
   position: relative;
   padding-left: 70px;
   /* Adjust the left padding as needed */
 }
 
-.richer__content > * {
+.geo-editor .richer__content > * {
   counter-increment: line;
   position: relative;
 }
 
-.passage_q {
+.geo-editor .passage_q {
   margin-left: 25px;
 }
 
-.passage_q::before {
+.geo-editor .passage_q::before {
   content: counter(line);
   position: absolute;
   left: -75px !important;
@@ -681,7 +774,7 @@ onMounted(() => {
   color: #237893;
 }
 
-.richer__content > *::before {
+.geo-editor .richer__content > *::before {
   content: counter(line);
   position: absolute;
   left: -50px;

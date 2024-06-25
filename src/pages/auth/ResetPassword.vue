@@ -1,7 +1,7 @@
 <template>
   <VaInnerLoading :loading="isLoading" :size="60">
     <VaForm ref="form" @submit.prevent="submit">
-      <h1 class="font-semibold text-4xl mb-4">Reset password</h1>
+      <h1 class="font-semibold text-4xl mb-4">{{ t('auth.reset_password') }}</h1>
       <VaValue v-slot="isPasswordVisible" :default-value="false">
         <VaInput
           ref="password1"
@@ -9,8 +9,8 @@
           :rules="passwordRules"
           :type="isPasswordVisible.value ? 'text' : 'password'"
           class="mb-4"
-          label="Password"
-          messages="Password should be 8+ characters: letters, numbers, and special characters."
+          :label="t('auth.password')"
+          :messages="t('auth.password_hint')"
           @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
         >
           <template #appendInner>
@@ -25,12 +25,12 @@
           ref="password2"
           v-model="formData.repeatPassword"
           :rules="[
-            (v) => !!v || 'Repeat Password field is required',
-            (v) => v === formData.password || 'Passwords don\'t match',
+            (v: any) => !!v || t('auth.repeat_password_required'),
+            (v: string) => v === formData.password || t('auth.password_match'),
           ]"
           :type="isPasswordVisible.value ? 'text' : 'password'"
           class="mb-4"
-          label="Repeat Password"
+          :label="t('auth.repeat_password')"
           @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
         >
           <template #appendInner>
@@ -42,7 +42,7 @@
           </template>
         </VaInput>
       </VaValue>
-      <VaButton class="w-full" @click="submit">Reset password</VaButton>
+      <VaButton class="w-full" @click="submit">{{ t('auth.reset_password') }}</VaButton>
     </VaForm>
   </VaInnerLoading>
 </template>
@@ -50,13 +50,15 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { ref } from 'vue'
 import { ResetPassword } from './types'
 import { getErrorMessage } from '@/services/utils'
 import { useReCaptcha } from 'vue-recaptcha-v3'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const { push } = useRouter()
@@ -93,8 +95,8 @@ const submit = async () => {
       .resetPassword(resetPasswordData)
       .then(() => {
         init({
-          title: 'Success',
-          message: 'Password has been reset successfully',
+          title: t('auth.success'),
+          message: t('auth.password_reset_success'),
           color: 'success',
         })
         push({ name: 'login' })
@@ -102,7 +104,7 @@ const submit = async () => {
       .catch((error) => {
         const message = getErrorMessage(error)
         init({
-          title: 'Error',
+          title: t('auth.error'),
           message: message,
           color: 'danger',
         })
@@ -114,10 +116,10 @@ const submit = async () => {
 }
 
 const passwordRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Password field is required',
-  (v) => (v && v.length >= 8) || 'Password must be at least 8 characters long',
-  (v) => (v && /[A-Za-z]/.test(v)) || 'Password must contain at least one letter',
-  (v) => (v && /\d/.test(v)) || 'Password must contain at least one number',
-  (v) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v)) || 'Password must contain at least one special character',
+  (v) => !!v || t('auth.password_required'),
+  (v) => (v && v.length >= 8) || t('auth.password_min_length'),
+  (v) => (v && /[A-Za-z]/.test(v)) || t('auth.password_letter_required'),
+  (v) => (v && /\d/.test(v)) || t('auth.password_number_required'),
+  (v) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v)) || t('auth.password_special_character_required'),
 ]
 </script>

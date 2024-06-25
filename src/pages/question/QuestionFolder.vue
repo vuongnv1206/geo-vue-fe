@@ -3,6 +3,7 @@ import { onMounted, ref, computed, watch } from 'vue'
 import { QuestionTree, QuestionTreeEmpty, QuestionFolderPermission, SharePermission } from './types'
 import QuestionFolder from './widgets/QuestionFolder.vue'
 import EditQuestionTreeForm from './widgets/EditQuestionTreeForm.vue'
+import QuestionBank from './QuestionBank.vue'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
@@ -11,6 +12,11 @@ import { getErrorMessage } from '@/services/utils'
 import { GroupTeacher, TeacherTeam, TeacherTeamTeacherGroupCombine } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
 import { avatarColor } from '@/services/utils'
+import { useQuestionStore } from '@/stores/modules/question.module'
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const loading = ref(true)
 const currentShowFolderId = ref<string>('')
@@ -33,9 +39,12 @@ const props = defineProps({
   },
 })
 
+const totalQuestions = ref(0)
+
 const getCurrentShowFolder = (questionTree: QuestionTree) => {
   if (questionTree.currentShow) {
     questionTrees.value = questionTree.children
+    totalQuestions.value = questionTree.totalQuestions || 0
     return questionTree
   } else {
     questionTree.children.forEach((child) => {
@@ -78,6 +87,9 @@ const doShowQuestionTreeFormModal = ref(false)
 const doShowShareQuestionTreeFormModal = ref(false)
 const doShowQuestionTreePermisionFormModal = ref(false)
 const doShowQuestionTreePermisionFormAddModal = ref(false)
+
+const storesQuestion = useQuestionStore()
+const { needReloadQuestionFolder } = storeToRefs(storesQuestion)
 
 const editQuestionTree = (questionTree: QuestionTree) => {
   QuestionTreeToEdit.value = questionTree
@@ -217,7 +229,7 @@ const shareQuestionTree = (questionTree: QuestionTree) => {
 
   if (!hasPermission) {
     notify({
-      message: 'You do not have permission to share this folder',
+      message: t('questionFolder.no_permission'),
       color: 'danger',
     })
     return
@@ -250,7 +262,7 @@ const deleteQuestionTree = (questionTree: QuestionTree) => {
       .deleteQuestionFolder(questionTree.id)
       .then(() => {
         notify({
-          message: 'Question Folder ' + questionTree.name + ' deleted',
+          message: t('questionFolder.folder_deleted', { name: questionTree.name }),
           color: 'success',
         })
         getQuestionFolders()
@@ -258,18 +270,27 @@ const deleteQuestionTree = (questionTree: QuestionTree) => {
       .catch((err) => {
         const message = getErrorMessage(err)
         notify({
-          message: 'Failed to delete question folder ' + questionTree.name + '\n' + message,
+          message: t('questionFolder.delete_failed', { name: questionTree.name }) + '\n' + message,
           color: 'danger',
         })
       })
       .finally(() => {
         loading.value = false
+        needReloadQuestionFolder.value = true
       })
   }
 }
 
+const deleteQuestionTreeOne = (questionTree: QuestionTree) => {
+  confirm(t('questionFolder.delete_confirmation', { name: questionTree.name })).then((agreed) => {
+    if (agreed) {
+      deleteQuestionTree(questionTree)
+    }
+  })
+}
+
 const deleteSelectedFolder = () => {
-  confirm('Are you sure you want to delete selected folders?').then((agreed) => {
+  confirm(t('questionFolder.delete_selected_confirmation')).then((agreed) => {
     if (agreed) {
       selectedItemsEmitted.value.forEach((questionTree) => {
         deleteQuestionTree(questionTree)
@@ -291,7 +312,7 @@ const getQuestionFolders = () => {
     .catch(() => {
       loading.value = false
       notify({
-        message: 'Failed to get question folders',
+        message: t('questionFolder.get_failed'),
         color: 'danger',
       })
     })
@@ -313,7 +334,7 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   if (editFormRef.value.isFormHasUnsavedChanges) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'Form has unsaved changes. Are you sure you want to close it?',
+      message: t('questionFolder.unsaved_changes'),
       size: 'small',
     })
     if (agreed) {
@@ -332,7 +353,7 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
       .updateQuestionFolder(qFolder.id, qFolder as QuestionTreeEmpty)
       .then(() => {
         notify({
-          message: 'Question Folder updated',
+          message: t('questionFolder.folder_updated'),
           color: 'success',
         })
         getQuestionFolders()
@@ -340,12 +361,13 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
       .catch((err) => {
         const message = getErrorMessage(err)
         notify({
-          message: 'Failed to update question folder ' + qFolder.name + '\n' + message,
+          message: t('questionFolder.update_failed', { name: qFolder.name }) + '\n' + message,
           color: 'danger',
         })
       })
       .finally(() => {
         loading.value = false
+        needReloadQuestionFolder.value = true
       })
   } else {
     if (currentShowFolderId.value != '') {
@@ -358,7 +380,7 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
       .createQuestionFolder(qFolder as QuestionTreeEmpty)
       .then(() => {
         notify({
-          message: 'Question Folder ' + qFolder.name + ' created',
+          message: t('questionFolder.folder_created', { name: qFolder.name }),
           color: 'success',
         })
         getQuestionFolders()
@@ -366,7 +388,7 @@ const onQuestionnFolderSaved = async (qFolder: QuestionTree) => {
       .catch((err) => {
         const message = getErrorMessage(err)
         notify({
-          message: 'Failed to create question folder ' + qFolder.name + '\n' + message,
+          message: t('questionFolder.create_failed', { name: qFolder.name }) + '\n' + message,
           color: 'danger',
         })
       })
@@ -417,7 +439,7 @@ const onShareQuestionFolderPermission = () => {
     .shareQuestionFolder(editPermissionValue.value?.questionFolderId || '', sharePermission.value)
     .then(() => {
       notify({
-        message: 'Question Folder permission updated',
+        message: t('questionFolder.permission_updated'),
         color: 'success',
       })
       doShowShareQuestionTreeFormModal.value = false
@@ -426,17 +448,60 @@ const onShareQuestionFolderPermission = () => {
     .catch((err) => {
       const message = getErrorMessage(err)
       notify({
-        message:
-          'Failed to update question folder permission ' +
-          editPermissionValue.value?.user?.firstName +
-          ' ' +
-          editPermissionValue.value?.user?.lastName +
-          '\n' +
-          message,
+        message: message,
         color: 'danger',
       })
     })
 }
+const tabValue = ref(0)
+
+const { sellectedQuestionFolderId } = storeToRefs(storesQuestion)
+const showQuestions = () => {
+  tabValue.value = 0
+  sellectedQuestionFolderId.value = currentShowFolderId.value
+}
+
+const getTotalQuestions = () => {
+  if (currentShowFolderId.value === '') {
+    let total = 0
+    questionTrees.value.forEach((folder) => {
+      total += folder.totalQuestions || 0
+    })
+    return total
+  } else {
+    return totalQuestions.value
+  }
+}
+
+const searchTerm = ref('')
+
+const handleSearch = () => {}
+
+const folderPermissionType = ref(0) // 0: all, 1: my documents, 2: shared documents
+
+const questionTreesFiltered = computed(() => {
+  const search = questionTrees.value.filter((questionTree) => {
+    const name = questionTree.name.toLowerCase().includes(searchTerm.value.toLowerCase())
+    return name
+  })
+  const filtered = search.filter((questionTree) => {
+    const permission = questionTree.permission.some((permission) => {
+      if (folderPermissionType.value == 0) {
+        return true
+      }
+      if (folderPermissionType.value == 2) {
+        const share = permission.canView && permission.user?.id == authStore.user?.id
+        const owner = questionTree?.owner?.id == authStore.user?.id
+        return share && !owner
+      }
+      if (folderPermissionType.value == 1) {
+        return questionTree?.owner?.id == authStore.user?.id
+      }
+    })
+    return permission
+  })
+  return filtered
+})
 
 watch(
   () => permissionEdit.value,
@@ -456,47 +521,110 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1 v-if="props.showTitle" class="page-title font-bold">Question Folder</h1>
-  <VaCard>
-    <VaCardContent>
-      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
-        <div class="flex flex-col md:flex-row gap-2 justify-start">
-          <VaBreadcrumbs>
-            <VaBreadcrumbsItem
-              v-for="item in QuestionFolderBreadcrumb"
-              :key="item.label"
-              :label="item.label"
-              @click="handleBreadcrumbClick(item)"
+  <VaTabs v-model="tabValue">
+    <template #tabs>
+      <VaTab v-for="tab in [t('questionFolder.questions'), t('questionFolder.folders')]" :key="tab">
+        {{ tab }}
+      </VaTab>
+    </template>
+  </VaTabs>
+  <VaCard v-if="tabValue == 1" class="pb-0">
+    <VaCard class="flex flex-col sm:flex-row gap-2 p-2 mb-2">
+      <VaInput v-model="searchTerm" :placeholder="t('questionFolder.search')" class="flex-grow">
+        <template #appendInner>
+          <VaIcon color="secondary" class="material-icons" @click="handleSearch">search</VaIcon>
+        </template>
+      </VaInput>
+      <VaCard class="flex justify-end items-center">
+        <VaCard class="flex gap-2">
+          <div class="flex flex-row gap-2 justify-end">
+            <VaButton
+              v-if="selectedItemsEmitted.length != 0 && props.mode == 'full'"
+              icon="delete"
+              color="danger"
+              @click="deleteSelectedFolder()"
             >
-              <a href="#" class="text-blue-500">{{ item.label }}</a>
-            </VaBreadcrumbsItem>
-          </VaBreadcrumbs>
-        </div>
-        <div class="flex flex-col md:flex-row gap-2 justify-end">
-          <VaButton
-            v-if="selectedItemsEmitted.length != 0 && props.mode == 'full'"
-            icon="delete"
-            color="danger"
-            @click="deleteSelectedFolder()"
-          >
-            Delete</VaButton
-          >
-          <VaButton v-if="props.mode == 'full'" icon="add" @click="createNewQuestionFolder()">Question Folder</VaButton>
-        </div>
-      </div>
+              {{ t('questionFolder.delete') }}</VaButton
+            >
+            <VaButton v-if="props.mode == 'full'" class="w-[170px]" icon="add" @click="createNewQuestionFolder()">{{
+              t('questionFolder.add_folder')
+            }}</VaButton>
+          </div>
+          <VaDropdown placement="bottom-end">
+            <template #anchor>
+              <VaButton icon="filter_alt" />
+            </template>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="folderPermissionType == 0 ? 'check' : ''"
+                @click="folderPermissionType = 0"
+                >{{ t('questionFolder.all') }}</VaButton
+              >
+            </VaDropdownContent>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="folderPermissionType == 1 ? 'check' : ''"
+                @click="folderPermissionType = 1"
+                >{{ t('questionFolder.my_documents') }}</VaButton
+              >
+            </VaDropdownContent>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="folderPermissionType == 2 ? 'check' : ''"
+                @click="folderPermissionType = 2"
+                >{{ t('questionFolder.shared_documents') }}</VaButton
+              >
+            </VaDropdownContent>
+          </VaDropdown>
+        </VaCard>
+      </VaCard>
+    </VaCard>
+    <VaCardTitle class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
+      <VaBreadcrumbs>
+        <VaBreadcrumbsItem
+          v-for="item in QuestionFolderBreadcrumb"
+          :key="item.label"
+          :label="item.label"
+          @click="handleBreadcrumbClick(item)"
+        >
+          <a href="#" class="text-blue-500">{{ item.label }}</a>
+        </VaBreadcrumbsItem>
+      </VaBreadcrumbs>
+      <VaCard class="flex justify-end w-[180px]">
+        <VaButton preset="primary" size="small" color="primary" @click="showQuestions">
+          {{ t('questionFolder.view_questions', { count: getTotalQuestions() }) }}
+        </VaButton>
+      </VaCard>
+    </VaCardTitle>
+    <VaCardContent class="pb-0">
       <QuestionFolder
         v-model:selectedItemsEmitted="selectedItemsEmitted"
-        :question-trees="questionTrees"
+        :question-trees="questionTreesFiltered"
         :loading="loading"
+        :total-questions="totalQuestions"
+        :current-show-folder-id="currentShowFolderId"
         :mode="props.mode"
         @edit="editQuestionTree"
-        @delete="deleteQuestionTree"
+        @delete="deleteQuestionTreeOne"
         @selectedFolder="selectedFolder"
         @share="shareQuestionTree"
+        @viewQuestions="showQuestions"
       />
     </VaCardContent>
   </VaCard>
-
+  <QuestionBank v-else @edit="editQuestionTree" @delete="deleteQuestionTreeOne" @share="shareQuestionTree" />
   <VaModal
     v-slot="{ cancel, ok }"
     v-model="doShowQuestionTreeFormModal"
@@ -507,12 +635,12 @@ onMounted(() => {
     hide-default-actions
     :before-cancel="beforeEditFormModalClose"
   >
-    <h1 v-if="QuestionTreeToEdit === null" class="va-h5 mb-4">Add folder</h1>
-    <h1 v-else class="va-h5 mb-4">Edit folder</h1>
+    <h1 v-if="QuestionTreeToEdit === null" class="va-h5 mb-4">{{ t('questionFolder.add_folder') }}</h1>
+    <h1 v-else class="va-h5 mb-4">{{ t('questionFolder.edit_folder') }}</h1>
     <EditQuestionTreeForm
       ref="editFormRef"
       :question-tree="QuestionTreeToEdit"
-      :save-button-label="QuestionTreeToEdit === null ? 'Add' : 'Save'"
+      :save-button-label="QuestionTreeToEdit === null ? t('questionFolder.add') : t('questionFolder.save')"
       @close="cancel"
       @save="
         (questionTree: QuestionTree) => {
@@ -531,18 +659,20 @@ onMounted(() => {
     stateful
     hide-default-actions
   >
-    <h1 class="va-h5 mb-4">Share folder "{{ QuestionTreeToEdit?.name }}"</h1>
+    <h1 class="va-h5 mb-4">{{ t('questionFolder.share_folder', { name: QuestionTreeToEdit?.name }) }}</h1>
 
     <VaSelect
       v-model="singleSelect"
       v-model:search="autoCompleteSearchValue"
       class="col-span-1"
       :loading="isLoadingSelect"
-      label="Select User or Group"
+      :label="t('questionFolder.select_user_or_group')"
       :options="options"
       searchable
-      :text-by="(option) => getOptionName(option as TeacherTeamTeacherGroupCombine).data"
-      placeholder="Search user or Group"
+      :text-by="
+        (option: TeacherTeamTeacherGroupCombine) => getOptionName(option as TeacherTeamTeacherGroupCombine).data
+      "
+      :placeholder="t('questionFolder.search_user_or_group')"
       track-by="id"
     >
       <template #appendInner>
@@ -576,7 +706,7 @@ onMounted(() => {
                 '00000000-0000-0000-0000-000000000000'
               "
               class="mr-2 mb-2"
-              message="Not registered yet"
+              :message="t('questionFolder.not_registered')"
             >
               <VaIcon class="mr-2" name="no_accounts" />
             </VaPopover>
@@ -590,7 +720,7 @@ onMounted(() => {
               border-color="primary"
               @click="AddPermission(option as TeacherTeamTeacherGroupCombine)"
             >
-              Select
+              {{ t('questionFolder.select') }}
             </VaButton>
           </div>
         </div>
@@ -599,7 +729,7 @@ onMounted(() => {
     <div class="mt-5">
       <VaScrollContainer class="h-80" vertical>
         <VaList>
-          <VaListLabel> Permissions </VaListLabel>
+          <VaListLabel> {{ t('questionFolder.permissions') }} </VaListLabel>
 
           <VaListItem
             v-for="(permission, index) in QuestionTreeToEdit?.permission"
@@ -636,7 +766,7 @@ onMounted(() => {
                 border-color="primary"
                 class="mr-6 mb-2"
               >
-                Owner
+                {{ t('questionFolder.owner') }}
               </VaButton>
               <VaButton
                 v-else
@@ -646,7 +776,7 @@ onMounted(() => {
                 class="mr-6 mb-2"
                 @click="editPermission(permission)"
               >
-                Edit Permissions
+                {{ t('questionFolder.edit_permissions') }}
               </VaButton>
             </VaListItemSection>
           </VaListItem>
@@ -657,17 +787,13 @@ onMounted(() => {
 
   <VaModal
     v-model="doShowQuestionTreePermisionFormModal"
-    ok-text="Save"
+    :ok-text="t('questionFolder.save')"
     size="small"
-    @ok="
-      () => {
-        onShareQuestionFolderPermission()
-      }
-    "
+    @ok="onShareQuestionFolderPermission"
   >
-    <span class="va-h5 mb-5"
-      >Edit Permissions for <b>"{{ getNameUserGroup(editPermissionValue) }}"</b></span
-    >
+    <span class="va-h5 mb-5">{{
+      t('questionFolder.edit_permissions_for', { name: getNameUserGroup(editPermissionValue) })
+    }}</span>
     <VaForm>
       <div class="gap-4 ml-10 mt-10">
         <VaListItem>
@@ -686,7 +812,7 @@ onMounted(() => {
             </VaListItemLabel>
           </VaListItemSection>
           <VaListItemSection icon>
-            <VaPopover message="Delete permission" position="top">
+            <VaPopover :message="t('questionFolder.delete_permission')" position="top">
               <VaButton
                 round
                 icon="mso-delete"
@@ -697,35 +823,31 @@ onMounted(() => {
                   }
                 "
               >
-                Delete
+                {{ t('questionFolder.delete') }}
               </VaButton>
             </VaPopover>
           </VaListItemSection>
         </VaListItem>
       </div>
       <div class="flex flex-col gap-4 p-10">
-        <VaCheckbox v-model="permissionEdit.canView" label="View" />
-        <VaCheckbox v-model="permissionEdit.canAdd" label="Create" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" label="Update" />
-        <VaCheckbox v-model="permissionEdit.canDelete" label="Delete" />
-        <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
+        <VaCheckbox v-model="permissionEdit.canView" :label="t('questionFolder.view')" />
+        <VaCheckbox v-model="permissionEdit.canAdd" :label="t('questionFolder.create')" />
+        <VaCheckbox v-model="permissionEdit.canUpdate" :label="t('questionFolder.update')" />
+        <VaCheckbox v-model="permissionEdit.canDelete" :label="t('questionFolder.delete')" />
+        <VaCheckbox v-model="permissionEdit.canShare" :label="t('questionFolder.share')" />
       </div>
     </VaForm>
   </VaModal>
 
   <VaModal
     v-model="doShowQuestionTreePermisionFormAddModal"
-    ok-text="Save"
+    :ok-text="t('questionFolder.save')"
     size="small"
-    @ok="
-      () => {
-        onShareQuestionFolderPermission()
-      }
-    "
+    @ok="onShareQuestionFolderPermission"
   >
-    <span class="va-h5 mb-5"
-      >Grand Permissions for <b>"{{ getNameUserGroup(editPermissionValue) }}"</b></span
-    >
+    <span class="va-h5 mb-5">{{
+      t('questionFolder.grant_permissions_for', { name: getNameUserGroup(editPermissionValue) })
+    }}</span>
     <VaForm>
       <div class="gap-4 ml-10 mt-10">
         <VaListItem>
@@ -744,7 +866,7 @@ onMounted(() => {
             </VaListItemLabel>
           </VaListItemSection>
           <VaListItemSection icon>
-            <VaPopover message="Delete permission" position="top">
+            <VaPopover :message="t('questionFolder.delete_permission')" position="top">
               <VaButton
                 round
                 icon="mso-delete"
@@ -755,17 +877,17 @@ onMounted(() => {
                   }
                 "
               >
-                Delete
+                {{ t('questionFolder.delete') }}
               </VaButton>
             </VaPopover>
           </VaListItemSection>
         </VaListItem>
       </div>
       <div class="flex flex-col gap-4 p-10">
-        <VaCheckbox v-model="permissionEdit.canView" label="View" />
-        <VaCheckbox v-model="permissionEdit.canAdd" label="Create" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" label="Update" />
-        <VaCheckbox v-model="permissionEdit.canDelete" label="Delete" />
+        <VaCheckbox v-model="permissionEdit.canView" :label="t('questionFolder.view')" />
+        <VaCheckbox v-model="permissionEdit.canAdd" :label="t('questionFolder.create')" />
+        <VaCheckbox v-model="permissionEdit.canUpdate" :label="t('questionFolder.update')" />
+        <VaCheckbox v-model="permissionEdit.canDelete" :label="t('questionFolder.delete')" />
       </div>
     </VaForm>
   </VaModal>

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import authService from '@services/auth.service'
 import jwtService from '@services/jwt.service'
 import { Register, ResetPassword } from '@/pages/auth/types'
+import { UserDetail } from '@/pages/user/types'
 
 export type User = {
   id: string
@@ -71,7 +72,11 @@ export const useAuthStore = defineStore('auth', {
         this.user = null
       }
     },
-    async login(email: string, password: string, captchaToken: string): Promise<any> {
+    setUserDetails(userDetail: UserDetail) {
+      this.avatarUrl = userDetail.imageUrl || ''
+      if (this.user) this.user.fullName = userDetail.firstName + userDetail.lastName
+    },
+    async login(email: string, password: string, captchaToken: string, keepLogin: boolean): Promise<any> {
       try {
         const response = await authService.login(email, password, captchaToken)
         if (response.data.token) {
@@ -88,6 +93,9 @@ export const useAuthStore = defineStore('auth', {
             permission: userParse.permission,
           }
           this.avatarUrl = userParse.image_url
+          if (!keepLogin) {
+            jwtService.removeRefreshToken()
+          }
         } else {
           this.isAuthenticated = false
           this.user = null

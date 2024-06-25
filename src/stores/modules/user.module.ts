@@ -7,6 +7,7 @@ import {
 } from '@/pages/user/types'
 import { defineStore } from 'pinia'
 import userService from '@services/user.service'
+import { useAuthStore } from './auth.module'
 
 export const useUserProfileStore = defineStore('userProfile', {
   state: () => ({
@@ -20,6 +21,7 @@ export const useUserProfileStore = defineStore('userProfile', {
         const response = await userService.getUserProfile()
         this.isLoading = false
         this.userDetails = { ...response?.data }
+        useAuthStore().setUserDetails({ ...response?.data })
         return await Promise.resolve(response)
       } catch (error) {
         this.isLoading = false

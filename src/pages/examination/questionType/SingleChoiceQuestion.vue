@@ -43,7 +43,7 @@ const getContentFormat = (question?: Question) => {
         <!--eslint-enable-->
       </div>
       <div class="grid xs:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div v-for="(answer, idx) in question.answers" :key="answer.id">
+        <div v-for="(answer, idx) in question.answers" :key="answer.id || ''">
           <span> {{ String.fromCharCode(65 + idx) }}. {{ answer.content }} </span>
           <span v-for="(ans, index2) in getUserAnswer(question.id)" :key="index2">
             <VaIcon

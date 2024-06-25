@@ -55,6 +55,9 @@ onMounted(() => {
 </script>
 
 <template>
+  <VaLayout>
+    <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'classroom' }" />
+  </VaLayout>
   <VaDivider />
   <VaCard class="flex">
     <VaCard class="w-1/6 mt-3">

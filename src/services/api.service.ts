@@ -60,7 +60,10 @@ class ApiService {
         return response
       },
       function (error) {
-        if (error.response.status === 401) {
+        if (
+          error.response.status === 401 &&
+          error.response.data.exception != 'Authentication Failed, Invalid Email or Password.'
+        ) {
           JwtService.destroyToken()
           JwtService.destroyUser()
           const { init } = useToast()
