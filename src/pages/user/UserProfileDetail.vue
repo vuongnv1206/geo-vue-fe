@@ -10,7 +10,7 @@ import {
 } from './types'
 import { VaAvatar, useForm, useToast } from 'vuestic-ui'
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { AvatarFiles, OTP, SettingProfileOptions } from './UserProfile.enum'
+import { AvatarFiles, OTP } from './UserProfile.enum'
 import { useUserProfileStore } from '@/stores/modules/user.module'
 import { getErrorMessage } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
@@ -83,9 +83,9 @@ const getUserDetail = async () => {
 }
 
 watch(
-  () => props.settingOption?.name,
-  (name) => {
-    const showProfile = name === SettingProfileOptions.General
+  () => props.settingOption?.id,
+  (id) => {
+    const showProfile = id == '1'
     if (showProfile) {
       getUserDetail()
     }
@@ -95,7 +95,7 @@ watch(
 )
 
 onMounted(() => {
-  const showProfile = props.settingOption?.name !== SettingProfileOptions.ChangePassword
+  const showProfile = props.settingOption?.id == '1'
   if (showProfile) {
     getUserDetail()
   }

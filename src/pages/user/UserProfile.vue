@@ -15,6 +15,7 @@ import { ref } from 'vue'
 import { SettingProfile } from './types'
 const selectedSettingOption = ref<SettingProfile | null>(null)
 function handleSelectedSettingOption(item: SettingProfile) {
+  console.log('item', item)
   selectedSettingOption.value = item
 }
 </script>
