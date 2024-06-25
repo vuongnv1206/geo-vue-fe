@@ -2,16 +2,18 @@
 import { computed, onBeforeMount, PropType, ref, watch } from 'vue'
 import { defineVaDataTableColumns, useMenu } from 'vuestic-ui'
 import { Pagination, QuestionTree } from '../types'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const { show } = useMenu()
 
 const columns = defineVaDataTableColumns([
-  { label: 'Folder Name', key: 'name', sortable: true },
-  { label: 'Total Questions', key: 'totalQuestions', sortable: true },
-  { label: 'Created By', key: 'createdBy', sortable: true },
-  { label: 'Created On', key: 'createdOn', sortable: true },
-  { label: 'Last Modified On', key: 'lastModifiedOn', sortable: true },
-  { label: ' ', key: 'actions' },
+  { label: t('questionFolderTable.folder_name'), key: 'name', sortable: true },
+  { label: t('questionFolderTable.total_questions'), key: 'totalQuestions', sortable: true },
+  { label: t('questionFolderTable.created_by'), key: 'createdBy', sortable: true },
+  { label: t('questionFolderTable.created_on'), key: 'createdOn', sortable: true },
+  { label: t('questionFolderTable.last_modified_on'), key: 'lastModifiedOn', sortable: true },
+  { label: t('questionFolderTable.actions'), key: 'actions' },
 ])
 
 const props = defineProps({
@@ -57,18 +59,18 @@ const contextmenu = (event: any) => {
   show({
     event: event.event,
     options: [
-      { text: 'Rename', icon: 'edit' },
-      { text: 'Share', icon: 'share' },
-      { text: 'Delete', icon: 'delete' },
+      { text: t('questionFolderTable.rename'), icon: 'edit' },
+      { text: t('questionFolderTable.share'), icon: 'share' },
+      { text: t('questionFolderTable.delete'), icon: 'delete' },
     ],
     onSelected(option) {
-      if (option.text === 'Rename') {
+      if (option.text === t('questionFolderTable.rename')) {
         emit('edit', event.item)
       }
-      if (option.text === 'Share') {
+      if (option.text === t('questionFolderTable.share')) {
         emit('share', event.item)
       }
-      if (option.text === 'Delete') {
+      if (option.text === t('questionFolderTable.delete')) {
         emit('delete', event.item)
       }
     },
@@ -110,7 +112,6 @@ watch(
 )
 
 onBeforeMount(() => {
-  // edit column if mode is lite
   if (props.mode == 'lite') {
     columns.splice(2, 3)
   }
@@ -191,8 +192,8 @@ onBeforeMount(() => {
     <VaCardContent>
       <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center pt-0 pb-0">
         <div>
-          <b>{{ pagination.total }} results.</b>
-          Results per page
+          <b>{{ pagination.total }} {{ t('questionFolderTable.results') }}.</b>
+          {{ t('questionFolderTable.results_per_page') }}
           <VaSelect v-model="pagination.perPage" class="!w-20" :options="[20, 50, 100]" />
         </div>
 
@@ -200,7 +201,7 @@ onBeforeMount(() => {
           <VaButton
             preset="secondary"
             icon="va-arrow-left"
-            aria-label="Previous page"
+            :aria-label="t('questionFolderTable.previous_page')"
             :disabled="pagination.page === 1"
             @click="pagination.page--"
           />
@@ -208,7 +209,7 @@ onBeforeMount(() => {
             class="mr-2"
             preset="secondary"
             icon="va-arrow-right"
-            aria-label="Next page"
+            :aria-label="t('questionFolderTable.next_page')"
             :disabled="pagination.page === totalPages"
             @click="pagination.page++"
           />

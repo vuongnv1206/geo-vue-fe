@@ -1,10 +1,10 @@
 <template>
   <VaInnerLoading :loading="isLoading" :size="60">
     <VaForm ref="form" @submit.prevent="submit">
-      <h1 class="font-semibold text-4xl mb-4">Log in</h1>
+      <h1 class="font-semibold text-4xl mb-4">{{ t('auth.login') }}</h1>
       <p class="text-base mb-4 leading-5">
-        New to GEO?
-        <RouterLink :to="{ name: 'signup' }" class="font-semibold text-primary">Sign up</RouterLink>
+        {{ t('auth.new_to_geo') }}
+        <RouterLink :to="{ name: 'signup' }" class="font-semibold text-primary">{{ t('auth.sign_up') }}</RouterLink>
       </p>
       <VaInput
         v-model="formData.email"
@@ -19,7 +19,7 @@
           :rules="[validators.required]"
           :type="isPasswordVisible.value ? 'text' : 'password'"
           class="mb-4"
-          label="Password"
+          :label="t('auth.password')"
           @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
         >
           <template #appendInner>
@@ -33,14 +33,14 @@
       </VaValue>
 
       <div class="auth-layout__options flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        <VaCheckbox v-model="formData.keepLoggedIn" class="mb-2 sm:mb-0" label="Keep me signed in on this device" />
+        <VaCheckbox v-model="formData.keepLoggedIn" class="mb-2 sm:mb-0" :label="t('auth.keep_signed_in')" />
         <RouterLink :to="{ name: 'recover-password' }" class="mt-2 sm:mt-0 sm:ml-1 font-semibold text-primary">
-          Forgot password?
+          {{ t('auth.forgot_password') }}
         </RouterLink>
       </div>
 
       <div class="flex justify-center mt-4">
-        <VaButton class="w-full" @click="submit"> Login</VaButton>
+        <VaButton class="w-full" @click="submit">{{ t('auth.login') }}</VaButton>
       </div>
     </VaForm>
   </VaInnerLoading>
@@ -53,6 +53,9 @@ import { useForm, useToast } from 'vuestic-ui'
 import { validators, getErrorMessage } from '@services/utils'
 import { useAuthStore } from '@modules/auth.module'
 import { useReCaptcha } from 'vue-recaptcha-v3'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const { validate } = useForm('form')
 const { push } = useRouter()

@@ -11,6 +11,9 @@ import { getErrorMessage } from '@/services/utils'
 import { QuestionTypeColor } from '@services/utils'
 import QuestionView from './widgets/QuestionView.vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const nodes = ref<QuestionTree[]>([])
 const stores = useQuestionFolderStore()
@@ -29,20 +32,20 @@ const { init } = useToast()
 const currentSelectedFolder = ref<QuestionTree | null>(null)
 
 const QuestionTypeOptions = [
-  { id: 0, name: 'All', questionType: 0 },
-  { id: 1, name: 'Single Choice', questionType: 1 },
-  { id: 2, name: 'Multiple Choice', questionType: 2 },
-  { id: 4, name: 'Fill Blank', questionType: 4 },
-  { id: 5, name: 'Matching', questionType: 5 },
-  { id: 6, name: 'Reading', questionType: 6 },
-  { id: 8, name: 'Writing', questionType: 8 },
-  { id: 100, name: 'Other', questionType: 100 },
+  { id: 0, name: t('questions.all'), questionType: 0 },
+  { id: 1, name: t('questions.single_choice'), questionType: 1 },
+  { id: 2, name: t('questions.multiple_choice'), questionType: 2 },
+  { id: 4, name: t('questions.fill_blank'), questionType: 4 },
+  { id: 5, name: t('questions.matching'), questionType: 5 },
+  { id: 6, name: t('questions.reading'), questionType: 6 },
+  { id: 8, name: t('questions.writing'), questionType: 8 },
+  { id: 100, name: t('questions.other'), questionType: 100 },
 ]
 
 const QuestionSortOptions = [
-  { id: 0, name: 'Newest', questionType: 1 },
-  { id: 1, name: 'Oldest', questionType: 2 },
-  { id: 2, name: 'Last Modified', questionType: 4 },
+  { id: 0, name: t('questions.newest'), questionType: 1 },
+  { id: 1, name: t('questions.oldest'), questionType: 2 },
+  { id: 2, name: t('questions.last_modified'), questionType: 4 },
 ]
 
 const emit = defineEmits<{
@@ -89,7 +92,7 @@ const searchQuestion = (search: SearchQuestion) => {
     .catch((err) => {
       const message = getErrorMessage(err)
       init({
-        title: 'Error',
+        title: t('questions.error'),
         message: message,
         color: 'danger',
       })
@@ -245,8 +248,8 @@ const editQuestion = (question: Question) => {
 
 const deleteQuestion = (question: Question) => {
   confirm({
-    title: 'Delete question',
-    message: `Are you sure you want to delete?`,
+    title: t('questions.delete_question'),
+    message: t('questions.delete_confirmation'),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -255,8 +258,8 @@ const deleteQuestion = (question: Question) => {
       .DeleteQuestion(question.id || '')
       .then(() => {
         init({
-          title: 'Success',
-          message: 'Delete question successfully',
+          title: t('questions.success'),
+          message: t('questions.delete_success'),
           color: 'success',
         })
         searchQuestion(searchValue.value)
@@ -264,7 +267,7 @@ const deleteQuestion = (question: Question) => {
       .catch((err) => {
         const message = getErrorMessage(err)
         init({
-          title: 'Error',
+          title: t('questions.error'),
           message: message,
           color: 'danger',
         })
@@ -282,8 +285,8 @@ const AddNewQuestion = () => {
     router.push({ name: 'question-edit' })
   } else {
     init({
-      title: 'Error',
-      message: 'Please select a folder to add question',
+      title: t('questions.error'),
+      message: t('questions.select_folder_to_add'),
       color: 'danger',
     })
   }
@@ -327,18 +330,18 @@ const contextmenu = (event: any, node: QuestionTree) => {
   show({
     event: event,
     options: [
-      { text: 'Rename', icon: 'edit' },
-      { text: 'Share', icon: 'share' },
-      { text: 'Delete', icon: 'delete' },
+      { text: t('questions.rename'), icon: 'edit' },
+      { text: t('questions.share'), icon: 'share' },
+      { text: t('questions.delete'), icon: 'delete' },
     ],
     onSelected(option) {
-      if (option.text === 'Rename') {
+      if (option.text === t('questions.rename')) {
         emit('edit', node)
       }
-      if (option.text === 'Share') {
+      if (option.text === t('questions.share')) {
         emit('share', node)
       }
-      if (option.text === 'Delete') {
+      if (option.text === t('questions.delete')) {
         emit('delete', node)
       }
     },
@@ -418,13 +421,13 @@ onMounted(() => {
           />
           <div style="font-size: smaller" class="text-secondary font-bold uppercase ml-2 flex items-center">
             <span class="inline-block align-middle">
-              Folder <b>{{ currentSelectedFolder?.name || '?' }}</b>
+              <VaIcon name="folder" class="ml-2" /> <b>{{ currentSelectedFolder?.name || '?' }}</b>
             </span>
           </div>
         </template>
         <template #right>
           <div class="flex gap-2">
-            <VaButton icon="add" @click="AddNewQuestion">Add question</VaButton>
+            <VaButton icon="add" @click="AddNewQuestion">{{ t('questions.add_question') }}</VaButton>
           </div>
         </template>
       </VaNavbar>
@@ -435,7 +438,7 @@ onMounted(() => {
           <VaInnerLoading :loading="loading" :size="60">
             <VaCard class="flex flex-col">
               <VaCardTitle class="flex items-start justify-between">
-                <h1 class="card-title text-secondary font-bold uppercase">Folders</h1>
+                <h1 class="card-title text-secondary font-bold uppercase">{{ t('questions.folders') }}</h1>
                 <div class="flex gap-2"></div>
               </VaCardTitle>
               <VaSkeletonGroup v-if="loading" animation="wave" :delay="0">
@@ -494,8 +497,8 @@ onMounted(() => {
                   v-model="QuestionTypeValue"
                   track-by="id"
                   :text-by="(option: any) => (option as any).name"
-                  placeholder="All"
-                  label="Question Type"
+                  :placeholder="t('questions.all')"
+                  :label="t('questions.question_type')"
                   :options="QuestionTypeOptions"
                 >
                   <template #content="{ value }">
@@ -519,7 +522,11 @@ onMounted(() => {
                 </VaSelect>
               </div>
               <div>
-                <VaInput v-model="filters.keyword" label="Search content" placeholder="Search">
+                <VaInput
+                  v-model="filters.keyword"
+                  :label="t('questions.search_content')"
+                  :placeholder="t('questions.search')"
+                >
                   <template #prependInner>
                     <VaIcon name="search" color="secondary" size="small" />
                   </template>
@@ -530,8 +537,8 @@ onMounted(() => {
                   v-model="QuestionSortValue"
                   track-by="id"
                   :text-by="(option: any) => (option as any).name"
-                  placeholder="Newest"
-                  label="Sort by"
+                  :placeholder="t('questions.newest')"
+                  :label="t('questions.sort_by')"
                   :options="QuestionSortOptions"
                 >
                   <template #content="{ value }">
@@ -558,8 +565,8 @@ onMounted(() => {
             <VaCard v-if="currentSelectedFolder == null" class="mb-5 pr-4 flex justify-center">
               <div class="flex flex-col gap-4 w-full">
                 <VaCardContent class="flex flex-col items-center justify-center">
-                  <h2 class="va-h5">No question folder selected</h2>
-                  <p class="text-base leading-5">Please select a question folder to view its questions</p>
+                  <h2 class="va-h5">{{ t('questions.no_folder_selected') }}</h2>
+                  <p class="text-base leading-5">{{ t('questions.select_folder') }}</p>
                 </VaCardContent>
               </div>
             </VaCard>
@@ -585,8 +592,8 @@ onMounted(() => {
                 <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
                   <div class="flex flex-col gap-4 w-full">
                     <VaCardContent class="flex flex-col items-center justify-center">
-                      <h2 class="va-h5">No question in this folder</h2>
-                      <p class="text-base leading-5">Please select another folder</p>
+                      <h2 class="va-h5">{{ t('questions.no_question') }}</h2>
+                      <p class="text-base leading-5">{{ t('questions.select_another_folder') }}</p>
                     </VaCardContent>
                   </div>
                 </VaCard>
@@ -595,8 +602,8 @@ onMounted(() => {
             <VaCardContent>
               <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center p-2">
                 <div>
-                  <b>{{ pagination.total }} results.</b>
-                  Results per page
+                  <b>{{ pagination.total }} {{ t('questions.results') }}.</b>
+                  {{ t('questions.results_per_page') }}
                   <VaSelect v-model="pagination.perPage" class="!w-20" :options="[10, 50, 100]" />
                 </div>
 

@@ -1,46 +1,27 @@
-<template>
-  <div class="flex items-center justify-between">
-    <p>Language</p>
-    <div class="w-40">
-      <VaSelect v-model="model" :options="options" />
-    </div>
-  </div>
-</template>
 <script lang="ts" setup>
-import { computed } from 'vue'
-
 import { useI18n } from 'vue-i18n'
-
-type LanguageMap = Record<string, string>
+import VaIconEnglish from '@/components/icons/VaIconEnglish.vue'
+import VaIconVietnamese from '@/components/icons/VaIconVietnamese.vue'
 
 const { locale } = useI18n()
 
-const languages: LanguageMap = {
-  english: 'English',
-  spanish: 'Spanish',
-  brazilian_portuguese: 'Português',
-  simplified_chinese: 'Simplified Chinese',
-  persian: 'Persian',
+const changeLanguage = (lang: string) => {
+  locale.value = lang
+  localStorage.setItem('locale', lang)
 }
-
-const languageCodes: LanguageMap = {
-  gb: languages.english,
-  es: languages.spanish,
-  br: languages.brazilian_portuguese,
-  cn: languages.simplified_chinese,
-  ir: languages.persian,
-}
-
-const languageName: LanguageMap = Object.fromEntries(Object.entries(languageCodes).map(([key, value]) => [value, key]))
-
-const options = Object.values(languageCodes)
-
-const model = computed({
-  get() {
-    return languageCodes[locale.value]
-  },
-  set(value) {
-    locale.value = languageName[value]
-  },
-})
 </script>
+
+<template>
+  <div class="flex items-center justify-between">
+    <VaMenu class="mr-2">
+      <template #anchor>
+        <VaIconEnglish v-if="locale === 'gb'" class="va-icon-message" />
+        <VaIconVietnamese v-else class="va-icon-message" />
+      </template>
+      <VaMenuItem @selected="changeLanguage('gb')"> <VaIconEnglish class="va-icon-message" /> English </VaMenuItem>
+      <VaMenuItem @selected="changeLanguage('vi')">
+        <VaIconVietnamese class="va-icon-message" /> Tiếng Việt
+      </VaMenuItem>
+    </VaMenu>
+  </div>
+</template>

@@ -1,31 +1,18 @@
+<script lang="ts" setup>
+import ProfileDropdown from './dropdowns/ProfileDropdown.vue'
+import NotificationDropdown from './dropdowns/NotificationDropdown.vue'
+import LanguageSwitcher from '@/pages/settings/language-switcher/LanguageSwitcher.vue'
+defineProps({
+  isMobile: { type: Boolean, default: false },
+})
+</script>
 <template>
   <div class="app-navbar-actions">
-    <VaButton
-      v-if="!isMobile"
-      preset="secondary"
-      href="https://test.guardianexam.com/"
-      target="_blank"
-      color="textPrimary"
-      class="app-navbar-actions__item flex-shrink-0 mx-0"
-    >
-      {{ t('helpAndSupport') }}
-    </VaButton>
+    <LanguageSwitcher class="app-navbar-actions__item" />
     <NotificationDropdown ref="notificationDropdownRef" class="app-navbar-actions__item" />
     <ProfileDropdown class="app-navbar-actions__item app-navbar-actions__item--profile mr-1" />
   </div>
 </template>
-
-<script lang="ts" setup>
-import ProfileDropdown from './dropdowns/ProfileDropdown.vue'
-import NotificationDropdown from './dropdowns/NotificationDropdown.vue'
-
-defineProps({
-  isMobile: { type: Boolean, default: false },
-})
-
-import { useI18n } from 'vue-i18n'
-const { t } = useI18n()
-</script>
 
 <style lang="scss">
 .app-navbar-actions {

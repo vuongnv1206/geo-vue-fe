@@ -2,16 +2,19 @@
 import { ref } from 'vue'
 import { SettingProfile } from './types'
 import { SettingProfileOptions } from './UserProfile.enum'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const listSettings = ref<SettingProfile[]>([
   {
     id: '1',
-    name: 'General',
+    name: t('settings.general'),
     icon: 'person',
   },
   {
     id: '2',
-    name: 'Change Password',
+    name: t('auth.change_password'),
     icon: 'lock',
   },
 ])
