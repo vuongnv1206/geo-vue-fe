@@ -97,7 +97,8 @@
     "female": "Nữ",
     "male": "Nam",
     "change_email": "Thay đổi email",
-    "change_password": "Thay đổi mật khẩu"
+    "change_password": "Thay đổi mật khẩu",
+    "verify_email": "Xác minh email"
   },
   "settings": {
     "title": "Cài đặt",

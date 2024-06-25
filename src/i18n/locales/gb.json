@@ -97,7 +97,8 @@
     "female": "female",
     "male": "male",
     "change_email": "Change email",
-    "change_password": "Change password"
+    "change_password": "Change password",
+    "verify_email": "Verify email"
   },
   "settings": {
     "title": "Settings",
