@@ -5,15 +5,18 @@ import { ref, watch } from 'vue'
 const store = useAuthStore()
 
 const url = import.meta.env.VITE_APP_BASE_URL as string
+// http://localhost:5000/api
+// https://test-api.guardianexam.com/api
+// https://api.guardianexam.com/api
+// sub 3 chars at the end
+const url_without_api = url.slice(0, -3)
 
-const avatarImage = ref<string | undefined>(
-  store.user?.avatarUrl ? `${url.replace('/api', '/')}${store.avatarUrl}` : undefined,
-)
+const avatarImage = ref<string | undefined>(store.user?.avatarUrl ? `${url_without_api}${store.avatarUrl}` : undefined)
 
 watch(
   () => store.avatarUrl,
   () => {
-    avatarImage.value = store.avatarUrl ? `${url.replace('/api', '/')}${store.avatarUrl}` : undefined
+    avatarImage.value = store.avatarUrl ? `${url_without_api}${store.avatarUrl}` : undefined
   },
   { immediate: true },
 )
@@ -25,7 +28,7 @@ const props = defineProps<{
   image?: string
 }>()
 
-const imageUrl = props.image ? `${url.replace('/api', '/')}${props.image}` : undefined
+const imageUrl = props.image ? `${url_without_api}${props.image}` : undefined
 </script>
 
 <template>
