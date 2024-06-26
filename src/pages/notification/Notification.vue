@@ -56,7 +56,7 @@
               <VaListItem
                 preset="secondary"
                 class="p-2 text-base cursor-pointer relative group notification-hover"
-                :class="{ 'bg-slate-100': !item?.isRead }"
+                :class="{ 'notification-unread': !item?.isRead }"
                 @click="handleClickToNotificationItem(item?.url, item?.id, item?.isRead)"
               >
                 <VaListItemSection icon class="mx-0 p-0">
@@ -384,6 +384,9 @@ defineExpose({
 </script>
 <style scoped>
 .notification-hover:hover {
+  background-color: var(--va-background-element) !important;
+}
+.notification-unread {
   background-color: var(--va-background-element) !important;
 }
 </style>

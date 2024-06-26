@@ -51,7 +51,7 @@
             <template v-for="(item, index) in notificationsWithRelativeTime" :key="item?.id">
               <VaListItem
                 class="p-1 text-base cursor-pointer notification-hover relative group"
-                :class="{ 'bg-slate-100': !item?.isRead }"
+                :class="{ 'notification-unread': !item?.isRead }"
                 @click="handleClickToNotificationItem(item?.url, item?.id, item?.isRead)"
               >
                 <VaListItemSection icon class="mx-0 p-0">
@@ -420,6 +420,10 @@ defineExpose({
 }
 
 .notification-hover:hover {
+  background-color: var(--va-background-element) !important;
+}
+
+.notification-unread {
   background-color: var(--va-background-element) !important;
 }
 </style>
