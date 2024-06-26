@@ -75,7 +75,7 @@ const genderOptions = reactive([
       v-model="newUserInClass.lastName"
       label="Last name"
       placeholder="Enter your last name"
-      :rules="[validators.required2('Last name'), validators.isCharacter('Last name'), , validators.maxLength(50)]"
+      :rules="[validators.required2('Last name'), validators.isCharacter('Last name'), validators.maxLength(50)]"
     />
     <VaInput
       v-model="newUserInClass.studentCode"
