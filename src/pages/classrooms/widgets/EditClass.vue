@@ -107,7 +107,6 @@ onMounted(() => {
       label="Group Class"
       placeholder="Select a group class"
       clearable
-      :rules="[validators.required2('Group class')]"
     />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>

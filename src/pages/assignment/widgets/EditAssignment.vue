@@ -238,7 +238,6 @@ onMounted(() => {
           label="Subject"
           placeholder="Select a subject"
           clearable
-          :rules="[validators.required2('Subject')]"
         />
         <VaLayout>
           <template #left>
