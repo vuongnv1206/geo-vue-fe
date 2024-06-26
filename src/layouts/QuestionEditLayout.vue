@@ -443,21 +443,8 @@ const handleSaveBtn = () => {
       questionToEdit.value.image = q?.image || null
       questionToEdit.value.audio = q?.audio || null
       questionToEdit.value.questionType = q?.questionType || QuestionType.Other
-      questionToEdit.value.questionPassages = q?.questionPassages || []
-      for (let i = 0; i < questionToEdit.value.answers.length; i++) {
-        questionToEdit.value.answers[i].content = q?.answers[i].content || ''
-        questionToEdit.value.answers[i].isCorrect = q?.answers[i].isCorrect || false
-      }
-      if (q?.answers?.length) {
-        if (q?.answers?.length > questionToEdit.value.answers.length) {
-          for (let i = questionToEdit.value.answers.length; i < q?.answers.length; i++) {
-            questionToEdit.value.answers.push({
-              content: q?.answers[i].content || '',
-              isCorrect: q?.answers[i].isCorrect || false,
-            })
-          }
-        }
-      }
+      questionToEdit.value.answers = q?.answers || []
+      questionToEdit.value.questionPassages = q?.questionPassages || null
       questionToEdit.value.questionLable = q?.questionLable || null
       if (q) {
         isLoading.value = true
