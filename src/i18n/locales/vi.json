@@ -98,7 +98,8 @@
     "male": "Nam",
     "change_email": "Thay đổi email",
     "change_password": "Thay đổi mật khẩu",
-    "verify_email": "Xác minh email"
+    "verify_email": "Xác minh email",
+    "password": "Mật khẩu"
   },
   "settings": {
     "title": "Cài đặt",

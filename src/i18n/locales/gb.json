@@ -98,7 +98,8 @@
     "male": "male",
     "change_email": "Change email",
     "change_password": "Change password",
-    "verify_email": "Verify email"
+    "verify_email": "Verify email",
+    "password": "Password"
   },
   "settings": {
     "title": "Settings",
