@@ -415,7 +415,8 @@ const uploadAvatar = async (formDataAvatar: FormData) => {
 
 const getSrcAvatar = () => {
   const url = import.meta.env.VITE_APP_BASE_URL as string
-  if (formData?.imageUrl) return `${url.replace('/api', '/')}${formData?.imageUrl}`
+  const url_without_api = url.slice(0, -3)
+  if (formData?.imageUrl) return `${url_without_api}${formData?.imageUrl}`
   return ''
 }
 
