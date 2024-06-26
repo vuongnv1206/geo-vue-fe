@@ -99,7 +99,8 @@ const handleReceiveNotification = (type, notification) => {
 }
 onMounted(async () => {
   const url = import.meta.env.VITE_APP_BASE_URL
-  const path = url.replace('/api', '/') + 'notifications'
+  const url_without_api = url.slice(0, -3)
+  const path = url_without_api + 'notifications'
   await signalRService.connect(`${path}`)
   signalRService.on('NotificationFromServer', handleReceiveNotification)
 })

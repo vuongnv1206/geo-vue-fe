@@ -5,10 +5,6 @@ import { ref, watch } from 'vue'
 const store = useAuthStore()
 
 const url = import.meta.env.VITE_APP_BASE_URL as string
-// http://localhost:5000/api
-// https://test-api.guardianexam.com/api
-// https://api.guardianexam.com/api
-// sub 3 chars at the end
 const url_without_api = url.slice(0, -3)
 
 const avatarImage = ref<string | undefined>(store.user?.avatarUrl ? `${url_without_api}${store.avatarUrl}` : undefined)
