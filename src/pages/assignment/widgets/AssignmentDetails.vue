@@ -13,12 +13,8 @@
         <VaCard v-if="assignment">
           <VaCard>
             <VaCardTitle>{{ assignment.name }}</VaCardTitle>
-            <VaCardContent>
-              Start Time: {{ assignment.startTime ? format.formatDate(assignment.startTime) : '' }}
-            </VaCardContent>
-            <VaCardContent>
-              End Time: {{ assignment.endTime ? format.formatDate(assignment.endTime) : '' }}
-            </VaCardContent>
+            <VaCardContent> Start Time: {{ format.formatDate(assignment.startTime) }} </VaCardContent>
+            <VaCardContent> End Time: {{ format.formatDate(assignment.endTime) }} </VaCardContent>
           </VaCard>
           <VaCard>
             <VaCardTitle>Menu</VaCardTitle>

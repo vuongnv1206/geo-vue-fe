@@ -55,7 +55,11 @@ watch(
     <VaInput
       v-model="newGroupClass.name"
       label="GroupClass name"
-      :rules="[validators.required2('group class name'), validators.maxLength(50)]"
+      :rules="[
+        validators.required2('Group class name'),
+        validators.isCharacter('Group class name'),
+        validators.maxLength(50),
+      ]"
     />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>

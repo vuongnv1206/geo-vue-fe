@@ -266,7 +266,7 @@ onMounted(() => {
                   </VaCard>
                 </VaCard>
               </template>
-              <VaCard class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <VaCard class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <VaCard v-for="classItem in groupClass.classes" :key="classItem.id">
                   <VaCard
                     color="primary"
@@ -291,7 +291,10 @@ onMounted(() => {
                           </template>
                         </VaMenu>
                       </VaCard>
-                      <VaCardContent class="text-sm text-gray-600">{{ classItem.schoolYear }}</VaCardContent>
+                      <VaCard class="flex flex-row justify-between items-center gap-2">
+                        <VaCardContent class="text-sm">Member: 0/11</VaCardContent>
+                        <VaCardContent class="text-sm">Year: {{ classItem.schoolYear }}</VaCardContent>
+                      </VaCard>
                     </VaCard>
                   </VaCard>
                 </VaCard>

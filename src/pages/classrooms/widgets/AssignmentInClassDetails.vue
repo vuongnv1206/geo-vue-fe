@@ -1,6 +1,6 @@
 <template>
   <VaCardContent>
-    <VaCard class="flex flex-col md:flex-row gap-2">
+    <VaCard class="flex flex-col md:flex-row gap-2 mb-4">
       <VaCard class="flex-grow justify-start items-center">
         <VaInput placeholder="Search">
           <template #appendInner>
@@ -8,7 +8,7 @@
           </template>
         </VaInput>
       </VaCard>
-      <VaMenu class="justify-end" :options="options" @selected="(v) => selectedOption(v)">
+      <VaMenu class="justify-end" :options="options" @selected="selectedOption">
         <template #anchor>
           <VaButton>
             <VaIcon name="add" />
@@ -77,16 +77,17 @@ const props = defineProps({
   },
 })
 
-const options = [
+const options = ref([
   { text: 'Assignment', value: 'create-assignment', icon: 'description' },
   { text: 'Paper', value: 'create-paper', icon: 'article' },
-]
+])
 
 const selectedOption = (v: { text: string; value: string }) => {
   if (v.text === 'Paper') {
-    return router.push({ name: v.value, params: { folderId: null } })
+    router.push({ name: v.value, params: { folderId: null } })
+  } else {
+    router.push({ name: v.value })
   }
-  return router.push({ name: v.value })
 }
 
 // Papers data
