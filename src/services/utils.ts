@@ -68,6 +68,9 @@ export const notifications = {
     return t('validateUtils.deleteFailed', { message })
   },
   unsavedChanges: t('validateUtils.unsavedChanges'),
+  confirmDelete: (message: string) => {
+    return t('validateUtils.confirmDelete', { message })
+  },
 }
 
 export const getErrorMessage = (error: any) => {
