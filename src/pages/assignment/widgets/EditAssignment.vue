@@ -203,7 +203,16 @@ onMounted(() => {
       <VaDivider />
       <VaForm ref="form" class="flex flex-col gap-4 mx-auto" style="max-width: 900px">
         <VaCardTitle>Create Assignment</VaCardTitle>
-        <VaInput v-model="newAssignment.name" label="Name" :rules="[validators.required, validators.maxLength(50)]" />
+        <VaInput
+          v-model="newAssignment.name"
+          label="Name"
+          placeholder="Enter assignment name"
+          :rules="[
+            validators.required2('Assignment name'),
+            validators.isCharacter('Assignment name'),
+            validators.maxLength(50),
+          ]"
+        />
         <VueDatePicker
           v-model="date"
           label="Time To Do"
@@ -219,7 +228,7 @@ onMounted(() => {
           placeholder="Start choosing or typing date and time"
         />
         <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
-        <VaInput v-model="newAssignment.content" label="Content" />
+        <VaInput v-model="newAssignment.content" label="Content" placeholder="Enter content" />
         <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
         <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
         <VaSelect
@@ -227,8 +236,8 @@ onMounted(() => {
           value-by="value"
           :options="subjects.map((subject) => ({ text: subject.name, value: subject.id }))"
           label="Subject"
+          placeholder="Select a subject"
           clearable
-          :rules="[(v) => (v ? true : 'Please select a subject.')]"
         />
         <VaLayout>
           <template #left>

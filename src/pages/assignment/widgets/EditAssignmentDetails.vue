@@ -207,7 +207,12 @@ onMounted(() => {
         <VaInput
           v-model="newAssignmentDetails.name"
           label="Name"
-          :rules="[validators.required2('name'), validators.maxLength(50)]"
+          placeholder="Enter assignment name"
+          :rules="[
+            validators.required2('Assignment name'),
+            validators.isCharacter('Assignment name'),
+            validators.maxLength(50),
+          ]"
         />
         <VueDatePicker
           v-model="date"

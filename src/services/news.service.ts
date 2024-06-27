@@ -1,8 +1,8 @@
-import { News } from '@/pages/classrooms/types'
+import { Post } from '@/pages/classrooms/types'
 import apiService from './api.service'
 
 class NewsService {
-  async getNews(): Promise<News> {
+  async getNews(): Promise<Post> {
     return apiService
       .get(`/v1/groupclasses/group-class-detail`)
       .then((response) => {

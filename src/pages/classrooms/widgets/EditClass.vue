@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue'
-import { Classrooms, EmptyClassrooms, GroupClass } from '../types'
+import { Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { validators } from '@/services/utils'
-import { VaSelect } from 'vuestic-ui/web-components'
 
 const props = defineProps<{
   classrooms: Classrooms | null
@@ -87,13 +86,16 @@ onMounted(() => {
     <VaInput
       v-model="newClass.name"
       label="Class name"
-      :rules="[validators.required2('name'), validators.maxLength(50)]"
+      placeholder="Enter class name"
+      :rules="[validators.required2('Class name'), validators.isCharacter('Class name'), validators.maxLength(50)]"
     />
     <VaInput
       v-model="newClass.schoolYear"
       label="School Year"
+      placeholder="Enter school year"
       :rules="[
-        validators.required2('school year'),
+        validators.required2('School year'),
+        validators.isNumber('School year'),
         validators.minValue(new Date().getFullYear()),
         validators.maxValue(new Date().getFullYear() + 10),
       ]"
@@ -104,7 +106,6 @@ onMounted(() => {
       :options="groupClasses.map((gc) => ({ text: gc.name, value: gc.id }))"
       label="Group Class"
       placeholder="Select a group class"
-      class="w-full"
       clearable
     />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">

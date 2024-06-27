@@ -1,5 +1,9 @@
 import { QuestionType } from '@/pages/question/types'
 import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/vi'
+dayjs.locale('vi')
+dayjs.extend(relativeTime)
 
 export const sleep = (ms = 0) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -7,28 +11,32 @@ export const sleep = (ms = 0) => {
 
 /** Validation */
 export const validators = {
-  email: (v: string) => {
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return pattern.test(v) || 'Please enter a valid email address'
-  },
   required: (v: any) => !!v || 'This field is required',
-  isNumber: (v: any) => !isNaN(parseFloat(v)) || 'This field must be a number',
-  required2: (fieldName: string) => (v: string) => !!v || `Field ${fieldName} is required`,
+  required2: (fieldName: string) => (v: string) => !!v || `${fieldName} is required`,
+
   minLength: (length: number) => (v: string) =>
     (v && v.length >= length) || `Must be greater than ${length} characters`,
-  // maxLength: (length: number) => (v: string) => (v && v.length <= length) || `Must be less than ${length} characters`,
   maxLength: (length: number) => (v: string | null) =>
     v === null || v.length <= length || `Must be less than ${length} characters`,
-  numeric: (v: string) => /^\d+$/.test(v) || 'Only numeric characters are allowed',
+
   minValue: (min: number) => (v: string) =>
     (v && parseFloat(v) >= min) || `Value must be greater than or equal to ${min}`,
   maxValue: (max: number) => (v: string) => (v && parseFloat(v) <= max) || `Value must be less than or equal to ${max}`,
-  validDate: (v: string) => !isNaN(Date.parse(v)) || 'Please enter a valid date',
+
+  isCharacter: (fieldName: string) => (v: string) => /^[\p{L} ]+$/u.test(v) || `${fieldName} must be valid characters`,
+  isDecimalNumber: (fieldName: string) => (v: string) =>
+    /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || `${fieldName} must be valid decimal number`,
+  isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || `${fieldName} must be valid number`,
+  email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Please enter a valid email address',
+  phone: (v: string) => /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(v) || 'Please enter a valid phone number',
 }
 
 export const format = {
   formatDate: (date: Date) => {
     return dayjs(date).format('DD/MM/YYYY - HH:mm')
+  },
+  formatDateFromNow: (date: Date) => {
+    return dayjs(date).fromNow()
   },
   getTimeString: (date: string) => {
     return date.split('T')[0] + ' ' + date.split('T')[1].split('.')[0]
@@ -57,6 +65,7 @@ export const notifications = {
   deleteFailed: (message: string) => {
     return 'Failed to delete ' + message + '\n'
   },
+  unsavedChanges: 'You have unsaved changes. Are you sure you want to leave?',
 }
 
 export const getErrorMessage = (error: any) => {
