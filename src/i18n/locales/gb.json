@@ -307,7 +307,8 @@
     "mark_as_read": "Mark as read",
     "sentMessage": "sent you a message",
     "uploadedZip": "uploaded a new Zip file with {type}",
-    "startedTopic": "started a new topic"
+    "startedTopic": "started a new topic",
+    "markAllAsRead": "Mark all as read"
   },
   "user": {
     "language": "Change language",

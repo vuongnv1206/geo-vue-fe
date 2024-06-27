@@ -304,7 +304,8 @@
     "mark_as_read": "Đánh dấu là đã đọc",
     "sentMessage": "đã gửi cho bạn một tin nhắn",
     "uploadedZip": "đã tải lên một tệp Zip mới với {type}",
-    "startedTopic": "đã bắt đầu một chủ đề mới"
+    "startedTopic": "đã bắt đầu một chủ đề mới",
+    "markAllAsRead": "Đánh dấu tất cả là đã đọc"
   },
   "user": {
     "language": "Thay đổi ngôn ngữ",

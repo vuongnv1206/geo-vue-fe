@@ -36,7 +36,7 @@
               @click="handleMarkAllAsRead"
             >
               <VaIcon name="check" />
-              Mark all as read
+              {{ t('notifications.markAllAsRead') }}
             </p>
           </VaDropdownContent>
         </VaDropdown>
