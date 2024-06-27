@@ -5,7 +5,7 @@
       <VaDropdown placement="right-bottom">
         <template #anchor>
           <VaButton preset="secondary" color="textPrimary" class="rounded-full">
-            <VaIcon name="more_horiz" size="large" class="hover:bg-slate-100" />
+            <VaIcon name="more_horiz" size="large" class="" />
           </VaButton>
         </template>
 
@@ -14,7 +14,7 @@
             class="py-1 px-3"
             :class="{
               'cursor-default': notificationsWithRelativeTime?.length <= 0 || allNotificationsRead,
-              'cursor-pointer hover:bg-slate-200': notificationsWithRelativeTime?.length > 0 && !allNotificationsRead,
+              'cursor-pointer': notificationsWithRelativeTime?.length > 0 && !allNotificationsRead,
             }"
             @click="handleMarkAllAsRead"
           >
@@ -27,20 +27,24 @@
     <VaCardContent>
       <VaInnerLoading :loading="isLoading">
         <div class="mb-2">
-          <button
-            class="rounded-2xl text-black bg-none font-semibold py-2 px-3 mr-2 hover:bg-slate-100"
-            :class="{ 'text-primary bg-cyan-100 hover:bg-cyan-100 ': isActiveButtonAll }"
+          <VaButton
+            round
+            size="small"
+            :preset="isActiveButtonAll ? 'primary' : 'secondary'"
+            class="mr-2"
             @click="handleFilterNotification(true)"
           >
             All
-          </button>
-          <button
-            class="rounded-2xl text-black bg-none font-semibold py-2 px-3 hover:bg-slate-100"
-            :class="{ 'text-primary bg-cyan-100 hover:bg-cyan-100': !isActiveButtonAll }"
+          </VaButton>
+          <VaButton
+            round
+            size="small"
+            :preset="!isActiveButtonAll ? 'primary' : 'secondary'"
+            class=""
             @click="handleFilterNotification(false)"
           >
             Unread
-          </button>
+          </VaButton>
         </div>
         <section class="py-4 overflow-auto">
           <section v-if="notificationsWithRelativeTime?.length <= 0" class="flex flex-col items-center">
@@ -50,8 +54,9 @@
           <VaList v-if="notificationsWithRelativeTime?.length > 0" class="space-y-1 mb-2">
             <template v-for="(item, index) in notificationsWithRelativeTime" :key="item?.id">
               <VaListItem
-                class="p-2 text-base cursor-pointer hover:bg-slate-200 relative group"
-                :class="{ 'bg-slate-100': !item?.isRead }"
+                preset="secondary"
+                class="p-2 text-base cursor-pointer relative group notification-hover"
+                :class="{ 'notification-unread': !item?.isRead }"
                 @click="handleClickToNotificationItem(item?.url, item?.id, item?.isRead)"
               >
                 <VaListItemSection icon class="mx-0 p-0">
@@ -73,7 +78,7 @@
                   </template>
 
                   <VaDropdownContent>
-                    <p class="py-1 px-3 cursor-pointer hover:bg-slate-200" @click="handleToggleMarkAsRead(item?.id)">
+                    <p class="py-1 px-3 cursor-pointer" @click="handleToggleMarkAsRead(item?.id)">
                       <VaIcon name="check" class="mr-1" />
                       {{ item?.isRead ? 'Mark as unread' : 'Mark as read' }}
                     </p>
@@ -256,31 +261,18 @@ const getIconType = (labelType: number) => {
   if (labelType === LabelType.Information) {
     return { iconName: IconType.Information, color: IconColor.Information }
   }
-  if (labelType === LabelType.Success) {
-    return { iconName: IconType.Success, color: IconColor.Success }
-  }
   if (labelType === LabelType.Warning) {
     return { iconName: IconType.Warning, color: IconColor.Warning }
   }
   if (labelType === LabelType.Error) {
     return { iconName: IconType.Error, color: IconColor.Error }
   }
+  if (labelType === LabelType.Success) {
+    return { iconName: IconType.Success, color: IconColor.Success }
+  }
   if (labelType === LabelType.Reminder) {
     return { iconName: IconType.Reminder, color: IconColor.Reminder }
   }
-
-  // switch (labelType) {
-  //   case LabelType.Information:
-  //     return { iconName: IconType.Information, color: IconColor.Information }
-  //   case LabelType.Success:
-  //     return { iconName: IconType.Success, color: IconColor.Success }
-  //   case LabelType.Warning:
-  //     return { iconName: IconType.Warning, color: IconColor.Warning }
-  //   case LabelType.Error:
-  //     return { iconName: IconType.Error, color: IconColor.Error }
-  //   case LabelType.Reminder:
-  //     return { iconName: IconType.Reminder, color: IconColor.Reminder }
-  // }
 }
 
 watch(
@@ -390,3 +382,11 @@ defineExpose({
   receiveNotification,
 })
 </script>
+<style scoped>
+.notification-hover:hover {
+  background-color: var(--va-background-element) !important;
+}
+.notification-unread {
+  background-color: var(--va-background-element) !important;
+}
+</style>

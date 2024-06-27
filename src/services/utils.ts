@@ -2,34 +2,35 @@ import { QuestionType } from '@/pages/question/types'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import relativeTime from 'dayjs/plugin/relativeTime'
-// import 'dayjs/locale/vi'
-// dayjs.locale('vi')
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
+import i18n from './../i18n'
+
+const { t } = i18n.global
+
 export const sleep = (ms = 0) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /** Validation */
 export const validators = {
-  required: (v: any) => !!v || 'This field is required',
-  required2: (fieldName: string) => (v: string) => !!v || `${fieldName} is required`,
+  required: (v: any) => !!v || t('validateUtils.required'),
+  required2: (fieldName: string) => (v: string) => !!v || t('validateUtils.required2', { fieldName }),
 
-  minLength: (length: number) => (v: string) =>
-    (v && v.length >= length) || `Must be greater than ${length} characters`,
+  minLength: (length: number) => (v: string) => (v && v.length >= length) || t('validateUtils.minLength', { length }),
   maxLength: (length: number) => (v: string | null) =>
-    v === null || v.length <= length || `Must be less than ${length} characters`,
+    v === null || v.length <= length || t('validateUtils.maxLength', { length }),
 
-  minValue: (min: number) => (v: string) =>
-    (v && parseFloat(v) >= min) || `Value must be greater than or equal to ${min}`,
-  maxValue: (max: number) => (v: string) => (v && parseFloat(v) <= max) || `Value must be less than or equal to ${max}`,
+  minValue: (min: number) => (v: string) => (v && parseFloat(v) >= min) || t('validateUtils.minValue', { min }),
+  maxValue: (max: number) => (v: string) => (v && parseFloat(v) <= max) || t('validateUtils.maxValue', { max }),
 
-  isCharacter: (fieldName: string) => (v: string) => /^[\p{L} ]+$/u.test(v) || `${fieldName} must be valid characters`,
+  isCharacter: (fieldName: string) => (v: string) =>
+    /^[\p{L} ]+$/u.test(v) || t('validateUtils.isCharacter', { fieldName }),
   isDecimalNumber: (fieldName: string) => (v: string) =>
-    /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || `${fieldName} must be valid decimal number`,
-  isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || `${fieldName} must be valid number`,
-  email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Please enter a valid email address',
-  phone: (v: string) => /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(v) || 'Please enter a valid phone number',
+    /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || t('validateUtils.isDecimalNumber', { fieldName }),
+  isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || t('validateUtils.isNumber', { fieldName }),
+  email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
+  phone: (v: string) => /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(v) || t('validateUtils.phone'),
 }
 
 export const format = {
@@ -46,27 +47,27 @@ export const format = {
 
 export const notifications = {
   updatedSuccessfully: (message: string) => {
-    return message + ' updated successfully'
+    return t('validateUtils.updatedSuccessfully', { message })
   },
   createSuccessfully: (message: string) => {
-    return message + ' created successfully'
+    return t('validateUtils.createSuccessfully', { message })
   },
   deleteSuccessfully: (message: string) => {
-    return message + ' deleted successfully'
+    return t('validateUtils.deleteSuccessfully', { message })
   },
   getFailed: (message: string) => {
-    return 'Failed to get ' + message + '\n'
+    return t('validateUtils.getFailed', { message })
   },
   updateFailed: (message: string) => {
-    return 'Failed to update ' + message + '\n'
+    return t('validateUtils.updateFailed', { message })
   },
   createFailed: (message: string) => {
-    return 'Failed to create ' + message + '\n'
+    return t('validateUtils.createFailed', { message })
   },
   deleteFailed: (message: string) => {
-    return 'Failed to delete ' + message + '\n'
+    return t('validateUtils.deleteFailed', { message })
   },
-  unsavedChanges: 'You have unsaved changes. Are you sure you want to leave?',
+  unsavedChanges: t('validateUtils.unsavedChanges'),
 }
 
 export const getErrorMessage = (error: any) => {
@@ -134,35 +135,35 @@ export const QuestionTypeLabel = (type: QuestionType | undefined) => {
   const labels = [
     {
       type: QuestionType.SingleChoice,
-      label: 'Single Choice',
+      label: t('validateUtils.singleChoice'),
     },
     {
       type: QuestionType.MultipleChoice,
-      label: 'Multiple Choice',
+      label: t('validateUtils.multipleChoice'),
     },
     {
       type: QuestionType.FillBlank,
-      label: 'Fill Blank',
+      label: t('validateUtils.fillBlank'),
     },
     {
       type: QuestionType.Matching,
-      label: 'Matching',
+      label: t('validateUtils.matching'),
     },
     {
       type: QuestionType.Reading,
-      label: 'Reading',
+      label: t('validateUtils.reading'),
     },
     {
       type: QuestionType.ReadingQuestionPassage,
-      label: 'Reading Question Passage',
+      label: t('validateUtils.readingQuestionPassage'),
     },
     {
       type: QuestionType.Writing,
-      label: 'Writing',
+      label: t('validateUtils.writing'),
     },
     {
       type: QuestionType.Other,
-      label: 'Other',
+      label: t('validateUtils.other'),
     },
   ]
   const label = labels.find((c) => c.type === type)?.label

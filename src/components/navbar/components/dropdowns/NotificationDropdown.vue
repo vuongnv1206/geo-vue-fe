@@ -22,7 +22,7 @@
         <VaDropdown placement="left-end">
           <template #anchor>
             <VaButton preset="secondary" color="textPrimary" class="rounded-full">
-              <VaIcon name="more_horiz" class="hover:bg-slate-100" />
+              <VaIcon name="more_horiz" class="" />
             </VaButton>
           </template>
 
@@ -31,7 +31,7 @@
               class="px-2 text-sm"
               :class="{
                 'cursor-default': notificationsWithRelativeTime?.length <= 0 || allNotificationsRead,
-                'cursor-pointer hover:bg-slate-200': notificationsWithRelativeTime?.length > 0 && !allNotificationsRead,
+                'cursor-pointer notification-hover': notificationsWithRelativeTime?.length > 0 && !allNotificationsRead,
               }"
               @click="handleMarkAllAsRead"
             >
@@ -50,8 +50,8 @@
           <VaList v-if="notificationsWithRelativeTime?.length > 0" class="space-y-1 mb-2">
             <template v-for="(item, index) in notificationsWithRelativeTime" :key="item?.id">
               <VaListItem
-                class="p-1 text-base cursor-pointer hover:bg-slate-200 relative group"
-                :class="{ 'bg-slate-100': !item?.isRead }"
+                class="p-1 text-base cursor-pointer notification-hover relative group"
+                :class="{ 'notification-unread': !item?.isRead }"
                 @click="handleClickToNotificationItem(item?.url, item?.id, item?.isRead)"
               >
                 <VaListItemSection icon class="mx-0 p-0">
@@ -73,7 +73,7 @@
                   </template>
 
                   <VaDropdownContent>
-                    <p class="py-1 px-3 cursor-pointer hover:bg-slate-200" @click="handleToggleMarkAsRead(item?.id)">
+                    <p class="py-1 px-3 cursor-pointer notification-hover" @click="handleToggleMarkAsRead(item?.id)">
                       <VaIcon name="check" class="mr-1" />
                       {{ item?.isRead ? 'Mark as unread' : 'Mark as read' }}
                     </p>
@@ -241,17 +241,20 @@ const handleMarkAllAsRead = async () => {
 }
 
 const getIconType = (lableType: number) => {
-  switch (lableType) {
-    case LabelType.Information:
-      return { iconName: IconType.Information, color: IconColor.Information }
-    case LabelType.Success:
-      return { iconName: IconType.Success, color: IconColor.Success }
-    case LabelType.Warning:
-      return { iconName: IconType.Warning, color: IconColor.Warning }
-    case LabelType.Error:
-      return { iconName: IconType.Error, color: IconColor.Error }
-    case LabelType.Reminder:
-      return { iconName: IconType.Reminder, color: IconColor.Reminder }
+  if (lableType === LabelType.Information) {
+    return { iconName: IconType.Information, color: IconColor.Information }
+  }
+  if (lableType === LabelType.Success) {
+    return { iconName: IconType.Success, color: IconColor.Success }
+  }
+  if (lableType === LabelType.Warning) {
+    return { iconName: IconType.Warning, color: IconColor.Warning }
+  }
+  if (lableType === LabelType.Error) {
+    return { iconName: IconType.Error, color: IconColor.Error }
+  }
+  if (lableType === LabelType.Reminder) {
+    return { iconName: IconType.Reminder, color: IconColor.Reminder }
   }
 }
 
@@ -414,5 +417,13 @@ defineExpose({
   .va-dropdown__anchor {
     display: inline-block;
   }
+}
+
+.notification-hover:hover {
+  background-color: var(--va-background-element) !important;
+}
+
+.notification-unread {
+  background-color: var(--va-background-element) !important;
 }
 </style>
