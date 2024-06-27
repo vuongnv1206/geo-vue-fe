@@ -8,7 +8,7 @@ export type Assignment = {
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectId: string
-  createOn: Date
+  createdOn: Date
 }
 
 export type EmptyAssignment = {

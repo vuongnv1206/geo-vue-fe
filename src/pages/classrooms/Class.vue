@@ -46,29 +46,14 @@ const getGroupClasses = () => {
     .getGroupClass()
     .then((response) => {
       listGroupClass.value = response
-      // console.log('Department: ', listGroupClass.value)
+      classrooms.value = response.flatMap((gc) => gc.classes)
+      console.log('Department: ', listGroupClass.value)
+      console.log('Classrooms: ', classrooms.value)
       loading.value = false
     })
     .catch(() => {
       notify({
         message: notifications.getFailed('group class'),
-        color: 'error',
-      })
-      loading.value = false
-    })
-}
-
-const getClassByUser = () => {
-  loading.value = true
-  stores
-    .getClassroomByUser()
-    .then((response) => {
-      classrooms.value = response
-      loading.value = false
-    })
-    .catch(() => {
-      notify({
-        message: notifications.getFailed('class'),
         color: 'error',
       })
       loading.value = false
@@ -169,7 +154,6 @@ const onClassSaved = async (classrooms: Classrooms) => {
           color: 'success',
         })
         getGroupClasses()
-        getClassByUser()
       })
       .catch((err) => {
         notify({
@@ -186,7 +170,6 @@ const onClassSaved = async (classrooms: Classrooms) => {
           color: 'success',
         })
         getGroupClasses()
-        getClassByUser()
       })
       .catch((err) => {
         notify({
@@ -232,9 +215,9 @@ const onGroupClassSaved = async (groupClass: GroupClass) => {
   }
   getGroupClasses()
 }
+
 onMounted(() => {
   getGroupClasses()
-  getClassByUser()
 })
 </script>
 

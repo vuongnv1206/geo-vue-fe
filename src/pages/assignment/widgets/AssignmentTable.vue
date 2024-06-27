@@ -19,9 +19,9 @@
                     class="mb-2"
                     placement="right"
                     color="#FFFFFF"
-                    :message="format.formatDate(assignment.createOn)"
+                    :message="format.formatDate(assignment.createdOn)"
                   >
-                    Create At: {{ format.formatDateFromNow(assignment.createOn) }}
+                    Create At: {{ format.formatDateFromNow(assignment.createdOn) }}
                   </VaPopover>
                 </VaListItemLabel>
                 <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
@@ -69,9 +69,9 @@
                         class="mb-2"
                         placement="right"
                         color="#FFFFFF"
-                        :message="format.formatDate(assignment.createOn)"
+                        :message="format.formatDate(assignment.createdOn)"
                       >
-                        Create At: {{ format.formatDateFromNow(assignment.createOn) }}
+                        Create At: {{ format.formatDateFromNow(assignment.createdOn) }}
                       </VaPopover>
                     </VaListItemLabel>
                     <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
@@ -118,7 +118,7 @@ const recentAssignments = computed(() => {
     })),
   )
   // console.log('All Assignments:', allAssignmentsWithClassId)
-  allAssignmentsWithClassId.sort((a, b) => (new Date(b.createOn) as any) - (new Date(a.createOn) as any)).reverse()
+  allAssignmentsWithClassId.sort((a, b) => (new Date(b.createdOn) as any) - (new Date(a.createdOn) as any))
   // console.log('Abc: ', allAssignmentsWithClassId.slice(0, 4))
   return allAssignmentsWithClassId.slice(0, 4)
 })

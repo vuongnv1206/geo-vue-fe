@@ -21,7 +21,7 @@ const assignmentDetails = ref<AssignmentDetails | null>(null)
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
 
-const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
+const date = ref<[Date, Date]>([new Date(), new Date()])
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id
 const classStore = useGroupClassStore()
