@@ -409,5 +409,34 @@
   "buttonSelect": {
     "dark": "Dark",
     "light": "Light"
+  },
+  "validateUtils": {
+    "required": "This field is required",
+    "required2": "{fieldName} is required",
+    "minLength": "Must be greater than {length} characters",
+    "maxLength": "Must be less than {length} characters",
+    "minValue": "Value must be greater than or equal to {min}",
+    "maxValue": "Value must be less than or equal to {max}",
+    "isCharacter": "{fieldName} must be valid characters",
+    "isDecimalNumber": "{fieldName} must be valid decimal number",
+    "isNumber": "{fieldName} must be valid number",
+    "email": "Please enter a valid email address",
+    "phone": "Please enter a valid phone number",
+    "updatedSuccessfully": "{message} updated successfully",
+    "createSuccessfully": "{message} created successfully",
+    "deleteSuccessfully": "{message} deleted successfully",
+    "getFailed": "Failed to get {message}\n",
+    "updateFailed": "Failed to update {message}\n",
+    "createFailed": "Failed to create {message}\n",
+    "deleteFailed": "Failed to delete {message}\n",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
+    "singleChoice": "Single Choice",
+    "multipleChoice": "Multiple Choice",
+    "fillBlank": "Fill Blank",
+    "matching": "Matching",
+    "reading": "Reading",
+    "readingQuestionPassage": "Reading Question Passage",
+    "writing": "Writing",
+    "other": "Other"
   }
 }

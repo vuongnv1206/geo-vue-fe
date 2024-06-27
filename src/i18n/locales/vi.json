@@ -406,5 +406,34 @@
   "buttonSelect": {
     "dark": "Tối",
     "light": "Sáng"
+  },
+  "validateUtils": {
+    "required": "Trường này là bắt buộc",
+    "required2": "{fieldName} là bắt buộc",
+    "minLength": "Phải lớn hơn {length} ký tự",
+    "maxLength": "Phải nhỏ hơn {length} ký tự",
+    "minValue": "Giá trị phải lớn hơn hoặc bằng {min}",
+    "maxValue": "Giá trị phải nhỏ hơn hoặc bằng {max}",
+    "isCharacter": "{fieldName} phải là ký tự hợp lệ",
+    "isDecimalNumber": "{fieldName} phải là số thập phân hợp lệ",
+    "isNumber": "{fieldName} phải là số hợp lệ",
+    "email": "Vui lòng nhập địa chỉ email hợp lệ",
+    "phone": "Vui lòng nhập số điện thoại hợp lệ",
+    "updatedSuccessfully": "{message} cập nhật thành công",
+    "createSuccessfully": "{message} tạo thành công",
+    "deleteSuccessfully": "{message} xóa thành công",
+    "getFailed": "Lấy thông tin {message} thất bại\n",
+    "updateFailed": "Cập nhật {message} thất bại\n",
+    "createFailed": "Tạo {message} thất bại\n",
+    "deleteFailed": "Xóa {message} thất bại\n",
+    "unsavedChanges": "Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời khỏi?",
+    "singleChoice": "Lựa chọn đơn",
+    "multipleChoice": "Lựa chọn nhiều",
+    "fillBlank": "Điền vào chỗ trống",
+    "matching": "Ghép đôi",
+    "reading": "Đọc",
+    "readingQuestionPassage": "Đoạn câu hỏi đọc",
+    "writing": "Viết",
+    "other": "Khác"
   }
 }
