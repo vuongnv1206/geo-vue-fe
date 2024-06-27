@@ -21,7 +21,7 @@ import { useColors } from 'vuestic-ui'
 
 const { applyPreset, currentPresetName } = useColors()
 
-const mode = ref(0)
+const mode = ref(false)
 
 const theme = computed({
   get() {
@@ -43,6 +43,11 @@ watch(
 onMounted(() => {
   const theme = localStorage.getItem('theme')
   if (theme) {
+    if (theme === 'dark') {
+      mode.value = true
+    } else {
+      mode.value = false
+    }
     applyPreset(theme)
   }
 })
