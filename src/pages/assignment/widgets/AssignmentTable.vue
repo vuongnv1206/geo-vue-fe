@@ -14,7 +14,16 @@
               </VaListItemSection>
               <VaListItemSection>
                 <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
-                <VaListItemLabel caption>Create At: {{ format.formatDate(assignment.createOn) }}</VaListItemLabel>
+                <VaListItemLabel caption>
+                  <VaPopover
+                    class="mb-2"
+                    placement="right"
+                    color="#FFFFFF"
+                    :message="format.formatDate(assignment.createOn)"
+                  >
+                    Create At: {{ format.formatDateFromNow(assignment.createOn) }}
+                  </VaPopover>
+                </VaListItemLabel>
                 <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
               </VaListItemSection>
               <VaListItemSection icon>
@@ -55,7 +64,16 @@
                   </VaListItemSection>
                   <VaListItemSection>
                     <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
-                    <VaListItemLabel caption>Create At: {{ format.formatDate(assignment.createOn) }}</VaListItemLabel>
+                    <VaListItemLabel caption>
+                      <VaPopover
+                        class="mb-2"
+                        placement="right"
+                        color="#FFFFFF"
+                        :message="format.formatDate(assignment.createOn)"
+                      >
+                        Create At: {{ format.formatDateFromNow(assignment.createOn) }}
+                      </VaPopover>
+                    </VaListItemLabel>
                     <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
                   </VaListItemSection>
                   <VaListItemSection icon>
@@ -99,8 +117,12 @@ const recentAssignments = computed(() => {
       className: assClass.name,
     })),
   )
+  // console.log('All Assignments:', allAssignmentsWithClassId)
+  // console.log('All Assignments:', allAssignmentsWithClassId)
+  // Sort the assignments by date in descending order
   allAssignmentsWithClassId.sort((a, b) => (new Date(b.createOn) as any) - (new Date(a.createOn) as any)).reverse()
-  console.log('Abc: ', allAssignmentsWithClassId.slice(0, 4))
+  // console.log('Abc: ', allAssignmentsWithClassId.slice(0, 4))
+  // Return the first 4 assignments
   return allAssignmentsWithClassId.slice(0, 4)
 })
 </script>

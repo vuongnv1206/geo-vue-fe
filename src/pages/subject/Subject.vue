@@ -48,7 +48,6 @@ const getSubjects = () => {
 }
 
 const deleteSubject = (subject: Subject) => {
-  console.log('deleteSelectedSubject', subject)
   stores
     .deleteSubject(subject.id)
     .then(() => {

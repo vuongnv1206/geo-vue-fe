@@ -16,7 +16,6 @@ defineEmits<{
 const defaultNewGroupClass: EmptyGroupClass = {
   name: '',
 }
-
 const newGroupClass = ref({ ...defaultNewGroupClass })
 
 const isFormHasUnsavedChanges = computed(() => {
@@ -29,10 +28,6 @@ const isFormHasUnsavedChanges = computed(() => {
       (props.groupClass ?? defaultNewGroupClass)?.[key as keyof EmptyGroupClass]
     )
   })
-})
-
-defineExpose({
-  isFormHasUnsavedChanges,
 })
 
 watch(
@@ -48,6 +43,10 @@ watch(
   },
   { immediate: true },
 )
+
+defineExpose({
+  isFormHasUnsavedChanges,
+})
 </script>
 
 <template>

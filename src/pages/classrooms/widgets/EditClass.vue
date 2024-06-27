@@ -3,6 +3,11 @@ import { computed, ref, watch, onMounted } from 'vue'
 import { Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { validators } from '@/services/utils'
+import { VaSelect } from 'vuestic-ui/web-components'
+
+const loading = ref(true)
+const store = useGroupClassStore()
+const groupClasses = ref<GroupClass[]>([])
 
 const props = defineProps<{
   classrooms: Classrooms | null
@@ -19,8 +24,27 @@ const defaultNewClass: EmptyClassrooms = {
   schoolYear: '',
   groupClassId: '',
 }
-
 const newClass = ref({ ...defaultNewClass })
+
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+})
+
+const getGroupClasses = () => {
+  loading.value = true
+  store
+    .getGroupClasses(dataFilter)
+    .then((response) => {
+      groupClasses.value = response.data
+      loading.value = false
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
 
 const isFormHasUnsavedChanges = computed(() => {
   return Object.keys(newClass.value).some((key) => {
@@ -34,32 +58,6 @@ const isFormHasUnsavedChanges = computed(() => {
     )
   })
 })
-
-defineExpose({
-  isFormHasUnsavedChanges,
-})
-const dataFilter = ref({
-  advancedSearch: {
-    fields: [''],
-    keyword: '',
-  },
-})
-
-const loading = ref(true)
-const store = useGroupClassStore()
-const groupClasses = ref<GroupClass[]>([])
-function getGroupClasses() {
-  loading.value = true
-  store
-    .getGroupClasses(dataFilter)
-    .then((response) => {
-      groupClasses.value = response.data
-    })
-    .finally(() => {
-      loading.value = false
-    })
-  loading.value = false
-}
 
 watch(
   () => props.classrooms,
@@ -76,6 +74,11 @@ watch(
     immediate: true,
   },
 )
+
+defineExpose({
+  isFormHasUnsavedChanges,
+})
+
 onMounted(() => {
   getGroupClasses()
 })

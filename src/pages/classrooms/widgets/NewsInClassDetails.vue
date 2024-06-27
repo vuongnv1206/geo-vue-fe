@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-2xl">
-    <VaCard class="relative">
+    <VaCard class="relative bg-white rounded-lg shadow-md mb-2">
       <QuillEditor class="pb-5" />
       <VaCard class="absolute bottom-2 right-2">
         <VaButton class="mr-2" preset="plain" :icon="postId ? 'lock' : 'lock_open'" />

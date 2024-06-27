@@ -1,10 +1,11 @@
 import { QuestionType } from '@/pages/question/types'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import 'dayjs/locale/vi'
-dayjs.locale('vi')
+// import 'dayjs/locale/vi'
+// dayjs.locale('vi')
 dayjs.extend(relativeTime)
-
+dayjs.extend(utc)
 export const sleep = (ms = 0) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }

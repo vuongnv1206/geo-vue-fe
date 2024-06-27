@@ -121,7 +121,6 @@ const getAssignment = (id: string) => {
       // console.log('Assignment:', assignment.value)
     })
     .catch((error) => {
-      console.log('Error:', error)
       notify({
         message: notifications.getFailed('assignment') + error.message,
         color: 'error',
