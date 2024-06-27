@@ -7,6 +7,7 @@ import { useModal, useToast, VaCard } from 'vuestic-ui'
 import EditClass from './widgets/EditClass.vue'
 import EditGroupClass from './widgets/EditGroupClass.vue'
 import { notifications } from '@/services/utils'
+import SharedClass from './SharedClass.vue'
 
 const editFormRef = ref()
 const { confirm } = useModal()
@@ -216,6 +217,8 @@ const onGroupClassSaved = async (groupClass: GroupClass) => {
   getGroupClasses()
 }
 
+const filterClassList = ref(true)
+
 onMounted(() => {
   getGroupClasses()
 })
@@ -237,12 +240,40 @@ onMounted(() => {
       <VaCard class="flex justify-end items-center">
         <VaCard class="flex gap-2">
           <VaButton icon="add" @click="createNewGroupClass()">Group Class</VaButton>
-          <VaButton icon="add" class="mr-2" @click="createNewClass()">Class</VaButton>
+          <VaButton icon="add" @click="createNewClass()">Class</VaButton>
+          <VaDropdown placement="bottom-end">
+            <template #anchor>
+              <VaButton icon="filter_alt" />
+            </template>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="filterClassList ? 'check' : ''"
+                @click="filterClassList = true"
+                >My class</VaButton
+              >
+            </VaDropdownContent>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="filterClassList ? '' : 'check'"
+                @click="filterClassList = false"
+              >
+                Shared class
+              </VaButton>
+            </VaDropdownContent>
+          </VaDropdown>
         </VaCard>
       </VaCard>
     </VaCard>
 
-    <VaCard>
+    <VaCard v-if="filterClassList">
       <VaCard v-if="listGroupClass.length > 0" class="mt-5 p-2">
         <VaScrollContainer vertical>
           <VaAccordion class="max-W-sm" multiple>
@@ -311,6 +342,9 @@ onMounted(() => {
           </VaAccordion>
         </VaScrollContainer>
       </VaCard>
+    </VaCard>
+    <VaCard v-else>
+      <SharedClass />
     </VaCard>
   </VaCard>
 
