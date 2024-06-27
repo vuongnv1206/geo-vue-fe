@@ -8,14 +8,10 @@ import { useSubjectStore } from '@/stores/modules/subject.module'
 import { Subject } from '@pages/subject/types'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { computed, onMounted, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { Attachment, EmptyAssignment } from '../types'
-
-dayjs.extend(utc)
 
 const { init: notify } = useToast()
 const { confirm } = useModal()
@@ -148,8 +144,8 @@ const dateInputFormat = {
   format: 'MM/dd/yyyy HH:mm',
 }
 const handleDatePicker = () => {
-  newAssignment.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
-  newAssignment.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
+  newAssignment.value.startTime = date.value[0]
+  newAssignment.value.endTime = date.value[1]
 }
 const handleAttachment = async () => {
   const files = filesUploaded.value
@@ -207,11 +203,7 @@ onMounted(() => {
           v-model="newAssignment.name"
           label="Name"
           placeholder="Enter assignment name"
-          :rules="[
-            validators.required2('Assignment name'),
-            validators.isCharacter('Assignment name'),
-            validators.maxLength(50),
-          ]"
+          :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
         />
         <VueDatePicker
           v-model="date"

@@ -1,11 +1,10 @@
 import { QuestionType } from '@/pages/question/types'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import 'dayjs/locale/vi'
-import i18n from './../i18n'
-
-dayjs.locale('vi')
 dayjs.extend(relativeTime)
+dayjs.extend(utc)
+import i18n from './../i18n'
 
 const { t } = i18n.global
 

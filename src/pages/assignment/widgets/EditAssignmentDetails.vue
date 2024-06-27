@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useRouter } from 'vue-router'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { computed, onMounted, ref } from 'vue'
@@ -12,7 +10,6 @@ import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
-dayjs.extend(utc)
 
 const router = useRouter()
 const { confirm } = useModal()
@@ -175,8 +172,8 @@ const dateInputFormat = {
 
 const handleClickUpdate = async () => {
   if (validate()) {
-    newAssignmentDetails.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
-    newAssignmentDetails.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
+    newAssignmentDetails.value.startTime = date.value[0]
+    newAssignmentDetails.value.endTime = date.value[1]
     try {
       newAssignmentDetails.value.classIds = selectedClasses.value
       await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
@@ -208,11 +205,7 @@ onMounted(() => {
           v-model="newAssignmentDetails.name"
           label="Name"
           placeholder="Enter assignment name"
-          :rules="[
-            validators.required2('Assignment name'),
-            validators.isCharacter('Assignment name'),
-            validators.maxLength(50),
-          ]"
+          :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
         />
         <VueDatePicker
           v-model="date"
