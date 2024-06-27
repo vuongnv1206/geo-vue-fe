@@ -3,6 +3,7 @@ import { computed, onBeforeMount, PropType, ref, watch } from 'vue'
 import { defineVaDataTableColumns, useMenu } from 'vuestic-ui'
 import { Pagination, QuestionTree } from '../types'
 import { useI18n } from 'vue-i18n'
+import { format } from '@services/utils'
 
 const { t } = useI18n()
 const { show } = useMenu()
@@ -157,14 +158,16 @@ onBeforeMount(() => {
       </template>
       <template v-if="props.mode == 'full'" #cell(createdOn)="{ rowData }">
         <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-          <div>{{ rowData.createdOn.split('T')[0] }}</div>
-          <div>{{ rowData.createdOn.split('T')[1].split('.')[0] }}</div>
+          <VaPopover icon="info" :message="format.formatDate(rowData.createdOn)">
+            <div>{{ format.getTimeString(rowData.createdOn) }}</div>
+          </VaPopover>
         </div>
       </template>
       <template v-if="props.mode == 'full'" #cell(lastModifiedOn)="{ rowData }">
         <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-          <div>{{ rowData.lastModifiedOn?.split('T')[0] }}</div>
-          <div>{{ rowData.lastModifiedOn?.split('T')[1].split('.')[0] }}</div>
+          <VaPopover icon="info" :message="format.formatDate(rowData.lastModifiedOn)">
+            <div>{{ format.getTimeString(rowData.lastModifiedOn) }}</div>
+          </VaPopover>
         </div>
       </template>
       <template v-if="props.mode == 'full'" #cell(actions)="{ rowData: questionTree }">

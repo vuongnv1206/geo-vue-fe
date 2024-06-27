@@ -1,12 +1,16 @@
 import { QuestionType } from '@/pages/question/types'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
+dayjs.extend(timezone)
 import i18n from './../i18n'
 
 const { t } = i18n.global
+
+const currentTimezone = dayjs.tz.guess()
 
 export const sleep = (ms = 0) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -35,13 +39,19 @@ export const validators = {
 
 export const format = {
   formatDate: (date: Date) => {
-    return dayjs(date).format('DD/MM/YYYY - HH:mm')
+    return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
   },
   formatDateFromNow: (date: Date) => {
-    return dayjs(date).fromNow()
+    return dayjs(date).tz(currentTimezone).fromNow()
   },
   getTimeString: (date: string) => {
-    return date.split('T')[0] + ' ' + date.split('T')[1].split('.')[0]
+    const dateTime = dayjs(date).tz(currentTimezone)
+    const now = dayjs().tz(currentTimezone)
+    if (now.diff(dateTime, 'day') >= 1) {
+      return dateTime.format('DD/MM/YYYY - HH:mm')
+    } else {
+      return dateTime.fromNow()
+    }
   },
 }
 

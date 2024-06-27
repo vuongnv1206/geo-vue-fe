@@ -23,6 +23,7 @@ import { PaperFolderPermission, SharePaperFolderRequest } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { getErrorMessage } from '../../services/utils'
 import SharedPaperFolder from './SharedPaperFolder.vue'
+import { format } from '@services/utils'
 
 const router = useRouter()
 const paperFolderStore = usePaperFolderStore()
@@ -728,14 +729,16 @@ const onSharePaperFolderPermission = () => {
         </template>
         <template #cell(createdOn)="{ rowData }">
           <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-            <div>{{ rowData.createdOn.split('T')[0] }}</div>
-            <div>{{ rowData.createdOn.split('T')[1].split('.')[0] }}</div>
+            <VaPopover icon="info" :message="format.formatDate(rowData.createdOn)">
+              <div>{{ format.getTimeString(rowData.createdOn) }}</div>
+            </VaPopover>
           </div>
         </template>
         <template #cell(lastModifiedOn)="{ rowData }">
           <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-            <div>{{ rowData.lastModifiedOn?.split('T')[0] }}</div>
-            <div>{{ rowData.lastModifiedOn?.split('T')[1].split('.')[0] }}</div>
+            <VaPopover icon="info" :message="format.formatDate(rowData.lastModifiedOn)">
+              <div>{{ format.getTimeString(rowData.lastModifiedOn) }}</div>
+            </VaPopover>
           </div>
         </template>
 
