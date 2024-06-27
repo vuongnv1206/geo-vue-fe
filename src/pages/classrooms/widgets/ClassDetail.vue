@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useToast } from 'vuestic-ui/web-components'
 import UserInClassDetails from './UserInClassDetails.vue'
+import { notifications } from '@/services/utils'
 
 const tabs = [
   { title: 'Student list', icon: 'groups' },
@@ -43,7 +44,7 @@ const getClassById = async () => {
     })
     .catch((error) => {
       notify({
-        message: 'Failed to get class\n' + error.message,
+        message: notifications.getFailed(`class with id ${classId}`) + error.message,
         color: 'error',
       })
     })

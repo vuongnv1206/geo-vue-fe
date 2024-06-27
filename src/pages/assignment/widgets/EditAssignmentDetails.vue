@@ -44,6 +44,16 @@ const defaultNewAssignmentDetails: AssignmentDetails = {
 
 const newAssignmentDetails = ref({ ...defaultNewAssignmentDetails })
 
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
+
 const getAssignment = (id: string) => {
   stores
     .getAssignment(id)
@@ -58,8 +68,8 @@ const getAssignment = (id: string) => {
         requireLoginToSubmit: response.requireLoginToSubmit,
         classIds: response.classIds,
       }
-      console.log('Assignment Details: ', assignmentDetails.value)
-      console.log('New Assignment Details: ', newAssignmentDetails.value)
+      // console.log('Assignment Details: ', assignmentDetails.value)
+      // console.log('New Assignment Details: ', newAssignmentDetails.value)
     })
     .catch((error) => {
       notify({
@@ -69,24 +79,19 @@ const getAssignment = (id: string) => {
     })
 }
 
-const dataFilter = ref({
-  advancedSearch: {
-    fields: [''],
-    keyword: '',
-  },
-  pageNumber: 0,
-  pageSize: 100,
-  orderBy: ['id'],
-})
-
-const getGroupClass = async () => {
-  try {
-    const response = await classStore.getGroupClasses(dataFilter.value)
-    groupClasses.value = response.data
-    // console.log('Group Classes: ', groupClasses.value)
-  } catch (error) {
-    console.error('Error fetching subjects:', error)
-  }
+const getGroupClass = () => {
+  classStore
+    .getGroupClasses(dataFilter.value)
+    .then((response) => {
+      groupClasses.value = response.data
+      // console.log('Group Classes: ', groupClasses.value)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('group class') + error.message,
+        color: 'error',
+      })
+    })
 }
 
 const showAllClassesForAllDepartments = () => {
@@ -158,7 +163,7 @@ const goBack = async () => {
   if (isFormHasUnsavedChanges.value) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'You have unsaved changes. Are you sure you want to discard them?',
+      message: notifications.unsavedChanges,
       size: 'small',
     })
     if (!agreed) return
