@@ -437,5 +437,8 @@
     "readingQuestionPassage": "Đoạn câu hỏi đọc",
     "writing": "Viết",
     "other": "Khác"
+  },
+  "languageSwitcher": {
+    "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."
   }
 }
