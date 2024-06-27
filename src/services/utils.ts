@@ -1,11 +1,13 @@
 import { QuestionType } from '@/pages/question/types'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+// import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
+// dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 import i18n from './../i18n'
-
+// dayjs.tz.setDefault('Asia/Bangkok')
 const { t } = i18n.global
 
 export const sleep = (ms = 0) => {
@@ -68,6 +70,9 @@ export const notifications = {
     return t('validateUtils.deleteFailed', { message })
   },
   unsavedChanges: t('validateUtils.unsavedChanges'),
+  confirmDelete: (message: string) => {
+    return t('validateUtils.confirmDelete', { message })
+  },
 }
 
 export const getErrorMessage = (error: any) => {

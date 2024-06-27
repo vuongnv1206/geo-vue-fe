@@ -427,6 +427,7 @@
     "createFailed": "Tạo {message} thất bại\n",
     "deleteFailed": "Xóa {message} thất bại\n",
     "unsavedChanges": "Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời khỏi?",
+    "confirmDelete": "Bạn muốn xóa {message}?",
     "singleChoice": "Lựa chọn đơn",
     "multipleChoice": "Lựa chọn nhiều",
     "fillBlank": "Điền vào chỗ trống",

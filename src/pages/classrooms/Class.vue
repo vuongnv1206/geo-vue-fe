@@ -6,6 +6,7 @@ import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useModal, useToast, VaCard } from 'vuestic-ui'
 import EditClass from './widgets/EditClass.vue'
 import EditGroupClass from './widgets/EditGroupClass.vue'
+import { notifications } from '@/services/utils'
 
 const editFormRef = ref()
 const { confirm } = useModal()
@@ -43,31 +44,16 @@ const getGroupClasses = () => {
   loading.value = true
   store
     .getGroupClass()
-    .then((res) => {
-      listGroupClass.value = res
+    .then((response) => {
+      listGroupClass.value = response
+      classrooms.value = response.flatMap((gc) => gc.classes)
       console.log('Department: ', listGroupClass.value)
+      console.log('Classrooms: ', classrooms.value)
       loading.value = false
     })
     .catch(() => {
       notify({
-        message: 'Failed to get class fails',
-        color: 'error',
-      })
-      loading.value = false
-    })
-}
-
-const getClassByUser = () => {
-  loading.value = true
-  stores
-    .getClassroomByUser()
-    .then((res) => {
-      classrooms.value = res
-      loading.value = false
-    })
-    .catch(() => {
-      notify({
-        message: 'Failed to get class fails',
+        message: notifications.getFailed('group class'),
         color: 'error',
       })
       loading.value = false
@@ -94,7 +80,7 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   if (editFormRef.value.isFormHasUnsavedChanges) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'Form has unsaved changes. Are you sure you want to close it?',
+      message: notifications.unsavedChanges,
       size: 'small',
     })
     if (agreed) {
@@ -108,7 +94,7 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
 const deleteClass = (classroom: Classrooms) => {
   confirm({
     title: 'Delete Class',
-    message: `Are you sure you want to delete Class "${classroom.name}"?`,
+    message: notifications.confirmDelete('class ' + classroom.name),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -117,14 +103,14 @@ const deleteClass = (classroom: Classrooms) => {
       .deleteClassroom(classroom.id)
       .then(() => {
         notify({
-          message: 'Class deleted successfully',
+          message: notifications.deleteSuccessfully(classroom.name),
           color: 'success',
         })
         getGroupClasses()
       })
       .catch(() => {
         notify({
-          message: 'Failed to delete GroupClass',
+          message: notifications.deleteFailed(classroom.name),
           color: 'error',
         })
       })
@@ -134,7 +120,7 @@ const deleteClass = (classroom: Classrooms) => {
 const deletedGroupClass = (groupClass: GroupClass) => {
   confirm({
     title: 'Delete GroupClass',
-    message: `Are you sure you want to delete GroupClass "${groupClass.name}"?`,
+    message: notifications.confirmDelete('group class' + groupClass.name),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -143,14 +129,14 @@ const deletedGroupClass = (groupClass: GroupClass) => {
       .deleteGroupClass(groupClass.id)
       .then(() => {
         notify({
-          message: 'GroupClass deleted successfully',
+          message: notifications.deleteSuccessfully(groupClass.name),
           color: 'success',
         })
         getGroupClasses()
       })
       .catch(() => {
         notify({
-          message: 'Failed to delete GroupClass',
+          message: notifications.deleteFailed(groupClass.name),
           color: 'error',
         })
       })
@@ -164,15 +150,14 @@ const onClassSaved = async (classrooms: Classrooms) => {
       .updateClassroom(classrooms.id, classrooms as Classrooms)
       .then(() => {
         notify({
-          message: 'Class updated successfully',
+          message: notifications.updatedSuccessfully('class'),
           color: 'success',
         })
         getGroupClasses()
-        getClassByUser()
       })
       .catch((err) => {
         notify({
-          message: 'Failed to update class\n' + err.message,
+          message: notifications.updateFailed('class') + '\n' + err.message,
           color: 'error',
         })
       })
@@ -181,15 +166,14 @@ const onClassSaved = async (classrooms: Classrooms) => {
       .addClassroom(classrooms as Classrooms)
       .then(() => {
         notify({
-          message: 'Class created successfully',
+          message: notifications.createSuccessfully('class'),
           color: 'success',
         })
         getGroupClasses()
-        getClassByUser()
       })
       .catch((err) => {
         notify({
-          message: 'Failed to create class\n' + err.message,
+          message: notifications.createFailed('class') + err.message,
           color: 'error',
         })
       })
@@ -203,13 +187,13 @@ const onGroupClassSaved = async (groupClass: GroupClass) => {
       .updateGroupClass(groupClass.id, groupClass as GroupClass)
       .then(() => {
         notify({
-          message: 'GroupClass updated',
+          message: notifications.updatedSuccessfully('Group class'),
           color: 'success',
         })
       })
       .catch((err) => {
         notify({
-          message: 'Failed to update GroupClass\n' + err.message,
+          message: notifications.updateFailed('Group class') + err.message,
           color: 'error',
         })
       })
@@ -218,22 +202,22 @@ const onGroupClassSaved = async (groupClass: GroupClass) => {
       .createGroupClass(groupClass as GroupClass)
       .then(() => {
         notify({
-          message: 'GroupClass created',
+          message: notifications.createSuccessfully('Group class'),
           color: 'success',
         })
       })
       .catch((err) => {
         notify({
-          message: 'Failed to create GroupClass\n' + err.message,
+          message: notifications.createFailed('Group class') + err.message,
           color: 'error',
         })
       })
   }
   getGroupClasses()
 }
+
 onMounted(() => {
   getGroupClasses()
-  getClassByUser()
 })
 </script>
 

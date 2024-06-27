@@ -91,12 +91,8 @@ import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { Assignment, AssignmentClass } from '../types'
 import { useBreakpoint, useToast } from 'vuestic-ui'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { format, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
-
-dayjs.extend(utc)
 
 const router = useRouter()
 const stores = useAssignmentStore()
