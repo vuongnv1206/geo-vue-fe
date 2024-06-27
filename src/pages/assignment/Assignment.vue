@@ -34,7 +34,7 @@ const getAssignmentByClass = () => {
     .catch((error) => {
       loading.value = false
       notify({
-        message: notifications.getFailed('class assignments') + error.message,
+        message: notifications.getFailed('assignments') + error.message,
         color: 'error',
       })
     })

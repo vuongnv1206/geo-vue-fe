@@ -430,6 +430,7 @@
     "createFailed": "Failed to create {message}\n",
     "deleteFailed": "Failed to delete {message}\n",
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
+    "confirmDelete": "Are you sure you want to delete {message}?",
     "singleChoice": "Single Choice",
     "multipleChoice": "Multiple Choice",
     "fillBlank": "Fill Blank",

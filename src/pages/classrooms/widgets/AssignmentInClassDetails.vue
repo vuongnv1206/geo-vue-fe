@@ -104,10 +104,10 @@ const groupedData = computed(() => {
   const groups: { [key: string]: any } = {}
   // Add assignments to groups
   props.classDetails.assignments.forEach((assignment) => {
-    const createOn = format.formatDate(assignment.createOn)
+    const createOn = format.formatDate(assignment.createdOn)
     if (!groups[createOn]) {
       groups[createOn] = {
-        createOn: assignment.createOn,
+        createOn: assignment.createdOn,
         assignments: [],
         papers: [],
       }

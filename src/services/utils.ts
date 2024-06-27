@@ -7,7 +7,6 @@ dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 import i18n from './../i18n'
-
 const { t } = i18n.global
 
 const currentTimezone = dayjs.tz.guess()
@@ -78,6 +77,9 @@ export const notifications = {
     return t('validateUtils.deleteFailed', { message })
   },
   unsavedChanges: t('validateUtils.unsavedChanges'),
+  confirmDelete: (message: string) => {
+    return t('validateUtils.confirmDelete', { message })
+  },
 }
 
 export const getErrorMessage = (error: any) => {

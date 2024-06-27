@@ -34,6 +34,9 @@ export const globalOptions = {
       [{ script: 'sub' }, { script: 'super' }],
       ['clean'],
     ],
+    imageResize: {
+      displaySize: true,
+    },
   },
   placeholder: 'Say something...',
   theme: 'snow',

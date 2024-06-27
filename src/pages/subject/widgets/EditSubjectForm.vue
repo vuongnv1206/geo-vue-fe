@@ -53,7 +53,7 @@ watch(
       v-model="newSubject.name"
       label="Subject name"
       placeholder="Enter subject name"
-      :rules="[validators.required2('Subject name'), validators.isCharacter('Subject name'), validators.maxLength(50)]"
+      :rules="[validators.required2('Subject name'), validators.maxLength(50)]"
     />
     <VaInput
       v-model="newSubject.description"

@@ -46,6 +46,44 @@ const defaultNewAssignment: EmptyAssignment = {
 }
 const newAssignment = ref({ ...defaultNewAssignment })
 
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
+
+const getGroupClass = () => {
+  classStore
+    .getGroupClasses(dataFilter.value)
+    .then((response) => {
+      groupClasses.value = response.data
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('group class') + error.message,
+        color: 'error',
+      })
+    })
+}
+
+const getSubjects = () => {
+  subjectStore
+    .getSubjects(dataFilter.value)
+    .then((response) => {
+      subjects.value = response.data
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('subject') + error.message,
+        color: 'error',
+      })
+    })
+}
+
 const isFormHasUnsavedChanges = computed(() => {
   return Object.keys(newAssignment.value).some((key) => {
     return (
@@ -58,42 +96,12 @@ const goBack = async () => {
   if (isFormHasUnsavedChanges.value) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'You have unsaved changes. Are you sure you want to discard them?',
+      message: notifications.unsavedChanges,
       size: 'small',
     })
     if (!agreed) return
   }
   router.push({ name: 'assignments' })
-}
-
-defineExpose({ isFormHasUnsavedChanges })
-
-const dataFilter = ref({
-  advancedSearch: {
-    fields: [''],
-    keyword: '',
-  },
-  pageNumber: 0,
-  pageSize: 100,
-  orderBy: ['id'],
-})
-
-const getGroupClass = async () => {
-  try {
-    const response = await classStore.getGroupClasses(dataFilter.value)
-    groupClasses.value = response.data
-  } catch (error) {
-    console.error('Error fetching subjects:', error)
-  }
-}
-
-const getSubjects = async () => {
-  try {
-    const response = await subjectStore.getSubjects(dataFilter.value)
-    subjects.value = response.data
-  } catch (error) {
-    console.error('Error fetching subjects:', error)
-  }
 }
 
 const showAllClassesForAllDepartments = () => {
@@ -175,7 +183,7 @@ const handleClickSave = async () => {
     try {
       newAssignment.value.classIds = selectedClasses.value
       await assignmentStore.createAssignment(newAssignment.value as EmptyAssignment)
-      console.log('New Assignment: ', newAssignment.value)
+      // console.log('New Assignment: ', newAssignment.value)
       notify({ message: notifications.createSuccessfully(newAssignment.value.name), color: 'success' })
       router.push({ name: 'assignments' })
     } catch (error) {
@@ -183,6 +191,8 @@ const handleClickSave = async () => {
     }
   }
 }
+
+defineExpose({ isFormHasUnsavedChanges })
 
 onMounted(() => {
   getSubjects()
