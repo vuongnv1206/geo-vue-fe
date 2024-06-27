@@ -31,6 +31,11 @@ class JwtService {
     window.localStorage.removeItem(this.REFRESH_TOKEN_EXPIRES)
   }
 
+  removeRefreshToken(): void {
+    window.localStorage.removeItem(this.REFRESH_TOKEN)
+    window.localStorage.removeItem(this.REFRESH_TOKEN_EXPIRES)
+  }
+
   saveUser(user: any): void {
     window.localStorage.setItem(this.USER, JSON.stringify(user))
   }

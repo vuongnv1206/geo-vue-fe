@@ -22,11 +22,13 @@ import { UserDetail } from '@/pages/user/types'
 import { PaperFolderPermission, SharePaperFolderRequest } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { getErrorMessage } from '../../services/utils'
+import SharedPaperFolder from './SharedPaperFolder.vue'
 
 const router = useRouter()
 const paperFolderStore = usePaperFolderStore()
 const paperStore = usePaperStore()
 const loading = ref(true)
+const isSharedDocument = ref(true)
 
 const dataFilterFolder = ref<DataFilterFolder>({
   keyword: '',
@@ -212,7 +214,7 @@ const getPaperFolders = async (parentId?: string | null, name?: string | null) =
     })
     .catch(() => {
       loading.value = false
-      notify({ message: 'Failed to get question folders', color: 'error' })
+      notify({ message: 'Failed to get folders', color: 'error' })
     })
 }
 
@@ -428,6 +430,7 @@ const combinedData = computed(() => {
     createdBy: paper.createdBy || '',
     lastModifiedBy: paper.lastModifiedBy || null,
   }))
+
   return [...resolvedFolders, ...resolvedPapers]
 })
 
@@ -634,33 +637,65 @@ const onSharePaperFolderPermission = () => {
 </script>
 
 <template>
-  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px">
-    <VaInput v-model="searchTerm" style="background-color: white" placeholder="Search..." />
-    <VaButton @click="handleSearch">Search</VaButton>
-  </div>
-  <VaCard>
-    <VaCardContent>
-      <div class="flex flex-col md:flex-row gap-2 mb-2 justify-between">
-        <div class="flex flex-col md:flex-row gap-2 justify-start">
-          <VaBreadcrumbs>
-            <VaBreadcrumbsItem v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.id ?? index">
-              <a href="#" class="text-blue-500" @click.prevent="navigateToBreadcrumb(index)">
-                {{ breadcrumb.name }}
-              </a>
-            </VaBreadcrumbsItem>
-          </VaBreadcrumbs>
-        </div>
-        <div class="flex flex-col md:flex-row gap-2 justify-end">
-          <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
-            Delete
-          </VaButton>
-          <VaButton icon="add" color="warning" size="small" class="uppercase" @click="showCreatePaper()"
-            >Add Paper</VaButton
-          >
-          <VaButton icon="add" size="small" class="uppercase" @click="showAddPaperFolderModal()">Add Folder</VaButton>
-        </div>
-      </div>
+  <VaCard class="flex flex-col md:flex-row gap-2 p-2 mb-2">
+    <VaCard class="flex justify-start items-center flex-grow">
+      <VaCard class="flex">
+        <VaInput v-model="searchTerm" placeholder="Search" class="flex-grow">
+          <template #appendInner>
+            <VaIcon color="secondary" class="material-icons" @click="handleSearch">search</VaIcon>
+          </template>
+        </VaInput>
+      </VaCard>
+    </VaCard>
+    <VaCard class="flex justify-end items-center">
+      <VaCard class="flex gap-2">
+        <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems"
+          >Delete
+        </VaButton>
+        <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
+        <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
+        <VaDropdown placement="bottom-end">
+          <template #anchor>
+            <VaButton icon="filter_alt" />
+          </template>
+          <VaDropdownContent class="p-0">
+            <VaButton
+              preset="secondary"
+              size="small"
+              style="width: 100%"
+              class="p-2"
+              :icon="isSharedDocument ? 'check' : ''"
+              @click="isSharedDocument = true"
+              >My Documents</VaButton
+            >
+          </VaDropdownContent>
+          <VaDropdownContent class="p-0">
+            <VaButton
+              preset="secondary"
+              size="small"
+              style="width: 100%"
+              class="p-2"
+              :icon="isSharedDocument ? '' : 'check'"
+              @click="isSharedDocument = false"
+              >Shared Documents</VaButton
+            >
+          </VaDropdownContent>
+        </VaDropdown>
+      </VaCard>
+    </VaCard>
+  </VaCard>
 
+  <VaCard v-if="isSharedDocument">
+    <VaCardTitle>
+      <VaBreadcrumbs>
+        <VaBreadcrumbsItem v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.id ?? index">
+          <a href="#" class="text-blue-500" @click.prevent="navigateToBreadcrumb(index)">
+            {{ breadcrumb.name }}
+          </a>
+        </VaBreadcrumbsItem>
+      </VaBreadcrumbs>
+    </VaCardTitle>
+    <VaCardContent>
       <VaDataTable
         :items="currentItems"
         :columns="tableColumns"
@@ -748,7 +783,9 @@ const onSharePaperFolderPermission = () => {
       />
     </VaCardContent>
   </VaCard>
-
+  <VaCard v-else>
+    <SharedPaperFolder />
+  </VaCard>
   <VaModal
     v-slot="{ cancel, ok }"
     v-model="doShowEditFolderModal"

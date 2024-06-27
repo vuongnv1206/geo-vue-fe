@@ -5,6 +5,9 @@ import { useForm, useToast } from 'vuestic-ui'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { Register } from './types'
 import { getErrorMessage } from '@/services/utils'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const { validate } = useForm('form')
 const { push } = useRouter()
@@ -43,7 +46,7 @@ const submit = () => {
       .then(() => {
         init({
           title: 'Success',
-          message: 'Account created successfully',
+          message: t('auth.account_created'),
           color: 'success',
         })
         push({ name: 'login' })
@@ -64,45 +67,45 @@ const submit = () => {
 
 const roleTabValue = ref(0)
 
-const passwordRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Password field is required',
-  (v) => (v && v.length >= 8) || 'Password must be at least 8 characters long',
-  (v) => (v && /[A-Za-z]/.test(v)) || 'Password must contain at least one letter',
-  (v) => (v && /\d/.test(v)) || 'Password must contain at least one number',
-  (v) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v)) || 'Password must contain at least one special character',
+const passwordRules = [
+  (v: any) => !!v || t('validation.password.required'),
+  (v: any) => (v && v.length >= 8) || t('validation.password.minLength'),
+  (v: any) => (v && /[A-Za-z]/.test(v)) || t('validation.password.letter'),
+  (v: any) => (v && /\d/.test(v)) || t('validation.password.number'),
+  (v: any) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v)) || t('validation.password.specialCharacter'),
 ]
 
-const usernameRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Username field is required',
-  (v) => (v && v.length >= 3) || 'Username must be at least 3 characters long',
-  (v) => (v && v.length <= 20) || 'Username must be at most 20 characters long',
-  (v) => (v && /^[a-zA-Z0-9_]*$/.test(v)) || 'Username must contain only letters, numbers, and underscores',
+const usernameRules = [
+  (v: any) => !!v || t('validation.username.required'),
+  (v: any) => (v && v.length >= 3) || t('validation.username.minLength'),
+  (v: any) => (v && v.length <= 20) || t('validation.username.maxLength'),
+  (v: any) => (v && /^[a-zA-Z0-9_]*$/.test(v)) || t('validation.username.pattern'),
 ]
 
-const phoneNumberRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Phone Number field is required',
-  (v) => (v && v.length >= 10) || 'Phone Number must be at least 10 characters long',
-  (v) => (v && v.length <= 15) || 'Phone Number must be at most 15 characters long',
-  (v) => (v && /^\d+$/.test(v)) || 'Phone Number must contain only numbers',
+const phoneNumberRules = [
+  (v: any) => !!v || t('validation.phoneNumber.required'),
+  (v: any) => (v && v.length >= 10) || t('validation.phoneNumber.minLength'),
+  (v: any) => (v && v.length <= 15) || t('validation.phoneNumber.maxLength'),
+  (v: any) => (v && /^\d+$/.test(v)) || t('validation.phoneNumber.pattern'),
 ]
 
-const emailRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Email field is required',
-  (v) => /.+@.+\..+/.test(v) || 'Email should be valid',
+const emailRules = [
+  (v: any) => !!v || t('validation.email.required'),
+  (v: any) => /.+@.+\..+/.test(v) || t('validation.email.pattern'),
 ]
 </script>
 
 <template>
   <VaInnerLoading :loading="isLoading" :size="60">
     <VaForm ref="form" @submit.prevent="submit">
-      <h1 class="font-semibold text-4xl mb-4">Sign up</h1>
+      <h1 class="font-semibold text-4xl mb-4">{{ t('auth.sign_up') }}</h1>
       <p class="text-base mb-4 leading-5">
-        Have an account?
-        <RouterLink :to="{ name: 'login' }" class="font-semibold text-primary">Login</RouterLink>
+        {{ t('auth.have_account') }}
+        <RouterLink :to="{ name: 'login' }" class="font-semibold text-primary">{{ t('auth.login') }}</RouterLink>
       </p>
       <VaTabs v-model="roleTabValue">
         <template #tabs>
-          <VaTab v-for="tab in ['Student', 'Teacher']" :key="tab">
+          <VaTab v-for="tab in [t('auth.tabs.student'), t('auth.tabs.teacher')]" :key="tab">
             {{ tab }}
           </VaTab>
         </template>
@@ -111,20 +114,20 @@ const emailRules: ((v: string) => boolean | string)[] = [
       <div class="grid grid-cols-2 gap-4 items-start">
         <VaInput
           v-model="formData.firstName"
-          :rules="[(v) => !!v || 'First Name field is required']"
+          :rules="[(v: any) => !!v || t('auth.first_name_required')]"
           class="mb-4"
-          label="First Name"
+          :label="t('auth.first_name')"
         />
         <VaInput
           v-model="formData.lastName"
-          :rules="[(v) => !!v || 'Last Name field is required']"
+          :rules="[(v: any) => !!v || t('auth.last_name_required')]"
           class="mb-4"
-          label="Last Name"
+          :label="t('auth.last_name')"
         />
       </div>
-      <VaInput v-model="formData.username" :rules="usernameRules" class="mb-4" label="Username" />
-      <VaInput v-model="formData.phoneNumber" :rules="phoneNumberRules" class="mb-4" label="Phone Number" />
-      <VaInput v-model="formData.email" :rules="emailRules" class="mb-4" label="Email" type="email" />
+      <VaInput v-model="formData.username" :rules="usernameRules" class="mb-4" :label="t('auth.username')" />
+      <VaInput v-model="formData.phoneNumber" :rules="phoneNumberRules" class="mb-4" :label="t('auth.phone_number')" />
+      <VaInput v-model="formData.email" :rules="emailRules" class="mb-4" :label="t('auth.email')" type="email" />
       <VaValue v-slot="isPasswordVisible" :default-value="false">
         <VaInput
           ref="password1"
@@ -132,8 +135,8 @@ const emailRules: ((v: string) => boolean | string)[] = [
           :rules="passwordRules"
           :type="isPasswordVisible.value ? 'text' : 'password'"
           class="mb-4"
-          label="Password"
-          messages="Password should be 8+ characters: letters, numbers, and special characters."
+          :label="t('auth.password')"
+          :messages="t('auth.password_hint')"
           @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
         >
           <template #appendInner>
@@ -148,12 +151,12 @@ const emailRules: ((v: string) => boolean | string)[] = [
           ref="password2"
           v-model="formData.repeatPassword"
           :rules="[
-            (v) => !!v || 'Repeat Password field is required',
-            (v) => v === formData.password || 'Passwords don\'t match',
+            (v: any) => !!v || t('auth.repeat_password_required'),
+            (v: string) => v === formData.password || t('auth.password_match'),
           ]"
           :type="isPasswordVisible.value ? 'text' : 'password'"
           class="mb-4"
-          label="Repeat Password"
+          :label="t('auth.repeat_password')"
           @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
         >
           <template #appendInner>
@@ -167,7 +170,7 @@ const emailRules: ((v: string) => boolean | string)[] = [
       </VaValue>
 
       <div class="flex justify-center mt-4">
-        <VaButton class="w-full" @click="submit"> Create account</VaButton>
+        <VaButton class="w-full" @click="submit">{{ t('auth.create_account') }}</VaButton>
       </div>
     </VaForm>
   </VaInnerLoading>

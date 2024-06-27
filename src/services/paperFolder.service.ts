@@ -3,6 +3,7 @@ import {
   CreatePaperFolderRequest,
   PaperFolderDto,
   PaperFolderResponse,
+  SearchSharedPaperFolderRequest,
   SharePaperFolderRequest,
   UpdatePaperFolderRequest,
 } from '@/pages/examination/types'
@@ -19,6 +20,8 @@ export interface IPaperFoldersService {
   paperFolders_Share(id: string, request: SharePaperFolderRequest): Promise<string>
 
   paperFolders_GetParents(id: string): Promise<PaperFolderDto[]>
+
+  paperFolders_SearchShared(request: SearchSharedPaperFolderRequest): Promise<PaperFolderDto[]>
 }
 
 class PaperFoldersService implements IPaperFoldersService {
@@ -87,6 +90,19 @@ class PaperFoldersService implements IPaperFoldersService {
   async paperFolders_GetParents(id: string): Promise<PaperFolderDto[]> {
     return apiService
       .get(`/v1/paperfolders/${id}/parents`)
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+  }
+
+  async paperFolders_SearchShared(request: SearchSharedPaperFolderRequest): Promise<PaperFolderDto[]> {
+    const url = '/v1/paperfolders/shared'
+
+    return apiService
+      .post(url, request)
       .catch((error: any) => {
         return Promise.reject(error)
       })

@@ -76,7 +76,7 @@ export const useAuthStore = defineStore('auth', {
       this.avatarUrl = userDetail.imageUrl || ''
       if (this.user) this.user.fullName = userDetail.firstName + userDetail.lastName
     },
-    async login(email: string, password: string, captchaToken: string): Promise<any> {
+    async login(email: string, password: string, captchaToken: string, keepLogin: boolean): Promise<any> {
       try {
         const response = await authService.login(email, password, captchaToken)
         if (response.data.token) {
@@ -93,6 +93,9 @@ export const useAuthStore = defineStore('auth', {
             permission: userParse.permission,
           }
           this.avatarUrl = userParse.image_url
+          if (!keepLogin) {
+            jwtService.removeRefreshToken()
+          }
         } else {
           this.isAuthenticated = false
           this.user = null
