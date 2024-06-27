@@ -120,7 +120,7 @@ export type QuestionPassage = {
 }
 
 export type Answer = {
-  id?: string | undefined
+  id?: string | undefined | null
   content: string
   questionId?: string | null
   isCorrect?: boolean | null

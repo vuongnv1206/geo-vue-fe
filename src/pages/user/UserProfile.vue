@@ -1,9 +1,11 @@
 <template>
-  <div class="flex flex-col md:flex-row">
-    <div class="p-3 rounded mr-1 ml-1 mb-2 h-fit md:w-1/4 sm:w-1/3" style="background-color: #fff">
-      <UserProfileSettingList @selectSettingOption="handleSelectedSettingOption" />
+  <div class="flex flex-col sm:flex-row">
+    <div class="item">
+      <VaCard class="p-2 ml-1 mb-5 rounded">
+        <UserProfileSettingList @selectSettingOption="handleSelectedSettingOption" />
+      </VaCard>
     </div>
-    <div class="item w-full flex-1">
+    <div class="item w-full">
       <UserProfileDetail :setting-option="selectedSettingOption" />
     </div>
   </div>
@@ -13,7 +15,15 @@ import UserProfileSettingList from './UserProfileSettingList.vue'
 import UserProfileDetail from './UserProfileDetail.vue'
 import { ref } from 'vue'
 import { SettingProfile } from './types'
-const selectedSettingOption = ref<SettingProfile | null>(null)
+import { useI18n } from 'vue-i18n'
+import { VaCard } from 'vuestic-ui/web-components'
+
+const { t } = useI18n()
+const selectedSettingOption = ref<SettingProfile | null>({
+  id: '1',
+  name: t('settings.general'),
+  icon: 'person',
+})
 function handleSelectedSettingOption(item: SettingProfile) {
   selectedSettingOption.value = item
 }

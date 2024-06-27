@@ -2,7 +2,9 @@
 import { Question } from '../types'
 import QuestionHeadView from './child/QuestionHeadView.vue'
 import QuestionFooterView from './child/QuestionFooterView.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   question: Question | null
   index: number | null
@@ -47,7 +49,7 @@ const getCorrectAnswer = (question: Question) => {
     </VaCardBlock>
     <div class="mt-5">
       <b style="color: var(--va-success)"
-        >Correct answer: {{ props.question ? getCorrectAnswer(props.question) : '' }}</b
+        >{{ t('questions.correct_answer') }}: {{ props.question ? getCorrectAnswer(props.question) : '' }}</b
       >
     </div>
     <!-- footer -->

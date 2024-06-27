@@ -22,43 +22,20 @@ export default {
       },
     },
     {
-      name: 'questions',
+      name: 'question-folder',
       displayName: 'menu.questions',
       meta: {
         icon: 'folder',
+        permission: 'QuestionFolders.View',
       },
-      children: [
-        {
-          name: 'question-folder',
-          displayName: 'menu.question-folder',
-          meta: {
-            permission: 'QuestionFolders.View',
-          },
-        },
-        {
-          name: 'question-bank',
-          displayName: 'menu.question-bank',
-          meta: {
-            permission: 'QuestionFolders.View',
-          },
-        },
-      ],
     },
     {
-      name: 'examinations',
+      name: 'paper-folder',
       displayName: 'menu.examinations',
       meta: {
         icon: 'menu_book',
+        permission: 'QuestionFolders.View',
       },
-      children: [
-        {
-          name: 'paper-folder',
-          displayName: 'menu.paper-folder',
-          meta: {
-            permission: 'QuestionFolders.View',
-          },
-        },
-      ],
     },
     {
       name: 'classroom',

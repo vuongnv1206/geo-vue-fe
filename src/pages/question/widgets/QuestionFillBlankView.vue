@@ -2,7 +2,9 @@
 import { Question } from '../types'
 import QuestionHeadView from './child/QuestionHeadView.vue'
 import QuestionFooterView from './child/QuestionFooterView.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   question: Question | null
   index: number | null
@@ -46,7 +48,7 @@ const formatContent = (content: string) => {
       <!--eslint-enable-->
     </div>
     <div class="mt-5">
-      <b style="color: var(--va-success)">Correct answer:</b>
+      <b style="color: var(--va-success)">{{ t('questions.correct_answer') }}:</b>
     </div>
     <div class="mb-2 mt-2 flex flex-wrap gap-4">
       <div

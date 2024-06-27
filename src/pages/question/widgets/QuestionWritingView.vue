@@ -3,6 +3,9 @@ import { onBeforeMount, ref } from 'vue'
 import { Question } from '../types'
 import QuestionHeadView from './child/QuestionHeadView.vue'
 import QuestionFooterView from './child/QuestionFooterView.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   question: Question | null
@@ -33,7 +36,9 @@ onBeforeMount(() => {
         <p style="line-height: initial" v-html="props.question?.content.slice(0, 500).replace(/\n/g, '<br>')" />
         <!--eslint-enable-->
         ...
-        <button href="#" class="text-primary" @click="readMoreActivated = !readMoreActivated">Read more</button>
+        <button href="#" class="text-primary" @click="readMoreActivated = !readMoreActivated">
+          {{ t('questions.read_more') }}
+        </button>
       </span>
       <span v-else>
         <p style="line-height: initial" v-html="props.question?.content.replace(/\n/g, '<br>')" />

@@ -40,7 +40,7 @@ watch(
     <VaInput
       v-model="newQuestionTree.name"
       label="Folder name"
-      :rules="[(v) => v.length > 0 || `Folder name is required`]"
+      :rules="[(v: string | any[]) => v.length > 0 || `Folder name is required`]"
     />
     <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
