@@ -3,11 +3,17 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/vi'
+import 'dayjs/locale/en'
+
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 import i18n from './../i18n'
 const { t } = i18n.global
+
+const local = i18n.global.locale.value === 'vi' ? 'vi' : 'en'
+dayjs.locale(local)
 
 const currentTimezone = dayjs.tz.guess()
 
