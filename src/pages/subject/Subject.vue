@@ -5,11 +5,11 @@ import SubjectTable from '@/pages/subject/widgets/SubjectTable.vue'
 import { useSubjectStore } from '@/stores/modules/subject.module'
 import { useModal, useToast } from 'vuestic-ui'
 import EditSubjectForm from '@/pages/subject/widgets/EditSubjectForm.vue'
+import { notifications } from '@/services/utils'
 
 const loading = ref(true)
 const stores = useSubjectStore()
 const subjects = ref<Subject[]>([])
-// const currentSubjectId = ref<string>('')
 const selectedItemsEmitted = ref<Subject[]>([])
 const SubjectToEdit = ref<Subject | null>(null)
 const doShowSubjectFormModal = ref(false)
@@ -34,33 +34,78 @@ const getSubjects = () => {
     .getSubjects(dataFilter.value)
     .then((response) => {
       subjects.value = response.data
-      console.log('Subjects:', subjects.value)
+      // console.log('Subjects:', subjects.value)
       loading.value = false
     })
     .catch((error) => {
-      console.log('Error:', error)
       notify({
-        message: 'Failed to get subjects\n' + error.message,
+        message: notifications.getFailed('subject') + error.message,
         color: 'error',
       })
       loading.value = false
     })
 }
 
+const createNewSubject = () => {
+  SubjectToEdit.value = null
+  doShowSubjectFormModal.value = true
+}
+
+const editSubject = (subject: Subject) => {
+  SubjectToEdit.value = subject
+  doShowSubjectFormModal.value = true
+}
+
+const onSubjectSaved = async (subject: Subject) => {
+  doShowSubjectFormModal.value = false
+  if (subject.id != '') {
+    stores
+      .updateSubject(subject.id, subject as EmptySubject)
+      .then(() => {
+        notify({
+          message: notifications.updatedSuccessfully('subject'),
+          color: 'success',
+        })
+        getSubjects()
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.updateFailed('subject') + error.message,
+          color: 'error',
+        })
+      })
+  } else {
+    stores
+      .createSubject(subject as EmptySubject)
+      .then(() => {
+        notify({
+          message: notifications.createSuccessfully('subject'),
+          color: 'success',
+        })
+        getSubjects()
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.createFailed('subject') + error.message,
+          color: 'error',
+        })
+      })
+  }
+}
+
 const deleteSubject = (subject: Subject) => {
-  console.log('deleteSelectedSubject', subject)
   stores
     .deleteSubject(subject.id)
     .then(() => {
       notify({
-        message: 'Subject deleted successfully',
+        message: notifications.deleteSuccessfully('subject'),
         color: 'success',
       })
       getSubjects()
     })
     .catch((error) => {
       notify({
-        message: 'Failed to delete subject\n' + error.message,
+        message: notifications.deleteFailed('subject') + error.message,
         color: 'error',
       })
     })
@@ -69,7 +114,7 @@ const deleteSubject = (subject: Subject) => {
 const deleteSelectedSubject = () => {
   confirm({
     title: 'Delete Subject',
-    message: `Are you sure you want to delete ${selectedItemsEmitted.value.length} selected subject(s)?`,
+    message: notifications.confirmDelete(`${selectedItemsEmitted.value.length} subjects`),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -83,7 +128,7 @@ const deleteSelectedSubject = () => {
 const deleteSubjectWithConfirm = (subject: Subject) => {
   confirm({
     title: 'Delete Subject',
-    message: `Are you sure you want to delete ${subject.name}?`,
+    message: notifications.confirmDelete('subject'),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -92,25 +137,11 @@ const deleteSubjectWithConfirm = (subject: Subject) => {
   })
 }
 
-const createNewSubject = () => {
-  SubjectToEdit.value = null
-  doShowSubjectFormModal.value = true
-}
-
-const editSubject = (subject: Subject) => {
-  SubjectToEdit.value = subject
-  doShowSubjectFormModal.value = true
-}
-
-// const selectedSubject = (subject: Subject) => {
-//   currentSubjectId.value = subject.id
-// }
-
 const beforeEditFormModalClose = async (hide: () => unknown) => {
   if (editFormRef.value.isFormHasUnsavedChanges) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'Form has unsaved changes. Are you sure you want to close it?',
+      message: notifications.unsavedChanges,
       size: 'small',
     })
     if (agreed) {
@@ -121,42 +152,6 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   }
 }
 
-const onSubjectSaved = async (subject: Subject) => {
-  doShowSubjectFormModal.value = false
-  if (subject.id != '') {
-    stores
-      .updateSubject(subject.id, subject as EmptySubject)
-      .then(() => {
-        notify({
-          message: 'Subject updated successfully',
-          color: 'success',
-        })
-        getSubjects()
-      })
-      .catch((error) => {
-        notify({
-          message: 'Failed to update subject\n' + error.message,
-          color: 'error',
-        })
-      })
-  } else {
-    stores
-      .createSubject(subject as EmptySubject)
-      .then(() => {
-        notify({
-          message: 'Subject created successfully',
-          color: 'success',
-        })
-        getSubjects()
-      })
-      .catch((error) => {
-        notify({
-          message: 'Failed to create subject\n' + error.message,
-          color: 'error',
-        })
-      })
-  }
-}
 onMounted(() => {
   getSubjects()
 })

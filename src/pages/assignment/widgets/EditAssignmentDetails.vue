@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useRouter } from 'vue-router'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { computed, onMounted, ref } from 'vue'
@@ -12,7 +10,6 @@ import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
-dayjs.extend(utc)
 
 const router = useRouter()
 const { confirm } = useModal()
@@ -24,7 +21,7 @@ const assignmentDetails = ref<AssignmentDetails | null>(null)
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
 
-const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
+const date = ref<[Date, Date]>([new Date(), new Date()])
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id
 const classStore = useGroupClassStore()
@@ -47,6 +44,16 @@ const defaultNewAssignmentDetails: AssignmentDetails = {
 
 const newAssignmentDetails = ref({ ...defaultNewAssignmentDetails })
 
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
+
 const getAssignment = (id: string) => {
   stores
     .getAssignment(id)
@@ -61,8 +68,8 @@ const getAssignment = (id: string) => {
         requireLoginToSubmit: response.requireLoginToSubmit,
         classIds: response.classIds,
       }
-      console.log('Assignment Details: ', assignmentDetails.value)
-      console.log('New Assignment Details: ', newAssignmentDetails.value)
+      // console.log('Assignment Details: ', assignmentDetails.value)
+      // console.log('New Assignment Details: ', newAssignmentDetails.value)
     })
     .catch((error) => {
       notify({
@@ -72,24 +79,19 @@ const getAssignment = (id: string) => {
     })
 }
 
-const dataFilter = ref({
-  advancedSearch: {
-    fields: [''],
-    keyword: '',
-  },
-  pageNumber: 0,
-  pageSize: 100,
-  orderBy: ['id'],
-})
-
-const getGroupClass = async () => {
-  try {
-    const response = await classStore.getGroupClasses(dataFilter.value)
-    groupClasses.value = response.data
-    // console.log('Group Classes: ', groupClasses.value)
-  } catch (error) {
-    console.error('Error fetching subjects:', error)
-  }
+const getGroupClass = () => {
+  classStore
+    .getGroupClasses(dataFilter.value)
+    .then((response) => {
+      groupClasses.value = response.data
+      // console.log('Group Classes: ', groupClasses.value)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('group class') + error.message,
+        color: 'error',
+      })
+    })
 }
 
 const showAllClassesForAllDepartments = () => {
@@ -161,7 +163,7 @@ const goBack = async () => {
   if (isFormHasUnsavedChanges.value) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'You have unsaved changes. Are you sure you want to discard them?',
+      message: notifications.unsavedChanges,
       size: 'small',
     })
     if (!agreed) return
@@ -175,8 +177,8 @@ const dateInputFormat = {
 
 const handleClickUpdate = async () => {
   if (validate()) {
-    newAssignmentDetails.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
-    newAssignmentDetails.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
+    newAssignmentDetails.value.startTime = date.value[0]
+    newAssignmentDetails.value.endTime = date.value[1]
     try {
       newAssignmentDetails.value.classIds = selectedClasses.value
       await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
@@ -207,7 +209,8 @@ onMounted(() => {
         <VaInput
           v-model="newAssignmentDetails.name"
           label="Name"
-          :rules="[validators.required2('name'), validators.maxLength(50)]"
+          placeholder="Enter assignment name"
+          :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
         />
         <VueDatePicker
           v-model="date"

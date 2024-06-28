@@ -52,9 +52,15 @@ watch(
     <VaInput
       v-model="newSubject.name"
       label="Subject name"
-      :rules="[validators.required2('name'), validators.maxLength(50)]"
+      placeholder="Enter subject name"
+      :rules="[validators.required2('Subject name'), validators.maxLength(50)]"
     />
-    <VaInput v-model="newSubject.description" label="Description" :rules="[validators.maxLength(2000)]" />
+    <VaInput
+      v-model="newSubject.description"
+      label="Description"
+      placeholder="Enter description"
+      :rules="[validators.maxLength(2000)]"
+    />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
       <VaButton @click="validate() && $emit('save', newSubject as Subject)">{{ saveButtonLabel }}</VaButton>

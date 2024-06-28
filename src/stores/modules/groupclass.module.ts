@@ -26,7 +26,7 @@ export const useGroupClassStore = defineStore('groupClass', {
         })
     },
 
-    async update(id: string, payload: GroupClass): Promise<GroupClass> {
+    async updateGroupClass(id: string, payload: GroupClass): Promise<GroupClass> {
       return groupClassService
         .updateGroupClass(id, payload)
         .then((response) => {
@@ -37,7 +37,7 @@ export const useGroupClassStore = defineStore('groupClass', {
         })
     },
 
-    async add(payload: GroupClass): Promise<GroupClass> {
+    async createGroupClass(payload: GroupClass): Promise<GroupClass> {
       return groupClassService
         .createGroupClass(payload)
         .then((response) => {
@@ -48,7 +48,7 @@ export const useGroupClassStore = defineStore('groupClass', {
         })
     },
 
-    async remove(id: string): Promise<GroupClass> {
+    async deleteGroupClass(id: string): Promise<GroupClass> {
       return groupClassService
         .deleteGroupClass(id)
         .then((response) => {

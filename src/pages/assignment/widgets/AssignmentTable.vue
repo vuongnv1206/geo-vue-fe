@@ -14,7 +14,16 @@
               </VaListItemSection>
               <VaListItemSection>
                 <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
-                <VaListItemLabel caption>Create At: {{ format.formatDate(assignment.createOn) }}</VaListItemLabel>
+                <VaListItemLabel caption>
+                  <VaPopover
+                    class="mb-2"
+                    placement="right"
+                    color="#FFFFFF"
+                    :message="format.formatDate(assignment.createdOn)"
+                  >
+                    Create At: {{ format.formatDateFromNow(assignment.createdOn) }}
+                  </VaPopover>
+                </VaListItemLabel>
                 <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
               </VaListItemSection>
               <VaListItemSection icon>
@@ -55,7 +64,16 @@
                   </VaListItemSection>
                   <VaListItemSection>
                     <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
-                    <VaListItemLabel caption>Create At: {{ format.formatDate(assignment.createOn) }}</VaListItemLabel>
+                    <VaListItemLabel caption>
+                      <VaPopover
+                        class="mb-2"
+                        placement="right"
+                        color="#FFFFFF"
+                        :message="format.formatDate(assignment.createdOn)"
+                      >
+                        Create At: {{ format.formatDateFromNow(assignment.createdOn) }}
+                      </VaPopover>
+                    </VaListItemLabel>
                     <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
                   </VaListItemSection>
                   <VaListItemSection icon>
@@ -99,8 +117,9 @@ const recentAssignments = computed(() => {
       className: assClass.name,
     })),
   )
-  allAssignmentsWithClassId.sort((a, b) => (new Date(b.createOn) as any) - (new Date(a.createOn) as any)).reverse()
-  console.log('Abc: ', allAssignmentsWithClassId.slice(0, 4))
+  // console.log('All Assignments:', allAssignmentsWithClassId)
+  allAssignmentsWithClassId.sort((a, b) => (new Date(b.createdOn) as any) - (new Date(a.createdOn) as any))
+  // console.log('Abc: ', allAssignmentsWithClassId.slice(0, 4))
   return allAssignmentsWithClassId.slice(0, 4)
 })
 </script>

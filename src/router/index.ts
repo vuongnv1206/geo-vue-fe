@@ -29,18 +29,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
         },
-        children: [
-          {
-            name: 'question-folder',
-            path: 'question-folder',
-            component: () => import('../pages/question/QuestionFolder.vue'),
-          },
-          {
-            name: 'question-bank',
-            path: 'question-bank',
-            component: () => import('../pages/question/QuestionBank.vue'),
-          },
-        ],
+        component: () => import('../pages/question/QuestionFolder.vue'),
       },
       {
         name: 'examinations',
@@ -103,7 +92,7 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
-        name: 'teacher group',
+        name: 'teacher-group',
         path: 'teacher-group',
         meta: {
           requiresAuth: true,

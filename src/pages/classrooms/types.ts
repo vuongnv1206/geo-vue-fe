@@ -6,6 +6,20 @@ export type GroupClass = {
   classes: Classrooms[]
 }
 
+export type GroupClassResponse = {
+  data: GroupClass[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type EmptyGroupClass = {
+  name: string
+}
+
 export type Classrooms = {
   id: string
   name: string
@@ -17,16 +31,6 @@ export type Classrooms = {
   assignments: Assignment[]
 }
 
-export type GroupClassResponse = {
-  data: GroupClass[]
-  currentPage: number
-  totalPages: number
-  totalCount: number
-  pageSize: number
-  hasPreviousPage: boolean
-  hasNextPage: boolean
-}
-
 export type ClassResponse = {
   data: Classrooms[]
   currentPage: number
@@ -35,10 +39,6 @@ export type ClassResponse = {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
-}
-
-export type EmptyGroupClass = {
-  name: string
 }
 
 export type EmptyClassrooms = {
@@ -53,26 +53,56 @@ export type UserInClassRequest = {
 }
 
 export type UserInClass = {
+  id: string
   userId: string
   classesId: string
-  isGender: boolean
   studentCode: string
+  firstName: string
+  lastName: string
   email: string
+  dob: Date
+  gender: boolean
   phoneNumber: string
 }
 
-export type News = {
-  id: string
+export type EmptyUserInClass = {
+  userId: string
   classesId: string
-  content: string
-  isLockComment: boolean
-  parentId: string
-  numberLikeInTheNews: number
+  studentCode: string
+  firstName: string
+  lastName: string
+  email: string
+  dob: Date
+  gender: boolean
+  phoneNumber: string
 }
 
-export type EmptyNews = {
-  classesId: string
+export type User = {
+  id: string
+  name: string
+  avatar: string
+}
+
+export type Comment = {
+  id: string
+  userId: string
+  postId: string
   content: string
+  numberLikeInTheComment: number
+  createdAt: string
+  parentId: string | null
+  user: User
+  comments?: Comment[]
+}
+
+export type Post = {
+  id: string
+  userId: string
+  content: string
+  numberLikeInTheNews: number
+  createdAt: string
   isLockComment: boolean
-  parentId: string
+  user: User
+  comments: Comment[]
+  showComments: boolean
 }

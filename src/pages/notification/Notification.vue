@@ -261,14 +261,14 @@ const getIconType = (labelType: number) => {
   if (labelType === LabelType.Information) {
     return { iconName: IconType.Information, color: IconColor.Information }
   }
-  if (labelType === LabelType.Success) {
-    return { iconName: IconType.Success, color: IconColor.Success }
-  }
   if (labelType === LabelType.Warning) {
     return { iconName: IconType.Warning, color: IconColor.Warning }
   }
   if (labelType === LabelType.Error) {
     return { iconName: IconType.Error, color: IconColor.Error }
+  }
+  if (labelType === LabelType.Success) {
+    return { iconName: IconType.Success, color: IconColor.Success }
   }
   if (labelType === LabelType.Reminder) {
     return { iconName: IconType.Reminder, color: IconColor.Reminder }

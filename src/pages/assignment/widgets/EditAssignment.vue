@@ -8,14 +8,10 @@ import { useSubjectStore } from '@/stores/modules/subject.module'
 import { Subject } from '@pages/subject/types'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { computed, onMounted, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { Attachment, EmptyAssignment } from '../types'
-
-dayjs.extend(utc)
 
 const { init: notify } = useToast()
 const { confirm } = useModal()
@@ -50,6 +46,44 @@ const defaultNewAssignment: EmptyAssignment = {
 }
 const newAssignment = ref({ ...defaultNewAssignment })
 
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
+
+const getGroupClass = () => {
+  classStore
+    .getGroupClasses(dataFilter.value)
+    .then((response) => {
+      groupClasses.value = response.data
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('group class') + error.message,
+        color: 'error',
+      })
+    })
+}
+
+const getSubjects = () => {
+  subjectStore
+    .getSubjects(dataFilter.value)
+    .then((response) => {
+      subjects.value = response.data
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('subject') + error.message,
+        color: 'error',
+      })
+    })
+}
+
 const isFormHasUnsavedChanges = computed(() => {
   return Object.keys(newAssignment.value).some((key) => {
     return (
@@ -62,42 +96,12 @@ const goBack = async () => {
   if (isFormHasUnsavedChanges.value) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'You have unsaved changes. Are you sure you want to discard them?',
+      message: notifications.unsavedChanges,
       size: 'small',
     })
     if (!agreed) return
   }
   router.push({ name: 'assignments' })
-}
-
-defineExpose({ isFormHasUnsavedChanges })
-
-const dataFilter = ref({
-  advancedSearch: {
-    fields: [''],
-    keyword: '',
-  },
-  pageNumber: 0,
-  pageSize: 100,
-  orderBy: ['id'],
-})
-
-const getGroupClass = async () => {
-  try {
-    const response = await classStore.getGroupClasses(dataFilter.value)
-    groupClasses.value = response.data
-  } catch (error) {
-    console.error('Error fetching subjects:', error)
-  }
-}
-
-const getSubjects = async () => {
-  try {
-    const response = await subjectStore.getSubjects(dataFilter.value)
-    subjects.value = response.data
-  } catch (error) {
-    console.error('Error fetching subjects:', error)
-  }
 }
 
 const showAllClassesForAllDepartments = () => {
@@ -148,8 +152,8 @@ const dateInputFormat = {
   format: 'MM/dd/yyyy HH:mm',
 }
 const handleDatePicker = () => {
-  newAssignment.value.startTime = dayjs.utc(date.value[0]).utcOffset(0, true).toDate()
-  newAssignment.value.endTime = dayjs.utc(date.value[1]).utcOffset(0, true).toDate()
+  newAssignment.value.startTime = date.value[0]
+  newAssignment.value.endTime = date.value[1]
 }
 const handleAttachment = async () => {
   const files = filesUploaded.value
@@ -179,7 +183,7 @@ const handleClickSave = async () => {
     try {
       newAssignment.value.classIds = selectedClasses.value
       await assignmentStore.createAssignment(newAssignment.value as EmptyAssignment)
-      console.log('New Assignment: ', newAssignment.value)
+      // console.log('New Assignment: ', newAssignment.value)
       notify({ message: notifications.createSuccessfully(newAssignment.value.name), color: 'success' })
       router.push({ name: 'assignments' })
     } catch (error) {
@@ -187,6 +191,8 @@ const handleClickSave = async () => {
     }
   }
 }
+
+defineExpose({ isFormHasUnsavedChanges })
 
 onMounted(() => {
   getSubjects()
@@ -203,7 +209,12 @@ onMounted(() => {
       <VaDivider />
       <VaForm ref="form" class="flex flex-col gap-4 mx-auto" style="max-width: 900px">
         <VaCardTitle>Create Assignment</VaCardTitle>
-        <VaInput v-model="newAssignment.name" label="Name" :rules="[validators.required, validators.maxLength(50)]" />
+        <VaInput
+          v-model="newAssignment.name"
+          label="Name"
+          placeholder="Enter assignment name"
+          :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
+        />
         <VueDatePicker
           v-model="date"
           label="Time To Do"
@@ -219,7 +230,7 @@ onMounted(() => {
           placeholder="Start choosing or typing date and time"
         />
         <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
-        <VaInput v-model="newAssignment.content" label="Content" />
+        <VaInput v-model="newAssignment.content" label="Content" placeholder="Enter content" />
         <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
         <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
         <VaSelect
@@ -227,8 +238,8 @@ onMounted(() => {
           value-by="value"
           :options="subjects.map((subject) => ({ text: subject.name, value: subject.id }))"
           label="Subject"
+          placeholder="Select a subject"
           clearable
-          :rules="[(v) => (v ? true : 'Please select a subject.')]"
         />
         <VaLayout>
           <template #left>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Question } from '../../types'
+import { format } from '@services/utils'
 
 const props = defineProps<{
   question: Question | null
@@ -11,14 +12,10 @@ const emit = defineEmits<{
   (event: 'delete', question: Question): void
 }>()
 
-const getTimeString = (date: string) => {
-  return date.split('T')[0] + ' ' + date.split('T')[1].split('.')[0]
-}
-
 const options = [
   { text: props.question?.owner?.userName, value: 'createdBy', icon: 'person' },
-  { text: getTimeString(props.question?.createdOn || ''), value: 'createdOn', icon: 'mso-event_upcoming' },
-  { text: getTimeString(props.question?.lastModifiedOn || ''), value: 'updatedOn', icon: 'edit_calendar' },
+  { text: format.getTimeString(props.question?.createdOn || ''), value: 'createdOn', icon: 'mso-event_upcoming' },
+  { text: format.getTimeString(props.question?.lastModifiedOn || ''), value: 'updatedOn', icon: 'edit_calendar' },
 ]
 </script>
 

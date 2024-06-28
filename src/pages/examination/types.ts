@@ -1,4 +1,5 @@
 import { Question } from '../question/types'
+import { GroupTeacher } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
 
 export interface CreatePaperFolderRequest {
@@ -18,6 +19,7 @@ export interface PaperFolderDto {
   lastModifiedOn: string | null
   paperFolderChildrens?: PaperFolderDto[] | null
   parents?: PaperFolderParentDto[]
+  paperFolderPermissions?: PaperFolderPermission[]
 }
 
 export interface PaperFolderParentDto {
@@ -32,13 +34,14 @@ export interface UpdatePaperFolderRequest {
 }
 
 export interface SharePaperFolderRequest {
-  userIds?: string[]
-  folderId?: string
-  groupId?: string | null
-  canView?: boolean
-  canAdd?: boolean
-  canUpdate?: boolean
-  canDelete?: boolean
+  userIds: string[]
+  folderId: string
+  groupIds?: string[]
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
 }
 export interface PaperInListDto {
   id: string
@@ -281,6 +284,35 @@ export type DataFilterPaper = {
   pageSize: number
   orderBy: string[]
   paperFolderId: string | null | undefined
+}
+
+export type PaperFolderPermission = {
+  id: string
+  userId: string
+  user: UserDetail | null
+  groupTeacherId: string
+  groupTeacher: GroupTeacher | null
+  folderId: string
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+  createdBy: string
+  createdOn: string
+  lastModifiedBy: string
+  lastModifiedOn: string | null
+}
+
+export type SharePermission = {
+  folderId: string
+  userIds: string[]
+  groupId: string
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
 }
 
 export interface SearchSharedPaperFolderRequest {

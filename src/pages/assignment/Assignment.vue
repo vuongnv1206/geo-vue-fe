@@ -34,7 +34,7 @@ const getAssignmentByClass = () => {
     .catch((error) => {
       loading.value = false
       notify({
-        message: notifications.getFailed('class assignments') + error.message,
+        message: notifications.getFailed('assignments') + error.message,
         color: 'error',
       })
     })
@@ -48,9 +48,9 @@ onMounted(() => {
 <template>
   <VaCard>
     <VaCardContent>
-      <div class="flex flex-col md:flex-row gap-2 justify-end">
+      <VaCard class="flex flex-col md:flex-row gap-2 justify-end">
         <VaButton icon="add" :to="{ name: 'create-assignment' }">Assignment</VaButton>
-      </div>
+      </VaCard>
       <AssignmentTable :loading="loading" :assignments-by-class="assignmentsByClass" />
     </VaCardContent>
   </VaCard>

@@ -13,12 +13,8 @@
         <VaCard v-if="assignment">
           <VaCard>
             <VaCardTitle>{{ assignment.name }}</VaCardTitle>
-            <VaCardContent>
-              Start Time: {{ assignment.startTime ? format.formatDate(assignment.startTime) : '' }}
-            </VaCardContent>
-            <VaCardContent>
-              End Time: {{ assignment.endTime ? format.formatDate(assignment.endTime) : '' }}
-            </VaCardContent>
+            <VaCardContent> Start Time: {{ format.formatDate(assignment.startTime) }} </VaCardContent>
+            <VaCardContent> End Time: {{ format.formatDate(assignment.endTime) }} </VaCardContent>
           </VaCard>
           <VaCard>
             <VaCardTitle>Menu</VaCardTitle>
@@ -95,12 +91,8 @@ import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { Assignment, AssignmentClass } from '../types'
 import { useBreakpoint, useToast } from 'vuestic-ui'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { format, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
-
-dayjs.extend(utc)
 
 const router = useRouter()
 const stores = useAssignmentStore()
@@ -125,7 +117,6 @@ const getAssignment = (id: string) => {
       // console.log('Assignment:', assignment.value)
     })
     .catch((error) => {
-      console.log('Error:', error)
       notify({
         message: notifications.getFailed('assignment') + error.message,
         color: 'error',
