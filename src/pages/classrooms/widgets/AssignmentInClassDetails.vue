@@ -41,7 +41,7 @@
                   <VaIcon name="description" size="3rem" class="text-gray-500" />
                   <div>
                     <VaCardTitle class="font-medium text-lg">{{ assignment.name }}</VaCardTitle>
-                    <VaCard>{{ assignment.content }}</VaCard>
+                    <VaCard>Submited: 0/0</VaCard>
                   </div>
                 </VaCard>
               </template>
@@ -51,7 +51,7 @@
                   <VaIcon name="article" size="3rem" class="text-gray-500" />
                   <div>
                     <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>
-                    <VaCard>Created On: {{ format.formatDate(paper.createOn) }}</VaCard>
+                    <VaCard>Submited: 0/0</VaCard>
                   </div>
                 </VaCard>
               </template>

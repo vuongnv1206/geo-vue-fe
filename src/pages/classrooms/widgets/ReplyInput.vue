@@ -2,8 +2,16 @@
   <VaCard class="p-2">
     <div class="relative">
       <!-- <VaInput class="flex-grow mr-2" v-model="replyContent" placeholder="Say something..." /> -->
-      <QuillEditor v-model="replyContent" class="h-13" theme="bubble" />
-
+      <QuillEditor
+        theme="bubble"
+        @update:content="
+          (v) =>
+            (replyContent = v.ops
+              .map((op: any) => op.insert)
+              .join('')
+              .trim())
+        "
+      />
       <div class="absolute right-0 top-0 h-full flex items-end">
         <VaButton preset="plain" size="small" class="mr-1" icon="send" @click="submitReply" />
         <VaButton preset="plain" size="small" class="mr-2" @click="$emit('cancel')"> Cancel </VaButton>

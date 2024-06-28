@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-2xl">
     <VaCard class="relative bg-white rounded-lg shadow-md mb-2">
-      <QuillEditor class="pb-5" />
+      <QuillEditor v-model:content="newPostContent" class="pb-5" />
       <VaCard class="absolute bottom-2 right-2">
         <VaButton class="mr-2" preset="plain" :icon="postId ? 'lock' : 'lock_open'" />
         <VaButton preset="plain" icon="send" class="mr-2" />
@@ -42,7 +42,7 @@
             </template>
           </VaMenu>
         </div>
-        <p class="text-base text-gray-700 mb-4">{{ post.content }}</p>
+        <div class="text-base text-gray-700 mb-4" v-html="post.content" />
         <VaDivider />
         <div class="flex items-center justify-between">
           <VaCard class="mr-auto">
@@ -89,7 +89,7 @@
                   </VaMenu>
                 </div>
 
-                <p class="text-sm text-gray-700">{{ comment.content }}</p>
+                <div class="text-sm text-gray-700" v-html="comment.content" />
                 <div class="my-2 flex items-center justify-start">
                   <VaButton preset="plain" size="small" icon="favorite" color="danger" class="mr-2">
                     {{ comment.numberLikeInTheComment }}
@@ -129,6 +129,8 @@ const authStore = useAuthStore()
 const currentUserId = authStore.user?.id ?? ''
 const currentUserName = authStore.user?.fullName ?? ''
 const currentUserAvatar = authStore.user?.avatarUrl ?? ''
+
+const newPostContent = ref('')
 
 const fetchPosts = async () => {
   try {
@@ -202,5 +204,6 @@ const submitReply = (postId: string, parentId: string, content: string) => {
 
 onMounted(() => {
   fetchPosts()
+  console.log('Post Content', newPostContent.value)
 })
 </script>
