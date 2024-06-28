@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import classService from '@/services/class.service'
-import { ClassResponse, Classrooms, EmptyClassrooms, UserInClass, UserInClassRequest } from '@/pages/classrooms/types'
+import { ClassResponse, Classrooms, EmptyClassrooms } from '@/pages/classrooms/types'
 
 export const useClassStore = defineStore('class', {
   state: () => ({}),
@@ -18,37 +18,6 @@ export const useClassStore = defineStore('class', {
     async getClassroomById(id: string): Promise<Classrooms> {
       return classService
         .getClassroomById(id)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-    async getClassroomByGroupClass(): Promise<Classrooms> {
-      return classService
-        .getClassroomByGroupClass()
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-    async getClassroomByGroupClassId(id: string): Promise<Classrooms[]> {
-      return classService
-        .getClassroomByGroupClassId(id)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-
-    async getClassroomByUser(): Promise<Classrooms[]> {
-      return classService
-        .getClassroomByUser()
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -86,56 +55,6 @@ export const useClassStore = defineStore('class', {
           return Promise.reject(error)
         })
     },
-    async getUserInClass(id: string): Promise<any> {
-      return classService
-        .getUserInClass(id)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-    async addUserToClass(data: UserInClass): Promise<Classrooms> {
-      return classService
-        .addUserInClass(data)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-    async updateUserInClass(id: string, data: UserInClass): Promise<Classrooms> {
-      return classService
-        .updateUserInClass(id, data)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-    async deleteUserInClass(data: UserInClassRequest): Promise<Classrooms> {
-      return classService
-        .deleteUserInClass(data)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-    async getClassSearch(data: any): Promise<any> {
-      return classService
-        .getClassSearch(data)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
     async removeAssignmentFromClass(data: any): Promise<any> {
       return classService
         .removeAssignmentFromClass(data)
@@ -146,9 +65,33 @@ export const useClassStore = defineStore('class', {
           return Promise.reject(error)
         })
     },
-    async GetClassById(id: string): Promise<Classrooms> {
+
+    // xóa bỏ
+    //===========================================
+    async getClassroomByGroupClass(): Promise<Classrooms> {
       return classService
-        .GetClassById(id)
+        .getClassroomByGroupClass()
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getClassroomByGroupClassId(id: string): Promise<Classrooms[]> {
+      return classService
+        .getClassroomByGroupClassId(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+
+    async getClassroomByUser(): Promise<Classrooms[]> {
+      return classService
+        .getClassroomByUser()
         .then((response) => {
           return Promise.resolve(response)
         })

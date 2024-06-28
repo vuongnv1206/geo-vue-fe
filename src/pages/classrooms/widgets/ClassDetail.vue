@@ -6,8 +6,8 @@ import NewsInClassDetails from './NewsInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useToast } from 'vuestic-ui/web-components'
-import UserInClassDetails from './UserInClassDetails.vue'
 import { notifications } from '@/services/utils'
+import StudentsInClassDetails from './StudentsInClassDetails.vue'
 
 const tabs = [
   { title: 'Student list', icon: 'groups' },
@@ -16,6 +16,7 @@ const tabs = [
 ]
 const { init: notify } = useToast()
 const router = useRouter()
+
 const classStore = useClassStore()
 const defaultClassDetails: Classrooms = {
   id: '',
@@ -26,12 +27,13 @@ const defaultClassDetails: Classrooms = {
   groupClassName: '',
   numberUserOfClass: 0,
   assignments: [],
+  userStudents: [],
 }
 
 const classDetails = ref<Classrooms>(defaultClassDetails)
 
 const classId = router.currentRoute.value.params.id.toString()
-const selectedTab = ref(tabs[2].title)
+const selectedTab = ref(tabs[0].title)
 const currentTab = computed(() => tabs.find((tab) => tab.title === selectedTab.value) || tabs[0])
 
 const getClassById = async () => {
@@ -40,7 +42,7 @@ const getClassById = async () => {
     .then((response) => {
       // console.log('Classroom:', response)
       classDetails.value = response
-      // console.log('classDetails:', classDetails.value)
+      console.log('classDetails:', classDetails.value)
     })
     .catch((error) => {
       notify({
@@ -78,7 +80,7 @@ onMounted(() => {
       <VaCardTitle>
         {{ currentTab.title }}
       </VaCardTitle>
-      <UserInClassDetails v-if="currentTab.title === 'Student list'" />
+      <StudentsInClassDetails v-if="currentTab.title === 'Student list'" :students="classDetails.userStudents" />
       <AssignmentInClassDetails v-if="currentTab.title === 'Assignment & Exam'" :class-details="classDetails" />
       <NewsInClassDetails v-if="currentTab.title === 'News board'" />
     </VaCard>

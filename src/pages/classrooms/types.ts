@@ -29,6 +29,7 @@ export type Classrooms = {
   groupClassName: string
   numberUserOfClass: number
   assignments: Assignment[]
+  userStudents: Student[]
 }
 
 export type ClassResponse = {
@@ -47,40 +48,44 @@ export type EmptyClassrooms = {
   groupClassId: string
 }
 
-export type UserInClassRequest = {
+export type StudentRequest = {
   userId: string
   classesId: string
 }
 
-export type UserInClass = {
+export type Student = {
   id: string
-  userId: string
-  classesId: string
+  studentId: string
   studentCode: string
   firstName: string
   lastName: string
   email: string
-  dob: Date
+  // dob: Date
   gender: boolean
   phoneNumber: string
-}
-
-export type EmptyUserInClass = {
-  userId: string
-  classesId: string
-  studentCode: string
-  firstName: string
-  lastName: string
-  email: string
-  dob: Date
-  gender: boolean
-  phoneNumber: string
-}
-
-export type User = {
-  id: string
-  name: string
   avatar: string
+  classesId: string
+}
+
+export type EmptyStudent = {
+  studentCode: string
+  firstName: string
+  lastName: string
+  email: string
+  // dob: Date
+  gender: boolean
+  phoneNumber: string
+  classesId: string
+}
+
+export type StudentResponse = {
+  data: Student[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
 
 export type Comment = {
@@ -91,8 +96,15 @@ export type Comment = {
   numberLikeInTheComment: number
   createdAt: string
   parentId: string | null
-  user: User
+  user: Student
   comments?: Comment[]
+}
+
+export type EmptyComent = {
+  userId: string
+  postId: string
+  content: string
+  parentId: string
 }
 
 export type Post = {
@@ -102,7 +114,7 @@ export type Post = {
   numberLikeInTheNews: number
   createdAt: string
   isLockComment: boolean
-  user: User
+  user: Student
   comments: Comment[]
   showComments: boolean
 }
