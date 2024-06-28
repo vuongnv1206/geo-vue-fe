@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-2xl">
     <VaCard class="relative bg-white rounded-lg shadow-md mb-2">
-      <QuillEditor class="pb-5" />
+      <QuillEditor v-model:content="newPostContent" class="pb-5" />
       <VaCard class="absolute bottom-2 right-2">
         <VaButton class="mr-2" preset="plain" :icon="postId ? 'lock' : 'lock_open'" />
         <VaButton preset="plain" icon="send" class="mr-2" />
@@ -18,7 +18,7 @@
           <div class="flex items-center mb-4">
             <VaAvatar :src="post.user.avatar" class="mr-4" />
             <div>
-              <h2 class="text-md font-bold text-gray-800">{{ post.user.name }}</h2>
+              <h2 class="text-md font-bold text-gray-800">{{ post.user.firstName }} {{ post.user.lastName }}</h2>
               <VaPopover
                 class="mb-2"
                 placement="right"
@@ -42,7 +42,7 @@
             </template>
           </VaMenu>
         </div>
-        <p class="text-base text-gray-700 mb-4">{{ post.content }}</p>
+        <div class="text-base text-gray-700 mb-4" v-html="post.content" />
         <VaDivider />
         <div class="flex items-center justify-between">
           <VaCard class="mr-auto">
@@ -89,14 +89,14 @@
                   </VaMenu>
                 </div>
 
-                <p class="text-sm text-gray-700">{{ comment.content }}</p>
+                <div class="text-sm text-gray-700" v-html="comment.content" />
                 <div class="my-2 flex items-center justify-start">
                   <VaButton preset="plain" size="small" icon="favorite" color="danger" class="mr-2">
                     {{ comment.numberLikeInTheComment }}
                   </VaButton>
                   <VaButton preset="plain" size="small" icon="reply" @click="startReply(comment)">Reply</VaButton>
                 </div>
-                <ReplyInput
+                <CommentInNews
                   v-if="replyingTo === comment.id"
                   :post-id="post.id"
                   :parent-id="comment.id"
@@ -114,12 +114,11 @@
 
 <script setup lang="ts">
 import { format } from '@/services/utils'
-import { onMounted, ref } from 'vue'
-import ReplyInput from './ReplyInput.vue'
+import { ref } from 'vue'
+import CommentInNews from './CommentInNews.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { VaCard, VaDivider } from 'vuestic-ui/web-components'
-import axios from 'axios'
-import { Comment, Post } from '../types'
+import { Comment, EmptyComent, Post } from '../types'
 
 const posts = ref<Post[]>([])
 const postId = ref<string | null>(null)
@@ -127,18 +126,18 @@ const replyingTo = ref<string | null>(null)
 
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id ?? ''
-const currentUserName = authStore.user?.fullName ?? ''
-const currentUserAvatar = authStore.user?.avatarUrl ?? ''
+// const currentUserName = authStore.user?.fullName ?? ''
+const newPostContent = ref('')
 
-const fetchPosts = async () => {
-  try {
-    const response = await axios.get('https://69b7b9cf-3f30-4450-8124-73d93e0db00a.mock.pstmn.io/news/search')
-    posts.value = response.data
-    // console.log('Post Value', posts.value)
-  } catch (error) {
-    console.error(error)
-  }
-}
+// const fetchPosts = async () => {
+//   try {
+//     const response = await axios.get('https://69b7b9cf-3f30-4450-8124-73d93e0db00a.mock.pstmn.io/news/search')
+//     posts.value = response.data
+//     // console.log('Post Value', posts.value)
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
 
 const structureComments = (comments: Comment[]): Comment[] => {
   const commentMap = new Map<string, Comment>()
@@ -181,26 +180,15 @@ const cancelReply = () => {
 const submitReply = (postId: string, parentId: string, content: string) => {
   const post = posts.value.find((p) => p.id === postId)
   if (post) {
-    const newComment: Comment = {
-      id: Date.now().toString(), // Tạo ID mới (trong thực tế, nên sử dụng UUID)
+    const newComment: EmptyComent = {
       userId: currentUserId,
       postId: postId,
       content: content,
-      numberLikeInTheComment: 0,
-      createdAt: new Date().toISOString(),
       parentId: parentId,
-      user: {
-        id: currentUserId,
-        name: currentUserName,
-        avatar: currentUserAvatar,
-      },
     }
-    post.comments.push(newComment)
+    // post.comments.push(newComment)
+    console.log('New Comment', newComment)
   }
   replyingTo.value = null
 }
-
-onMounted(() => {
-  fetchPosts()
-})
 </script>

@@ -47,7 +47,7 @@
           <VaCard>
             <VaCardTitle>Content</VaCardTitle>
             <VaCardContent>
-              {{ assignment.content ? assignment.content : 'Content is empty' }}
+              <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
             </VaCardContent>
           </VaCard>
         </VaCard>

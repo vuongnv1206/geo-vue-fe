@@ -10,8 +10,10 @@ import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { computed, onMounted, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
-import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
+import { useForm, useModal, useToast, VaCardTitle } from 'vuestic-ui/web-components'
 import { Attachment, EmptyAssignment } from '../types'
+import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import { QuillEditor } from '@vueup/vue-quill'
 
 const { init: notify } = useToast()
 const { confirm } = useModal()
@@ -192,6 +194,12 @@ const handleClickSave = async () => {
   }
 }
 
+// const updateContent = (content: any) => {
+//   console.log('Content1: ', content)
+//   newAssignment.value.content = content
+//   console.log('Content2: ', newAssignment.value.content)
+// }
+
 defineExpose({ isFormHasUnsavedChanges })
 
 onMounted(() => {
@@ -230,7 +238,10 @@ onMounted(() => {
           placeholder="Start choosing or typing date and time"
         />
         <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
-        <VaInput v-model="newAssignment.content" label="Content" placeholder="Enter content" />
+        <div>
+          <QuillEditor v-model:content="newAssignment.content" class="h-15" theme="bubble" content-type="html" />
+        </div>
+        <!-- <QuillEditor class="h-13" theme="bubble" content-type="html" @update:content="updateContent" /> -->
         <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
         <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
         <VaSelect

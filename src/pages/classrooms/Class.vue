@@ -146,7 +146,7 @@ const deletedGroupClass = (groupClass: GroupClass) => {
 
 const onClassSaved = async (classrooms: Classrooms) => {
   doShowClassFormModal.value = false
-  if (classrooms.id != '') {
+  if ('id' in classrooms) {
     stores
       .updateClassroom(classrooms.id, classrooms as Classrooms)
       .then(() => {
@@ -183,7 +183,7 @@ const onClassSaved = async (classrooms: Classrooms) => {
 
 const onGroupClassSaved = async (groupClass: GroupClass) => {
   doShowGroupClassFormModal.value = false
-  if (groupClass.id != '') {
+  if ('id' in groupClass) {
     await store
       .updateGroupClass(groupClass.id, groupClass as GroupClass)
       .then(() => {
@@ -331,7 +331,7 @@ onMounted(() => {
                         </VaMenu>
                       </VaCard>
                       <VaCard class="flex flex-row justify-between items-center gap-2">
-                        <VaCardContent class="text-sm">Member: 0/11</VaCardContent>
+                        <VaCardContent class="text-sm">Member: {{ classItem.numberUserOfClass }}</VaCardContent>
                         <VaCardContent class="text-sm">Year: {{ classItem.schoolYear }}</VaCardContent>
                       </VaCard>
                     </VaCard>
