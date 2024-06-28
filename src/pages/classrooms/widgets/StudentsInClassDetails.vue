@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PropType, ref } from 'vue'
-import { defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
+import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
 import { EmptyStudent, Student } from '../types'
 import { notifications } from '@/services/utils'
 import { useStudentStore } from '@/stores/modules/student.module'
@@ -37,9 +37,9 @@ const handleSelectionChange = (selectedItems: Student[]) => {
   selectedItemsEmitted.value = selectedItems
 }
 
-const deleteStudent = (student: Student) => {
+const deleteStudent = (rowData: DataTableItem) => {
   studentStore
-    .deleteStudent(student.id)
+    .deleteStudent(rowData.id)
     .then(() => {
       notify({
         message: notifications.deleteSuccessfully('student'),
@@ -73,8 +73,8 @@ const createNewStudent = () => {
   doShowStudentFormModal.value = true
 }
 
-const editStudent = (student: Student) => {
-  studentToEdit.value = student
+const editStudent = (rowData: DataTableItem) => {
+  studentToEdit.value = rowData as Student
   doShowStudentFormModal.value = true
 }
 const deleteStudentWithConfirm = (student: Student) => {

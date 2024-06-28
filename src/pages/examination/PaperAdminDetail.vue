@@ -186,7 +186,7 @@ const classStore = useClassStore()
 const selectClassInGroup = async (classId: string) => {
   valueClassInGroupTap.value = classId
   try {
-    const classDetail = await classStore.GetClassById(classId)
+    const classDetail = await classStore.getClassById(classId)
     const res = await classStore.getClassroomByGroupClassId(classDetail.groupClassId)
     classInSelectedGroup.value = res.filter((classroom: Classrooms) =>
       paperDetail.value?.paperAccesses?.some((x: PaperAccess) => x.classId == classroom.id),

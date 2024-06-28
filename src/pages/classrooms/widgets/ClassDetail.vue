@@ -38,7 +38,7 @@ const currentTab = computed(() => tabs.find((tab) => tab.title === selectedTab.v
 
 const getClassById = async () => {
   classStore
-    .getClassroomById(classId)
+    .getClassById(classId)
     .then((response) => {
       // console.log('Classroom:', response)
       classDetails.value = response

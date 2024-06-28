@@ -13,7 +13,7 @@ class ClassService {
         return Promise.reject(error)
       })
   }
-  async getClassroomById(id: string): Promise<any> {
+  async getClassById(id: string): Promise<any> {
     return apiService
       .get(`/v1/class/${id}`)
       .then((response) => {
@@ -88,6 +88,16 @@ class ClassService {
   async getClassroomByUser(): Promise<Classrooms[]> {
     return apiService
       .get(`/v1/class`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  async getUserInClass(id: string): Promise<any> {
+    return apiService
+      .get(`/v1/class/getall-user-in-class?classId=${id}`)
       .then((response) => {
         return Promise.resolve(response.data)
       })

@@ -15,9 +15,9 @@ export const useClassStore = defineStore('class', {
           return Promise.reject(error)
         })
     },
-    async getClassroomById(id: string): Promise<Classrooms> {
+    async getClassById(id: string): Promise<Classrooms> {
       return classService
-        .getClassroomById(id)
+        .getClassById(id)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -92,6 +92,17 @@ export const useClassStore = defineStore('class', {
     async getClassroomByUser(): Promise<Classrooms[]> {
       return classService
         .getClassroomByUser()
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+
+    async getUserInClass(id: string): Promise<any> {
+      return classService
+        .getUserInClass(id)
         .then((response) => {
           return Promise.resolve(response)
         })
