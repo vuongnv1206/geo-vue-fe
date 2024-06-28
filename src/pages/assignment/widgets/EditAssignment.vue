@@ -215,12 +215,11 @@ onMounted(() => {
     </template>
     <template #content>
       <VaDivider />
-      <VaForm ref="form" class="flex flex-col gap-2 mx-auto" style="max-width: 900px">
+      <VaForm ref="form" class="gap-2 mx-auto" style="max-width: 900px">
         <VaCardTitle>Create Assignment</VaCardTitle>
-        <VaCard class="p-2">
+        <VaCard class="p-2 flex flex-col gap-2">
           <VaInput
             v-model="newAssignment.name"
-            class="mb-2"
             label="Name"
             placeholder="Enter assignment name"
             :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
@@ -240,7 +239,7 @@ onMounted(() => {
             placeholder="Start choosing or typing date and time"
           />
           <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
-          <QuillEditor v-model:content="newAssignment.content" class="h-15 mb-2" theme="bubble" content-type="html" />
+          <QuillEditor v-model:content="newAssignment.content" class="h-15" theme="bubble" content-type="html" />
           <!-- <QuillEditor class="h-13" theme="bubble" content-type="html" @update:content="updateContent" /> -->
           <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
           <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
