@@ -62,29 +62,29 @@ export const format = {
 
 export const notifications = {
   updatedSuccessfully: (message: string) => {
-    return t('validateUtils.updatedSuccessfully', { message })
+    return t('validateUtils.updatedSuccessfully', { message }) + '\n'
   },
   createSuccessfully: (message: string) => {
-    return t('validateUtils.createSuccessfully', { message })
+    return t('validateUtils.createSuccessfully', { message }) + '\n'
   },
   deleteSuccessfully: (message: string) => {
-    return t('validateUtils.deleteSuccessfully', { message })
+    return t('validateUtils.deleteSuccessfully', { message }) + '\n'
   },
   getFailed: (message: string) => {
-    return t('validateUtils.getFailed', { message })
+    return t('validateUtils.getFailed', { message }) + '\n'
   },
   updateFailed: (message: string) => {
-    return t('validateUtils.updateFailed', { message })
+    return t('validateUtils.updateFailed', { message }) + '\n'
   },
   createFailed: (message: string) => {
-    return t('validateUtils.createFailed', { message })
+    return t('validateUtils.createFailed', { message }) + '\n'
   },
   deleteFailed: (message: string) => {
-    return t('validateUtils.deleteFailed', { message })
+    return t('validateUtils.deleteFailed', { message }) + '\n'
   },
   unsavedChanges: t('validateUtils.unsavedChanges'),
   confirmDelete: (message: string) => {
-    return t('validateUtils.confirmDelete', { message })
+    return t('validateUtils.confirmDelete', { message }) + '\n'
   },
 }
 

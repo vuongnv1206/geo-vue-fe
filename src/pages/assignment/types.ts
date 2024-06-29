@@ -42,6 +42,15 @@ export type EmptyAssignmentDetails = {
   classIds: string[]
 }
 
+export type AssignmentContent = {
+  id: string
+  content: string
+}
+
+export type EmptyAssignmentContent = {
+  content: string
+}
+
 export type Attachment = {
   name: string
   extension: string

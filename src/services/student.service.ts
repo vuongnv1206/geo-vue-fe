@@ -21,7 +21,7 @@ class StudentService {
       })
   }
   async createStudent(data: EmptyStudent): Promise<any> {
-    return ApiService.post('/v1/userstudent/student-in-class', data)
+    return ApiService.post('/v1/userstudent', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })

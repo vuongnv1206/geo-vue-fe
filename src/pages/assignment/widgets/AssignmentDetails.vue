@@ -45,7 +45,16 @@
             </VaCardContent>
           </VaCard>
           <VaCard>
-            <VaCardTitle>Content</VaCardTitle>
+            <VaCard class="flex flex-row justify-between">
+              <VaCardTitle>Content</VaCardTitle>
+              <VaButton
+                class="pr-6"
+                icon="edit"
+                size="small"
+                preset="plain"
+                @click="editAssignmentContent(assignment)"
+              />
+            </VaCard>
             <VaCardContent>
               <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
             </VaCardContent>
@@ -83,16 +92,41 @@
       </main>
     </template>
   </VaLayout>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowFormModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    stateful
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+  >
+    <h1 class="va-h5 mb-4">Edit Content</h1>
+    <EditAssignmentContent
+      ref="editFormRef"
+      :assignment-content="assignmentContent"
+      @close="cancel"
+      @save="
+        (assignmentContent: AssignmentContent) => {
+          onAssignmentContent(assignmentContent)
+          ok()
+        }
+      "
+    />
+  </VaModal>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { Assignment, AssignmentClass } from '../types'
-import { useBreakpoint, useToast } from 'vuestic-ui'
+import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent } from '../types'
+import { useBreakpoint, useModal, useToast } from 'vuestic-ui'
 import { format, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
+import EditAssignmentContent from './EditAssignmentContent.vue'
 
 const router = useRouter()
 const stores = useAssignmentStore()
@@ -101,20 +135,26 @@ const breakpoints = useBreakpoint()
 const { init: notify } = useToast()
 const showSidebar = ref(breakpoints.smUp)
 const assignment = ref<Assignment | null>(null)
+const assignmentContent = ref<AssignmentContent | null>(null)
+
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
 const assignmentClass = ref<AssignmentClass>({
   assignmentId: assignmentId,
   classesdId: classId,
 })
+const doShowFormModal = ref(false)
+const editFormRef = ref()
+const { confirm } = useModal()
 
-console.log('Assignment Class:', assignmentClass.value)
 const getAssignment = (id: string) => {
   stores
     .getAssignment(id)
     .then((response) => {
       assignment.value = response
-      // console.log('Assignment:', assignment.value)
+      if (assignment.value?.content == '<p><br></p>') {
+        assignment.value.content = ''
+      }
     })
     .catch((error) => {
       notify({
@@ -143,6 +183,48 @@ const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
     })
 }
 
+const beforeEditFormModalClose = async (hide: () => unknown) => {
+  if (editFormRef.value.isFormHasUnsavedChanges) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: notifications.unsavedChanges,
+      size: 'small',
+    })
+    if (agreed) {
+      hide()
+    }
+  } else {
+    hide()
+  }
+}
+
+const onAssignmentContent = async (assignmentContent: AssignmentContent) => {
+  console.log('Assignment content:', assignmentContent)
+  doShowFormModal.value = false
+  if (assignmentContent.id != '') {
+    stores
+      .updateAssignment(assignmentContent.id, assignmentContent as EmptyAssignmentContent)
+      .then(() => {
+        notify({
+          message: notifications.updatedSuccessfully('assignment content'),
+          color: 'success',
+        })
+        getAssignment(assignmentContent.id)
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.updateFailed('assignment content') + error.message,
+          color: 'error',
+        })
+      })
+  }
+}
+
+const editAssignmentContent = (assContent: AssignmentContent) => {
+  assignmentContent.value = assContent
+  doShowFormModal.value = true
+}
+
 watchEffect(() => {
   showSidebar.value = breakpoints.smUp
 })
@@ -152,12 +234,4 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-.va-select-content__autocomplete {
-  flex: 1;
-}
-
-.va-input-wrapper__text {
-  gap: 0.2rem;
-}
-</style>
+<style lang="scss" scoped></style>
