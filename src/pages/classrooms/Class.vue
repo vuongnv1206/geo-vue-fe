@@ -40,13 +40,24 @@ const editGroupClass = (gc: GroupClass) => {
   doShowGroupClassFormModal.value = true
 }
 
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
+
 const getGroupClasses = () => {
   loading.value = true
+  dataFilter.value.advancedSearch.fields = ['name']
   store
-    .getGroupClass()
+    .getGroupClasses(dataFilter)
     .then((response) => {
-      listGroupClass.value = response
-      classrooms.value = response.flatMap((gc) => gc.classes)
+      listGroupClass.value = response.data
+      classrooms.value = response.data.flatMap((gc) => gc.classes)
       console.log('Department: ', listGroupClass.value)
       console.log('Classrooms: ', classrooms.value)
       loading.value = false

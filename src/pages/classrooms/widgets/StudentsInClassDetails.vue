@@ -2,7 +2,7 @@
 import { PropType, ref } from 'vue'
 import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
 import { EmptyStudent, Student } from '../types'
-import { notifications } from '@/services/utils'
+import { notifications, getErrorMessage } from '@/services/utils'
 import { useStudentStore } from '@/stores/modules/student.module'
 import EditStudent from './EditStudent.vue'
 
@@ -48,7 +48,7 @@ const deleteStudent = (rowData: DataTableItem) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.deleteFailed('student') + error.message,
+        message: notifications.deleteFailed('student') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -118,7 +118,7 @@ const onStudentSaved = async (student: Student) => {
       })
       .catch((error) => {
         notify({
-          message: notifications.updatedSuccessfully('student') + error.message,
+          message: notifications.updatedSuccessfully('student') + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -133,7 +133,7 @@ const onStudentSaved = async (student: Student) => {
       })
       .catch((error) => {
         notify({
-          message: notifications.createFailed('student') + error.message,
+          message: notifications.createFailed('student') + getErrorMessage(error),
           color: 'error',
         })
       })

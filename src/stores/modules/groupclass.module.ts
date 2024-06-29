@@ -15,17 +15,6 @@ export const useGroupClassStore = defineStore('groupClass', {
           return Promise.reject(error)
         })
     },
-    async getGroupClass(): Promise<GroupClass[]> {
-      return groupClassService
-        .getGroupClass()
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-
     async updateGroupClass(id: string, payload: GroupClass): Promise<GroupClass> {
       return groupClassService
         .updateGroupClass(id, payload)

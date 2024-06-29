@@ -224,9 +224,9 @@ onMounted(() => {
             placeholder="Enter assignment name"
             :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
           />
+          <VaCardTitle class="text-sm text-gray-700">Start and End Time</VaCardTitle>
           <VueDatePicker
             v-model="date"
-            label="Time To Do"
             range
             model-auto
             :action-row="{ showNow: true }"
@@ -239,7 +239,15 @@ onMounted(() => {
             placeholder="Start choosing or typing date and time"
           />
           <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
-          <QuillEditor v-model:content="newAssignment.content" class="h-15" theme="bubble" content-type="html" />
+          <VaCard>
+            <VaCardTitle class="text-sm text-gray-700">Content</VaCardTitle>
+            <QuillEditor
+              v-model:content="newAssignment.content"
+              class="h-15 border rounded"
+              theme="bubble"
+              content-type="html"
+            />
+          </VaCard>
           <!-- <QuillEditor class="h-13" theme="bubble" content-type="html" @update:content="updateContent" /> -->
           <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
           <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
@@ -251,9 +259,9 @@ onMounted(() => {
             placeholder="Select a subject"
             clearable
           />
-          <VaLayout>
+          <VaLayout class="border rounded-xl pb-4 px-2">
             <template #left>
-              <VaSidebar v-model="showSidebar">
+              <VaSidebar v-model="showSidebar" class="mt-2 mr-1 border rounded">
                 <VaCard class="mt-1 mx-1">
                   <VaInput placeholder="Search">
                     <template #appendInner>
@@ -279,9 +287,9 @@ onMounted(() => {
               </VaSidebar>
             </template>
             <template #content>
-              <VaLayout>
+              <VaLayout class="mt-2 border rounded">
                 <template #top>
-                  <VaNavbar class="py-1">
+                  <VaNavbar class="pt-1 pb-0 rounded">
                     <template #left>
                       <VaButton
                         preset="secondary"
@@ -290,19 +298,19 @@ onMounted(() => {
                       />
                     </template>
                     <template #right>
-                      <div class="flex">
+                      <VaCard class="flex">
                         <VaInput placeholder="Search">
                           <template #appendInner>
                             <VaIcon color="secondary" class="material-icons"> search </VaIcon>
                           </template>
                         </VaInput>
-                      </div>
+                      </VaCard>
                     </template>
                   </VaNavbar>
                 </template>
                 <template #content>
                   <VaDivider />
-                  <VaScrollContainer class="max-h-80" vertical>
+                  <VaScrollContainer class="max-h-80 pb-0" vertical>
                     <VaCard class="pb-2 pl-2">
                       <div v-if="selectedDepartment">
                         <div v-if="selectedDepartment.classes.length > 0">
@@ -382,12 +390,4 @@ onMounted(() => {
   </VaLayout>
 </template>
 
-<style lang="scss" scoped>
-.va-select-content__autocomplete {
-  flex: 1;
-}
-
-.va-input-wrapper__text {
-  gap: 0.2rem;
-}
-</style>
+<style lang="scss" scoped></style>

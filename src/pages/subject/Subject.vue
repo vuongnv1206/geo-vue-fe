@@ -11,7 +11,7 @@ const loading = ref(true)
 const stores = useSubjectStore()
 const subjects = ref<Subject[]>([])
 const selectedItemsEmitted = ref<Subject[]>([])
-const SubjectToEdit = ref<Subject | null>(null)
+const subjectToEdit = ref<Subject | null>(null)
 const doShowSubjectFormModal = ref(false)
 const { init: notify } = useToast()
 const editFormRef = ref()
@@ -47,12 +47,12 @@ const getSubjects = () => {
 }
 
 const createNewSubject = () => {
-  SubjectToEdit.value = null
+  subjectToEdit.value = null
   doShowSubjectFormModal.value = true
 }
 
 const editSubject = (subject: Subject) => {
-  SubjectToEdit.value = subject
+  subjectToEdit.value = subject
   doShowSubjectFormModal.value = true
 }
 
@@ -187,12 +187,12 @@ onMounted(() => {
     @close="doShowSubjectFormModal = false"
   >
     <VaModalHeader>
-      <h3 class="text-lg font-bold">{{ SubjectToEdit ? 'Edit' : 'Create' }} Subject</h3>
+      <h3 class="text-lg font-bold">{{ subjectToEdit ? 'Edit' : 'Create' }} Subject</h3>
     </VaModalHeader>
     <EditSubjectForm
       ref="editFormRef"
-      :subject="SubjectToEdit"
-      :save-button-label="SubjectToEdit === null ? 'Add' : 'Save'"
+      :subject="subjectToEdit"
+      :save-button-label="subjectToEdit === null ? 'Add' : 'Save'"
       @close="cancel"
       @save="
         (subject: Subject) => {

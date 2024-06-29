@@ -204,128 +204,95 @@ onMounted(() => {
     </template>
     <template #content>
       <VaDivider />
-      <VaForm ref="form" class="flex flex-col gap-4 mx-auto" style="max-width: 700px">
+      <VaForm ref="form" class="gap-2 mx-auto" style="max-width: 900px">
         <VaCardTitle>Global Setting</VaCardTitle>
-        <VaInput
-          v-model="newAssignmentDetails.name"
-          label="Name"
-          placeholder="Enter assignment name"
-          :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
-        />
-        <VueDatePicker
-          v-model="date"
-          range
-          model-auto
-          :action-row="{ showNow: true }"
-          :is-24="true"
-          enable-seconds
-          :clearable="true"
-          :text-input="dateInputFormat"
-          :month-change-on-scroll="true"
-          :month-change-on-arrows="true"
-          placeholder="Start choosing or typing date and time"
-        />
-        <VaSwitch v-model="newAssignmentDetails.canViewResult" size="small" label="Can View Result" />
-        <VaSwitch v-model="newAssignmentDetails.requireLoginToSubmit" size="small" label="Require Login to Submit" />
-        <VaLayout>
-          <template #left>
-            <VaSidebar v-model="showSidebar">
-              <VaCard class="mt-1 mx-1">
-                <VaInput placeholder="Search">
-                  <template #appendInner>
-                    <VaIcon color="secondary" class="material-icons"> search </VaIcon>
-                  </template>
-                </VaInput>
-              </VaCard>
-              <VaDivider />
-              <VaScrollContainer class="max-h-80" vertical>
-                <div class="mx-1">
-                  <VaSidebarItem class="cursor-pointer font-bold" @click="showAllClassesForAllDepartments">
-                    All ({{ countAllSelectedClasses }}/{{ countAllClasses }})
-                  </VaSidebarItem>
-                  <div v-for="(groupClass, index) in groupClasses" :key="index">
-                    <VaSidebarItem class="cursor-pointer font-bold" @click="showDepartmentClasses(groupClass)"
-                      >{{ groupClass.name }} ({{ countDepartmentSelectedClasses(groupClass) }}/{{
-                        groupClass.classes.length
-                      }})
-                    </VaSidebarItem>
-                  </div>
-                </div>
-              </VaScrollContainer>
-            </VaSidebar>
-          </template>
-          <template #content>
-            <VaLayout>
-              <template #top>
-                <VaNavbar class="py-1">
-                  <template #left>
-                    <VaButton
-                      preset="secondary"
-                      :icon="showSidebar ? 'menu_open' : 'menu'"
-                      @click="showSidebar = !showSidebar"
-                    />
-                  </template>
-                  <template #right>
-                    <div class="flex">
-                      <VaInput placeholder="Search">
-                        <template #appendInner>
-                          <VaIcon color="secondary" class="material-icons"> search </VaIcon>
-                        </template>
-                      </VaInput>
-                    </div>
-                  </template>
-                </VaNavbar>
-              </template>
-              <template #content>
+        <VaCard class="p-2 flex flex-col gap-2">
+          <VaInput
+            v-model="newAssignmentDetails.name"
+            label="Name"
+            placeholder="Enter assignment name"
+            :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
+          />
+          <VueDatePicker
+            v-model="date"
+            range
+            model-auto
+            :action-row="{ showNow: true }"
+            :is-24="true"
+            enable-seconds
+            :clearable="true"
+            :text-input="dateInputFormat"
+            :month-change-on-scroll="true"
+            :month-change-on-arrows="true"
+            placeholder="Start choosing or typing date and time"
+          />
+          <VaSwitch v-model="newAssignmentDetails.canViewResult" size="small" label="Can View Result" />
+          <VaSwitch v-model="newAssignmentDetails.requireLoginToSubmit" size="small" label="Require Login to Submit" />
+          <VaLayout class="border rounded-xl pb-4 px-2">
+            <template #left>
+              <VaSidebar v-model="showSidebar" class="mt-2 mr-1 border rounded">
+                <VaCard class="mt-1 mx-1">
+                  <VaInput placeholder="Search">
+                    <template #appendInner>
+                      <VaIcon color="secondary" class="material-icons"> search </VaIcon>
+                    </template>
+                  </VaInput>
+                </VaCard>
                 <VaDivider />
                 <VaScrollContainer class="max-h-80" vertical>
-                  <VaCard class="pb-2 pl-2">
-                    <div v-if="selectedDepartment">
-                      <div v-if="selectedDepartment.classes.length > 0">
-                        <VaCard class="flex flex-row">
-                          <VaCard class="mr-1">{{ selectedDepartment.name }}</VaCard>
-                          <VaButton preset="secondary" size="small" @click="selectAllClasses(selectedDepartment)">
-                            {{
-                              selectedClassesByDepartmentState[selectedDepartment.id] ? 'Deselect All' : 'Select All'
-                            }}
-                          </VaButton>
-                        </VaCard>
-                        <VaCard class="grid grid-cols-2 lg:grid-cols-2 gap-1">
-                          <div v-for="(classItem, classIndex) in selectedDepartment.classes" :key="classIndex">
-                            <input
-                              :id="classItem.id"
-                              v-model="selectedClasses"
-                              type="checkbox"
-                              :value="classItem.id"
-                              class="mr-1"
-                            />
-                            <label :for="classItem.id">{{ classItem.name }}</label>
-                            <VaChip v-if="currentUserId != classItem.ownerId" outline class="ml-2" size="small">
-                              Share
-                            </VaChip>
-                          </div>
-                        </VaCard>
-                      </div>
-                      <div v-else>No Class</div>
+                  <div class="mx-1">
+                    <VaSidebarItem class="cursor-pointer" @click="showAllClassesForAllDepartments">
+                      All ({{ countAllSelectedClasses }}/{{ countAllClasses }})
+                    </VaSidebarItem>
+                    <div v-for="(groupClass, index) in groupClasses" :key="index">
+                      <VaSidebarItem class="cursor-pointer" @click="showDepartmentClasses(groupClass)"
+                        >{{ groupClass.name }} ({{ countDepartmentSelectedClasses(groupClass) }}/{{
+                          groupClass.classes.length
+                        }})
+                      </VaSidebarItem>
                     </div>
-                    <div v-else>
-                      <VaButton preset="secondary" size="small" @click="selectAllClassesForAllDepartments">
-                        {{ selectAllClassesState ? 'Deselect All' : 'Select All' }}
-                      </VaButton>
-                      <div v-for="groupClass in groupClasses" :key="groupClass.id">
-                        <VaCard v-if="groupClass.classes.length > 0">
+                  </div>
+                </VaScrollContainer>
+              </VaSidebar>
+            </template>
+            <template #content>
+              <VaLayout class="mt-2 border rounded">
+                <template #top>
+                  <VaNavbar class="pt-1 pb-0 rounded">
+                    <template #left>
+                      <VaButton
+                        preset="secondary"
+                        :icon="showSidebar ? 'menu_open' : 'menu'"
+                        @click="showSidebar = !showSidebar"
+                      />
+                    </template>
+                    <template #right>
+                      <div class="flex">
+                        <VaInput placeholder="Search">
+                          <template #appendInner>
+                            <VaIcon color="secondary" class="material-icons"> search </VaIcon>
+                          </template>
+                        </VaInput>
+                      </div>
+                    </template>
+                  </VaNavbar>
+                </template>
+                <template #content>
+                  <VaDivider />
+                  <VaScrollContainer class="max-h-80" vertical>
+                    <VaCard class="pb-2 pl-2">
+                      <div v-if="selectedDepartment">
+                        <div v-if="selectedDepartment.classes.length > 0">
                           <VaCard class="flex flex-row">
-                            <VaCard class="cursor-pointer" @click="showDepartmentClasses(groupClass)"
-                              >{{ groupClass.name }} ({{ countDepartmentSelectedClasses(groupClass) }}/{{
-                                groupClass.classes.length
-                              }})
-                            </VaCard>
-                            <VaButton preset="secondary" size="small" @click="selectAllClasses(groupClass)">
-                              {{ selectedClassesByDepartmentState[groupClass.id] ? 'Deselect All' : 'Select All' }}
+                            <VaCard class="mr-1">{{ selectedDepartment.name }}</VaCard>
+                            <VaButton preset="secondary" size="small" @click="selectAllClasses(selectedDepartment)">
+                              {{
+                                selectedClassesByDepartmentState[selectedDepartment.id] ? 'Deselect All' : 'Select All'
+                              }}
                             </VaButton>
                           </VaCard>
                           <VaCard class="grid grid-cols-2 lg:grid-cols-2 gap-1">
-                            <div v-for="classItem in groupClass.classes" :key="classItem.id">
+                            <div v-for="(classItem, classIndex) in selectedDepartment.classes" :key="classIndex">
                               <input
                                 :id="classItem.id"
                                 v-model="selectedClasses"
@@ -339,16 +306,50 @@ onMounted(() => {
                               </VaChip>
                             </div>
                           </VaCard>
-                        </VaCard>
+                        </div>
+                        <div v-else>No Class</div>
                       </div>
-                    </div>
-                  </VaCard>
-                </VaScrollContainer>
-              </template>
-            </VaLayout>
-          </template>
-        </VaLayout>
-
+                      <div v-else>
+                        <VaButton preset="secondary" size="small" @click="selectAllClassesForAllDepartments">
+                          {{ selectAllClassesState ? 'Deselect All' : 'Select All' }}
+                        </VaButton>
+                        <div v-for="groupClass in groupClasses" :key="groupClass.id">
+                          <VaCard v-if="groupClass.classes.length > 0">
+                            <VaCard class="flex flex-row">
+                              <VaCard class="cursor-pointer" @click="showDepartmentClasses(groupClass)"
+                                >{{ groupClass.name }} ({{ countDepartmentSelectedClasses(groupClass) }}/{{
+                                  groupClass.classes.length
+                                }})
+                              </VaCard>
+                              <VaButton preset="secondary" size="small" @click="selectAllClasses(groupClass)">
+                                {{ selectedClassesByDepartmentState[groupClass.id] ? 'Deselect All' : 'Select All' }}
+                              </VaButton>
+                            </VaCard>
+                            <VaCard class="grid grid-cols-2 lg:grid-cols-2 gap-1">
+                              <div v-for="classItem in groupClass.classes" :key="classItem.id">
+                                <input
+                                  :id="classItem.id"
+                                  v-model="selectedClasses"
+                                  type="checkbox"
+                                  :value="classItem.id"
+                                  class="mr-1"
+                                />
+                                <label :for="classItem.id">{{ classItem.name }}</label>
+                                <VaChip v-if="currentUserId != classItem.ownerId" outline class="ml-2" size="small">
+                                  Share
+                                </VaChip>
+                              </div>
+                            </VaCard>
+                          </VaCard>
+                        </div>
+                      </div>
+                    </VaCard>
+                  </VaScrollContainer>
+                </template>
+              </VaLayout>
+            </template>
+          </VaLayout>
+        </VaCard>
         <div class="flex flex-col-reverse sm:flex-row mt-4 gap-2 justify-end">
           <VaButton preset="secondary" color="secondary" @click="goBack()">Cancel</VaButton>
           <VaButton type="submit" @click="handleClickUpdate">Save</VaButton>
@@ -358,12 +359,4 @@ onMounted(() => {
   </VaLayout>
 </template>
 
-<style lang="scss" scoped>
-.va-select-content__autocomplete {
-  flex: 1;
-}
-
-.va-input-wrapper__text {
-  gap: 0.2rem;
-}
-</style>
+<style lang="scss" scoped></style>
