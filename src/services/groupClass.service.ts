@@ -52,6 +52,18 @@ class GroupClassService {
         return Promise.reject(error)
       })
   }
+  //=============================
+  //xoa
+  async getGroupClass(): Promise<GroupClass[]> {
+    return apiService
+      .get(`/v1/groupclasses`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new GroupClassService()
