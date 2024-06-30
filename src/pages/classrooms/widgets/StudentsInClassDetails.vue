@@ -77,6 +77,7 @@ const deleteStudent = (rowData: DataTableItem) => {
         message: notifications.deleteSuccessfully('student'),
         color: 'success',
       })
+      emit('load')
     })
     .catch((error) => {
       notify({
@@ -103,7 +104,7 @@ const deleteSelectedStudent = () => {
 const deleteStudentWithConfirm = (student: Student) => {
   confirm({
     title: 'Delete Student',
-    message: `Do you want to delete this student ?`,
+    message: notifications.confirmDelete('student'),
   }).then((agreed) => {
     if (!agreed) {
       return
