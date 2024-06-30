@@ -192,7 +192,8 @@
     "create": "Tạo",
     "update": "Cập nhật",
     "delete": "Xóa",
-    "share": "Chia sẻ"
+    "share": "Chia sẻ",
+    "edit": "Chỉnh sửa"
   },
   "questionFolderTable": {
     "folder_name": "Tên thư mục",
