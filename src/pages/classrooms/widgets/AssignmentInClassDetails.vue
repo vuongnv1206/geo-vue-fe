@@ -92,17 +92,16 @@ const selectedOption = (v: { text: string; value: string }) => {
 
 // Papers data
 const papers = ref([
-  { id: '1', examName: 'Paper 1', createOn: new Date('2024-06-23T03:59:17.437Z') },
-  { id: '2', examName: 'Paper 2', createOn: new Date('2024-06-24T03:59:17.437Z') },
-  { id: '3', examName: 'Paper 3', createOn: new Date('2024-06-25T03:59:17.437Z') },
-  { id: '4', examName: 'Paper 4', createOn: new Date('2024-06-26T03:59:17.437Z') },
-  { id: '5', examName: 'Paper 5', createOn: new Date('2024-06-27T03:59:17.437Z') },
+  { id: '1', examName: 'Paper 1', createOn: '2024-06-30T11:21:35.721019+00:00' },
+  { id: '2', examName: 'Paper 2', createOn: '2024-06-30T11:21:35.721019+00:00' },
+  { id: '3', examName: 'Paper 3', createOn: '2024-06-30T11:21:35.721019+00:00' },
+  { id: '4', examName: 'Paper 4', createOn: '2024-06-30T11:21:35.721019+00:00' },
+  { id: '5', examName: 'Paper 5', createOn: '2024-06-30T11:21:35.721019+00:00' },
 ])
 
 // Combined and grouped data
 const groupedData = computed(() => {
   const groups: { [key: string]: any } = {}
-  // Add assignments to groups
   props.classDetails.assignments.forEach((assignment) => {
     const createOn = format.formatDate(assignment.createdOn)
     if (!groups[createOn]) {
@@ -115,9 +114,8 @@ const groupedData = computed(() => {
     groups[createOn].assignments.push(assignment)
   })
 
-  // Add papers to groups
   papers.value.forEach((paper) => {
-    const createOn = format.formatDate(paper.createOn)
+    const createOn = format.formatDate(new Date(paper.createOn))
     if (!groups[createOn]) {
       groups[createOn] = {
         createOn: paper.createOn,
@@ -128,6 +126,10 @@ const groupedData = computed(() => {
     groups[createOn].papers.push(paper)
   })
 
-  return Object.values(groups)
+  const sortedGroups = Object.values(groups).sort(
+    (a: any, b: any) => (new Date(b.createOn) as any) - (new Date(a.createOn) as any),
+  )
+
+  return sortedGroups
 })
 </script>

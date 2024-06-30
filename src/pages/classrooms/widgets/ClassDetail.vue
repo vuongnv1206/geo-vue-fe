@@ -9,6 +9,8 @@ import { useToast, VaCardContent } from 'vuestic-ui/web-components'
 import { notifications } from '@/services/utils'
 import StudentsInClassDetails from './StudentsInClassDetails.vue'
 import { VaCard } from 'vuestic-ui'
+
+const loading = ref(true)
 const showTabs = ref(false)
 const router = useRouter()
 const { init: notify } = useToast()
@@ -35,17 +37,21 @@ const defaultClassDetails: Classrooms = {
 const classDetails = ref({ ...defaultClassDetails })
 
 const getClassById = async () => {
+  loading.value = true
   classStore
     .getClassById(classId)
     .then((response) => {
       classDetails.value = response
-      console.log('classDetails:', classDetails.value)
+      // console.log('classDetails:', classDetails.value)
     })
     .catch((error) => {
       notify({
         message: notifications.getFailed(`class with id ${classId}`) + error.message,
         color: 'error',
       })
+    })
+    .finally(() => {
+      loading.value = false
     })
 }
 
@@ -88,7 +94,12 @@ onMounted(() => {
               {{ currentTab.title }}
             </VaCardContent>
           </VaCard>
-          <StudentsInClassDetails v-if="currentTab.title === 'Student list'" :students="classDetails.students" />
+          <StudentsInClassDetails
+            v-if="currentTab.title === 'Student list'"
+            :students="classDetails.students"
+            :loading="loading"
+            @load="getClassById"
+          />
           <AssignmentInClassDetails v-if="currentTab.title === 'Assignment & Exam'" :class-details="classDetails" />
           <NewsInClassDetails v-if="currentTab.title === 'News board'" />
         </VaCard>
