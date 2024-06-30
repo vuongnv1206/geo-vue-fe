@@ -11,10 +11,17 @@ const props = defineProps({
     type: Array as PropType<Student[]>,
     required: true,
   },
+  loading: {
+    type: Boolean,
+    required: true,
+  },
 })
 
+const emit = defineEmits<{
+  (event: 'load'): void
+}>()
+
 const editFormRef = ref()
-// const loading = ref(true)
 const { confirm } = useModal()
 const { init: notify } = useToast()
 const studentStore = useStudentStore()
@@ -115,6 +122,7 @@ const onStudentSaved = async (student: Student) => {
           message: notifications.updatedSuccessfully('student'),
           color: 'success',
         })
+        emit('load')
       })
       .catch((error) => {
         notify({
@@ -130,6 +138,7 @@ const onStudentSaved = async (student: Student) => {
           message: notifications.createSuccessfully('student'),
           color: 'success',
         })
+        emit('load')
       })
       .catch((error) => {
         notify({
@@ -157,6 +166,7 @@ const onStudentSaved = async (student: Student) => {
         :columns="columns"
         select-mode="multiple"
         :items="props.students"
+        :loading="props.loading"
         :disable-client-side-sorting="false"
         @selectionChange="handleSelectionChange($event.currentSelectedItems)"
         @delete="deleteStudentWithConfirm"
