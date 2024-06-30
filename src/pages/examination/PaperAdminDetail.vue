@@ -39,17 +39,18 @@ const getPaperDetail = async () => {
     })
   }
 }
+const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
 
 const groupClasses = ref<GroupClass[]>([])
 const groupClassStores = useGroupClassStore()
 const getGroupClasses = async () => {
   try {
-    const res = await groupClassStores.getGroupClass()
+    const res = await groupClassStores.getGroupClasses(groupClassFilter)
     if (paperDetail.value?.paperAccesses) {
       paperDetail.value.paperAccesses
         .filter((element) => element.classId !== null)
         .forEach((element) => {
-          res.forEach((groupClass) => {
+          res.data.forEach((groupClass) => {
             if (groupClass.classes.some((x) => x.id === element.classId)) {
               if (!groupClasses.value.some((existingGroupClass) => existingGroupClass.id === groupClass.id)) {
                 groupClasses.value.push(groupClass)
