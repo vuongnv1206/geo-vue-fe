@@ -227,6 +227,15 @@ const shareQuestionTree = (questionTree: QuestionTree) => {
         hasPermission = true
       }
     }
+    if (permission.groupTeacher?.teacherTeams) {
+      permission.groupTeacher.teacherTeams.forEach((teacherTeam) => {
+        if (teacherTeam.teacherId == currentUserId) {
+          if (permission.canShare) {
+            hasPermission = true
+          }
+        }
+      })
+    }
   })
 
   if (!hasPermission) {
