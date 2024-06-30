@@ -36,13 +36,12 @@ const defaultClassDetails: Classrooms = {
 }
 const classDetails = ref({ ...defaultClassDetails })
 
-const getClassById = async () => {
+const getClassById = () => {
   loading.value = true
   classStore
     .getClassById(classId)
     .then((response) => {
       classDetails.value = response
-      // console.log('classDetails:', classDetails.value)
     })
     .catch((error) => {
       notify({
