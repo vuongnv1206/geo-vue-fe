@@ -130,10 +130,12 @@ const getClassByGroupClass = (groupId: string) => {
 }
 
 const groupClassStores = useGroupClassStore()
+const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
+
 const getGroupClasses = async () => {
   try {
-    const res = await groupClassStores.getGroupClass()
-    groupClasses.value = res
+    const res = await groupClassStores.getGroupClasses(groupClassFilter)
+    groupClasses.value = res.data
   } catch (error) {
     console.error(error)
   }
@@ -216,15 +218,15 @@ onMounted(() => {
           <div class="grid grid-cols-2">
             <VaInput
               v-model="editPaper.examName"
-              :rules="[(value) => (value && value.length > 0) || 'Exam name is required']"
+              :rules="[(value: any) => (value && value.length > 0) || 'Exam name is required']"
               label="Exam name"
               class="mb-2 col-span-2"
             />
-            <VaSelect :rules="[(v) => v || 'Field is required']" label="Subject" class="mb-2 pl-1" />
+            <VaSelect :rules="[(v: any) => v || 'Field is required']" label="Subject" class="mb-2 pl-1" />
             <VaCounter
               v-model="editPaper.duration"
               label="Test duration (minutes)"
-              :rules="[(v) => v >= 0 || 'Field is required']"
+              :rules="[(v: any) => v >= 0 || 'Field is required']"
               manual-input
               class="mb-2 w-full pl-1"
             />
