@@ -75,16 +75,6 @@ class ClassService {
         return Promise.reject(error)
       })
   }
-  async getClassroomByGroupClassId(id: string): Promise<Classrooms[]> {
-    return apiService
-      .get(`/v1/class/get-class-by-group-class?groupClassId=${id}`)
-      .then((response) => {
-        return Promise.resolve(response.data)
-      })
-      .catch((error) => {
-        return Promise.reject(error)
-      })
-  }
   async getClassroomByUser(): Promise<Classrooms[]> {
     return apiService
       .get(`/v1/class`)
