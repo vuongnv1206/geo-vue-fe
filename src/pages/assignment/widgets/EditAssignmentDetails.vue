@@ -204,7 +204,7 @@ onMounted(() => {
     </template>
     <template #content>
       <VaDivider />
-      <VaForm ref="form" class="gap-2 mx-auto" style="max-width: 900px">
+      <VaForm ref="form" class="max-w-4xl mx-auto px-4">
         <VaCardTitle>Global Setting</VaCardTitle>
         <VaCard class="p-2 flex flex-col gap-2">
           <VaInput
@@ -213,6 +213,7 @@ onMounted(() => {
             placeholder="Enter assignment name"
             :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
           />
+          <VaCardTitle class="text-sm text-gray-700">Start and End Time</VaCardTitle>
           <VueDatePicker
             v-model="date"
             range
@@ -230,7 +231,7 @@ onMounted(() => {
           <VaSwitch v-model="newAssignmentDetails.requireLoginToSubmit" size="small" label="Require Login to Submit" />
           <VaLayout class="border rounded-xl pb-4 px-2">
             <template #left>
-              <VaSidebar v-model="showSidebar" class="mt-2 mr-1 border rounded">
+              <VaSidebar v-model="showSidebar" class="mt-2 rounded" :class="showSidebar ? 'border mr-1' : ''">
                 <VaCard class="mt-1 mx-1">
                   <VaInput placeholder="Search">
                     <template #appendInner>

@@ -5,7 +5,7 @@ import AssignmentInClassDetails from './AssignmentInClassDetails.vue'
 import NewsInClassDetails from './NewsInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
-import { useToast } from 'vuestic-ui/web-components'
+import { useToast, VaCardContent } from 'vuestic-ui/web-components'
 import { notifications } from '@/services/utils'
 import StudentsInClassDetails from './StudentsInClassDetails.vue'
 import { VaCard } from 'vuestic-ui'
@@ -80,12 +80,14 @@ onMounted(() => {
     </template>
 
     <template #content>
-      <VaCard class="mt-2">
-        <VaCard class="flex-1 min-h-80 p-2">
-          <VaButton :icon="showTabs ? 'menu_open' : 'menu'" @click="showTabs = !showTabs" />
-          <VaCardTitle>
-            {{ currentTab.title }}
-          </VaCardTitle>
+      <VaCard class="mt-2 min-h-80">
+        <VaCard class="pl-2">
+          <VaCard class="flex flex-row pl-2">
+            <VaButton :icon="showTabs ? 'menu_open' : 'menu'" preset="plain" @click="showTabs = !showTabs" />
+            <VaCardContent>
+              {{ currentTab.title }}
+            </VaCardContent>
+          </VaCard>
           <StudentsInClassDetails v-if="currentTab.title === 'Student list'" :students="classDetails.students" />
           <AssignmentInClassDetails v-if="currentTab.title === 'Assignment & Exam'" :class-details="classDetails" />
           <NewsInClassDetails v-if="currentTab.title === 'News board'" />

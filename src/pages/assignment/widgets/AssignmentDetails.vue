@@ -63,7 +63,7 @@
       </VaSidebar>
     </template>
     <template #top>
-      <VaNavbar class="py-1">
+      <VaNavbar class="py-1 rounded">
         <template #left>
           <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
         </template>
