@@ -1,3 +1,145 @@
+<script lang="ts" setup>
+import { onMounted, ref, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent } from '../types'
+import { useBreakpoint, useModal, useToast, VaCard, VaList, VaListItemSection } from 'vuestic-ui'
+import { format, notifications } from '@/services/utils'
+import { useClassStore } from '@/stores/modules/class.module'
+import EditAssignmentContent from './EditAssignmentContent.vue'
+import { Student } from '@/pages/classrooms/types'
+
+const loading = ref(true)
+const router = useRouter()
+const stores = useAssignmentStore()
+const classStores = useClassStore()
+const breakpoints = useBreakpoint()
+const { init: notify } = useToast()
+const showSidebar = ref(breakpoints.smUp)
+const assignment = ref<Assignment | null>(null)
+const assignmentContent = ref<AssignmentContent | null>(null)
+const students = ref<Student[]>([])
+const assignmentId = router.currentRoute.value.params.id.toString()
+const classId = router.currentRoute.value.params.classId.toString()
+const assignmentClass = ref<AssignmentClass>({
+  assignmentId: assignmentId,
+  classesdId: classId,
+})
+const doShowFormModal = ref(false)
+const editFormRef = ref()
+const { confirm } = useModal()
+
+const getAssignment = (id: string) => {
+  loading.value = true
+  stores
+    .getAssignment(id)
+    .then((response) => {
+      assignment.value = response
+      if (assignment.value?.content == '<p><br></p>') {
+        assignment.value.content = ''
+      }
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('assignment') + error.message,
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getClassById = async () => {
+  loading.value = true
+  classStores
+    .getClassById(classId)
+    .then((response) => {
+      students.value = response.students
+      console.log('Students:', students.value)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(`class with id ${classId}`) + error.message,
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
+  classStores
+    .removeAssignmentFromClass(assignmentClass)
+    .then(() => {
+      router.push({ name: 'assignments' })
+      notify({
+        message: notifications.deleteSuccessfully('assignment'),
+        color: 'success',
+      })
+    })
+    .catch((error) => {
+      notify({
+        message:
+          notifications.deleteFailed(assignment.value?.name ? assignment.value.name : 'assignment') + error.message,
+        color: 'error',
+      })
+    })
+}
+
+const beforeEditFormModalClose = async (hide: () => unknown) => {
+  if (editFormRef.value.isFormHasUnsavedChanges) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: notifications.unsavedChanges,
+      size: 'small',
+    })
+    if (agreed) {
+      hide()
+    }
+  } else {
+    hide()
+  }
+}
+
+const onAssignmentContent = async (assignmentContent: AssignmentContent) => {
+  console.log('Assignment content:', assignmentContent)
+  doShowFormModal.value = false
+  if (assignmentContent.id != '') {
+    stores
+      .updateAssignment(assignmentContent.id, assignmentContent as EmptyAssignmentContent)
+      .then(() => {
+        notify({
+          message: notifications.updatedSuccessfully('assignment content'),
+          color: 'success',
+        })
+        getAssignment(assignmentContent.id)
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.updateFailed('assignment content') + error.message,
+          color: 'error',
+        })
+      })
+  }
+}
+
+const editAssignmentContent = (assContent: AssignmentContent) => {
+  assignmentContent.value = assContent
+  doShowFormModal.value = true
+}
+
+watchEffect(() => {
+  showSidebar.value = breakpoints.smUp
+})
+
+onMounted(() => {
+  getClassById()
+  getAssignment(assignmentId)
+})
+</script>
+
 <template>
   <VaLayout>
     <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'assignments' }" />
@@ -81,15 +223,17 @@
       </VaNavbar>
     </template>
     <template #content>
-      <main class="p-4">
-        <h3 class="text-xl font-bold">Page content</h3>
-        <p>
-          Page content must be wrapped in main tag. You must do it manually. Here you can place any blocks you need in
-          your application.
-        </p>
-        <p>For example, you can place here your router view, add sidebar with navigation in #left slot.</p>
-        <p>If you're using VaSidebar for page navigation don't forget to wrap it in nav tag.</p>
-      </main>
+      <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+        <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
+          <VaListItemSection avatar>
+            <VaAvatar :src="student.avatar" />
+          </VaListItemSection>
+          <VaListItemSection>
+            <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
+            <VaListItemLabel caption> đã nộp/chưa nôp </VaListItemLabel>
+          </VaListItemSection>
+        </VaListItem>
+      </VaList>
     </template>
   </VaLayout>
 
@@ -117,121 +261,5 @@
     />
   </VaModal>
 </template>
-
-<script lang="ts" setup>
-import { onMounted, ref, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent } from '../types'
-import { useBreakpoint, useModal, useToast } from 'vuestic-ui'
-import { format, notifications } from '@/services/utils'
-import { useClassStore } from '@/stores/modules/class.module'
-import EditAssignmentContent from './EditAssignmentContent.vue'
-
-const router = useRouter()
-const stores = useAssignmentStore()
-const classStores = useClassStore()
-const breakpoints = useBreakpoint()
-const { init: notify } = useToast()
-const showSidebar = ref(breakpoints.smUp)
-const assignment = ref<Assignment | null>(null)
-const assignmentContent = ref<AssignmentContent | null>(null)
-
-const assignmentId = router.currentRoute.value.params.id.toString()
-const classId = router.currentRoute.value.params.classId.toString()
-const assignmentClass = ref<AssignmentClass>({
-  assignmentId: assignmentId,
-  classesdId: classId,
-})
-const doShowFormModal = ref(false)
-const editFormRef = ref()
-const { confirm } = useModal()
-
-const getAssignment = (id: string) => {
-  stores
-    .getAssignment(id)
-    .then((response) => {
-      assignment.value = response
-      if (assignment.value?.content == '<p><br></p>') {
-        assignment.value.content = ''
-      }
-    })
-    .catch((error) => {
-      notify({
-        message: notifications.getFailed('assignment') + error.message,
-        color: 'error',
-      })
-    })
-}
-
-const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
-  classStores
-    .removeAssignmentFromClass(assignmentClass)
-    .then(() => {
-      router.push({ name: 'assignments' })
-      notify({
-        message: notifications.deleteSuccessfully('assignment'),
-        color: 'success',
-      })
-    })
-    .catch((error) => {
-      notify({
-        message:
-          notifications.deleteFailed(assignment.value?.name ? assignment.value.name : 'assignment') + error.message,
-        color: 'error',
-      })
-    })
-}
-
-const beforeEditFormModalClose = async (hide: () => unknown) => {
-  if (editFormRef.value.isFormHasUnsavedChanges) {
-    const agreed = await confirm({
-      maxWidth: '380px',
-      message: notifications.unsavedChanges,
-      size: 'small',
-    })
-    if (agreed) {
-      hide()
-    }
-  } else {
-    hide()
-  }
-}
-
-const onAssignmentContent = async (assignmentContent: AssignmentContent) => {
-  console.log('Assignment content:', assignmentContent)
-  doShowFormModal.value = false
-  if (assignmentContent.id != '') {
-    stores
-      .updateAssignment(assignmentContent.id, assignmentContent as EmptyAssignmentContent)
-      .then(() => {
-        notify({
-          message: notifications.updatedSuccessfully('assignment content'),
-          color: 'success',
-        })
-        getAssignment(assignmentContent.id)
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.updateFailed('assignment content') + error.message,
-          color: 'error',
-        })
-      })
-  }
-}
-
-const editAssignmentContent = (assContent: AssignmentContent) => {
-  assignmentContent.value = assContent
-  doShowFormModal.value = true
-}
-
-watchEffect(() => {
-  showSidebar.value = breakpoints.smUp
-})
-
-onMounted(() => {
-  getAssignment(assignmentId)
-})
-</script>
 
 <style lang="scss" scoped></style>
