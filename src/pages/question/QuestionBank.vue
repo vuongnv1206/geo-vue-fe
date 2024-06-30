@@ -412,7 +412,7 @@ onMounted(() => {
     @leftOverlayClick="isSidebarVisibleChild = false"
   >
     <template #top>
-      <VaNavbar class="py-2">
+      <VaNavbar class="py-2 rounded">
         <template #left>
           <VaButton
             size="small"
