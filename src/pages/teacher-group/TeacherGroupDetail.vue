@@ -161,12 +161,14 @@ const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
 }
 
 const groupClasses = ref<GroupClass[]>([])
-const value = ref([])
+const valueAccordion = ref([])
+
+const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
 
 const getGroupClasses = async () => {
   try {
-    const res = await groupClassStores.getGroupClass()
-    groupClasses.value = res
+    const res = await groupClassStores.getGroupClasses(groupClassFilter)
+    groupClasses.value = res.data
     initializeCheckedPermissions()
   } catch (error) {
     const message = getErrorMessage(error)
@@ -316,6 +318,11 @@ const filteredGroupClasses = computed(() => {
     })
     .filter((groupClass) => groupClass.classes.length > 0)
 })
+
+watch(searchQuery, () => {
+  accordionKey.value += 1
+})
+const accordionKey = ref(0)
 </script>
 
 <template>
@@ -382,8 +389,8 @@ const filteredGroupClasses = computed(() => {
             <VaInput v-model="searchQuery" placeholder="search class" />
           </VaCardContent>
           <VaScrollContainer vertical>
-            <VaAccordion v-model="value" class="max-W-sm mb-3 max-h-[60vh]" multiple>
-              <VaCollapse v-for="groupClass in filteredGroupClasses" :key="groupClass.id" :header="groupClass.name">
+            <VaAccordion :key="accordionKey" v-model="valueAccordion" class="max-W-sm mb-3 max-h-[60vh]" multiple>
+              <VaCollapse v-for="(groupClass, index) in filteredGroupClasses" :key="index" :header="groupClass.name">
                 <template #content>
                   <div class="grid md:grid-cols-4 sm:grid-cols-3 gap-3">
                     <div v-for="classRoom in groupClass.classes" :key="classRoom.id">

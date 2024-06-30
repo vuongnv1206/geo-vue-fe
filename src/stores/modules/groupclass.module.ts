@@ -59,16 +59,5 @@ export const useGroupClassStore = defineStore('groupClass', {
     },
 
     //==============================
-    // xoa
-    async getGroupClass(): Promise<GroupClass[]> {
-      return groupClassService
-        .getGroupClass()
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
   },
 })
