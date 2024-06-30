@@ -13,28 +13,53 @@ const props = defineProps({
   },
 })
 
-const studentStore = useStudentStore()
+const editFormRef = ref()
 // const loading = ref(true)
-const { init: notify } = useToast()
 const { confirm } = useModal()
+const { init: notify } = useToast()
+const studentStore = useStudentStore()
+const doShowStudentFormModal = ref(false)
 const selectedItemsEmitted = ref<Student[]>([])
 const studentToEdit = ref<Student | null>(null)
-const doShowStudentFormModal = ref(false)
-const editFormRef = ref()
 
 const columns = defineVaDataTableColumns([
   { label: 'Student Code', key: 'studentCode', sortable: true },
   { label: 'First Name', key: 'firstName', sortable: true },
   { label: 'Last Name', key: 'lastName', sortable: true },
   { label: 'Email', key: 'email', sortable: true },
-  { label: 'Date of Birth', key: 'dob', sortable: true },
+  { label: 'Date of Birth', key: 'dateOfBirth', sortable: true },
   { label: 'Gender', key: 'gender', sortable: true },
   { label: 'Phone Number', key: 'phoneNumber', sortable: true },
   { label: ' ', key: 'actions' },
 ])
 
+const createNewStudent = () => {
+  studentToEdit.value = null
+  doShowStudentFormModal.value = true
+}
+
+const editStudent = (rowData: DataTableItem) => {
+  studentToEdit.value = rowData as Student
+  doShowStudentFormModal.value = true
+}
+
 const handleSelectionChange = (selectedItems: Student[]) => {
   selectedItemsEmitted.value = selectedItems
+}
+
+const beforeEditFormModalClose = async (hide: () => unknown) => {
+  if (editFormRef.value.isFormHasUnsavedChanges) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: notifications.unsavedChanges,
+      size: 'small',
+    })
+    if (agreed) {
+      hide()
+    }
+  } else {
+    hide()
+  }
 }
 
 const deleteStudent = (rowData: DataTableItem) => {
@@ -68,15 +93,6 @@ const deleteSelectedStudent = () => {
   })
 }
 
-const createNewStudent = () => {
-  studentToEdit.value = null
-  doShowStudentFormModal.value = true
-}
-
-const editStudent = (rowData: DataTableItem) => {
-  studentToEdit.value = rowData as Student
-  doShowStudentFormModal.value = true
-}
 const deleteStudentWithConfirm = (student: Student) => {
   confirm({
     title: 'Delete Student',
@@ -89,24 +105,8 @@ const deleteStudentWithConfirm = (student: Student) => {
   })
 }
 
-const beforeEditFormModalClose = async (hide: () => unknown) => {
-  if (editFormRef.value.isFormHasUnsavedChanges) {
-    const agreed = await confirm({
-      maxWidth: '380px',
-      message: notifications.unsavedChanges,
-      size: 'small',
-    })
-    if (agreed) {
-      hide()
-    }
-  } else {
-    hide()
-  }
-}
-
 const onStudentSaved = async (student: Student) => {
   doShowStudentFormModal.value = false
-  console.log('student data: ', student)
   if (student.id) {
     studentStore
       .updateStudent(student.id, student as EmptyStudent)

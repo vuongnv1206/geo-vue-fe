@@ -4,6 +4,9 @@ import { computed, reactive, ref, watch } from 'vue'
 import { EmptyStudent, Student } from '../types'
 import { useRouter } from 'vue-router'
 
+const router = useRouter()
+const classId = router.currentRoute.value.params.id.toString()
+
 const props = defineProps<{
   student: Student | null
   saveButtonLabel: string
@@ -19,17 +22,15 @@ const defaultNewStudent: EmptyStudent = {
   firstName: '',
   lastName: '',
   email: '',
-  // dob: new Date(),
+  dateOfBirth: new Date(),
   gender: false,
   phoneNumber: '',
   classesId: '',
 }
 
 const newStudent = ref({ ...defaultNewStudent })
-
-const router = useRouter()
-const classId = router.currentRoute.value.params.id.toString()
 newStudent.value.classesId = classId
+
 const isFormHasUnsavedChanges = computed(() => {
   return Object.keys(newStudent.value).some((key) => {
     return (
@@ -85,7 +86,7 @@ const genderOptions = reactive([
       placeholder="Enter your student code"
       :rules="[validators.required2('Student code'), validators.maxLength(50)]"
     />
-    <!-- <VaDateInput v-model="newStudent.dob" label="Birth date" placeholder="Enter your date of birth" /> -->
+    <VaDateInput v-model="newStudent.dateOfBirth" label="Birth date" placeholder="Enter your date of birth" />
     <VaRadio v-model="newStudent.gender" :options="genderOptions" value-by="value" />
     <VaInput
       v-model="newStudent.phoneNumber"

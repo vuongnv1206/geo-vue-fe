@@ -29,7 +29,7 @@ export type Classrooms = {
   groupClassName: string
   numberUserOfClass: number
   assignments: Assignment[]
-  userStudents: Student[]
+  students: Student[]
 }
 
 export type ClassResponse = {
@@ -60,7 +60,7 @@ export type Student = {
   firstName: string
   lastName: string
   email: string
-  // dob: Date
+  dateOfBirth: Date
   gender: boolean
   phoneNumber: string
   avatar: string
@@ -72,7 +72,7 @@ export type EmptyStudent = {
   firstName: string
   lastName: string
   email: string
-  // dob: Date
+  dateOfBirth: Date
   gender: boolean
   phoneNumber: string
   classesId: string

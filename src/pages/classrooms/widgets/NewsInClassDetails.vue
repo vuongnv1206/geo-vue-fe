@@ -118,7 +118,7 @@ import { ref } from 'vue'
 import CommentInNews from './CommentInNews.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { VaCard, VaDivider } from 'vuestic-ui/web-components'
-import { Comment, EmptyComent, Post } from '../types'
+import { Comment, EmptyComment, Post } from '../types'
 
 const posts = ref<Post[]>([])
 const postId = ref<string | null>(null)
@@ -180,7 +180,7 @@ const cancelReply = () => {
 const submitReply = (postId: string, parentId: string, content: string) => {
   const post = posts.value.find((p) => p.id === postId)
   if (post) {
-    const newComment: EmptyComent = {
+    const newComment: EmptyComment = {
       userId: currentUserId,
       postId: postId,
       content: content,
