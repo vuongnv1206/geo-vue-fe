@@ -3,7 +3,7 @@ import ApiService from '@services/api.service'
 
 class StudentService {
   async getStudents(data: any): Promise<any> {
-    return ApiService.post('/v1/userstudent/search', data)
+    return ApiService.post('/v1/student/search', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -12,7 +12,7 @@ class StudentService {
       })
   }
   async getStudent(id: string): Promise<any> {
-    return ApiService.get(`/v1/userstudent/${id}`)
+    return ApiService.get(`/v1/student/${id}`)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -21,7 +21,7 @@ class StudentService {
       })
   }
   async createStudent(data: EmptyStudent): Promise<any> {
-    return ApiService.post('/v1/userstudent', data)
+    return ApiService.post('/v1/student', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -30,7 +30,7 @@ class StudentService {
       })
   }
   async updateStudent(id: string, data: EmptyStudent): Promise<any> {
-    return ApiService.put(`/v1/userstudent/student-in-class/${id}`, data)
+    return ApiService.put(`/v1/student/student-in-class/${id}`, data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -39,7 +39,7 @@ class StudentService {
       })
   }
   async updateStudentInClass(id: string, data: EmptyStudent): Promise<any> {
-    return ApiService.put(`/v1/userstudent/student-in-class/${id}`, data)
+    return ApiService.put(`/v1/student/student-in-class/${id}`, data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -49,7 +49,7 @@ class StudentService {
   }
 
   async deleteStudent(id: string): Promise<any> {
-    return ApiService.delete(`/v1/userstudent/remove-user-student/?id=${id}`)
+    return ApiService.delete(`/v1/student/${id}`)
       .then((response) => {
         return Promise.resolve(response)
       })

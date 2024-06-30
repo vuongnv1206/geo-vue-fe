@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
-import { EmptySubject, Subject, SubjectResponse } from '@pages/subject/types'
-import subjectService from '@/services/subject.service'
+import { EmptyComment, Comment, CommentResponse } from '@pages/classrooms/types'
+import subjectService from '@/services/comments.service'
 
-export const useSubjectStore = defineStore('subject', {
+export const useCommentStore = defineStore('subject', {
   state: () => ({}),
   actions: {
-    async getSubjects(data: any): Promise<SubjectResponse> {
+    async getComments(data: any): Promise<CommentResponse> {
       return subjectService
-        .getSubjects(data)
+        .getComments(data)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -15,9 +15,9 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async getSubject(id: string): Promise<Subject> {
+    async getComment(id: string): Promise<Comment> {
       return subjectService
-        .getSubject(id)
+        .getComment(id)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -25,9 +25,9 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async createSubject(data: EmptySubject): Promise<any> {
+    async createComment(data: EmptyComment): Promise<any> {
       return subjectService
-        .createSubject(data)
+        .createComment(data)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -35,9 +35,9 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async updateSubject(id: string, data: EmptySubject): Promise<any> {
+    async updateComment(id: string, data: EmptyComment): Promise<any> {
       return subjectService
-        .updateSubject(id, data)
+        .updateComment(id, data)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -45,9 +45,9 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async deleteSubject(id: string): Promise<any> {
+    async deleteComment(id: string): Promise<any> {
       return subjectService
-        .deleteSubject(id)
+        .deleteComment(id)
         .then((response) => {
           return Promise.resolve(response)
         })

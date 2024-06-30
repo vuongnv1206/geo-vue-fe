@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
-import { EmptySubject, Subject, SubjectResponse } from '@pages/subject/types'
-import subjectService from '@/services/subject.service'
+import { EmptyPost, Post, PostResponse } from '@pages/classrooms/types'
+import subjectService from '@/services/posts.service'
 
-export const useSubjectStore = defineStore('subject', {
+export const usePostStore = defineStore('subject', {
   state: () => ({}),
   actions: {
-    async getSubjects(data: any): Promise<SubjectResponse> {
+    async getPosts(data: any): Promise<PostResponse> {
       return subjectService
-        .getSubjects(data)
+        .getPosts(data)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -15,9 +15,9 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async getSubject(id: string): Promise<Subject> {
+    async getPost(id: string): Promise<Post> {
       return subjectService
-        .getSubject(id)
+        .getPost(id)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -25,9 +25,9 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async createSubject(data: EmptySubject): Promise<any> {
+    async createPost(data: EmptyPost): Promise<any> {
       return subjectService
-        .createSubject(data)
+        .createPost(data)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -35,9 +35,9 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async updateSubject(id: string, data: EmptySubject): Promise<any> {
+    async updatePost(id: string, data: EmptyPost): Promise<any> {
       return subjectService
-        .updateSubject(id, data)
+        .updatePost(id, data)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -45,9 +45,9 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async deleteSubject(id: string): Promise<any> {
+    async deletePost(id: string): Promise<any> {
       return subjectService
-        .deleteSubject(id)
+        .deletePost(id)
         .then((response) => {
           return Promise.resolve(response)
         })
