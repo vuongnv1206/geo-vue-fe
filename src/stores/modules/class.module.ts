@@ -78,17 +78,6 @@ export const useClassStore = defineStore('class', {
           return Promise.reject(error)
         })
     },
-    async getClassroomByGroupClassId(id: string): Promise<Classrooms[]> {
-      return classService
-        .getClassroomByGroupClassId(id)
-        .then((response) => {
-          return Promise.resolve(response)
-        })
-        .catch((error) => {
-          return Promise.reject(error)
-        })
-    },
-
     async getClassroomByUser(): Promise<Classrooms[]> {
       return classService
         .getClassroomByUser()

@@ -40,12 +40,13 @@ const getGroupClasses = async () => {
 const checkedPermissionsClassAccess = ref<string[]>([])
 const classRoomsInGroup = ref<Classrooms[]>([])
 const selectedGroupClass = ref<string>('')
-
+const classFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'], groupClassId: '' })
 const getClassByGroupClass = (groupId: string) => {
+  classFilter.value.groupClassId = groupId
   classStores
-    .getClassroomByGroupClassId(groupId)
+    .getClasses(classFilter.value)
     .then((res) => {
-      classRoomsInGroup.value = res
+      classRoomsInGroup.value = res.data
       selectedGroupClass.value = groupId
     })
     .catch((error) => {

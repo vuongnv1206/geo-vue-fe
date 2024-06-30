@@ -113,12 +113,14 @@ const accessOptions = [
 const groupClasses = ref<GroupClass[] | null>(null)
 const classRoomsInGroup = ref<Classrooms[]>([])
 const selectedGroupClass = ref<string>('')
+const classFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'], groupClassId: '' })
 
-const getClassByGroupClass = (groupId: string) => {
-  classStores
-    .getClassroomByGroupClassId(groupId)
+const getClassByGroupClass = async (groupId: string) => {
+  classFilter.value.groupClassId = groupId
+  await classStores
+    .getClasses(classFilter.value)
     .then((res) => {
-      classRoomsInGroup.value = res
+      classRoomsInGroup.value = res.data
       selectedGroupClass.value = groupId
     })
     .catch((error) => {
