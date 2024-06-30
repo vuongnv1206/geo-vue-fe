@@ -95,7 +95,7 @@ onMounted(() => {
       v-model="newClass.name"
       label="Class name"
       placeholder="Enter class name"
-      :rules="[validators.required2('Class name'), validators.isCharacter('Class name'), validators.maxLength(50)]"
+      :rules="[validators.required2('Class name'), validators.maxLength(50)]"
     />
     <VaInput
       v-model="newClass.schoolYear"
