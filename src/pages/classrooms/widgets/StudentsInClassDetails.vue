@@ -2,7 +2,7 @@
 import { PropType, ref } from 'vue'
 import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
 import { EmptyStudent, Student } from '../types'
-import { notifications, getErrorMessage } from '@/services/utils'
+import { notifications, getErrorMessage, format } from '@/services/utils'
 import { useStudentStore } from '@/stores/modules/student.module'
 import EditStudent from './EditStudent.vue'
 
@@ -161,6 +161,11 @@ const onStudentSaved = async (student: Student) => {
         @selectionChange="handleSelectionChange($event.currentSelectedItems)"
         @delete="deleteStudentWithConfirm"
       >
+        <template #cell(dateOfBirth)="{ rowData }">
+          <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+            <div>{{ format.formatDate(rowData.dateOfBirth) }}</div>
+          </div>
+        </template>
         <template #cell(actions)="{ rowData }">
           <div class="flex gap-2 justify-end">
             <VaButton
