@@ -5,10 +5,11 @@ import AssignmentInClassDetails from './AssignmentInClassDetails.vue'
 import NewsInClassDetails from './NewsInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
-import { useToast } from 'vuestic-ui/web-components'
+import { useToast, VaCardContent } from 'vuestic-ui/web-components'
 import { notifications } from '@/services/utils'
 import StudentsInClassDetails from './StudentsInClassDetails.vue'
-
+import { VaCard } from 'vuestic-ui'
+const showTabs = ref(false)
 const router = useRouter()
 const { init: notify } = useToast()
 const classStore = useClassStore()
@@ -55,30 +56,43 @@ onMounted(() => {
 
 <template>
   <VaLayout>
-    <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'classroom' }" />
-  </VaLayout>
-  <VaDivider />
-  <VaCard class="flex">
-    <VaCard class="w-1/6 mt-3">
-      <VaTabs v-model="selectedTab" vertical grow class="mr">
-        <template #tabs>
-          <VaTab v-for="tab in tabs" :key="tab.title" :name="tab.title">
-            <VaIcon :name="tab.icon" class="mr-2" />
-            {{ tab.title }}
-          </VaTab>
+    <template #top>
+      <VaNavbar class="py-2 rounded">
+        <template #left>
+          <VaLayout>
+            <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'classroom' }" />
+          </VaLayout>
         </template>
-      </VaTabs>
-    </VaCard>
+      </VaNavbar>
+    </template>
 
-    <VaDivider vertical class="" />
+    <template #left>
+      <VaCard class="mt-2" :class="showTabs ? 'mr-2' : ''">
+        <VaTabs v-if="showTabs" v-model="selectedTab" vertical grow class="p-2">
+          <template #tabs>
+            <VaTab v-for="tab in tabs" :key="tab.title" :name="tab.title">
+              <VaIcon :name="tab.icon" class="mr-2" />
+              {{ tab.title }}
+            </VaTab>
+          </template>
+        </VaTabs>
+      </VaCard>
+    </template>
 
-    <VaCard class="flex-1 min-h-80">
-      <VaCardTitle>
-        {{ currentTab.title }}
-      </VaCardTitle>
-      <StudentsInClassDetails v-if="currentTab.title === 'Student list'" :students="classDetails.students" />
-      <AssignmentInClassDetails v-if="currentTab.title === 'Assignment & Exam'" :class-details="classDetails" />
-      <NewsInClassDetails v-if="currentTab.title === 'News board'" />
-    </VaCard>
-  </VaCard>
+    <template #content>
+      <VaCard class="mt-2 min-h-80">
+        <VaCard class="pl-2">
+          <VaCard class="flex flex-row pl-2">
+            <VaButton :icon="showTabs ? 'menu_open' : 'menu'" preset="plain" @click="showTabs = !showTabs" />
+            <VaCardContent>
+              {{ currentTab.title }}
+            </VaCardContent>
+          </VaCard>
+          <StudentsInClassDetails v-if="currentTab.title === 'Student list'" :students="classDetails.students" />
+          <AssignmentInClassDetails v-if="currentTab.title === 'Assignment & Exam'" :class-details="classDetails" />
+          <NewsInClassDetails v-if="currentTab.title === 'News board'" />
+        </VaCard>
+      </VaCard>
+    </template>
+  </VaLayout>
 </template>

@@ -39,7 +39,7 @@
     <VaCardContent class="font-bold">All</VaCardContent>
     <VaCard class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <template v-for="assClass in props.assignmentsByClass" :key="assClass.id">
-        <VaCard v-if="assClass.assignments.length > 0" class="border p-4 rounded">
+        <VaCard v-if="assClass.assignments.length > 0" class="border p-4 pb-0 rounded">
           <div class="flex justify-between items-center mb-4">
             <span class="font-semibold">{{ assClass.name }}</span>
             <VaChip v-if="currentUserId != assClass.ownerId" outline class="ml-2" size="small"> Share </VaChip>
