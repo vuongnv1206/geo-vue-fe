@@ -100,11 +100,21 @@ export type Comment = {
   comments?: Comment[]
 }
 
-export type EmptyComent = {
+export type EmptyComment = {
   userId: string
   postId: string
   content: string
   parentId: string
+}
+
+export type CommentResponse = {
+  data: Comment[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
 
 export type Post = {
@@ -117,4 +127,20 @@ export type Post = {
   user: Student
   comments: Comment[]
   showComments: boolean
+}
+
+export type EmptyPost = {
+  userId: string
+  content: string
+  isLockComment: boolean
+}
+
+export type PostResponse = {
+  data: Post[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
