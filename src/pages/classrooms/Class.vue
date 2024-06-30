@@ -72,6 +72,12 @@ const getGroupClasses = () => {
     })
 }
 
+const handlerSearch = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  dataFilter.value.advancedSearch.keyword = input.value
+  getGroupClasses()
+}
+
 const handleMenuGroupClassClick = (option: any) => {
   if (option.text === 'Edit') {
     editGroupClass(getGroupClassById(option.value) as GroupClass)
@@ -241,7 +247,7 @@ onMounted(() => {
     <VaCard class="flex flex-col md:flex-row gap-2 p-2">
       <VaCard class="flex justify-start items-center flex-grow">
         <VaCard class="flex flex-grow">
-          <VaInput placeholder="Search" class="flex-grow">
+          <VaInput placeholder="Search group class name" class="flex-grow" @input="handlerSearch">
             <template #appendInner>
               <VaIcon color="secondary" class="material-icons">search</VaIcon>
             </template>
