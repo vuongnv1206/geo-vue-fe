@@ -153,7 +153,7 @@ export interface UpdatePaperRequest {
   isPublish?: boolean
   description?: string
   shareType?: number
-  paperAccesses?: PaperAccess[]
+  paperAccesses?: PaperAccess[] | null
 }
 
 export interface PaperAccess {
