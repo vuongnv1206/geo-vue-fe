@@ -69,6 +69,13 @@
         </div>
         <div v-if="isShowComments">
           <VaDivider />
+          <VaCard v-if="post.comments.length === 0">
+            <Comments
+              :post-id="post.id"
+              :parent-id="commentId"
+              @save="(comment: EmptyComment) => OnCommentSaved(comment)"
+            />
+          </VaCard>
           <VaTreeView :nodes="structureComments(post.comments)" children-by="comments">
             <template #content="comment">
               <div class="bg-white p-3 rounded-md shadow-sm mb-2" :commentId="comment.id">
@@ -148,7 +155,7 @@ const { confirm } = useModal()
 
 const posts = ref<Post[]>([])
 const postId = ref<string>(null ?? '')
-const commentId = ref<string>(null ?? '')
+const commentId = ref<string>('')
 const isLikePost = ref(false)
 const isLikeComment = ref(false)
 const isShowComments = ref(false)
@@ -156,6 +163,8 @@ const authStore = useAuthStore()
 const postsStore = usePostsStore()
 const commentStore = useCommentStore()
 const userId = authStore.user?.id ?? ''
+
+console.log('commentId:', commentId.value)
 
 const props = defineProps<{
   classId: string
@@ -316,8 +325,14 @@ const OnCommentSaved = async (comment: EmptyComment) => {
         })
       })
   } else {
+    let comm
+    if (comment.parentId === '') {
+      comm = { postId: comment.postId, content: comment.content }
+    } else {
+      comm = comment
+    }
     commentStore
-      .createComment(comment as EmptyComment)
+      .createComment(comm)
       .then(() => {
         notify({
           message: notifications.createSuccessfully('comment'),

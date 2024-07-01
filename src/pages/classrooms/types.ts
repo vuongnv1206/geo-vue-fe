@@ -103,7 +103,7 @@ export type Comment = {
 export type EmptyComment = {
   postId: string
   content: string
-  parentId: string
+  parentId?: string
 }
 
 export type CommentResponse = {

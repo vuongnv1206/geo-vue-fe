@@ -25,7 +25,7 @@ export const useCommentStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    async createComment(data: EmptyComment): Promise<any> {
+    async createComment(data: any): Promise<any> {
       return subjectService
         .createComment(data)
         .then((response) => {
