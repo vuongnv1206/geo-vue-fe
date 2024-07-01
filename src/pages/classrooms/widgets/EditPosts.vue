@@ -1,9 +1,11 @@
 <template>
   <QuillEditor v-model:content="newPost.content" class="border rounded" theme="bubble" content-type="html" />
-  <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
-    <VaButton preset="secondary" color="secondary" @click="emit('close')">Cancel</VaButton>
-    <VaButton @click="emit('save', newPost)">Save</VaButton>
-  </VaCard>
+  <div class="w-full flex justify-end mt-4">
+    <VaCard class="inline-flex flex-col-reverse sm:flex-row gap-2 p-2">
+      <VaButton preset="secondary" color="secondary" @click="emit('close')">Cancel</VaButton>
+      <VaButton @click="emit('save', newPost)">Save</VaButton>
+    </VaCard>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -41,7 +43,6 @@ watch(
     if (!props.posts) {
       return
     }
-
     newPost.value = { ...props.posts }
   },
   { immediate: true },

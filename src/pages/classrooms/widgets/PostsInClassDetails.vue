@@ -307,43 +307,51 @@ const selectedPostOption = (option: any) => {
 }
 
 const OnPostsSaved = async (post: EmptyPost) => {
-  doShowPostFormModal.value = false
-  if (post.id != '') {
-    postsStore
-      .updatePost(post.id, post as EmptyPost)
-      .then(() => {
-        notify({
-          message: notifications.updatedSuccessfully('post'),
-          color: 'success',
+  console.log('post content:', post.content)
+  if (post.content != null && post.content.trim() !== '' && post.content !== '<p><br></p>') {
+    if (post.id != '') {
+      doShowPostFormModal.value = false
+      postsStore
+        .updatePost(post.id, post as EmptyPost)
+        .then(() => {
+          notify({
+            message: notifications.updatedSuccessfully('post'),
+            color: 'success',
+          })
+          getPosts()
         })
-        getPosts()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.updateFailed('post') + error.message,
-          color: 'error',
+        .catch((error) => {
+          notify({
+            message: notifications.updateFailed('post') + error.message,
+            color: 'error',
+          })
         })
-      })
-  } else {
-    postsStore
-      .createPost(post as EmptyPost)
-      .then(() => {
-        notify({
-          message: notifications.createSuccessfully('post'),
-          color: 'success',
-        })
+    } else {
+      postsStore
+        .createPost(post as EmptyPost)
+        .then(() => {
+          notify({
+            message: notifications.createSuccessfully('post'),
+            color: 'success',
+          })
 
-        if (quillInstance.value) {
-          quillInstance.value.setText('')
-        }
-        getPosts()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.createFailed('post') + error.message,
-          color: 'error',
+          if (quillInstance.value) {
+            quillInstance.value.setText('')
+          }
+          getPosts()
         })
-      })
+        .catch((error) => {
+          notify({
+            message: notifications.createFailed('post') + error.message,
+            color: 'error',
+          })
+        })
+    }
+  } else {
+    notify({
+      message: 'Please enter content',
+      color: 'error',
+    })
   }
 }
 
@@ -385,44 +393,51 @@ const selectedCommentOption = (option: any) => {
 
 const OnCommentSaved = async (comment: EmptyComment) => {
   doShowCommentFormModal.value = false
-  if (comment.id != '') {
-    commentStore
-      .updateComment(comment.id, comment as EmptyComment)
-      .then(() => {
-        notify({
-          message: notifications.updatedSuccessfully('comment'),
-          color: 'success',
+  if (comment.content != null && comment.content.trim() !== '' && comment.content !== '<p><br></p>') {
+    if (comment.id != '') {
+      commentStore
+        .updateComment(comment.id, comment as EmptyComment)
+        .then(() => {
+          notify({
+            message: notifications.updatedSuccessfully('comment'),
+            color: 'success',
+          })
+          getPosts()
         })
-        getPosts()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.updateFailed('comment') + error.message,
-          color: 'error',
+        .catch((error) => {
+          notify({
+            message: notifications.updateFailed('comment') + error.message,
+            color: 'error',
+          })
         })
-      })
-  } else {
-    let comm
-    if (comment.parentId === '') {
-      comm = { postId: comment.postId, content: comment.content }
     } else {
-      comm = comment
+      let comm
+      if (comment.parentId === '') {
+        comm = { postId: comment.postId, content: comment.content }
+      } else {
+        comm = comment
+      }
+      commentStore
+        .createComment(comm)
+        .then(() => {
+          notify({
+            message: notifications.createSuccessfully('comment'),
+            color: 'success',
+          })
+          getPosts()
+        })
+        .catch((error) => {
+          notify({
+            message: notifications.createFailed('comment') + error.message,
+            color: 'error',
+          })
+        })
     }
-    commentStore
-      .createComment(comm)
-      .then(() => {
-        notify({
-          message: notifications.createSuccessfully('comment'),
-          color: 'success',
-        })
-        getPosts()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.createFailed('comment') + error.message,
-          color: 'error',
-        })
-      })
+  } else {
+    notify({
+      message: 'Please enter content',
+      color: 'error',
+    })
   }
 }
 
