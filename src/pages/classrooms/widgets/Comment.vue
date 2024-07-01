@@ -23,6 +23,7 @@ const props = defineProps<{
 }>()
 
 const defaultNewComment: EmptyComment = {
+  id: '',
   postId: props.postId,
   parentId: props.parentId,
   content: '',

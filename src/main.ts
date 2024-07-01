@@ -20,7 +20,7 @@ app.use(createVuestic({ config: vuesticGlobalConfig }))
 
 // define your options
 export const globalOptions = {
-  debug: 'info',
+  // debug: 'info',
   modules: {
     toolbar: [
       [{ header: [1, 2, 3, 4, 5, 6, false] }],

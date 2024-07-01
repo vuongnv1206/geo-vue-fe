@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-2xl">
     <VaCard class="relative bg-white rounded-lg shadow-md mb-2">
-      <QuillEditor v-model:content="newPost.content" class="pb-5" content-type="html" />
+      <QuillEditor ref="quillEditor" v-model:content="newPost.content" class="pb-5" content-type="html" />
       <VaCard class="absolute bottom-2 right-2">
         <VaButton class="mr-2" preset="plain" :icon="postId ? 'lock' : 'lock_open'" />
         <VaButton preset="plain" icon="send" class="mr-2" @click="OnPostsSaved(newPost)" />
@@ -69,13 +69,6 @@
         </div>
         <div v-if="isShowComments">
           <VaDivider />
-          <VaCard v-if="post.comments.length === 0">
-            <Comments
-              :post-id="post.id"
-              :parent-id="commentId"
-              @save="(comment: EmptyComment) => OnCommentSaved(comment)"
-            />
-          </VaCard>
           <VaTreeView :nodes="structureComments(post.comments)" children-by="comments">
             <template #content="comment">
               <div class="bg-white p-3 rounded-md shadow-sm mb-2" :commentId="comment.id">
@@ -132,10 +125,71 @@
               </div>
             </template>
           </VaTreeView>
+          <Comments
+            :post-id="post.id"
+            :parent-id="commentId"
+            @save="(comment: EmptyComment) => OnCommentSaved(comment)"
+          />
         </div>
       </VaCard>
     </div>
   </div>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowPostFormModal"
+    size="small"
+    stateful
+    close-button
+    mobile-fullscreen
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+    @close="doShowPostFormModal = false"
+  >
+    <VaModalHeader>
+      <h3 class="text-lg font-bold">Edit Post</h3>
+    </VaModalHeader>
+    <EditPosts
+      ref="editFormRef"
+      :posts="postToEdit"
+      @close="cancel"
+      @save="
+        (posts: EmptyPost) => {
+          OnPostsSaved(posts)
+          ok()
+        }
+      "
+    />
+  </VaModal>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowCommentFormModal"
+    size="small"
+    stateful
+    close-button
+    mobile-fullscreen
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+    @close="doShowCommentFormModal = false"
+  >
+    <VaModalHeader>
+      <h3 class="text-lg font-bold">Edit Comment</h3>
+    </VaModalHeader>
+    <EditComment
+      ref="editFormRef"
+      :comment="commentToEdit"
+      :post-id="postId"
+      :parent-id="commentId"
+      @close="cancel"
+      @save="
+        (comment: EmptyComment) => {
+          OnCommentSaved(comment)
+          ok()
+        }
+      "
+    />
+  </VaModal>
 </template>
 
 <script setup lang="ts">
@@ -143,34 +197,48 @@ import { format, notifications } from '@/services/utils'
 import { onMounted, ref } from 'vue'
 import Comments from './Comment.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { useModal, useToast, VaCard, VaDivider } from 'vuestic-ui/web-components'
+import { useModal, useToast, VaCard, VaDivider, VaModal } from 'vuestic-ui/web-components'
 import { Comment, EmptyComment, EmptyCommentLike, EmptyPost, EmptyPostLike, Post } from '../types'
 import { usePostsStore } from '@/stores/modules/posts.module'
 import { useCommentStore } from '@/stores/modules/comments.module'
-import { QuillEditor } from '@vueup/vue-quill'
+import { Quill, QuillEditor } from '@vueup/vue-quill'
+import EditComment from './EditComment.vue'
+import EditPosts from './EditPosts.vue'
 
 const loading = ref(true)
 const { init: notify } = useToast()
 const { confirm } = useModal()
 
-const posts = ref<Post[]>([])
-const postId = ref<string>(null ?? '')
-const commentId = ref<string>('')
-const isLikePost = ref(false)
-const isLikeComment = ref(false)
-const isShowComments = ref(false)
 const authStore = useAuthStore()
 const postsStore = usePostsStore()
 const commentStore = useCommentStore()
+
+const editFormRef = ref()
+
+const postId = ref<string>(null ?? '')
+const commentId = ref<string>('')
 const userId = authStore.user?.id ?? ''
 
-console.log('commentId:', commentId.value)
+const posts = ref<Post[]>([])
+const commentToEdit = ref<EmptyComment | null>(null)
+const postToEdit = ref<EmptyPost | null>(null)
+
+const doShowCommentFormModal = ref(false)
+const doShowPostFormModal = ref(false)
+
+const isLikePost = ref(false)
+const isLikeComment = ref(false)
+const isShowComments = ref(false)
+
+const quillEditor = ref<InstanceType<typeof QuillEditor> | null>(null)
+const quillInstance = ref<Quill | null>(null)
 
 const props = defineProps<{
   classId: string
 }>()
 
 const defaultNewPost: EmptyPost = {
+  id: '',
   classesId: props.classId,
   content: '',
   isLockComment: false,
@@ -231,26 +299,23 @@ const structureComments = (comments: Comment[]): Comment[] => {
 
 const selectedPostOption = (option: any) => {
   if (option.text === 'Edit') {
-    postId.value = option.value.id
-    console.log('postId:', postId.value)
-    console.log('option:', option.value)
-
-    OnPostsSaved(option.value)
+    doShowPostFormModal.value = true
+    postToEdit.value = option.value
   } else {
     deletePosts(option.value.id)
   }
 }
 
 const OnPostsSaved = async (post: EmptyPost) => {
-  if (postId.value != '') {
+  doShowPostFormModal.value = false
+  if (post.id != '') {
     postsStore
-      .updatePost(postId.value, post as EmptyPost)
+      .updatePost(post.id, post as EmptyPost)
       .then(() => {
         notify({
           message: notifications.updatedSuccessfully('post'),
           color: 'success',
         })
-        postId.value = ''
         getPosts()
       })
       .catch((error) => {
@@ -267,6 +332,10 @@ const OnPostsSaved = async (post: EmptyPost) => {
           message: notifications.createSuccessfully('post'),
           color: 'success',
         })
+
+        if (quillInstance.value) {
+          quillInstance.value.setText('')
+        }
         getPosts()
       })
       .catch((error) => {
@@ -305,24 +374,25 @@ const deletePosts = (postId: string) => {
 }
 
 const selectedCommentOption = (option: any) => {
+  console.log('option value:', option.value)
   if (option.text === 'Edit') {
-    commentId.value = option.value.id
-    OnCommentSaved(option.value)
+    doShowCommentFormModal.value = true
+    commentToEdit.value = option.value
   } else {
     deleteComment(option.value.id)
   }
 }
 
 const OnCommentSaved = async (comment: EmptyComment) => {
-  if (commentId.value != '') {
+  doShowCommentFormModal.value = false
+  if (comment.id != '') {
     commentStore
-      .updateComment(commentId.value, comment as EmptyComment)
+      .updateComment(comment.id, comment as EmptyComment)
       .then(() => {
         notify({
           message: notifications.updatedSuccessfully('comment'),
           color: 'success',
         })
-        commentId.value = ''
         getPosts()
       })
       .catch((error) => {
@@ -456,7 +526,25 @@ const dislikeComment = (commentDisLike: EmptyCommentLike) => {
     })
 }
 
+const beforeEditFormModalClose = async (hide: () => unknown) => {
+  if (editFormRef.value.isFormHasUnsavedChanges) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: notifications.unsavedChanges,
+      size: 'small',
+    })
+    if (agreed) {
+      hide()
+    }
+  } else {
+    hide()
+  }
+}
+
 onMounted(() => {
+  if (quillEditor.value) {
+    quillInstance.value = quillEditor.value.getQuill()
+  }
   getPosts()
 })
 </script>
