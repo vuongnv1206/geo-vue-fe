@@ -55,26 +55,26 @@ export type StudentRequest = {
 
 export type Student = {
   id: string
-  studentId: string
-  studentCode: string
   firstName: string
   lastName: string
-  email: string
+  avatarUrl: string
   dateOfBirth: Date
-  gender: boolean
+  email: string
   phoneNumber: string
-  avatar: string
+  studentCode: string
+  gender: boolean
   classesId: string
 }
 
 export type EmptyStudent = {
-  studentCode: string
   firstName: string
   lastName: string
-  email: string
+  avatarUrl: string
   dateOfBirth: Date
-  gender: boolean
+  email: string
   phoneNumber: string
+  studentCode: string
+  gender: boolean
   classesId: string
 }
 
@@ -90,18 +90,17 @@ export type StudentResponse = {
 
 export type Comment = {
   id: string
-  userId: string
+  createdBy: string
   postId: string
   content: string
   numberLikeInTheComment: number
-  createdAt: string
+  createdOn: string
   parentId: string | null
   user: Student
   comments?: Comment[]
 }
 
 export type EmptyComment = {
-  userId: string
   postId: string
   content: string
   parentId: string
@@ -119,18 +118,18 @@ export type CommentResponse = {
 
 export type Post = {
   id: string
-  userId: string
   content: string
-  numberLikeInTheNews: number
-  createdAt: string
+  numberLikeInThePost: number
+  createdOn: string
+  createdBy: string
   isLockComment: boolean
+  classesId: string
   user: Student
   comments: Comment[]
-  showComments: boolean
 }
 
 export type EmptyPost = {
-  userId: string
+  classesId: string
   content: string
   isLockComment: boolean
 }
@@ -143,4 +142,14 @@ export type PostResponse = {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
+}
+
+export type EmptyPostLike = {
+  userId: string
+  postsId: string
+}
+
+export type EmptyCommentLike = {
+  userId: string
+  commentId: string
 }

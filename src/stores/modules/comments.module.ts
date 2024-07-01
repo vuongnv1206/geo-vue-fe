@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { EmptyComment, Comment, CommentResponse } from '@pages/classrooms/types'
+import { EmptyComment, Comment, CommentResponse, EmptyCommentLike } from '@pages/classrooms/types'
 import subjectService from '@/services/comments.service'
 
 export const useCommentStore = defineStore('subject', {
@@ -48,6 +48,26 @@ export const useCommentStore = defineStore('subject', {
     async deleteComment(id: string): Promise<any> {
       return subjectService
         .deleteComment(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async likeComment(data: EmptyCommentLike): Promise<any> {
+      return subjectService
+        .likeComment(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async dislikeComment(data: EmptyCommentLike): Promise<any> {
+      return subjectService
+        .dislikeComment(data)
         .then((response) => {
           return Promise.resolve(response)
         })

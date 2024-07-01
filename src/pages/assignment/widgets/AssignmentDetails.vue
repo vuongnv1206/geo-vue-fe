@@ -226,7 +226,7 @@ onMounted(() => {
       <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
         <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
           <VaListItemSection avatar>
-            <VaAvatar :src="student.avatar" />
+            <VaAvatar :src="student.avatarUrl" />
           </VaListItemSection>
           <VaListItemSection>
             <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>

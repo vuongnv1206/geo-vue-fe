@@ -2,13 +2,13 @@
 import { onMounted, ref, computed } from 'vue'
 import { Classrooms } from '../types'
 import AssignmentInClassDetails from './AssignmentInClassDetails.vue'
-import NewsInClassDetails from './NewsInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useToast, VaCardContent } from 'vuestic-ui/web-components'
 import { notifications } from '@/services/utils'
 import StudentsInClassDetails from './StudentsInClassDetails.vue'
 import { VaCard } from 'vuestic-ui'
+import PostsInClassDetails from './PostsInClassDetails.vue'
 
 const loading = ref(true)
 const showTabs = ref(false)
@@ -21,7 +21,7 @@ const tabs = [
   { title: 'Assignment & Exam', icon: 'assignment_add' },
   { title: 'News board', icon: 'newspaper' },
 ]
-const selectedTab = ref(tabs[0].title)
+const selectedTab = ref(tabs[2].title)
 const currentTab = computed(() => tabs.find((tab) => tab.title === selectedTab.value) || tabs[0])
 const defaultClassDetails: Classrooms = {
   id: '',
@@ -100,7 +100,7 @@ onMounted(() => {
             @load="getClassById"
           />
           <AssignmentInClassDetails v-if="currentTab.title === 'Assignment & Exam'" :class-details="classDetails" />
-          <NewsInClassDetails v-if="currentTab.title === 'News board'" />
+          <PostsInClassDetails v-if="currentTab.title === 'News board'" :class-id="classId" />
         </VaCard>
       </VaCard>
     </template>

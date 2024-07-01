@@ -35,13 +35,14 @@ const getSubjects = () => {
     .then((response) => {
       subjects.value = response.data
       // console.log('Subjects:', subjects.value)
-      loading.value = false
     })
     .catch((error) => {
       notify({
         message: notifications.getFailed('subject') + error.message,
         color: 'error',
       })
+    })
+    .finally(() => {
       loading.value = false
     })
 }

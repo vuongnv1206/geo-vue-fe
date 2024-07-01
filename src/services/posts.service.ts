@@ -1,9 +1,9 @@
-import { EmptyPost } from '@/pages/classrooms/types'
+import { EmptyPost, EmptyPostLike } from '@/pages/classrooms/types'
 import ApiService from '@services/api.service'
 
 class PostService {
   async getPosts(data: any): Promise<any> {
-    return ApiService.post('/v1/post/search', data)
+    return ApiService.post('/v1/posts/search', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -13,7 +13,7 @@ class PostService {
   }
 
   async getPost(id: string): Promise<any> {
-    return ApiService.get(`/v1/post/${id}`)
+    return ApiService.get(`/v1/posts/${id}`)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -22,7 +22,7 @@ class PostService {
       })
   }
   async createPost(data: EmptyPost): Promise<any> {
-    return ApiService.post('/v1/post', data)
+    return ApiService.post('/v1/posts', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -31,7 +31,7 @@ class PostService {
       })
   }
   async updatePost(id: string, data: EmptyPost): Promise<any> {
-    return ApiService.put(`/v1/post/${id}`, data)
+    return ApiService.put(`/v1/posts/${id}`, data)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -41,7 +41,27 @@ class PostService {
   }
 
   async deletePost(id: string): Promise<any> {
-    return ApiService.delete(`/v1/post/${id}`)
+    return ApiService.delete(`/v1/posts/${id}`)
+      .then((response) => {
+        return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async likePost(data: EmptyPostLike): Promise<any> {
+    return ApiService.post(`/v1/posts/like`, data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async dislikePost(data: EmptyPostLike): Promise<any> {
+    return ApiService.post(`/v1/posts/dislike`, data)
       .then((response) => {
         return Promise.resolve(response)
       })
