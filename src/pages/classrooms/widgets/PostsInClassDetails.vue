@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-2xl">
     <VaCard class="relative bg-white rounded-lg shadow-md mb-2">
-      <QuillEditor v-model:content="newPost.content" class="pb-5" content-type="html" />
+      <QuillEditor ref="quillEditor" v-model:content="newPost.content" class="pb-5" content-type="html" />
       <VaCard class="absolute bottom-2 right-2">
         <VaButton class="mr-2" preset="plain" :icon="postId ? 'lock' : 'lock_open'" />
         <VaButton preset="plain" icon="send" class="mr-2" @click="OnPostsSaved(newPost)" />
@@ -125,10 +125,71 @@
               </div>
             </template>
           </VaTreeView>
+          <Comments
+            :post-id="post.id"
+            :parent-id="commentId"
+            @save="(comment: EmptyComment) => OnCommentSaved(comment)"
+          />
         </div>
       </VaCard>
     </div>
   </div>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowPostFormModal"
+    size="small"
+    stateful
+    close-button
+    mobile-fullscreen
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+    @close="doShowPostFormModal = false"
+  >
+    <VaModalHeader>
+      <h3 class="text-lg font-bold">Edit Post</h3>
+    </VaModalHeader>
+    <EditPosts
+      ref="editFormRef"
+      :posts="postToEdit"
+      @close="cancel"
+      @save="
+        (posts: EmptyPost) => {
+          OnPostsSaved(posts)
+          ok()
+        }
+      "
+    />
+  </VaModal>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowCommentFormModal"
+    size="small"
+    stateful
+    close-button
+    mobile-fullscreen
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+    @close="doShowCommentFormModal = false"
+  >
+    <VaModalHeader>
+      <h3 class="text-lg font-bold">Edit Comment</h3>
+    </VaModalHeader>
+    <EditComment
+      ref="editFormRef"
+      :comment="commentToEdit"
+      :post-id="postId"
+      :parent-id="commentId"
+      @close="cancel"
+      @save="
+        (comment: EmptyComment) => {
+          OnCommentSaved(comment)
+          ok()
+        }
+      "
+    />
+  </VaModal>
 </template>
 
 <script setup lang="ts">
@@ -136,32 +197,48 @@ import { format, notifications } from '@/services/utils'
 import { onMounted, ref } from 'vue'
 import Comments from './Comment.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { useModal, useToast, VaCard, VaDivider } from 'vuestic-ui/web-components'
+import { useModal, useToast, VaCard, VaDivider, VaModal } from 'vuestic-ui/web-components'
 import { Comment, EmptyComment, EmptyCommentLike, EmptyPost, EmptyPostLike, Post } from '../types'
 import { usePostsStore } from '@/stores/modules/posts.module'
 import { useCommentStore } from '@/stores/modules/comments.module'
-import { QuillEditor } from '@vueup/vue-quill'
+import { Quill, QuillEditor } from '@vueup/vue-quill'
+import EditComment from './EditComment.vue'
+import EditPosts from './EditPosts.vue'
 
 const loading = ref(true)
 const { init: notify } = useToast()
 const { confirm } = useModal()
 
-const posts = ref<Post[]>([])
-const postId = ref<string>(null ?? '')
-const commentId = ref<string>(null ?? '')
-const isLikePost = ref(false)
-const isLikeComment = ref(false)
-const isShowComments = ref(false)
 const authStore = useAuthStore()
 const postsStore = usePostsStore()
 const commentStore = useCommentStore()
+
+const editFormRef = ref()
+
+const postId = ref<string>(null ?? '')
+const commentId = ref<string>('')
 const userId = authStore.user?.id ?? ''
+
+const posts = ref<Post[]>([])
+const commentToEdit = ref<EmptyComment | null>(null)
+const postToEdit = ref<EmptyPost | null>(null)
+
+const doShowCommentFormModal = ref(false)
+const doShowPostFormModal = ref(false)
+
+const isLikePost = ref(false)
+const isLikeComment = ref(false)
+const isShowComments = ref(false)
+
+const quillEditor = ref<InstanceType<typeof QuillEditor> | null>(null)
+const quillInstance = ref<Quill | null>(null)
 
 const props = defineProps<{
   classId: string
 }>()
 
 const defaultNewPost: EmptyPost = {
+  id: '',
   classesId: props.classId,
   content: '',
   isLockComment: false,
@@ -222,45 +299,59 @@ const structureComments = (comments: Comment[]): Comment[] => {
 
 const selectedPostOption = (option: any) => {
   if (option.text === 'Edit') {
-    OnPostsSaved(option.value)
+    doShowPostFormModal.value = true
+    postToEdit.value = option.value
   } else {
     deletePosts(option.value.id)
   }
 }
 
 const OnPostsSaved = async (post: EmptyPost) => {
-  if (postId.value != '') {
-    postsStore
-      .updatePost(postId.value, post as EmptyPost)
-      .then(() => {
-        notify({
-          message: notifications.updatedSuccessfully('post'),
-          color: 'success',
+  console.log('post content:', post.content)
+  if (post.content != null && post.content.trim() !== '' && post.content !== '<p><br></p>') {
+    if (post.id != '') {
+      doShowPostFormModal.value = false
+      postsStore
+        .updatePost(post.id, post as EmptyPost)
+        .then(() => {
+          notify({
+            message: notifications.updatedSuccessfully('post'),
+            color: 'success',
+          })
+          getPosts()
         })
-        getPosts()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.updateFailed('post') + error.message,
-          color: 'error',
+        .catch((error) => {
+          notify({
+            message: notifications.updateFailed('post') + error.message,
+            color: 'error',
+          })
         })
-      })
+    } else {
+      postsStore
+        .createPost(post as EmptyPost)
+        .then(() => {
+          notify({
+            message: notifications.createSuccessfully('post'),
+            color: 'success',
+          })
+
+          if (quillInstance.value) {
+            quillInstance.value.setText('')
+          }
+          getPosts()
+        })
+        .catch((error) => {
+          notify({
+            message: notifications.createFailed('post') + error.message,
+            color: 'error',
+          })
+        })
+    }
   } else {
-    postsStore
-      .createPost(post as EmptyPost)
-      .then(() => {
-        notify({
-          message: notifications.createSuccessfully('post'),
-          color: 'success',
-        })
-        getPosts()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.createFailed('post') + error.message,
-          color: 'error',
-        })
-      })
+    notify({
+      message: 'Please enter content',
+      color: 'error',
+    })
   }
 }
 
@@ -291,46 +382,62 @@ const deletePosts = (postId: string) => {
 }
 
 const selectedCommentOption = (option: any) => {
+  console.log('option value:', option.value)
   if (option.text === 'Edit') {
-    OnCommentSaved(option.value)
+    doShowCommentFormModal.value = true
+    commentToEdit.value = option.value
   } else {
     deleteComment(option.value.id)
   }
 }
 
 const OnCommentSaved = async (comment: EmptyComment) => {
-  if (commentId.value != '') {
-    commentStore
-      .updateComment(commentId.value, comment as EmptyComment)
-      .then(() => {
-        notify({
-          message: notifications.updatedSuccessfully('comment'),
-          color: 'success',
+  doShowCommentFormModal.value = false
+  if (comment.content != null && comment.content.trim() !== '' && comment.content !== '<p><br></p>') {
+    if (comment.id != '') {
+      commentStore
+        .updateComment(comment.id, comment as EmptyComment)
+        .then(() => {
+          notify({
+            message: notifications.updatedSuccessfully('comment'),
+            color: 'success',
+          })
+          getPosts()
         })
-        getPosts()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.updateFailed('comment') + error.message,
-          color: 'error',
+        .catch((error) => {
+          notify({
+            message: notifications.updateFailed('comment') + error.message,
+            color: 'error',
+          })
         })
-      })
+    } else {
+      let comm
+      if (comment.parentId === '') {
+        comm = { postId: comment.postId, content: comment.content }
+      } else {
+        comm = comment
+      }
+      commentStore
+        .createComment(comm)
+        .then(() => {
+          notify({
+            message: notifications.createSuccessfully('comment'),
+            color: 'success',
+          })
+          getPosts()
+        })
+        .catch((error) => {
+          notify({
+            message: notifications.createFailed('comment') + error.message,
+            color: 'error',
+          })
+        })
+    }
   } else {
-    commentStore
-      .createComment(comment as EmptyComment)
-      .then(() => {
-        notify({
-          message: notifications.createSuccessfully('comment'),
-          color: 'success',
-        })
-        getPosts()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.createFailed('comment') + error.message,
-          color: 'error',
-        })
-      })
+    notify({
+      message: 'Please enter content',
+      color: 'error',
+    })
   }
 }
 
@@ -434,7 +541,25 @@ const dislikeComment = (commentDisLike: EmptyCommentLike) => {
     })
 }
 
+const beforeEditFormModalClose = async (hide: () => unknown) => {
+  if (editFormRef.value.isFormHasUnsavedChanges) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: notifications.unsavedChanges,
+      size: 'small',
+    })
+    if (agreed) {
+      hide()
+    }
+  } else {
+    hide()
+  }
+}
+
 onMounted(() => {
+  if (quillEditor.value) {
+    quillInstance.value = quillEditor.value.getQuill()
+  }
   getPosts()
 })
 </script>

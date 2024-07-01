@@ -21,7 +21,7 @@ class CommentService {
         return Promise.reject(error)
       })
   }
-  async createComment(data: EmptyComment): Promise<any> {
+  async createComment(data: any): Promise<any> {
     return ApiService.post('/v1/comment', data)
       .then((response) => {
         return Promise.resolve(response.data)

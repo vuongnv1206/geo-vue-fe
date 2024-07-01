@@ -101,9 +101,10 @@ export type Comment = {
 }
 
 export type EmptyComment = {
+  id: string
   postId: string
   content: string
-  parentId: string
+  parentId?: string
 }
 
 export type CommentResponse = {
@@ -129,6 +130,7 @@ export type Post = {
 }
 
 export type EmptyPost = {
+  id: string
   classesId: string
   content: string
   isLockComment: boolean
