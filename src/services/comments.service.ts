@@ -1,4 +1,4 @@
-import { EmptyComment } from '@/pages/classrooms/types'
+import { EmptyComment, EmptyCommentLike } from '@/pages/classrooms/types'
 import ApiService from '@services/api.service'
 
 class CommentService {
@@ -42,6 +42,26 @@ class CommentService {
 
   async deleteComment(id: string): Promise<any> {
     return ApiService.delete(`/v1/comment/${id}`)
+      .then((response) => {
+        return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async likeComment(data: EmptyCommentLike): Promise<any> {
+    return ApiService.post(`/v1/comment/like`, data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async dislikeComment(data: EmptyCommentLike): Promise<any> {
+    return ApiService.post(`/v1/comment/dislike`, data)
       .then((response) => {
         return Promise.resolve(response)
       })

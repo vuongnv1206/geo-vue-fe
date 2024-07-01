@@ -17,63 +17,24 @@
         </template>
       </VaMenu>
     </VaCard>
-    <VaScrollContainer vertical>
-      <VaAccordion class="w-full" multiple>
-        <VaCollapse
-          v-for="(group, index) in filteredGroupedData"
-          :key="index"
-          :header="format.formatDate(group.createOn)"
-          solid
-          class="py-1 font-bold"
-        >
-          <template #header="{ value, attrs, iconAttrs, text }">
-            <VaCard v-bind="attrs" class="w-full flex border-2 p-2 items-center">
-              <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" />
-              <VaCard class="flex justify-between items-center w-full">
-                <VaCard>{{ text }}</VaCard>
-              </VaCard>
-            </VaCard>
-          </template>
-          <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-            <template>
-              <VaCard
-                v-for="assignment in group.assignments"
-                :key="assignment.id"
-                class="border border-gray-200 rounded-lg overflow-hidden p-4 mb-4 flex space-x-4"
-              >
-                <VaIcon name="description" size="3rem" class="text-gray-500" />
-                <div>
-                  <VaCardTitle class="font-medium text-lg">{{ assignment.name }}</VaCardTitle>
-                  <VaCard>Submited: 0/0</VaCard>
-                </div>
-              </VaCard>
-            </template>
-            <template>
-              <VaCard
-                v-for="paper in group.papers"
-                :key="paper.id"
-                class="border border-gray-200 rounded-lg overflow-hidden p-4 mb-4 flex space-x-4"
-              >
-                <VaIcon name="article" size="3rem" class="text-gray-500" />
-                <div>
-                  <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>
-                  <VaCard>Submited: 0/0</VaCard>
-                </div>
-              </VaCard>
-            </template>
-          </div>
-        </VaCollapse>
-      </VaAccordion>
+    <VaScrollContainer vertical class="max-h-[66vh] pb-0">
+      <AcordionOfAssignment :key="forceUpdate" :filtered-grouped-data="filteredGroupedData" />
     </VaScrollContainer>
   </VaCardContent>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, PropType } from 'vue'
+import { ref, computed, PropType, watch } from 'vue'
 import { format } from '@/services/utils'
 import { Classrooms } from '../types'
+import AcordionOfAssignment from './AccordionOfAssignment.vue'
 import router from '@/router'
-import { VaAccordion, VaCollapse } from 'vuestic-ui/web-components'
+
+const forceUpdate = ref(0)
+
+const forceRerender = () => {
+  forceUpdate.value += 1
+}
 
 const props = defineProps({
   classDetails: {
@@ -166,5 +127,9 @@ const filteredGroupedData = computed(() => {
 
   console.log('filteredGroups:', filteredGroups)
   return filteredGroups.length > 0 ? filteredGroups : []
+})
+
+watch(filteredGroupedData, () => {
+  forceRerender()
 })
 </script>

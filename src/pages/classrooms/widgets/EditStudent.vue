@@ -18,13 +18,14 @@ defineEmits<{
 }>()
 
 const defaultNewStudent: EmptyStudent = {
-  studentCode: '',
   firstName: '',
   lastName: '',
-  email: '',
+  avatarUrl: '',
   dateOfBirth: new Date(),
-  gender: false,
+  email: '',
   phoneNumber: '',
+  studentCode: '',
+  gender: false,
   classesId: '',
 }
 
@@ -80,6 +81,7 @@ const genderOptions = reactive([
       placeholder="Enter your last name"
       :rules="[validators.required2('Last name'), validators.isCharacter('Last name'), validators.maxLength(50)]"
     />
+    <VaInput v-model="newStudent.avatarUrl" label="Avatar" placeholder="tam the da" />
     <VaInput
       v-model="newStudent.studentCode"
       label="Student code"

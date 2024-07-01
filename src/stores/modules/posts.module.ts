@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import { EmptyPost, Post, PostResponse } from '@pages/classrooms/types'
-import subjectService from '@/services/posts.service'
+import postsService from '@/services/posts.service'
 
-export const usePostStore = defineStore('subject', {
+export const usePostsStore = defineStore('posts', {
   state: () => ({}),
   actions: {
     async getPosts(data: any): Promise<PostResponse> {
-      return subjectService
+      return postsService
         .getPosts(data)
         .then((response) => {
           return Promise.resolve(response)
@@ -16,7 +16,7 @@ export const usePostStore = defineStore('subject', {
         })
     },
     async getPost(id: string): Promise<Post> {
-      return subjectService
+      return postsService
         .getPost(id)
         .then((response) => {
           return Promise.resolve(response)
@@ -26,7 +26,7 @@ export const usePostStore = defineStore('subject', {
         })
     },
     async createPost(data: EmptyPost): Promise<any> {
-      return subjectService
+      return postsService
         .createPost(data)
         .then((response) => {
           return Promise.resolve(response)
@@ -36,7 +36,7 @@ export const usePostStore = defineStore('subject', {
         })
     },
     async updatePost(id: string, data: EmptyPost): Promise<any> {
-      return subjectService
+      return postsService
         .updatePost(id, data)
         .then((response) => {
           return Promise.resolve(response)
@@ -46,8 +46,28 @@ export const usePostStore = defineStore('subject', {
         })
     },
     async deletePost(id: string): Promise<any> {
-      return subjectService
+      return postsService
         .deletePost(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async likePost(data: any): Promise<any> {
+      return postsService
+        .likePost(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async dislikePost(data: any): Promise<any> {
+      return postsService
+        .dislikePost(data)
         .then((response) => {
           return Promise.resolve(response)
         })

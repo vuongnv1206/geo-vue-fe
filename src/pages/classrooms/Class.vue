@@ -53,7 +53,7 @@ const dataFilter = ref({
 
 const getGroupClasses = () => {
   loading.value = true
-  dataFilter.value.advancedSearch.fields = ['name']
+  dataFilter.value.advancedSearch.fields = ['name', 'classes.name']
   store
     .getGroupClasses(dataFilter)
     .then((response) => {
