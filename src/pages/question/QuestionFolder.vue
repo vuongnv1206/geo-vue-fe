@@ -133,6 +133,9 @@ const editPermission = (permission: QuestionFolderPermission) => {
     canDelete: permission.canDelete,
     canShare: permission.canShare,
   }
+  if (permission.canAdd && permission.canUpdate && permission.canDelete) {
+    canEdit.value = true
+  }
 }
 
 const optionsSelect = ref<TeacherTeamTeacherGroupCombine | null>(null)
