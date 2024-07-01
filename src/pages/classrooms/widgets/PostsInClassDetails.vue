@@ -231,6 +231,10 @@ const structureComments = (comments: Comment[]): Comment[] => {
 
 const selectedPostOption = (option: any) => {
   if (option.text === 'Edit') {
+    postId.value = option.value.id
+    console.log('postId:', postId.value)
+    console.log('option:', option.value)
+
     OnPostsSaved(option.value)
   } else {
     deletePosts(option.value.id)
@@ -246,6 +250,7 @@ const OnPostsSaved = async (post: EmptyPost) => {
           message: notifications.updatedSuccessfully('post'),
           color: 'success',
         })
+        postId.value = ''
         getPosts()
       })
       .catch((error) => {
@@ -301,6 +306,7 @@ const deletePosts = (postId: string) => {
 
 const selectedCommentOption = (option: any) => {
   if (option.text === 'Edit') {
+    commentId.value = option.value.id
     OnCommentSaved(option.value)
   } else {
     deleteComment(option.value.id)
@@ -316,6 +322,7 @@ const OnCommentSaved = async (comment: EmptyComment) => {
           message: notifications.updatedSuccessfully('comment'),
           color: 'success',
         })
+        commentId.value = ''
         getPosts()
       })
       .catch((error) => {
