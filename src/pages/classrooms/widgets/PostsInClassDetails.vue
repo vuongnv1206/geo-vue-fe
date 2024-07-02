@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-2xl">
+  <div class="max-w-2xl min-h-[75vh]">
     <VaCard class="relative bg-white rounded-lg shadow-md mb-2">
       <QuillEditor ref="quillEditor" v-model:content="newPost.content" class="pb-5" content-type="html" />
       <VaCard class="absolute bottom-2 right-2">

@@ -53,14 +53,14 @@ const dataFilter = ref({
 
 const getGroupClasses = () => {
   loading.value = true
-  dataFilter.value.advancedSearch.fields = ['name', 'classes.name']
+  dataFilter.value.advancedSearch.fields = ['name']
   store
     .getGroupClasses(dataFilter)
     .then((response) => {
       listGroupClass.value = response.data
       classrooms.value = response.data.flatMap((gc) => gc.classes)
-      console.log('Department: ', listGroupClass.value)
-      console.log('Classrooms: ', classrooms.value)
+      // console.log('Department: ', listGroupClass.value)
+      // console.log('Classrooms: ', classrooms.value)
       loading.value = false
     })
     .catch(() => {
@@ -75,6 +75,7 @@ const getGroupClasses = () => {
 const handlerSearch = (event: Event) => {
   const input = event.target as HTMLInputElement
   dataFilter.value.advancedSearch.keyword = input.value
+  console.log('Search: ', dataFilter.value.advancedSearch.keyword)
   getGroupClasses()
 }
 
