@@ -2,7 +2,7 @@
 import { computed, ref, watch, onMounted } from 'vue'
 import { Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { notifications, validators } from '@/services/utils'
+import { getErrorMessage, notifications, validators } from '@/services/utils'
 import { useToast, VaSelect } from 'vuestic-ui/web-components'
 
 const { init: notify } = useToast()
@@ -44,7 +44,7 @@ const getGroupClasses = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('group class') + error.message,
+        message: notifications.getFailed('group class') + getErrorMessage(error),
         color: 'error',
       })
       loading.value = false

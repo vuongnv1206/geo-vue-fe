@@ -5,7 +5,7 @@ import AssignmentInClassDetails from './AssignmentInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useToast, VaCardContent } from 'vuestic-ui/web-components'
-import { notifications } from '@/services/utils'
+import { getErrorMessage, notifications } from '@/services/utils'
 import StudentsInClassDetails from './StudentsInClassDetails.vue'
 import { VaCard } from 'vuestic-ui'
 import PostsInClassDetails from './PostsInClassDetails.vue'
@@ -50,7 +50,7 @@ const getClassById = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed(`class with id ${classId}`) + error.message,
+        message: notifications.getFailed(`class with id ${classId}`) + getErrorMessage(error),
         color: 'error',
       })
     })

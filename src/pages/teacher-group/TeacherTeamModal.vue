@@ -55,14 +55,14 @@ const onSave = () => {
           name="teacherName"
           label="Teacher name"
           placeholder="Teacher name"
-          :rules="[(v) => !!v || 'Required']"
+          :rules="[(v: any) => !!v || 'Required']"
         />
         <VaInput
           v-model="newTeacher.contact"
           name="contact"
           label="Contact"
           placeholder="Contact"
-          :rules="[(v) => !!v || 'Required']"
+          :rules="[(v: any) => !!v || 'Required']"
         />
       </VaForm>
     </VaCardContent>

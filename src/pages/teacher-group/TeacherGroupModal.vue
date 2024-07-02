@@ -52,7 +52,7 @@ const onSave = () => {
           name="name"
           label="Group name"
           placeholder="Group name"
-          :rules="[(v) => !!v || 'Required']"
+          :rules="[(v: any) => !!v || 'Required']"
         />
       </VaForm>
     </VaCardContent>

@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { computed, onMounted, ref } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
-import { notifications, validators } from '@/services/utils'
+import { getErrorMessage, notifications, validators } from '@/services/utils'
 import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
 import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
@@ -73,7 +73,7 @@ const getAssignment = (id: string) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('assignments') + error.message,
+        message: notifications.getFailed('assignments') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -88,7 +88,7 @@ const getGroupClass = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('group class') + error.message,
+        message: notifications.getFailed('group class') + getErrorMessage(error),
         color: 'error',
       })
     })

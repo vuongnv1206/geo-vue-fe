@@ -193,7 +193,7 @@
 </template>
 
 <script setup lang="ts">
-import { format, notifications } from '@/services/utils'
+import { format, getErrorMessage, notifications } from '@/services/utils'
 import { onMounted, ref } from 'vue'
 import Comments from './Comment.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
@@ -266,7 +266,7 @@ const getPosts = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('posts') + error.message,
+        message: notifications.getFailed('posts') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -322,7 +322,7 @@ const OnPostsSaved = async (post: EmptyPost) => {
         })
         .catch((error) => {
           notify({
-            message: notifications.updateFailed('post') + error.message,
+            message: notifications.updateFailed('post') + getErrorMessage(error),
             color: 'error',
           })
         })
@@ -342,7 +342,7 @@ const OnPostsSaved = async (post: EmptyPost) => {
         })
         .catch((error) => {
           notify({
-            message: notifications.createFailed('post') + error.message,
+            message: notifications.createFailed('post') + getErrorMessage(error),
             color: 'error',
           })
         })
@@ -374,7 +374,7 @@ const deletePosts = (postId: string) => {
       })
       .catch((error) => {
         notify({
-          message: notifications.deleteFailed('post') + error.message,
+          message: notifications.deleteFailed('post') + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -406,7 +406,7 @@ const OnCommentSaved = async (comment: EmptyComment) => {
         })
         .catch((error) => {
           notify({
-            message: notifications.updateFailed('comment') + error.message,
+            message: notifications.updateFailed('comment') + getErrorMessage(error),
             color: 'error',
           })
         })
@@ -428,7 +428,7 @@ const OnCommentSaved = async (comment: EmptyComment) => {
         })
         .catch((error) => {
           notify({
-            message: notifications.createFailed('comment') + error.message,
+            message: notifications.createFailed('comment') + getErrorMessage(error),
             color: 'error',
           })
         })
@@ -460,7 +460,7 @@ const deleteComment = (commentId: string) => {
       })
       .catch((error) => {
         notify({
-          message: notifications.deleteFailed('comment') + error.message,
+          message: notifications.deleteFailed('comment') + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -484,7 +484,7 @@ const likePosts = (postLike: EmptyPostLike) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.updateFailed('post') + error.message,
+        message: notifications.updateFailed('post') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -498,7 +498,7 @@ const dislikePosts = (postDisLike: EmptyPostLike) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.updateFailed('post') + error.message,
+        message: notifications.updateFailed('post') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -521,7 +521,7 @@ const likeComment = (commentLike: EmptyCommentLike) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.updateFailed('comment') + error.message,
+        message: notifications.updateFailed('comment') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -535,7 +535,7 @@ const dislikeComment = (commentDisLike: EmptyCommentLike) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.updateFailed('comment') + error.message,
+        message: notifications.updateFailed('comment') + getErrorMessage(error),
         color: 'error',
       })
     })

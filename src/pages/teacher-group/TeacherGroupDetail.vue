@@ -12,9 +12,7 @@ import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { GroupClass } from '../classrooms/types'
 import { PermissionNameInClass } from './PermissionInClass.enum'
 import { useToast } from 'vuestic-ui'
-import { getErrorMessage } from '@/services/utils'
-
-const loading = ref(true)
+import { getErrorMessage, notifications } from '@/services/utils'
 
 const props = defineProps({
   group: {
@@ -27,14 +25,21 @@ const props = defineProps({
   },
 })
 
+const loading = ref(true)
 const showSelect = ref(false)
+const { init: notify } = useToast()
+const stores = useGroupTeacherStore()
+const selectedTeacher = ref<string[]>([])
+const groupClassStores = useGroupClassStore()
+const groupDetail = ref<GroupTeacher | null>(null)
+const teacherDetail = ref<TeacherTeam | null>(null)
 const teacherOptions = ref<{ label: string; value: string }[]>([])
 const currentSelectedTeacher = ref<{ label: string; value: string }[]>([])
-const selectedTeacher = ref<string[]>([])
-const stores = useGroupTeacherStore()
-
-const { init: notify } = useToast()
-const groupClassStores = useGroupClassStore()
+const checkedPermissions = ref<{ [key: string]: string[] }>({})
+const optionCheckBox = ref<{ key: string; value: string }[]>([])
+const valueAccordion = ref([])
+const groupClasses = ref<GroupClass[]>([])
+const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
 
 const dataFilter = {
   keyword: '',
@@ -42,8 +47,6 @@ const dataFilter = {
   pageSize: 100,
   orderBy: ['id'],
 }
-
-const groupDetail = ref<GroupTeacher | null>(null)
 
 const getGroupDetail = async () => {
   loading.value = true
@@ -71,15 +74,12 @@ const getGroupDetail = async () => {
     loading.value = false
   } catch (error) {
     loading.value = false
-    const message = getErrorMessage(error)
     notify({
-      message: `${message}`,
+      message: notifications.getFailed('group detail') + getErrorMessage(error),
       color: 'danger',
     })
   }
 }
-
-const teacherDetail = ref<TeacherTeam | null>(null)
 
 const getTeacherDetail = async () => {
   if (!props.teacherId) return
@@ -89,12 +89,24 @@ const getTeacherDetail = async () => {
     teacherDetail.value = response
     loading.value = false
   } catch (error) {
-    const message = getErrorMessage(error)
     notify({
-      message: `${message}`,
+      message: notifications.getFailed('teacher') + getErrorMessage(error),
       color: 'danger',
     })
     loading.value = false
+  }
+}
+
+const getGroupClasses = async () => {
+  try {
+    const res = await groupClassStores.getGroupClasses(groupClassFilter)
+    groupClasses.value = res.data
+    initializeCheckedPermissions()
+  } catch (error) {
+    notify({
+      message: notifications.getFailed('group class') + getErrorMessage(error),
+      color: 'danger',
+    })
   }
 }
 
@@ -119,14 +131,13 @@ const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
         .addTeacherIntoGroup(teacherInGroupRequest)
         .then(() => {
           notify({
-            message: `Add ${teacher.label} into group success`,
+            message: notifications.createSuccessfully(teacher.label),
             color: 'success',
           })
         })
         .catch((error) => {
-          const message = getErrorMessage(error)
           notify({
-            message: `Add ${teacher.label} into group fail \n ${message}`,
+            message: notifications.createFailed(teacher.label) + getErrorMessage(error),
             color: 'danger',
           })
         })
@@ -144,14 +155,13 @@ const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
         .removeTeacherInGroup(teacherInGroupRequest)
         .then(() => {
           notify({
-            message: `Remove ${currentSelectedTeacher.value[i].label} into group success`,
+            message: notifications.deleteSuccessfully(currentSelectedTeacher.value[i].label),
             color: 'success',
           })
         })
         .catch((error) => {
-          const message = getErrorMessage(error)
           notify({
-            message: `Remove ${currentSelectedTeacher.value[i].label} into group fail \n ${message}`,
+            message: notifications.deleteFailed(currentSelectedTeacher.value[i].label) + getErrorMessage(error),
             color: 'danger',
           })
         })
@@ -160,35 +170,12 @@ const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
   await getGroupDetail()
 }
 
-const groupClasses = ref<GroupClass[]>([])
-const valueAccordion = ref([])
-
-const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
-
-const getGroupClasses = async () => {
-  try {
-    const res = await groupClassStores.getGroupClasses(groupClassFilter)
-    groupClasses.value = res.data
-    initializeCheckedPermissions()
-  } catch (error) {
-    const message = getErrorMessage(error)
-    notify({
-      message: `${message}`,
-      color: 'danger',
-    })
-  }
-}
-
-const optionCheckBox = ref<{ key: string; value: string }[]>([])
-
 const optionPermissionInClass = () => {
   optionCheckBox.value = Object.entries(PermissionNameInClass).map(([key, value]) => ({
     key: String(key),
     value: String(value),
   }))
 }
-
-const checkedPermissions = ref<{ [key: string]: string[] }>({})
 
 const initializeCheckedPermissions = () => {
   const checked: { [key: string]: string[] } = {}
@@ -211,7 +198,6 @@ const initializeCheckedPermissions = () => {
 
   checkedPermissions.value = checked
 }
-
 const permissionTypeMap: { [key: string]: number } = {
   AssignAssignment: 1,
   Marking: 2,
@@ -238,15 +224,14 @@ const updatePermissionGroup = async () => {
       await stores.setPermissionGroupInClass(requestGroup)
       loading.value = false
       notify({
-        message: 'Update permission successfully',
+        message: notifications.updatedSuccessfully('permission'),
         color: 'success',
       })
       getGroupDetail()
     } catch (error) {
       loading.value = false
-      const message = getErrorMessage(error)
       notify({
-        message: `Update permission failed \n ${message}`,
+        message: notifications.updateFailed('permission') + getErrorMessage(error),
         color: 'danger',
       })
     }
@@ -261,15 +246,14 @@ const updatePermissionGroup = async () => {
       await stores.setPermissionTeacherInClass(requestTeacher)
       loading.value = false
       notify({
-        message: 'Update permission successfully',
+        message: notifications.updatedSuccessfully('permission'),
         color: 'success',
       })
       getTeacherDetail()
     } catch (error) {
       loading.value = false
-      const message = getErrorMessage(error)
       notify({
-        message: `Update permission failed \n ${message}`,
+        message: notifications.updateFailed('permission') + getErrorMessage(error),
         color: 'danger',
       })
     }
