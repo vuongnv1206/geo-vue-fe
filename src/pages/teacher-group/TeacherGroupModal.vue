@@ -2,6 +2,7 @@
 import { PropType, ref, watch } from 'vue'
 import { GroupTeacher } from './types'
 import { useForm } from 'vuestic-ui'
+import { validators } from '@/services/utils'
 
 const props = defineProps({
   groupTeacher: {
@@ -52,7 +53,7 @@ const onSave = () => {
           name="name"
           label="Group name"
           placeholder="Group name"
-          :rules="[(v: any) => !!v || 'Required']"
+          :rules="[validators.required2('group name'), validators.maxLength(50)]"
         />
       </VaForm>
     </VaCardContent>
