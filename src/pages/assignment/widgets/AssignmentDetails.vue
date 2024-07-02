@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent } from '../types'
 import { useBreakpoint, useModal, useToast, VaCard, VaList, VaListItemSection } from 'vuestic-ui'
-import { format, notifications } from '@/services/utils'
+import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { Student } from '@/pages/classrooms/types'
@@ -41,7 +41,7 @@ const getAssignment = (id: string) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('assignment') + error.message,
+        message: notifications.getFailed('assignment') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -56,11 +56,11 @@ const getClassById = async () => {
     .getClassById(classId)
     .then((response) => {
       students.value = response.students
-      console.log('Students:', students.value)
+      // console.log('Students:', students.value)
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed(`class with id ${classId}`) + error.message,
+        message: notifications.getFailed(`class with id ${classId}`) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -81,8 +81,7 @@ const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
     })
     .catch((error) => {
       notify({
-        message:
-          notifications.deleteFailed(assignment.value?.name ? assignment.value.name : 'assignment') + error.message,
+        message: notifications.deleteFailed('assignment') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -103,22 +102,22 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   }
 }
 
-const onAssignmentContent = async (assignmentContent: AssignmentContent) => {
-  console.log('Assignment content:', assignmentContent)
+const onAssignmentContent = async (assignment: AssignmentContent) => {
+  console.log('Assignment content:', assignment)
   doShowFormModal.value = false
-  if (assignmentContent.id != '') {
+  if (assignment.id != '') {
     stores
-      .updateAssignment(assignmentContent.id, assignmentContent as EmptyAssignmentContent)
+      .updateAssignment(assignment.id, assignment as EmptyAssignmentContent)
       .then(() => {
         notify({
-          message: notifications.updatedSuccessfully('assignment content'),
+          message: notifications.updatedSuccessfully(assignment.content),
           color: 'success',
         })
-        getAssignment(assignmentContent.id)
+        getAssignment(assignment.id)
       })
       .catch((error) => {
         notify({
-          message: notifications.updateFailed('assignment content') + error.message,
+          message: notifications.updateFailed(assignment.content) + getErrorMessage(error),
           color: 'error',
         })
       })

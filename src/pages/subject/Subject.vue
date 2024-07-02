@@ -5,7 +5,7 @@ import SubjectTable from '@/pages/subject/widgets/SubjectTable.vue'
 import { useSubjectStore } from '@/stores/modules/subject.module'
 import { useModal, useToast } from 'vuestic-ui'
 import EditSubjectForm from '@/pages/subject/widgets/EditSubjectForm.vue'
-import { notifications } from '@/services/utils'
+import { getErrorMessage, notifications } from '@/services/utils'
 
 const loading = ref(true)
 const stores = useSubjectStore()
@@ -34,11 +34,10 @@ const getSubjects = () => {
     .getSubjects(dataFilter.value)
     .then((response) => {
       subjects.value = response.data
-      // console.log('Subjects:', subjects.value)
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('subject') + error.message,
+        message: notifications.getFailed('subject') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -64,14 +63,14 @@ const onSubjectSaved = async (subject: Subject) => {
       .updateSubject(subject.id, subject as EmptySubject)
       .then(() => {
         notify({
-          message: notifications.updatedSuccessfully('subject'),
+          message: notifications.updatedSuccessfully(subject.name),
           color: 'success',
         })
         getSubjects()
       })
       .catch((error) => {
         notify({
-          message: notifications.updateFailed('subject') + error.message,
+          message: notifications.updateFailed(subject.name) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -80,14 +79,14 @@ const onSubjectSaved = async (subject: Subject) => {
       .createSubject(subject as EmptySubject)
       .then(() => {
         notify({
-          message: notifications.createSuccessfully('subject'),
+          message: notifications.createSuccessfully(subject.name),
           color: 'success',
         })
         getSubjects()
       })
       .catch((error) => {
         notify({
-          message: notifications.createFailed('subject') + error.message,
+          message: notifications.createFailed(subject.name) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -99,14 +98,14 @@ const deleteSubject = (subject: Subject) => {
     .deleteSubject(subject.id)
     .then(() => {
       notify({
-        message: notifications.deleteSuccessfully('subject'),
+        message: notifications.deleteSuccessfully(subject.name),
         color: 'success',
       })
       getSubjects()
     })
     .catch((error) => {
       notify({
-        message: notifications.deleteFailed('subject') + error.message,
+        message: notifications.deleteFailed(subject.name) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -129,7 +128,7 @@ const deleteSelectedSubject = () => {
 const deleteSubjectWithConfirm = (subject: Subject) => {
   confirm({
     title: 'Delete Subject',
-    message: notifications.confirmDelete('subject'),
+    message: notifications.confirmDelete(subject.name),
   }).then((agreed) => {
     if (!agreed) {
       return

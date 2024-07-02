@@ -3,7 +3,7 @@
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { ref, onMounted, computed } from 'vue'
 import { GroupTeacher, TeacherTeam } from './types'
-import { getErrorMessage } from '@/services/utils'
+import { getErrorMessage, notifications } from '@/services/utils'
 import { useModal, useToast } from 'vuestic-ui'
 import TeacherGroupModal from './TeacherGroupModal.vue'
 import TeacherTeamModal from './TeacherTeamModal.vue'
@@ -22,6 +22,27 @@ const { init: notify } = useToast()
 const groupTeachers = ref<GroupTeacher[]>([])
 const teacherTeams = ref<TeacherTeam[]>([])
 const loading = ref(true)
+
+const doShowGroupEditModal = ref(false)
+const doShowTeacherEditModal = ref(false)
+
+const modalToGroupEdit = ref<GroupTeacher | null>(null)
+const modalToTeacherEdit = ref<TeacherTeam | null>(null)
+
+const editFormRef = ref()
+const { confirm } = useModal()
+const titleModal = ref<string>()
+
+const emit = defineEmits(['select-group', 'select-teacher'])
+
+const selectGroup = (group: GroupTeacher) => {
+  emit('select-group', group)
+}
+
+const detailTeacherInTeam = (teacherId: string) => {
+  emit('select-teacher', teacherId)
+}
+
 const getTeacherGroups = () => {
   loading.value = true
   dataFilter.value.advancedSearch.fields = ['name']
@@ -29,15 +50,15 @@ const getTeacherGroups = () => {
     .getGroupTeachers(dataFilter.value)
     .then((res) => {
       groupTeachers.value = res.data
-      loading.value = false
     })
     .catch((error) => {
-      const message = getErrorMessage(error)
-      loading.value = false
       notify({
-        message: `${message}`,
+        message: notifications.getFailed('group teacher') + getErrorMessage(error),
         color: 'danger',
       })
+    })
+    .finally(() => {
+      loading.value = false
     })
 }
 
@@ -48,34 +69,32 @@ const getTeacherTeams = () => {
     .getTeacherTeams(dataFilter.value)
     .then((res) => {
       teacherTeams.value = res.data
-      loading.value = false
     })
     .catch((error) => {
-      const message = getErrorMessage(error)
-      loading.value = false
       notify({
-        message: `${message}`,
+        message: notifications.getFailed('teacher team') + getErrorMessage(error),
         color: 'danger',
       })
     })
+    .finally(() => {
+      loading.value = false
+    })
 }
-
 const onGroupSaved = async (group: GroupTeacher) => {
   if (modalToGroupEdit.value) {
     await stores
       .updateGroupTeacher(group.id, group)
       .then(() => {
         notify({
-          message: `'${group.name}' group has been updated`,
+          message: notifications.updatedSuccessfully(group.name),
           color: 'success',
         })
         getTeacherGroups()
         getTeacherTeams()
       })
       .catch((error) => {
-        const message = getErrorMessage(error)
         notify({
-          message: 'Failed to update group teacher\n' + message,
+          message: notifications.updateFailed(group.name) + getErrorMessage(error),
           color: 'danger',
         })
       })
@@ -84,16 +103,15 @@ const onGroupSaved = async (group: GroupTeacher) => {
       .addGroup(group)
       .then(() => {
         notify({
-          message: `'${group.name}' group has been created`,
+          message: notifications.createSuccessfully(group.name),
           color: 'success',
         })
         getTeacherGroups()
         getTeacherTeams()
       })
       .catch((error) => {
-        const message = getErrorMessage(error)
         notify({
-          message: 'Failed to create group teacher\n' + message,
+          message: notifications.createFailed(group.name) + getErrorMessage(error),
           color: 'danger',
         })
       })
@@ -106,16 +124,15 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
       .updateTeacherInTeam(teacher.id, teacher)
       .then(() => {
         notify({
-          message: `'${teacher.teacherName}' has been updated`,
+          message: notifications.updatedSuccessfully(teacher.teacherName),
           color: 'success',
         })
         getTeacherGroups()
         getTeacherTeams()
       })
       .catch((error) => {
-        const message = getErrorMessage(error)
         notify({
-          message: 'Failed to Update teacher\n' + message,
+          message: notifications.updateFailed(teacher.teacherName) + getErrorMessage(error),
           color: 'danger',
         })
       })
@@ -124,29 +141,20 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
       .addTeacherIntoTeam(teacher)
       .then(() => {
         notify({
-          message: `'${teacher.teacherName}' has been created`,
+          message: notifications.createSuccessfully(teacher.teacherName),
           color: 'success',
         })
         getTeacherGroups()
         getTeacherTeams()
       })
       .catch((error) => {
-        const message = getErrorMessage(error)
         notify({
-          message: 'Failed to add teacher into team\n' + message,
+          message: notifications.createFailed(teacher.teacherName) + getErrorMessage(error),
           color: 'danger',
         })
       })
   }
 }
-
-const doShowGroupEditModal = ref(false)
-const doShowTeacherEditModal = ref(false)
-
-const modalToGroupEdit = ref<GroupTeacher | null>(null)
-const modalToTeacherEdit = ref<TeacherTeam | null>(null)
-
-const titleModal = ref<string>()
 
 const showAddGroupModal = (title: string) => {
   modalToGroupEdit.value = null
@@ -174,13 +182,11 @@ const saveButtonLabel = computed(() => {
       : 'Add'
 })
 
-const editFormRef = ref()
-const { confirm } = useModal()
 const beforeEditFormModalClose = async (hide: () => unknown) => {
   if (editFormRef.value.isFormHasUnsavedChanges) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'Form has unsaved changes. Are you sure you want to close it?',
+      message: notifications.unsavedChanges,
       size: 'small',
     })
     if (agreed) {
@@ -204,7 +210,7 @@ const showEditTeacherModal = (teacher: TeacherTeam) => {
 
 const confirmDeleteGroupModal = async (groupId: string, groupName: string) => {
   const result = await confirm({
-    message: `Are you sure want to delete "${groupName}"?`,
+    message: notifications.confirmDelete(groupName),
     title: 'Delete Group',
     okText: 'Confirm',
     size: 'small',
@@ -215,16 +221,15 @@ const confirmDeleteGroupModal = async (groupId: string, groupName: string) => {
       .deleteGroupTeacher(groupId)
       .then(() => {
         notify({
-          message: `Delete ${groupName} successfully`,
+          message: notifications.deleteSuccessfully(groupName),
           color: 'success',
         })
         getTeacherGroups()
         getTeacherTeams()
       })
       .catch((error) => {
-        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete \n ${message}`,
+          message: notifications.deleteFailed(groupName) + getErrorMessage(error),
           color: 'danger',
         })
       })
@@ -232,7 +237,7 @@ const confirmDeleteGroupModal = async (groupId: string, groupName: string) => {
 }
 const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string) => {
   const result = await confirm({
-    message: `Are you sure want to delete "${teacherName}"?`,
+    message: notifications.confirmDelete(teacherName),
     title: 'Delete Teacher',
     okText: 'Confirm',
     size: 'small',
@@ -243,30 +248,19 @@ const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string
       .deleteTeacherInTeam(teacherId)
       .then(() => {
         notify({
-          message: `Delete ${teacherName} successfully`,
+          message: notifications.deleteSuccessfully(teacherName),
           color: 'success',
         })
         getTeacherGroups()
         getTeacherTeams()
       })
       .catch((error) => {
-        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete \n ${message}`,
+          message: notifications.deleteFailed(teacherName) + getErrorMessage(error),
           color: 'danger',
         })
       })
   }
-}
-
-const emit = defineEmits(['select-group', 'select-teacher'])
-
-function selectGroup(group: GroupTeacher) {
-  emit('select-group', group)
-}
-
-function detailTeacherInTeam(teacherId: string) {
-  emit('select-teacher', teacherId)
 }
 
 onMounted(() => {
@@ -305,7 +299,8 @@ const handlerSearch = (event: Event) => {
                 style="width: 100%"
                 class="p-2"
                 @click="showAddTeacherModal('Teacher')"
-                >New teacher
+              >
+                New teacher
               </VaButton>
             </VaDropdownContent>
             <VaDropdownContent class="p-0">
@@ -317,8 +312,8 @@ const handlerSearch = (event: Event) => {
                 @click="showAddGroupModal('Group')"
               >
                 New teacher group
-              </VaButton></VaDropdownContent
-            >
+              </VaButton>
+            </VaDropdownContent>
           </VaDropdown>
         </div>
         <VaModal

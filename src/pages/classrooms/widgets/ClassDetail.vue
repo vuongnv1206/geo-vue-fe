@@ -1,27 +1,32 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { Classrooms } from '../types'
 import AssignmentInClassDetails from './AssignmentInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useToast, VaCardContent } from 'vuestic-ui/web-components'
-import { notifications } from '@/services/utils'
+import { getErrorMessage, notifications } from '@/services/utils'
 import StudentsInClassDetails from './StudentsInClassDetails.vue'
 import { VaCard } from 'vuestic-ui'
 import PostsInClassDetails from './PostsInClassDetails.vue'
 
 const loading = ref(true)
-const showTabs = ref(false)
+const showTabs = ref(true)
 const router = useRouter()
 const { init: notify } = useToast()
 const classStore = useClassStore()
 const classId = router.currentRoute.value.params.id.toString()
+
 const tabs = [
   { title: 'Student list', icon: 'groups' },
   { title: 'Assignment & Exam', icon: 'assignment_add' },
   { title: 'News board', icon: 'newspaper' },
 ]
-const selectedTab = ref(tabs[2].title)
+const selectedTab = ref(localStorage.getItem('selectedTab') || tabs[0].title)
+
+watch(selectedTab, (value) => {
+  localStorage.setItem('selectedTab', value)
+})
 const currentTab = computed(() => tabs.find((tab) => tab.title === selectedTab.value) || tabs[0])
 const defaultClassDetails: Classrooms = {
   id: '',
@@ -45,7 +50,7 @@ const getClassById = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed(`class with id ${classId}`) + error.message,
+        message: notifications.getFailed(`class with id ${classId}`) + getErrorMessage(error),
         color: 'error',
       })
     })

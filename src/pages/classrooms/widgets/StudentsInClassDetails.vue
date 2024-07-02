@@ -74,14 +74,14 @@ const deleteStudent = (rowData: DataTableItem) => {
     .deleteStudent(rowData.id)
     .then(() => {
       notify({
-        message: notifications.deleteSuccessfully('student'),
+        message: notifications.deleteSuccessfully(rowData.firstName + ' ' + rowData.lastName),
         color: 'success',
       })
       emit('load')
     })
     .catch((error) => {
       notify({
-        message: notifications.deleteFailed('student') + getErrorMessage(error),
+        message: notifications.deleteFailed(rowData.firstName + ' ' + rowData.lastName) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -104,7 +104,7 @@ const deleteSelectedStudent = () => {
 const deleteStudentWithConfirm = (student: Student) => {
   confirm({
     title: 'Delete Student',
-    message: notifications.confirmDelete('student'),
+    message: notifications.confirmDelete(student.firstName + ' ' + student.lastName),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -120,14 +120,15 @@ const onStudentSaved = async (student: Student) => {
       .updateStudent(student.id, student as EmptyStudent)
       .then(() => {
         notify({
-          message: notifications.updatedSuccessfully('student'),
+          message: notifications.updatedSuccessfully(student.firstName + ' ' + student.lastName),
           color: 'success',
         })
         emit('load')
       })
       .catch((error) => {
         notify({
-          message: notifications.updatedSuccessfully('student') + getErrorMessage(error),
+          message:
+            notifications.updatedSuccessfully(student.firstName + ' ' + student.lastName) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -136,14 +137,14 @@ const onStudentSaved = async (student: Student) => {
       .createStudent(student as EmptyStudent)
       .then(() => {
         notify({
-          message: notifications.createSuccessfully('student'),
+          message: notifications.createSuccessfully(student.firstName + ' ' + student.lastName),
           color: 'success',
         })
         emit('load')
       })
       .catch((error) => {
         notify({
-          message: notifications.createFailed('student') + getErrorMessage(error),
+          message: notifications.createFailed(student.firstName + ' ' + student.lastName) + getErrorMessage(error),
           color: 'error',
         })
       })

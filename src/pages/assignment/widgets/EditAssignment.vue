@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { GroupClass } from '@/pages/classrooms/types'
-import { notifications, validators } from '@/services/utils'
+import { getErrorMessage, notifications, validators } from '@/services/utils'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
@@ -66,7 +66,7 @@ const getGroupClass = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('group class') + error.message,
+        message: notifications.getFailed('group class') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -80,7 +80,7 @@ const getSubjects = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('subject') + error.message,
+        message: notifications.getFailed('subject') + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -185,7 +185,6 @@ const handleClickSave = async () => {
     try {
       newAssignment.value.classIds = selectedClasses.value
       await assignmentStore.createAssignment(newAssignment.value as EmptyAssignment)
-      // console.log('New Assignment: ', newAssignment.value)
       notify({ message: notifications.createSuccessfully(newAssignment.value.name), color: 'success' })
       router.push({ name: 'assignments' })
     } catch (error) {
@@ -193,12 +192,6 @@ const handleClickSave = async () => {
     }
   }
 }
-
-// const updateContent = (content: any) => {
-//   console.log('Content1: ', content)
-//   newAssignment.value.content = content
-//   console.log('Content2: ', newAssignment.value.content)
-// }
 
 defineExpose({ isFormHasUnsavedChanges })
 
@@ -248,7 +241,6 @@ onMounted(() => {
               content-type="html"
             />
           </VaCard>
-          <!-- <QuillEditor class="h-13" theme="bubble" content-type="html" @update:content="updateContent" /> -->
           <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
           <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
           <VaSelect
