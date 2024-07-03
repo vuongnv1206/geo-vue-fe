@@ -16,10 +16,15 @@
       <VaCard class="p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center mb-4">
-            <!-- <VaAvatar :src="post.user.avatar" class="mr-4" /> -->
-            <VaAvatar class="mr-4" />
+            <GeoAvatar
+              class="mr-2"
+              :size="48"
+              color="warning"
+              :image="post.owner?.imageUrl || undefined"
+              :txt="post.owner?.firstName?.charAt(0).toUpperCase()"
+            />
             <div>
-              <h2 class="text-md font-bold text-gray-800">user name</h2>
+              <h2 class="text-md font-bold text-gray-800">{{ post.owner?.firstName }} {{ post.owner?.lastName }}</h2>
               <VaPopover
                 class="mb-2"
                 placement="right"
@@ -69,10 +74,17 @@
               <div class="bg-white p-3 rounded-md shadow-sm mb-2" :commentId="comment.id">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center mb-2">
-                    <!-- <VaAvatar :src="comment.user.avatar" class="mr-2" /> -->
-                    <VaAvatar class="mr-4" />
+                    <GeoAvatar
+                      class="mr-2"
+                      :size="36"
+                      color="warning"
+                      :image="comment.owner?.imageUrl || undefined"
+                      :txt="comment.owner?.firstName?.charAt(0).toUpperCase()"
+                    />
                     <div class="flex flex-col">
-                      <h2 class="text-md font-bold text-gray-800">user name</h2>
+                      <h2 class="text-sm font-bold text-gray-800">
+                        {{ comment.owner?.firstName }} {{ comment.owner?.lastName }}
+                      </h2>
                       <VaPopover
                         class="mb-2"
                         placement="right"
@@ -108,7 +120,7 @@
                     color="danger"
                     @click="toggleCommentLike(comment)"
                   >
-                    {{ comment.numberLikeInTheComment }}
+                    {{ comment.numberLikeInComment }}
                   </VaButton>
                   <VaButton preset="plain" size="small" icon="reply" @click="toggleReplies(comment.id)">
                     Reply</VaButton
@@ -203,6 +215,7 @@ import { useCommentStore } from '@/stores/modules/comments.module'
 import { Quill, QuillEditor } from '@vueup/vue-quill'
 import EditComment from './EditComment.vue'
 import EditPosts from './EditPosts.vue'
+import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 
 const loading = ref(true)
 const { init: notify } = useToast()
@@ -262,7 +275,7 @@ const getPosts = () => {
     .getPosts(dataFilter.value)
     .then((response) => {
       posts.value = response.data
-      // console.log('Posts:', posts.value)
+      console.log('Postsssssssssssssssssssssss:', posts.value)
     })
     .catch((error) => {
       notify({

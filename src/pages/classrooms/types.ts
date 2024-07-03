@@ -1,4 +1,5 @@
 import { Assignment } from '../assignment/types'
+import { UserDetail } from '../user/types'
 
 export type GroupClass = {
   id: string
@@ -93,7 +94,7 @@ export type Comment = {
   createdBy: string
   postId: string
   content: string
-  numberLikeInTheComment: number
+  numberLikeInComment: number
   createdOn: string
   parentId: string | null
   user: Student
@@ -127,6 +128,7 @@ export type Post = {
   classesId: string
   user: Student
   comments: Comment[]
+  owner: UserDetail | null
 }
 
 export type EmptyPost = {
