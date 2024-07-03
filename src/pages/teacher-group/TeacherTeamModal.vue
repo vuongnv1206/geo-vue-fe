@@ -2,6 +2,7 @@
 import { PropType, ref, watch } from 'vue'
 import { TeacherTeamRequest, TeacherTeam } from './types'
 import { useForm } from 'vuestic-ui'
+import { validators } from '@/services/utils'
 
 const props = defineProps({
   teacherTeam: {
@@ -54,15 +55,15 @@ const onSave = () => {
           v-model="newTeacher.teacherName"
           name="teacherName"
           label="Teacher name"
-          placeholder="Teacher name"
-          :rules="[(v) => !!v || 'Required']"
+          placeholder="Enter teacher name"
+          :rules="[validators.required2('Teacher name'), validators.maxLength(50)]"
         />
         <VaInput
           v-model="newTeacher.contact"
           name="contact"
           label="Contact"
-          placeholder="Contact"
-          :rules="[(v) => !!v || 'Required']"
+          placeholder="Enter contact"
+          :rules="[validators.required2('Teacher name'), validators.maxLength(200)]"
         />
       </VaForm>
     </VaCardContent>

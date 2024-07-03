@@ -98,7 +98,8 @@
     "male": "Nam",
     "change_email": "Thay đổi email",
     "change_password": "Thay đổi mật khẩu",
-    "verify_email": "Xác minh email"
+    "verify_email": "Xác minh email",
+    "password": "Mật khẩu"
   },
   "settings": {
     "title": "Cài đặt",
@@ -191,7 +192,8 @@
     "create": "Tạo",
     "update": "Cập nhật",
     "delete": "Xóa",
-    "share": "Chia sẻ"
+    "share": "Chia sẻ",
+    "edit": "Chỉnh sửa"
   },
   "questionFolderTable": {
     "folder_name": "Tên thư mục",
@@ -277,12 +279,12 @@
     "questions": "Câu hỏi",
     "question-folder": "Thư mục câu hỏi",
     "question-bank": "Ngân hàng câu hỏi",
-    "examinations": "Kiểm tra",
+    "examinations": "Đề thi",
     "paper-folder": "Thư mục bài kiểm tra",
     "classroom": "Lớp học",
     "class": "Lớp",
     "group-class": "Nhóm lớp",
-    "teacher-group": "Nhóm giáo viên",
+    "teacher-group": "Giáo viên",
     "exam": "Kỳ thi",
     "assignments": "Bài tập",
     "subjects": "Môn học"
@@ -303,7 +305,8 @@
     "mark_as_read": "Đánh dấu là đã đọc",
     "sentMessage": "đã gửi cho bạn một tin nhắn",
     "uploadedZip": "đã tải lên một tệp Zip mới với {type}",
-    "startedTopic": "đã bắt đầu một chủ đề mới"
+    "startedTopic": "đã bắt đầu một chủ đề mới",
+    "markAllAsRead": "Đánh dấu tất cả là đã đọc"
   },
   "user": {
     "language": "Thay đổi ngôn ngữ",
@@ -405,5 +408,38 @@
   "buttonSelect": {
     "dark": "Tối",
     "light": "Sáng"
+  },
+  "validateUtils": {
+    "required": "Trường này là bắt buộc",
+    "required2": "{fieldName} là bắt buộc",
+    "minLength": "Phải lớn hơn {length} ký tự",
+    "maxLength": "Phải nhỏ hơn {length} ký tự",
+    "minValue": "Giá trị phải lớn hơn hoặc bằng {min}",
+    "maxValue": "Giá trị phải nhỏ hơn hoặc bằng {max}",
+    "isCharacter": "{fieldName} phải là ký tự hợp lệ",
+    "isDecimalNumber": "{fieldName} phải là số thập phân hợp lệ",
+    "isNumber": "{fieldName} phải là số hợp lệ",
+    "email": "Vui lòng nhập địa chỉ email hợp lệ",
+    "phone": "Vui lòng nhập số điện thoại hợp lệ",
+    "updatedSuccessfully": "{message} cập nhật thành công",
+    "createSuccessfully": "{message} tạo thành công",
+    "deleteSuccessfully": "{message} xóa thành công",
+    "getFailed": "Lấy thông tin {message} thất bại\n",
+    "updateFailed": "Cập nhật {message} thất bại\n",
+    "createFailed": "Tạo {message} thất bại\n",
+    "deleteFailed": "Xóa {message} thất bại\n",
+    "unsavedChanges": "Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời khỏi?",
+    "confirmDelete": "Bạn muốn xóa {message}?",
+    "singleChoice": "Lựa chọn đơn",
+    "multipleChoice": "Lựa chọn nhiều",
+    "fillBlank": "Điền vào chỗ trống",
+    "matching": "Ghép đôi",
+    "reading": "Đọc",
+    "readingQuestionPassage": "Đoạn câu hỏi đọc",
+    "writing": "Viết",
+    "other": "Khác"
+  },
+  "languageSwitcher": {
+    "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."
   }
 }

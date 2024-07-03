@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
+import { GroupClass } from '@/pages/classrooms/types'
 
 const store = useGroupClassStore()
 const listGroupClass = ref<GroupClass[]>([])
@@ -72,7 +72,10 @@ watch(
                   >Name class: {{ classItem.name }}
                   <VaIcon name="co_present" />
                 </VaCardContent>
-                <VaCardContent class="text-xs text-gray-600">School year: {{ classItem.schoolYear }}</VaCardContent>
+                <VaCardContent class="text-xs text-gray-600">
+                  <p>School year: {{ classItem.schoolYear }}</p>
+                  <p>Member: {{ classItem.numberUserOfClass }}</p>
+                </VaCardContent>
               </VaCard>
             </VaCard>
           </VaCard>

@@ -39,17 +39,18 @@ const getPaperDetail = async () => {
     })
   }
 }
+const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
 
 const groupClasses = ref<GroupClass[]>([])
 const groupClassStores = useGroupClassStore()
 const getGroupClasses = async () => {
   try {
-    const res = await groupClassStores.getGroupClass()
+    const res = await groupClassStores.getGroupClasses(groupClassFilter)
     if (paperDetail.value?.paperAccesses) {
       paperDetail.value.paperAccesses
         .filter((element) => element.classId !== null)
         .forEach((element) => {
-          res.forEach((groupClass) => {
+          res.data.forEach((groupClass) => {
             if (groupClass.classes.some((x) => x.id === element.classId)) {
               if (!groupClasses.value.some((existingGroupClass) => existingGroupClass.id === groupClass.id)) {
                 groupClasses.value.push(groupClass)
@@ -183,12 +184,14 @@ const showSelectClassModal = ref(false)
 const classInSelectedGroup = ref<Classrooms[]>([])
 const selectedGroupClassName = ref('')
 const classStore = useClassStore()
+const classFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'], groupClassId: '' })
 const selectClassInGroup = async (classId: string) => {
   valueClassInGroupTap.value = classId
   try {
-    const classDetail = await classStore.GetClassById(classId)
-    const res = await classStore.getClassroomByGroupClassId(classDetail.groupClassId)
-    classInSelectedGroup.value = res.filter((classroom: Classrooms) =>
+    const classDetail = await classStore.getClassById(classId)
+    classFilter.value.groupClassId = classDetail.groupClassId
+    const res = await classStore.getClasses(classFilter.value)
+    classInSelectedGroup.value = res.data.filter((classroom: Classrooms) =>
       paperDetail.value?.paperAccesses?.some((x: PaperAccess) => x.classId == classroom.id),
     )
     selectedGroupClassName.value = classDetail.groupClassName
@@ -293,7 +296,6 @@ onMounted(async () => {
                 Everyone
               </VaButton>
               <div v-if="assignedOptionValue == AccessType.ByClass">
-                <VaInput placeholder="Search by name" class="mb-1" />
                 <VaCard outlined class="container-groupClass">
                   <VaCardContent class="p-1">
                     <VaAccordion v-model="valueCollapses" class="max-w-sm text-xs" multiple>

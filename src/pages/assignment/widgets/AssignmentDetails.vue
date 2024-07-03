@@ -1,3 +1,144 @@
+<script lang="ts" setup>
+import { onMounted, ref, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent } from '../types'
+import { useBreakpoint, useModal, useToast, VaCard, VaList, VaListItemSection } from 'vuestic-ui'
+import { format, getErrorMessage, notifications } from '@/services/utils'
+import { useClassStore } from '@/stores/modules/class.module'
+import EditAssignmentContent from './EditAssignmentContent.vue'
+import { Student } from '@/pages/classrooms/types'
+
+const loading = ref(true)
+const router = useRouter()
+const stores = useAssignmentStore()
+const classStores = useClassStore()
+const breakpoints = useBreakpoint()
+const { init: notify } = useToast()
+const showSidebar = ref(breakpoints.smUp)
+const assignment = ref<Assignment | null>(null)
+const assignmentContent = ref<AssignmentContent | null>(null)
+const students = ref<Student[]>([])
+const assignmentId = router.currentRoute.value.params.id.toString()
+const classId = router.currentRoute.value.params.classId.toString()
+const assignmentClass = ref<AssignmentClass>({
+  assignmentId: assignmentId,
+  classesdId: classId,
+})
+const doShowFormModal = ref(false)
+const editFormRef = ref()
+const { confirm } = useModal()
+
+const getAssignment = (id: string) => {
+  loading.value = true
+  stores
+    .getAssignment(id)
+    .then((response) => {
+      assignment.value = response
+      if (assignment.value?.content == '<p><br></p>') {
+        assignment.value.content = ''
+      }
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('assignment') + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getClassById = async () => {
+  loading.value = true
+  classStores
+    .getClassById(classId)
+    .then((response) => {
+      students.value = response.students
+      // console.log('Students:', students.value)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(`class with id ${classId}`) + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
+  classStores
+    .removeAssignmentFromClass(assignmentClass)
+    .then(() => {
+      router.push({ name: 'assignments' })
+      notify({
+        message: notifications.deleteSuccessfully('assignment'),
+        color: 'success',
+      })
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.deleteFailed('assignment') + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+}
+
+const beforeEditFormModalClose = async (hide: () => unknown) => {
+  if (editFormRef.value.isFormHasUnsavedChanges) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: notifications.unsavedChanges,
+      size: 'small',
+    })
+    if (agreed) {
+      hide()
+    }
+  } else {
+    hide()
+  }
+}
+
+const onAssignmentContent = async (assignment: AssignmentContent) => {
+  console.log('Assignment content:', assignment)
+  doShowFormModal.value = false
+  if (assignment.id != '') {
+    stores
+      .updateAssignment(assignment.id, assignment as EmptyAssignmentContent)
+      .then(() => {
+        notify({
+          message: notifications.updatedSuccessfully(assignment.content),
+          color: 'success',
+        })
+        getAssignment(assignment.id)
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.updateFailed(assignment.content) + getErrorMessage(error),
+          color: 'error',
+        })
+      })
+  }
+}
+
+const editAssignmentContent = (assContent: AssignmentContent) => {
+  assignmentContent.value = assContent
+  doShowFormModal.value = true
+}
+
+watchEffect(() => {
+  showSidebar.value = breakpoints.smUp
+})
+
+onMounted(() => {
+  getClassById()
+  getAssignment(assignmentId)
+})
+</script>
+
 <template>
   <VaLayout>
     <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'assignments' }" />
@@ -13,12 +154,8 @@
         <VaCard v-if="assignment">
           <VaCard>
             <VaCardTitle>{{ assignment.name }}</VaCardTitle>
-            <VaCardContent>
-              Start Time: {{ assignment.startTime ? format.formatDate(assignment.startTime) : '' }}
-            </VaCardContent>
-            <VaCardContent>
-              End Time: {{ assignment.endTime ? format.formatDate(assignment.endTime) : '' }}
-            </VaCardContent>
+            <VaCardContent> Start Time: {{ format.formatDate(assignment.startTime) }} </VaCardContent>
+            <VaCardContent> End Time: {{ format.formatDate(assignment.endTime) }} </VaCardContent>
           </VaCard>
           <VaCard>
             <VaCardTitle>Menu</VaCardTitle>
@@ -49,16 +186,25 @@
             </VaCardContent>
           </VaCard>
           <VaCard>
-            <VaCardTitle>Content</VaCardTitle>
+            <VaCard class="flex flex-row justify-between">
+              <VaCardTitle>Content</VaCardTitle>
+              <VaButton
+                class="pr-6"
+                icon="edit"
+                size="small"
+                preset="plain"
+                @click="editAssignmentContent(assignment)"
+              />
+            </VaCard>
             <VaCardContent>
-              {{ assignment.content ? assignment.content : 'Content is empty' }}
+              <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
             </VaCardContent>
           </VaCard>
         </VaCard>
       </VaSidebar>
     </template>
     <template #top>
-      <VaNavbar class="py-1">
+      <VaNavbar class="py-1 rounded">
         <template #left>
           <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
         </template>
@@ -76,97 +222,43 @@
       </VaNavbar>
     </template>
     <template #content>
-      <main class="p-4">
-        <h3 class="text-xl font-bold">Page content</h3>
-        <p>
-          Page content must be wrapped in main tag. You must do it manually. Here you can place any blocks you need in
-          your application.
-        </p>
-        <p>For example, you can place here your router view, add sidebar with navigation in #left slot.</p>
-        <p>If you're using VaSidebar for page navigation don't forget to wrap it in nav tag.</p>
-      </main>
+      <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+        <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
+          <VaListItemSection avatar>
+            <VaAvatar :src="student.avatarUrl" />
+          </VaListItemSection>
+          <VaListItemSection>
+            <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
+            <VaListItemLabel caption> đã nộp/chưa nôp </VaListItemLabel>
+          </VaListItemSection>
+        </VaListItem>
+      </VaList>
     </template>
   </VaLayout>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowFormModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    stateful
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+  >
+    <h1 class="va-h5 mb-4">Edit Content</h1>
+    <EditAssignmentContent
+      ref="editFormRef"
+      :assignment-content="assignmentContent"
+      @close="cancel"
+      @save="
+        (assignmentContent: AssignmentContent) => {
+          onAssignmentContent(assignmentContent)
+          ok()
+        }
+      "
+    />
+  </VaModal>
 </template>
 
-<script lang="ts" setup>
-import { onMounted, ref, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { Assignment, AssignmentClass } from '../types'
-import { useBreakpoint, useToast } from 'vuestic-ui'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { format, notifications } from '@/services/utils'
-import { useClassStore } from '@/stores/modules/class.module'
-
-dayjs.extend(utc)
-
-const router = useRouter()
-const stores = useAssignmentStore()
-const classStores = useClassStore()
-const breakpoints = useBreakpoint()
-const { init: notify } = useToast()
-const showSidebar = ref(breakpoints.smUp)
-const assignment = ref<Assignment | null>(null)
-const assignmentId = router.currentRoute.value.params.id.toString()
-const classId = router.currentRoute.value.params.classId.toString()
-const assignmentClass = ref<AssignmentClass>({
-  assignmentId: assignmentId,
-  classesdId: classId,
-})
-
-console.log('Assignment Class:', assignmentClass.value)
-const getAssignment = (id: string) => {
-  stores
-    .getAssignment(id)
-    .then((response) => {
-      assignment.value = response
-      // console.log('Assignment:', assignment.value)
-    })
-    .catch((error) => {
-      console.log('Error:', error)
-      notify({
-        message: notifications.getFailed('assignment') + error.message,
-        color: 'error',
-      })
-    })
-}
-
-const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
-  classStores
-    .removeAssignmentFromClass(assignmentClass)
-    .then(() => {
-      router.push({ name: 'assignments' })
-      notify({
-        message: notifications.deleteSuccessfully('assignment'),
-        color: 'success',
-      })
-    })
-    .catch((error) => {
-      notify({
-        message:
-          notifications.deleteFailed(assignment.value?.name ? assignment.value.name : 'assignment') + error.message,
-        color: 'error',
-      })
-    })
-}
-
-watchEffect(() => {
-  showSidebar.value = breakpoints.smUp
-})
-
-onMounted(() => {
-  getAssignment(assignmentId)
-})
-</script>
-
-<style lang="scss" scoped>
-.va-select-content__autocomplete {
-  flex: 1;
-}
-
-.va-input-wrapper__text {
-  gap: 0.2rem;
-}
-</style>
+<style lang="scss" scoped></style>

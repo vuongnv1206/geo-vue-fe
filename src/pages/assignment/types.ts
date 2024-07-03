@@ -8,7 +8,7 @@ export type Assignment = {
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectId: string
-  createOn: Date
+  createdOn: Date
 }
 
 export type EmptyAssignment = {
@@ -40,6 +40,15 @@ export type EmptyAssignmentDetails = {
   canViewResult: boolean
   requireLoginToSubmit: boolean
   classIds: string[]
+}
+
+export type AssignmentContent = {
+  id: string
+  content: string
+}
+
+export type EmptyAssignmentContent = {
+  content: string
 }
 
 export type Attachment = {

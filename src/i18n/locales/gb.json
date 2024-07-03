@@ -98,7 +98,8 @@
     "male": "male",
     "change_email": "Change email",
     "change_password": "Change password",
-    "verify_email": "Verify email"
+    "verify_email": "Verify email",
+    "password": "Password"
   },
   "settings": {
     "title": "Settings",
@@ -156,6 +157,7 @@
     "folders": "Folders",
     "search": "Search",
     "delete": "Delete",
+    "edit": "Edit",
     "add_folder": "Add Folder",
     "all": "All",
     "my_documents": "My Documents",
@@ -280,12 +282,12 @@
     "questions": "Questions",
     "question-folder": "Question folder",
     "question-bank": "Question bank",
-    "examinations": "Examinations",
+    "examinations": "Exams",
     "paper-folder": "Paper folder",
-    "classroom": "Classroom",
+    "classroom": "Classes",
     "class": "Class",
     "group-class": "Group class",
-    "teacher-group": "Teacher Group",
+    "teacher-group": "Teacher",
     "exam": "Exam",
     "assignments": "Assignment",
     "subjects": "Subject"
@@ -306,7 +308,8 @@
     "mark_as_read": "Mark as read",
     "sentMessage": "sent you a message",
     "uploadedZip": "uploaded a new Zip file with {type}",
-    "startedTopic": "started a new topic"
+    "startedTopic": "started a new topic",
+    "markAllAsRead": "Mark all as read"
   },
   "user": {
     "language": "Change language",
@@ -408,5 +411,38 @@
   "buttonSelect": {
     "dark": "Dark",
     "light": "Light"
+  },
+  "validateUtils": {
+    "required": "This field is required",
+    "required2": "{fieldName} is required",
+    "minLength": "Must be greater than {length} characters",
+    "maxLength": "Must be less than {length} characters",
+    "minValue": "Value must be greater than or equal to {min}",
+    "maxValue": "Value must be less than or equal to {max}",
+    "isCharacter": "{fieldName} must be valid characters",
+    "isDecimalNumber": "{fieldName} must be valid decimal number",
+    "isNumber": "{fieldName} must be valid number",
+    "email": "Please enter a valid email address",
+    "phone": "Please enter a valid phone number",
+    "updatedSuccessfully": "{message} updated successfully",
+    "createSuccessfully": "{message} created successfully",
+    "deleteSuccessfully": "{message} deleted successfully",
+    "getFailed": "Failed to get {message}\n",
+    "updateFailed": "Failed to update {message}\n",
+    "createFailed": "Failed to create {message}\n",
+    "deleteFailed": "Failed to delete {message}\n",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
+    "confirmDelete": "Are you sure you want to delete {message}?",
+    "singleChoice": "Single Choice",
+    "multipleChoice": "Multiple Choice",
+    "fillBlank": "Fill Blank",
+    "matching": "Matching",
+    "reading": "Reading",
+    "readingQuestionPassage": "Reading Question Passage",
+    "writing": "Writing",
+    "other": "Other"
+  },
+  "languageSwitcher": {
+    "change_language_success": "Change language successfully, some cases need to reload page to update language"
   }
 }

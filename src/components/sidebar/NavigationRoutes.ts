@@ -22,7 +22,7 @@ export default {
       },
     },
     {
-      name: 'question-folder',
+      name: 'questions',
       displayName: 'menu.questions',
       meta: {
         icon: 'folder',
@@ -62,7 +62,7 @@ export default {
       },
     },
     {
-      name: 'teacher group',
+      name: 'teacher-group',
       displayName: 'menu.teacher-group',
       meta: {
         icon: 'group',

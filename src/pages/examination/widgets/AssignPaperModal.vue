@@ -27,11 +27,12 @@ const valueOption = ref<AccessType>()
 const emit = defineEmits(['close', 'save'])
 
 const groupClasses = ref<GroupClass[] | null>(null)
+const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
 
 const getGroupClasses = async () => {
   try {
-    const res = await groupClassStores.getGroupClass()
-    groupClasses.value = res
+    const res = await groupClassStores.getGroupClasses(groupClassFilter)
+    groupClasses.value = res.data
   } catch (error) {
     console.error(error)
   }
@@ -39,12 +40,13 @@ const getGroupClasses = async () => {
 const checkedPermissionsClassAccess = ref<string[]>([])
 const classRoomsInGroup = ref<Classrooms[]>([])
 const selectedGroupClass = ref<string>('')
-
+const classFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'], groupClassId: '' })
 const getClassByGroupClass = (groupId: string) => {
+  classFilter.value.groupClassId = groupId
   classStores
-    .getClassroomByGroupClassId(groupId)
+    .getClasses(classFilter.value)
     .then((res) => {
-      classRoomsInGroup.value = res
+      classRoomsInGroup.value = res.data
       selectedGroupClass.value = groupId
     })
     .catch((error) => {

@@ -1,23 +1,28 @@
 <script lang="ts" setup>
-import { onMounted, ref, PropType } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Classrooms, GroupClass } from './types'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { useModal, useToast, VaCard } from 'vuestic-ui'
+import { useModal, useToast } from 'vuestic-ui'
 import EditClass from './widgets/EditClass.vue'
 import EditGroupClass from './widgets/EditGroupClass.vue'
+import { getErrorMessage, notifications } from '@/services/utils'
 import SharedClass from './SharedClass.vue'
 
+const editFormRef = ref()
+const { confirm } = useModal()
+const { init: notify } = useToast()
 const loading = ref(true)
 const stores = useClassStore()
 const classrooms = ref<Classrooms[]>([])
 const classToEdit = ref<Classrooms | null>(null)
 const doShowClassFormModal = ref(false)
-
-const editClass = (classrooms: Classrooms) => {
-  classToEdit.value = classrooms
-  doShowClassFormModal.value = true
-}
+const groupClassToEdit = ref<GroupClass | null>(null)
+const doShowGroupClassFormModal = ref(false)
+const store = useGroupClassStore()
+const listGroupClass = ref<GroupClass[]>([])
+const getGroupClassById = (id: string) => listGroupClass.value.find((gc) => gc.id === id)
+const getClassById = (id: string) => classrooms.value.find((c) => c.id === id)
 
 const createNewClass = () => {
   classToEdit.value = null
@@ -27,41 +32,58 @@ const createNewGroupClass = () => {
   groupClassToEdit.value = null
   doShowGroupClassFormModal.value = true
 }
-
-const groupClassToEdit = ref<GroupClass | null>(null)
-const doShowGroupClassFormModal = ref(false)
-const store = useGroupClassStore()
-const listGroupClass = ref<GroupClass[]>([])
-const getGroupClassById = (id: string) => listGroupClass.value.find((gc) => gc.id === id)
-const getClassById = (id: string) => classrooms.value.find((c) => c.id === id)
-
-const selectedItemsEmitted = defineModel('selectedItemsEmitted', {
-  type: Array as PropType<GroupClass[]>,
-  default: [],
-})
-
-function getGroupClasses() {
-  loading.value = true
-  store
-    .getGroupClass()
-    .then((res) => {
-      listGroupClass.value = res
-      console.log('Department: ', listGroupClass.value)
-    })
-    .finally(() => {
-      loading.value = false
-    })
+const editClass = (classrooms: Classrooms) => {
+  classToEdit.value = classrooms
+  doShowClassFormModal.value = true
 }
 const editGroupClass = (gc: GroupClass) => {
   groupClassToEdit.value = gc
   doShowGroupClassFormModal.value = true
 }
 
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
+
+const getGroupClasses = () => {
+  loading.value = true
+  dataFilter.value.advancedSearch.fields = ['name']
+  store
+    .getGroupClasses(dataFilter)
+    .then((response) => {
+      listGroupClass.value = response.data
+      classrooms.value = response.data.flatMap((gc) => gc.classes)
+      // console.log('Department: ', listGroupClass.value)
+      // console.log('Classrooms: ', classrooms.value)
+      loading.value = false
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('group class') + getErrorMessage(error),
+        color: 'error',
+      })
+      loading.value = false
+    })
+}
+
+const handlerSearch = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  dataFilter.value.advancedSearch.keyword = input.value
+  console.log('Search: ', dataFilter.value.advancedSearch.keyword)
+  getGroupClasses()
+}
+
 const handleMenuGroupClassClick = (option: any) => {
   if (option.text === 'Edit') {
     editGroupClass(getGroupClassById(option.value) as GroupClass)
   } else if (option.text === 'Delete') {
-    onGroupClassDeleted(getGroupClassById(option.value) as GroupClass)
+    deletedGroupClass(getGroupClassById(option.value) as GroupClass)
   }
 }
 
@@ -69,77 +91,15 @@ const handleMenuClassClick = (option: any) => {
   if (option.text === 'Edit') {
     editClass(getClassById(option.value) as Classrooms)
   } else if (option.text === 'Delete') {
-    onClassDelete(getClassById(option.value) as Classrooms)
+    deleteClass(getClassById(option.value) as Classrooms)
   }
 }
-
-const onGroupClassSaved = async (gc: GroupClass) => {
-  doShowGroupClassFormModal.value = false
-  if ('id' in gc) {
-    await store.update(gc.id, gc as GroupClass)
-    notify({
-      message: 'GroupClass updated',
-      color: 'success',
-    })
-  } else {
-    await store.add(gc as GroupClass)
-    notify({
-      message: 'GroupClass created',
-      color: 'success',
-    })
-  }
-  getGroupClasses()
-}
-
-const onGroupClassDeleted = async (gc: GroupClass) => {
-  const response = await confirm({
-    title: 'Delete GroupClass',
-    message: `Are you sure you want to delete GroupClass "${gc.name}"?`,
-    okText: 'Delete',
-    size: 'small',
-    maxWidth: '380px',
-  })
-
-  if (!response) {
-    return
-  }
-
-  await store.remove(gc.id)
-  notify({
-    message: 'GroupClass deleted',
-    color: 'success',
-  })
-  getGroupClasses()
-}
-
-function getClassByUser() {
-  loading.value = true
-  stores
-    .getClassroomByUser()
-    .then((res) => {
-      classrooms.value = res
-    })
-    .catch(() => {
-      notify({
-        message: 'Failed to get class fails',
-        color: 'error',
-      })
-    })
-    .finally(() => {
-      selectedItemsEmitted.value = []
-      loading.value = false
-    })
-}
-
-const editFormRef = ref()
-const { confirm } = useModal()
-const { init: notify } = useToast()
 
 const beforeEditFormModalClose = async (hide: () => unknown) => {
   if (editFormRef.value.isFormHasUnsavedChanges) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'Form has unsaved changes. Are you sure you want to close it?',
+      message: notifications.unsavedChanges,
       size: 'small',
     })
     if (agreed) {
@@ -150,25 +110,56 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   }
 }
 
-const onClassDelete = async (c: Classrooms) => {
-  const response = await confirm({
+const deleteClass = (classroom: Classrooms) => {
+  confirm({
     title: 'Delete Class',
-    message: `Are you sure you want to delete Class "${c.name}"?`,
-    okText: 'Delete',
-    size: 'small',
-    maxWidth: '380px',
+    message: notifications.confirmDelete(classroom.name),
+  }).then((agreed) => {
+    if (!agreed) {
+      return
+    }
+    stores
+      .deleteClassroom(classroom.id)
+      .then(() => {
+        notify({
+          message: notifications.deleteSuccessfully(classroom.name),
+          color: 'success',
+        })
+        getGroupClasses()
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.deleteFailed(classroom.name) + getErrorMessage(error),
+          color: 'error',
+        })
+      })
   })
+}
 
-  if (!response) {
-    return
-  }
-
-  await stores.deleteClassroom(c.id)
-  notify({
-    message: 'Class deleted successfully',
-    color: 'success',
+const deletedGroupClass = (groupClass: GroupClass) => {
+  confirm({
+    title: 'Delete GroupClass',
+    message: notifications.confirmDelete(groupClass.name),
+  }).then((agreed) => {
+    if (!agreed) {
+      return
+    }
+    store
+      .deleteGroupClass(groupClass.id)
+      .then(() => {
+        notify({
+          message: notifications.deleteSuccessfully(groupClass.name),
+          color: 'success',
+        })
+        getGroupClasses()
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.deleteFailed(groupClass.name) + getErrorMessage(error),
+          color: 'error',
+        })
+      })
   })
-  getGroupClasses()
 }
 
 const onClassSaved = async (classrooms: Classrooms) => {
@@ -178,15 +169,14 @@ const onClassSaved = async (classrooms: Classrooms) => {
       .updateClassroom(classrooms.id, classrooms as Classrooms)
       .then(() => {
         notify({
-          message: 'Class updated successfully',
+          message: notifications.updatedSuccessfully(classrooms.name),
           color: 'success',
         })
         getGroupClasses()
-        getClassByUser()
       })
-      .catch((err) => {
+      .catch((error) => {
         notify({
-          message: 'Failed to update class\n' + err.message,
+          message: notifications.updateFailed(classrooms.name) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -195,35 +185,70 @@ const onClassSaved = async (classrooms: Classrooms) => {
       .addClassroom(classrooms as Classrooms)
       .then(() => {
         notify({
-          message: 'Class created successfully',
+          message: notifications.createSuccessfully('class'),
           color: 'success',
         })
         getGroupClasses()
-        getClassByUser()
       })
-      .catch((err) => {
+      .catch((error) => {
         notify({
-          message: 'Failed to create class\n' + err.message,
+          message: notifications.createFailed('class') + getErrorMessage(error),
           color: 'error',
         })
       })
   }
 }
 
+const onGroupClassSaved = async (groupClass: GroupClass) => {
+  doShowGroupClassFormModal.value = false
+  if ('id' in groupClass) {
+    await store
+      .updateGroupClass(groupClass.id, groupClass as GroupClass)
+      .then(() => {
+        notify({
+          message: notifications.updatedSuccessfully(groupClass.name),
+          color: 'success',
+        })
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.updateFailed(groupClass.name) + getErrorMessage(error),
+          color: 'error',
+        })
+      })
+  } else {
+    await store
+      .createGroupClass(groupClass as GroupClass)
+      .then(() => {
+        notify({
+          message: notifications.createSuccessfully('Group class'),
+          color: 'success',
+        })
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.createFailed('Group class') + getErrorMessage(error),
+          color: 'error',
+        })
+      })
+  }
+  getGroupClasses()
+}
+
 const filterClassList = ref(true)
 
 onMounted(() => {
   getGroupClasses()
-  getClassByUser()
 })
 </script>
+
 <template>
   <link rel="stylesheet" />
   <VaCard>
     <VaCard class="flex flex-col md:flex-row gap-2 p-2">
       <VaCard class="flex justify-start items-center flex-grow">
         <VaCard class="flex flex-grow">
-          <VaInput placeholder="Search" class="flex-grow">
+          <VaInput placeholder="Search group class name" class="flex-grow" @input="handlerSearch">
             <template #appendInner>
               <VaIcon color="secondary" class="material-icons">search</VaIcon>
             </template>
@@ -287,7 +312,7 @@ onMounted(() => {
                         { text: 'Edit', value: groupClass.id, icon: 'edit' },
                         { text: 'Delete', value: groupClass.id, icon: 'delete' },
                       ]"
-                      @selected="(v) => handleMenuGroupClassClick(v)"
+                      @selected="(v: any) => handleMenuGroupClassClick(v)"
                     >
                       <template #anchor>
                         <VaCard class="cursor-pointer text-gray-500 hover:text-gray-700" @click.stop>
@@ -298,7 +323,7 @@ onMounted(() => {
                   </VaCard>
                 </VaCard>
               </template>
-              <VaCard class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <VaCard class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <VaCard v-for="classItem in groupClass.classes" :key="classItem.id">
                   <VaCard
                     color="primary"
@@ -314,7 +339,7 @@ onMounted(() => {
                             { text: 'Edit', value: classItem.id, icon: 'edit' },
                             { text: 'Delete', value: classItem.id, icon: 'delete' },
                           ]"
-                          @selected="(v) => handleMenuClassClick(v)"
+                          @selected="(v: any) => handleMenuClassClick(v)"
                         >
                           <template #anchor>
                             <VaCard class="cursor-pointer text-gray-500 hover:text-gray-700" @click.stop>
@@ -323,7 +348,10 @@ onMounted(() => {
                           </template>
                         </VaMenu>
                       </VaCard>
-                      <VaCardContent class="text-sm text-gray-600">{{ classItem.schoolYear }}</VaCardContent>
+                      <VaCard class="flex flex-row justify-between items-center gap-2">
+                        <VaCardContent class="text-sm">Member: {{ classItem.numberUserOfClass }}</VaCardContent>
+                        <VaCardContent class="text-sm">Year: {{ classItem.schoolYear }}</VaCardContent>
+                      </VaCard>
                     </VaCard>
                   </VaCard>
                 </VaCard>

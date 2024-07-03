@@ -2,12 +2,15 @@
 import { useI18n } from 'vue-i18n'
 import VaIconEnglish from '@/components/icons/VaIconEnglish.vue'
 import VaIconVietnamese from '@/components/icons/VaIconVietnamese.vue'
+import { useToast } from 'vuestic-ui'
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
+const { init } = useToast()
 
 const changeLanguage = (lang: string) => {
   locale.value = lang
   localStorage.setItem('locale', lang)
+  init({ message: t('languageSwitcher.change_language_success'), color: 'success', position: 'bottom-right' })
 }
 </script>
 

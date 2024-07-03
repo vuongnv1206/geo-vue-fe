@@ -16,7 +16,6 @@ defineEmits<{
 const defaultNewGroupClass: EmptyGroupClass = {
   name: '',
 }
-
 const newGroupClass = ref({ ...defaultNewGroupClass })
 
 const isFormHasUnsavedChanges = computed(() => {
@@ -29,10 +28,6 @@ const isFormHasUnsavedChanges = computed(() => {
       (props.groupClass ?? defaultNewGroupClass)?.[key as keyof EmptyGroupClass]
     )
   })
-})
-
-defineExpose({
-  isFormHasUnsavedChanges,
 })
 
 watch(
@@ -48,6 +43,10 @@ watch(
   },
   { immediate: true },
 )
+
+defineExpose({
+  isFormHasUnsavedChanges,
+})
 </script>
 
 <template>
@@ -55,7 +54,11 @@ watch(
     <VaInput
       v-model="newGroupClass.name"
       label="GroupClass name"
-      :rules="[validators.required2('group class name'), validators.maxLength(50)]"
+      :rules="[
+        validators.required2('Group class name'),
+        validators.isCharacter('Group class name'),
+        validators.maxLength(50),
+      ]"
     />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>

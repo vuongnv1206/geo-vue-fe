@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed, watch } from 'vue'
-import { QuestionTree, QuestionTreeEmpty, QuestionFolderPermission, SharePermission } from './types'
+import { QuestionTree, QuestionTreeEmpty, QuestionFolderPermission, SharePermission, Permission } from './types'
 import QuestionFolder from './widgets/QuestionFolder.vue'
 import EditQuestionTreeForm from './widgets/EditQuestionTreeForm.vue'
 import QuestionBank from './QuestionBank.vue'
@@ -121,6 +121,8 @@ const permissionEdit = ref({
   canShare: false,
 })
 
+const canEdit = ref(false)
+
 const editPermission = (permission: QuestionFolderPermission) => {
   doShowQuestionTreePermisionFormModal.value = true
   editPermissionValue.value = permission
@@ -130,6 +132,9 @@ const editPermission = (permission: QuestionFolderPermission) => {
     canUpdate: permission.canUpdate,
     canDelete: permission.canDelete,
     canShare: permission.canShare,
+  }
+  if (permission.canAdd && permission.canUpdate && permission.canDelete) {
+    canEdit.value = true
   }
 }
 
@@ -224,6 +229,15 @@ const shareQuestionTree = (questionTree: QuestionTree) => {
       if (permission.canShare) {
         hasPermission = true
       }
+    }
+    if (permission.groupTeacher?.teacherTeams) {
+      permission.groupTeacher.teacherTeams.forEach((teacherTeam) => {
+        if (teacherTeam.teacherId == currentUserId) {
+          if (permission.canShare) {
+            hasPermission = true
+          }
+        }
+      })
     }
   })
 
@@ -452,7 +466,22 @@ const onShareQuestionFolderPermission = () => {
         color: 'danger',
       })
     })
+    .finally(() => {
+      doShowQuestionTreePermisionFormModal.value = false
+    })
 }
+
+const handleDeletePermission = () => {
+  permissionEdit.value = {
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+  }
+  onShareQuestionFolderPermission()
+}
+
 const tabValue = ref(0)
 
 const { sellectedQuestionFolderId } = storeToRefs(storesQuestion)
@@ -503,13 +532,45 @@ const questionTreesFiltered = computed(() => {
   return filtered
 })
 
+const allPermissionFalse = (permission: Permission) => {
+  return !permission.canView && !permission.canAdd && !permission.canUpdate && !permission.canDelete
+}
+
 watch(
   () => permissionEdit.value,
   (value) => {
     if (!value.canView) {
-      permissionEdit.value.canAdd = false
-      permissionEdit.value.canUpdate = false
-      permissionEdit.value.canDelete = false
+      canEdit.value = false
+    }
+  },
+  { deep: true },
+)
+
+watch(
+  () => canEdit.value,
+  (value) => {
+    if (!value) {
+      permissionEdit.value = {
+        canView: false,
+        canAdd: false,
+        canUpdate: false,
+        canDelete: false,
+        canShare: false,
+      }
+    } else {
+      permissionEdit.value.canView = true
+      permissionEdit.value.canAdd = true
+      permissionEdit.value.canUpdate = true
+      permissionEdit.value.canDelete = true
+    }
+  },
+)
+
+watch(
+  () => permissionEdit.value.canShare,
+  (value) => {
+    if (value) {
+      canEdit.value = true
     }
   },
   { deep: true },
@@ -730,13 +791,12 @@ onMounted(() => {
       <VaScrollContainer class="h-80" vertical>
         <VaList>
           <VaListLabel> {{ t('questionFolder.permissions') }} </VaListLabel>
-
           <VaListItem
             v-for="(permission, index) in QuestionTreeToEdit?.permission"
             :key="index"
             class="list__item ml-5"
           >
-            <VaListItemSection avatar>
+            <VaListItemSection v-if="!allPermissionFalse(permission as Permission)" avatar>
               <VaAvatar
                 v-if="permission.user ? true : false"
                 :size="42"
@@ -746,8 +806,7 @@ onMounted(() => {
               </VaAvatar>
               <VaAvatar v-else :size="42" color="warning" icon="group"> </VaAvatar>
             </VaListItemSection>
-
-            <VaListItemSection>
+            <VaListItemSection v-if="!allPermissionFalse(permission as Permission)">
               <VaListItemLabel>
                 {{ getNameUserGroup(permission) }}
               </VaListItemLabel>
@@ -756,8 +815,7 @@ onMounted(() => {
                 {{ permission.user?.email }}
               </VaListItemLabel>
             </VaListItemSection>
-
-            <VaListItemSection icon>
+            <VaListItemSection v-if="!allPermissionFalse(permission as Permission)" icon>
               <VaButton
                 v-if="QuestionTreeToEdit?.owner && QuestionTreeToEdit.owner.id == permission.user?.id"
                 size="small"
@@ -819,7 +877,7 @@ onMounted(() => {
                 color="danger"
                 @click="
                   () => {
-                    console.log('delete')
+                    handleDeletePermission()
                   }
                 "
               >
@@ -831,9 +889,7 @@ onMounted(() => {
       </div>
       <div class="flex flex-col gap-4 p-10">
         <VaCheckbox v-model="permissionEdit.canView" :label="t('questionFolder.view')" />
-        <VaCheckbox v-model="permissionEdit.canAdd" :label="t('questionFolder.create')" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" :label="t('questionFolder.update')" />
-        <VaCheckbox v-model="permissionEdit.canDelete" :label="t('questionFolder.delete')" />
+        <VaCheckbox v-model="canEdit" :label="t('questionFolder.edit')" />
         <VaCheckbox v-model="permissionEdit.canShare" :label="t('questionFolder.share')" />
       </div>
     </VaForm>
@@ -885,9 +941,8 @@ onMounted(() => {
       </div>
       <div class="flex flex-col gap-4 p-10">
         <VaCheckbox v-model="permissionEdit.canView" :label="t('questionFolder.view')" />
-        <VaCheckbox v-model="permissionEdit.canAdd" :label="t('questionFolder.create')" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" :label="t('questionFolder.update')" />
-        <VaCheckbox v-model="permissionEdit.canDelete" :label="t('questionFolder.delete')" />
+        <VaCheckbox v-model="canEdit" :label="t('questionFolder.edit')" />
+        <VaCheckbox v-model="permissionEdit.canShare" :label="t('questionFolder.share')" />
       </div>
     </VaForm>
   </VaModal>

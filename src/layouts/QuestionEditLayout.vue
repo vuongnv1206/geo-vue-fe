@@ -45,7 +45,7 @@ if (!storesQEdit.folder?.id) {
     color: 'danger',
   })
   // go to question bank
-  router.push({ name: 'question-bank' })
+  router.push({ name: 'questions' })
 }
 
 // sync listQuestions with store
@@ -457,7 +457,7 @@ const handleSaveBtn = () => {
               color: 'success',
             })
             sellectedQuestionFolderId.value = storesQEdit.folder?.id
-            router.push({ name: 'question-bank' })
+            router.push({ name: 'questions' })
           })
           .catch((error) => {
             const message = getErrorMessage(error)
@@ -487,7 +487,7 @@ const handleSaveBtn = () => {
           color: 'success',
         })
         sellectedQuestionFolderId.value = storesQEdit.folder?.id
-        router.push({ name: 'question-bank' })
+        router.push({ name: 'questions' })
       })
       .catch((error) => {
         const message = getErrorMessage(error)

@@ -1,5 +1,21 @@
 import { QuestionType } from '@/pages/question/types'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/vi'
+import 'dayjs/locale/en'
+
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
+dayjs.extend(timezone)
+import i18n from './../i18n'
+const { t } = i18n.global
+
+const local = i18n.global.locale.value === 'vi' ? 'vi' : 'en'
+dayjs.locale(local)
+
+const currentTimezone = dayjs.tz.guess()
 
 export const sleep = (ms = 0) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -7,55 +23,68 @@ export const sleep = (ms = 0) => {
 
 /** Validation */
 export const validators = {
-  email: (v: string) => {
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return pattern.test(v) || 'Please enter a valid email address'
-  },
-  required: (v: any) => !!v || 'This field is required',
-  isNumber: (v: any) => !isNaN(parseFloat(v)) || 'This field must be a number',
-  required2: (fieldName: string) => (v: string) => !!v || `Field ${fieldName} is required`,
-  minLength: (length: number) => (v: string) =>
-    (v && v.length >= length) || `Must be greater than ${length} characters`,
-  // maxLength: (length: number) => (v: string) => (v && v.length <= length) || `Must be less than ${length} characters`,
+  required: (v: any) => !!v || t('validateUtils.required'),
+  required2: (fieldName: string) => (v: string) => !!v || t('validateUtils.required2', { fieldName }),
+
+  minLength: (length: number) => (v: string) => (v && v.length >= length) || t('validateUtils.minLength', { length }),
   maxLength: (length: number) => (v: string | null) =>
-    v === null || v.length <= length || `Must be less than ${length} characters`,
-  numeric: (v: string) => /^\d+$/.test(v) || 'Only numeric characters are allowed',
-  minValue: (min: number) => (v: string) =>
-    (v && parseFloat(v) >= min) || `Value must be greater than or equal to ${min}`,
-  maxValue: (max: number) => (v: string) => (v && parseFloat(v) <= max) || `Value must be less than or equal to ${max}`,
-  validDate: (v: string) => !isNaN(Date.parse(v)) || 'Please enter a valid date',
+    v === null || v.length <= length || t('validateUtils.maxLength', { length }),
+
+  minValue: (min: number) => (v: string) => (v && parseFloat(v) >= min) || t('validateUtils.minValue', { min }),
+  maxValue: (max: number) => (v: string) => (v && parseFloat(v) <= max) || t('validateUtils.maxValue', { max }),
+
+  isCharacter: (fieldName: string) => (v: string) =>
+    /^[\p{L} ]+$/u.test(v) || t('validateUtils.isCharacter', { fieldName }),
+  isDecimalNumber: (fieldName: string) => (v: string) =>
+    /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || t('validateUtils.isDecimalNumber', { fieldName }),
+  isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || t('validateUtils.isNumber', { fieldName }),
+  email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
+  phone: (v: string) => /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(v) || t('validateUtils.phone'),
 }
 
 export const format = {
   formatDate: (date: Date) => {
-    return dayjs(date).format('DD/MM/YYYY - HH:mm')
+    return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
+  },
+  formatDateFromNow: (date: Date) => {
+    return dayjs(date).tz(currentTimezone).fromNow()
   },
   getTimeString: (date: string) => {
-    return date.split('T')[0] + ' ' + date.split('T')[1].split('.')[0]
+    const dateTime = dayjs(date).tz(currentTimezone)
+    const now = dayjs().tz(currentTimezone)
+    if (now.diff(dateTime, 'day') >= 1) {
+      return dateTime.format('DD/MM/YYYY - HH:mm')
+    } else {
+      return dateTime.fromNow()
+    }
   },
 }
 
 export const notifications = {
   updatedSuccessfully: (message: string) => {
-    return message + ' updated successfully'
+    return t('validateUtils.updatedSuccessfully', { message }) + '\n'
   },
   createSuccessfully: (message: string) => {
-    return message + ' created successfully'
+    return t('validateUtils.createSuccessfully', { message }) + '\n'
   },
   deleteSuccessfully: (message: string) => {
-    return message + ' deleted successfully'
+    return t('validateUtils.deleteSuccessfully', { message }) + '\n'
   },
   getFailed: (message: string) => {
-    return 'Failed to get ' + message + '\n'
+    return t('validateUtils.getFailed', { message }) + '\n'
   },
   updateFailed: (message: string) => {
-    return 'Failed to update ' + message + '\n'
+    return t('validateUtils.updateFailed', { message }) + '\n'
   },
   createFailed: (message: string) => {
-    return 'Failed to create ' + message + '\n'
+    return t('validateUtils.createFailed', { message }) + '\n'
   },
   deleteFailed: (message: string) => {
-    return 'Failed to delete ' + message + '\n'
+    return t('validateUtils.deleteFailed', { message }) + '\n'
+  },
+  unsavedChanges: t('validateUtils.unsavedChanges'),
+  confirmDelete: (message: string) => {
+    return t('validateUtils.confirmDelete', { message }) + '\n'
   },
 }
 
@@ -124,35 +153,35 @@ export const QuestionTypeLabel = (type: QuestionType | undefined) => {
   const labels = [
     {
       type: QuestionType.SingleChoice,
-      label: 'Single Choice',
+      label: t('validateUtils.singleChoice'),
     },
     {
       type: QuestionType.MultipleChoice,
-      label: 'Multiple Choice',
+      label: t('validateUtils.multipleChoice'),
     },
     {
       type: QuestionType.FillBlank,
-      label: 'Fill Blank',
+      label: t('validateUtils.fillBlank'),
     },
     {
       type: QuestionType.Matching,
-      label: 'Matching',
+      label: t('validateUtils.matching'),
     },
     {
       type: QuestionType.Reading,
-      label: 'Reading',
+      label: t('validateUtils.reading'),
     },
     {
       type: QuestionType.ReadingQuestionPassage,
-      label: 'Reading Question Passage',
+      label: t('validateUtils.readingQuestionPassage'),
     },
     {
       type: QuestionType.Writing,
-      label: 'Writing',
+      label: t('validateUtils.writing'),
     },
     {
       type: QuestionType.Other,
-      label: 'Other',
+      label: t('validateUtils.other'),
     },
   ]
   const label = labels.find((c) => c.type === type)?.label
