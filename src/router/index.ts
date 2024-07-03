@@ -55,6 +55,11 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/examination/PaperFolder.vue'),
           },
           {
+            name: 'shared-paper-folder',
+            path: 'shared-paper-folder',
+            component: () => import('../pages/examination/SharedPaperFolder.vue'),
+          },
+          {
             name: 'create-paper',
             path: 'create-paper/:folderId?',
             component: () => import('../pages/examination/CreatePaper.vue'),
