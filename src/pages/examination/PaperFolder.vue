@@ -22,14 +22,13 @@ import { UserDetail } from '@/pages/user/types'
 import { PaperFolderPermission, SharePaperFolderRequest } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { getErrorMessage } from '../../services/utils'
-import SharedPaperFolder from './SharedPaperFolder.vue'
 import { format } from '@services/utils'
 
 const router = useRouter()
 const paperFolderStore = usePaperFolderStore()
 const paperStore = usePaperStore()
 const loading = ref(true)
-const isSharedDocument = ref(true)
+const isMyDocument = ref(true)
 
 const dataFilterFolder = ref<DataFilterFolder>({
   keyword: '',
@@ -444,6 +443,11 @@ watchEffect(() => {
   calculateTotalPages()
 })
 
+const switchToSharedDocuments = () => {
+  isMyDocument.value = false
+  router.push({ name: 'shared-paper-folder' })
+}
+
 // Computed property để lấy ra dữ liệu cho trang hiện tại
 const currentItems = computed(() => {
   const startIndex = (pagination.value.pageNumber - 1) * pagination.value.pageSize
@@ -648,6 +652,7 @@ const onSharePaperFolderPermission = () => {
         </VaInput>
       </VaCard>
     </VaCard>
+
     <VaCard class="flex justify-end items-center">
       <VaCard class="flex gap-2">
         <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems"
@@ -665,10 +670,10 @@ const onSharePaperFolderPermission = () => {
               size="small"
               style="width: 100%"
               class="p-2"
-              :icon="isSharedDocument ? 'check' : ''"
-              @click="isSharedDocument = true"
-              >My Documents</VaButton
-            >
+              :icon="isMyDocument ? 'check' : ''"
+              @click="isMyDocument = true"
+              >My Documents
+            </VaButton>
           </VaDropdownContent>
           <VaDropdownContent class="p-0">
             <VaButton
@@ -676,17 +681,17 @@ const onSharePaperFolderPermission = () => {
               size="small"
               style="width: 100%"
               class="p-2"
-              :icon="isSharedDocument ? '' : 'check'"
-              @click="isSharedDocument = false"
-              >Shared Documents</VaButton
-            >
+              :icon="isMyDocument ? '' : 'check'"
+              @click="switchToSharedDocuments"
+              >Shared Documents
+            </VaButton>
           </VaDropdownContent>
         </VaDropdown>
       </VaCard>
     </VaCard>
   </VaCard>
 
-  <VaCard v-if="isSharedDocument">
+  <VaCard>
     <VaCardTitle>
       <VaBreadcrumbs>
         <VaBreadcrumbsItem v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.id ?? index">
@@ -786,9 +791,7 @@ const onSharePaperFolderPermission = () => {
       />
     </VaCardContent>
   </VaCard>
-  <VaCard v-else>
-    <SharedPaperFolder />
-  </VaCard>
+
   <VaModal
     v-slot="{ cancel, ok }"
     v-model="doShowEditFolderModal"
