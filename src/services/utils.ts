@@ -13,7 +13,28 @@ import i18n from './../i18n'
 const { t } = i18n.global
 
 const local = i18n.global.locale.value === 'vi' ? 'vi' : 'en'
-dayjs.locale(local)
+// dayjs.locale(local)
+const customRelativeTime = {
+  future: 'in %s',
+  past: '%s ago',
+  s: 'a few seconds',
+  m: 'a minute',
+  mm: '%d minutes',
+  h: 'an hour',
+  hh: '%d hours',
+  d: 'a day',
+  dd: '%d days',
+  M: 'a month',
+  MM: '%d months',
+  y: 'a year',
+  yy: '%d years',
+}
+
+dayjs.locale({
+  name: local,
+  formats: {},
+  relativeTime: customRelativeTime,
+})
 
 const currentTimezone = dayjs.tz.guess()
 
@@ -48,6 +69,11 @@ export const format = {
   },
   formatDateFromNow: (date: Date) => {
     return dayjs(date).tz(currentTimezone).fromNow()
+  },
+  formatTimeToX: (date1: Date, date2: Date) => {
+    const start = dayjs(date1).tz(currentTimezone)
+    const end = dayjs(date2).tz(currentTimezone)
+    return end.from(start, true)
   },
   getTimeString: (date: string) => {
     const dateTime = dayjs(date).tz(currentTimezone)
