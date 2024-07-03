@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { VaButton, VaCardTitle, useToast } from 'vuestic-ui'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto } from '@/pages/examination/types'
+import { PaperDto, ShowQuestionAnswer, ShowResult } from '@/pages/examination/types'
 import { useRoute } from 'vue-router'
 import { Classrooms, GroupClass, Student } from '@/pages/classrooms/types'
 import { useClassStore } from '@/stores/modules/class.module'
@@ -10,11 +10,15 @@ import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { UpdatePaperRequest, PaperAccess, AccessType } from './types'
 import DatePickerModal from '@/pages/examination/widgets/DatePickerModal.vue'
 import StudentListInClassModal from '@pages/examination/widgets/StudentListInClassModal.vue'
+import { useSubjectStore } from '@/stores/modules/subject.module'
+import { Subject } from '../subject/types'
+import { getErrorMessage, notifications } from '@/services/utils'
 
 const paperDetail = ref<PaperDto | null>(null)
 const route = useRoute()
 const paperStore = usePaperStore()
 const classStores = useClassStore()
+const subjectStores = useSubjectStore()
 const { init: notify } = useToast()
 
 const paperId = route.params.id
@@ -46,6 +50,27 @@ const formatDateTimeForSave = (dateTime: string | undefined): string | undefined
   return `${date}T${time}`
 }
 
+const subjects = ref<Subject[]>([])
+
+const subjectFilter = {
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+}
+
+const getSubjects = async () => {
+  try {
+    const res = await subjectStores.getSubjects(subjectFilter)
+    subjects.value = res.data
+  } catch (error) {
+    notify({
+      message: notifications.getFailed('subject') + getErrorMessage(error),
+      color: 'danger',
+    })
+  }
+}
+
 const editPaper = ref<UpdatePaperRequest>({
   id: paperId.toString(),
   examName: '',
@@ -55,14 +80,15 @@ const editPaper = ref<UpdatePaperRequest>({
   paperLabelId: undefined,
   duration: 0,
   shuffle: false,
-  showMarkResult: false,
-  showQUestionAnswer: false,
+  showMarkResult: 0,
+  showQuestionAnswer: 0,
   password: undefined,
   type: 0,
   isPublish: false,
   description: '',
   paperAccesses: undefined,
   shareType: 1,
+  subjectId: undefined,
 })
 
 const valueOption = ref<AccessType>(AccessType.Everyone)
@@ -80,14 +106,15 @@ watch(
         paperLabelId: paperDetail.value.paperLabelId ?? undefined,
         duration: paperDetail.value.duration ?? 0,
         shuffle: false, // Assuming a default value
-        showMarkResult: paperDetail.value.showMarkResult ?? false,
-        showQUestionAnswer: paperDetail.value.showQuestionAnswer ?? false,
+        showMarkResult: paperDetail.value.showMarkResult ?? 0,
+        showQuestionAnswer: paperDetail.value.showQuestionAnswer ?? 0,
         password: paperDetail.value.password ?? '',
         type: parseInt(paperDetail.value.type ?? '0'), // Assuming type needs to be converted to a number
         isPublish: paperDetail.value.isPublish ?? false,
         description: paperDetail.value.description ?? '',
         paperAccesses: paperDetail.value.paperAccesses,
         shareType: paperDetail.value.shareType,
+        subjectId: paperDetail.value.subjectId,
       }
 
       valueOption.value = paperDetail.value.shareType as AccessType
@@ -220,9 +247,21 @@ const updateSelectedStudent = (selectedStudents: string[]) => {
   checkedPermissionsStudentAccess.value = selectedStudents
 }
 
+const showMarkResultOptions = computed(() => [
+  { label: 'No', value: ShowResult.No },
+  { label: 'When submitted', value: ShowResult.WhenSubmitted },
+  { label: 'When all students submitted', value: ShowResult.WhenAllStudentSubmitted },
+])
+const showQuestionAnswerOptions = computed(() => [
+  { label: 'No', value: ShowQuestionAnswer.No },
+  { label: 'When submitted', value: ShowQuestionAnswer.WhenSubmitted },
+  { label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
+])
+
 onMounted(() => {
   getPaperDetail()
   getGroupClasses()
+  getSubjects()
 })
 </script>
 <template>
@@ -250,7 +289,14 @@ onMounted(() => {
             label="Exam name"
             class="mb-2 col-span-2"
           />
-          <VaSelect :rules="[(v: any) => v || 'Field is required']" label="Subject" class="mb-2 pl-1" />
+          <VaSelect
+            v-model="editPaper.subjectId"
+            :options="subjects"
+            :text-by="(option: Subject) => option.name"
+            :value-by="(option: Subject) => option.id"
+            label="Subject"
+            class="mb-2 pl-1"
+          />
           <VaCounter
             v-model="editPaper.duration"
             label="Test duration (minutes)"
@@ -403,7 +449,10 @@ onMounted(() => {
         <div class="mb-2">
           <span class="va-title">Show result</span>
           <VaRadio
-            :options="['No', 'When submitted', 'When all students submitted']"
+            v-model="editPaper.showMarkResult"
+            :options="showMarkResultOptions"
+            :text-by="(op: any) => op.label"
+            :value-by="(op: any) => op.value"
             type="radio"
             class="assign-radio"
             vertical
@@ -412,12 +461,10 @@ onMounted(() => {
         <div>
           <span class="va-title">Show the exam and answers</span>
           <VaRadio
-            :options="[
-              'No',
-              'When submitted',
-              'When all students submitted',
-              'When a certain number of points is reached',
-            ]"
+            v-model="editPaper.showQuestionAnswer"
+            :options="showQuestionAnswerOptions"
+            :text-by="(op: any) => op.label"
+            :value-by="(op: any) => op.value"
             type="radio"
             class="assign-radio"
             vertical
