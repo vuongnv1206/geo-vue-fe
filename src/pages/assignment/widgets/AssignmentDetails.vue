@@ -70,21 +70,29 @@ const getClassById = async () => {
 }
 
 const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
-  classStores
-    .removeAssignmentFromClass(assignmentClass)
-    .then(() => {
-      router.push({ name: 'assignments' })
-      notify({
-        message: notifications.deleteSuccessfully('assignment'),
-        color: 'success',
+  confirm({
+    title: 'Delete Assignment',
+    message: notifications.confirmDelete('assignment'),
+  }).then((agreed) => {
+    if (!agreed) {
+      return
+    }
+    classStores
+      .removeAssignmentFromClass(assignmentClass)
+      .then(() => {
+        router.push({ name: 'assignments' })
+        notify({
+          message: notifications.deleteSuccessfully('assignment'),
+          color: 'success',
+        })
       })
-    })
-    .catch((error) => {
-      notify({
-        message: notifications.deleteFailed('assignment') + getErrorMessage(error),
-        color: 'error',
+      .catch((error) => {
+        notify({
+          message: notifications.deleteFailed('assignment') + getErrorMessage(error),
+          color: 'error',
+        })
       })
-    })
+  })
 }
 
 const beforeEditFormModalClose = async (hide: () => unknown) => {

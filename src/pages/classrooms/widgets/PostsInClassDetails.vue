@@ -57,17 +57,12 @@
               @click="togglePostLike(post)"
               >{{ post.numberLikeInThePost }}
             </VaButton>
-            <VaButton
-              v-model="isShowComments"
-              class="mr-4"
-              preset="plain"
-              icon="comment"
-              @click="isShowComments = !isShowComments"
+            <VaButton class="mr-4" preset="plain" icon="comment" @click="toggleComments(post.id)"
               >{{ post.comments.length }}
             </VaButton>
           </VaCard>
         </div>
-        <div v-if="isShowComments">
+        <div v-if="selectedPostIds.includes(post.id)">
           <VaDivider />
           <VaTreeView :nodes="structureComments(post.comments)" children-by="comments">
             <template #content="comment">
@@ -115,13 +110,17 @@
                   >
                     {{ comment.numberLikeInTheComment }}
                   </VaButton>
-                  <VaButton preset="plain" size="small" icon="reply">Reply</VaButton>
+                  <VaButton preset="plain" size="small" icon="reply" @click="toggleReplies(comment.id)">
+                    Reply</VaButton
+                  >
                 </div>
-                <Comments
-                  :post-id="post.id"
-                  :parent-id="comment.id"
-                  @save="(comment: EmptyComment) => OnCommentSaved(comment)"
-                />
+                <div v-if="selectedCommentIds.includes(comment.id)">
+                  <Comments
+                    :post-id="post.id"
+                    :parent-id="comment.id"
+                    @save="(comment: EmptyComment) => OnCommentSaved(comment)"
+                  />
+                </div>
               </div>
             </template>
           </VaTreeView>
@@ -195,7 +194,7 @@
 <script setup lang="ts">
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { onMounted, ref } from 'vue'
-import Comments from './Comment.vue'
+import Comments from './Comments.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { useModal, useToast, VaCard, VaDivider, VaModal } from 'vuestic-ui/web-components'
 import { Comment, EmptyComment, EmptyCommentLike, EmptyPost, EmptyPostLike, Post } from '../types'
@@ -215,7 +214,7 @@ const commentStore = useCommentStore()
 
 const editFormRef = ref()
 
-const postId = ref<string>(null ?? '')
+const postId = ref<string | null>(null)
 const commentId = ref<string>('')
 const userId = authStore.user?.id ?? ''
 
@@ -228,7 +227,8 @@ const doShowPostFormModal = ref(false)
 
 const isLikePost = ref(false)
 const isLikeComment = ref(false)
-const isShowComments = ref(false)
+const selectedPostIds = ref<string[]>([])
+const selectedCommentIds = ref<string[]>([])
 
 const quillEditor = ref<InstanceType<typeof QuillEditor> | null>(null)
 const quillInstance = ref<Quill | null>(null)
@@ -334,7 +334,6 @@ const OnPostsSaved = async (post: EmptyPost) => {
             message: notifications.createSuccessfully('post'),
             color: 'success',
           })
-
           if (quillInstance.value) {
             quillInstance.value.setText('')
           }
@@ -379,6 +378,24 @@ const deletePosts = (postId: string) => {
         })
       })
   })
+}
+
+const toggleComments = (postId: string) => {
+  const index = selectedPostIds.value.indexOf(postId)
+  if (index === -1) {
+    selectedPostIds.value.push(postId)
+  } else {
+    selectedPostIds.value.splice(index, 1)
+  }
+}
+
+const toggleReplies = (commentId: string) => {
+  const index = selectedCommentIds.value.indexOf(commentId)
+  if (index === -1) {
+    selectedCommentIds.value.push(commentId)
+  } else {
+    selectedCommentIds.value.splice(index, 1)
+  }
 }
 
 const selectedCommentOption = (option: any) => {
