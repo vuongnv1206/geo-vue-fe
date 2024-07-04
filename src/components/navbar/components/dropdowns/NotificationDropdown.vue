@@ -42,7 +42,7 @@
         </VaDropdown>
       </div>
       <VaInnerLoading :loading="isLoading">
-        <section class="sm:max-h-[350px] p-2 overflow-auto">
+        <section class="sm:max-h-[350px] max-w-[450px] p-2 overflow-y">
           <section v-if="notificationsWithRelativeTime?.length <= 0" class="flex flex-col items-center">
             <VaIcon name="notifications" color="secondary" size="4rem" />
             <p class="text-lg font-semibold">You do not have any notifications</p>

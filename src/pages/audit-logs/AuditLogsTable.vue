@@ -28,7 +28,11 @@
           <span :class="getActionColor(value)">{{ value }}</span>
         </template>
         <template #cell(createdAt)="{ value }">
-          <span>{{ getFormatedDate(value) }}</span>
+          <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+            <VaPopover icon="info" :message="format.formatDate(value)">
+              <div>{{ format.getTimeString(value) }}</div>
+            </VaPopover>
+          </div>
         </template>
         <template #cell(viewDetails)="{ row }">
           <VaButton preset="secondary" class="w-fit text-xs md:text-sm" size="small" @click="handleShowDetails(row)">
@@ -84,8 +88,8 @@ import { pageSizeOptions } from './audit-logs.enum'
 import { VaAvatar, useToast } from 'vuestic-ui/web-components'
 import { watch } from 'vue'
 import { useAuditLogsStore } from '@/stores/modules/auditLogs.module'
-import { getActionColor, getFormatedDate, getSrcAvatar } from './helper'
-import { getErrorMessage } from '@/services/utils'
+import { getActionColor, getSrcAvatar } from './helper'
+import { getErrorMessage, format } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

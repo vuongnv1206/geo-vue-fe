@@ -116,14 +116,14 @@
     "general": "Chung"
   },
   "auditLogs": {
-    "title": "Nhật ký kiểm tra",
+    "title": "Nhật ký",
     "form": {
       "actionType": "Loại Hành Động",
       "resourceType": "Loại Tài Nguyên"
     },
     "table": {
       "buttonDetails": "Xem chi tiết",
-      "titleDetails": "Chi Tiết Nhật Ký Kiểm Tra",
+      "titleDetails": "Chi Tiết Nhật Ký",
       "buttonCloseDetails": "Đóng",
       "item": "bản ghi",
       "items": "bản ghi",

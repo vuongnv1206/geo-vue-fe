@@ -11,30 +11,9 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 import i18n from './../i18n'
 const { t } = i18n.global
-
 const local = i18n.global.locale.value === 'vi' ? 'vi' : 'en'
-// dayjs.locale(local)
-const customRelativeTime = {
-  future: 'in %s',
-  past: '%s ago',
-  s: 'a few seconds',
-  m: 'a minute',
-  mm: '%d minutes',
-  h: 'an hour',
-  hh: '%d hours',
-  d: 'a day',
-  dd: '%d days',
-  M: 'a month',
-  MM: '%d months',
-  y: 'a year',
-  yy: '%d years',
-}
 
-dayjs.locale({
-  name: local,
-  formats: {},
-  relativeTime: customRelativeTime,
-})
+dayjs.locale(local)
 
 const currentTimezone = dayjs.tz.guess()
 
@@ -78,7 +57,7 @@ export const format = {
   getTimeString: (date: string) => {
     const dateTime = dayjs(date).tz(currentTimezone)
     const now = dayjs().tz(currentTimezone)
-    if (now.diff(dateTime, 'day') >= 1) {
+    if (now.diff(dateTime, 'day') >= 365) {
       return dateTime.format('DD/MM/YYYY - HH:mm')
     } else {
       return dateTime.fromNow()
