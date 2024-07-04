@@ -212,7 +212,9 @@ onMounted(() => {
               />
             </VaCard>
             <VaCardContent>
+              <!-- eslint-disable vue/no-v-html -->
               <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
+              <!--eslint-enable-->
             </VaCardContent>
           </VaCard>
         </VaCard>

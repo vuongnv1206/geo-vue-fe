@@ -37,7 +37,7 @@ const props = defineProps({
         <!-- List assignments and papers for this date in rows -->
         <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
           <!-- Loop through assignments -->
-          <div v-for="(assignment, index) in group.assignments" :key="index">
+          <div v-for="(assignment, index2) in group.assignments" :key="index2">
             <VaCard
               class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
               :to="{ name: 'assignment-details', params: { id: assignment.id, classId: classId } }"
@@ -50,7 +50,7 @@ const props = defineProps({
             </VaCard>
           </div>
           <!-- Loop through papers -->
-          <div v-for="(paper, index) in group.papers" :key="index">
+          <div v-for="(paper, index3) in group.papers" :key="index3">
             <VaCard class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4">
               <VaIcon name="article" size="3rem" class="text-gray-500" />
               <div>

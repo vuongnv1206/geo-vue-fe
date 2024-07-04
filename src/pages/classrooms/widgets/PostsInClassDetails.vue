@@ -49,7 +49,9 @@
             </template>
           </VaMenu>
         </div>
+        <!-- eslint-disable vue/no-v-html -->
         <div class="text-base text-gray-700 mb-4" v-html="post.content" />
+        <!--eslint-enable-->
         <VaDivider />
         <div class="flex items-center justify-start">
           <VaCard class="mr-auto">
@@ -109,7 +111,9 @@
                     </template>
                   </VaMenu>
                 </div>
+                <!-- eslint-disable vue/no-v-html -->
                 <div class="text-sm text-gray-700" v-html="comment.content" />
+                <!--eslint-enable-->
                 <div class="my-2 flex items-center justify-start">
                   <VaButton
                     v-model="isLikeComment"
