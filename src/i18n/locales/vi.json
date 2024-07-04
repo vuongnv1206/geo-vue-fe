@@ -115,6 +115,29 @@
     "settings_updated_successfully": "Cài đặt được cập nhật thành công",
     "general": "Chung"
   },
+  "auditLogs": {
+    "title": "Nhật ký kiểm tra",
+    "form": {
+      "actionType": "Loại Hành Động",
+      "resourceType": "Loại Tài Nguyên"
+    },
+    "table": {
+      "buttonDetails": "Xem chi tiết",
+      "titleDetails": "Chi Tiết Nhật Ký Kiểm Tra",
+      "buttonCloseDetails": "Đóng",
+      "item": "bản ghi",
+      "items": "bản ghi",
+      "userCol": "người dùng",
+      "resourceCol": "tài nguyên",
+      "actionCol": "hành động",
+      "createdAtCol": "thời gian",
+      "viewDetailsCol": "xem chi tiết"
+    },
+    "details": {
+      "oldData": "Dữ Liệu Cũ",
+      "newData": "Dữ Liệu Mới"
+    }
+  },
   "questions": {
     "add_question": "Thêm câu hỏi",
     "folders": "Thư mục",
@@ -287,7 +310,8 @@
     "teacher-group": "Giáo viên",
     "exam": "Kỳ thi",
     "assignments": "Bài tập",
-    "subjects": "Môn học"
+    "subjects": "Môn học",
+    "audit-logs": "Nhật ký kiểm tra"
   },
   "messages": {
     "all": "Xem tất cả tin nhắn",
