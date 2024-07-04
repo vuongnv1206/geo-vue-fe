@@ -29,7 +29,7 @@
         </template>
         <template #cell(createdAt)="{ value }">
           <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-            <VaPopover icon="info" :message="format.getTimeString(value)">
+            <VaPopover icon="info" :message="format.formatDateStr(value)">
               <div>{{ format.getTimeString(value) }}</div>
             </VaPopover>
           </div>
