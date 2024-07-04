@@ -176,6 +176,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/notification/Notification.vue'),
       },
+      {
+        name: 'audit logs',
+        path: 'audit-logs',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/audit-logs/AuditLogs.vue'),
+      },
     ],
   },
   {

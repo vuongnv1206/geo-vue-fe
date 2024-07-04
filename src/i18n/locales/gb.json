@@ -115,6 +115,29 @@
     "settings_updated_successfully": "Settings updated successfully",
     "general": "General"
   },
+  "auditLogs": {
+    "title": "Audit Logs",
+    "form": {
+      "actionType": "Action Type",
+      "resourceType": "Resource Type"
+    },
+    "table": {
+      "buttonDetails": "View details",
+      "titleDetails": "Audit Logs Details",
+      "buttonCloseDetails": "Close",
+      "item": "item",
+      "items": "items",
+      "userCol": "user",
+      "resourceCol": "resource",
+      "actionCol": "action",
+      "createdAtCol": "created At",
+      "viewDetailsCol": "view Details"
+    },
+    "details": {
+      "oldData": "Old Data",
+      "newData": "New Data"
+    }
+  },
   "questions": {
     "add_question": "Add question",
     "folders": "Folders",
@@ -279,6 +302,8 @@
     "faq": "FAQ",
     "users": "Users",
     "projects": "Projects",
+    "audit-logs": "Audit logs",
+
     "questions": "Questions",
     "question-folder": "Question folder",
     "question-bank": "Question bank",
