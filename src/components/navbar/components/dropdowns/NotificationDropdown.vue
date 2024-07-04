@@ -16,7 +16,7 @@
         <VaIconNotification v-if="amountOfNewNotification <= 0" class="notification-dropdown__icon" />
       </VaButton>
     </template>
-    <VaDropdownContent class="h-full sm:max-w-[420px] sm:h-auto">
+    <VaDropdownContent class="h-full min-w-[420px] sm:h-auto">
       <div class="flex justify-between items-center">
         <VaButton preset="secondary" color="textPrimary" @click="handleSeeAll">{{ t('notifications.all') }} </VaButton>
         <VaDropdown placement="left-end">
