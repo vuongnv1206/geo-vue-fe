@@ -9,6 +9,7 @@ import QuestionView from '../question/widgets/QuestionView.vue'
 import { Classrooms, GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useClassStore } from '../../stores/modules/class.module'
+import { format } from '@/services/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -63,12 +64,6 @@ const getGroupClasses = async () => {
   } catch (error) {
     console.error(error)
   }
-}
-
-const formatDate = (isoString: string | undefined, localization: string) => {
-  if (!isoString) return ''
-  const date = new Date(isoString)
-  return new Intl.DateTimeFormat(localization, { dateStyle: 'long' }).format(date)
 }
 
 const showSidebar = ref(true)
@@ -153,21 +148,6 @@ const getSubmittedStudents = async () => {
     })
   }
 }
-const getFormattedDuration = (startTime: string, endTime: string) => {
-  const start = new Date(startTime)
-  const end = new Date(endTime)
-  const durationInSeconds = (end.getTime() - start.getTime()) / 1000
-
-  if (durationInSeconds < 60) {
-    return `${Math.round(durationInSeconds)} sec`
-  } else if (durationInSeconds < 3600) {
-    return `${Math.round(durationInSeconds / 60)} min`
-  } else if (durationInSeconds < 86400) {
-    return `${Math.round(durationInSeconds / 3600)} hours`
-  } else {
-    return `${Math.round(durationInSeconds / 86400)} days`
-  }
-}
 
 const navigateToExamReview = (paperId: string, userId: string, submitPaperId: string) => {
   router.push({
@@ -233,7 +213,7 @@ onMounted(async () => {
           <VaList class="va-text-secondary text-xs mb-2">
             <VaListItem>
               <VaIcon name="event" class="mr-1 material-symbols-outlined" /> Created at:
-              {{ formatDate(paperDetail?.createdOn, 'Vi') }}
+              {{ format.formatDate(new Date(paperDetail?.createdOn || '')) }}
             </VaListItem>
             <VaListItem>
               <VaIcon name="person" class="mr-1 material-symbols-outlined" /> Creator: {{ paperDetail?.creatorName }}
@@ -248,7 +228,7 @@ onMounted(async () => {
                 <VaMenuItem @click="paperConfigAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Setting
                 </VaMenuItem>
-                <VaMenuItem><VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem>
+                <VaMenuItem> <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem>
                 <VaMenuItem>
                   <VaIcon name="settings" class="material-symbols-outlined" /> Advanced monitoring
                 </VaMenuItem>
@@ -454,18 +434,18 @@ onMounted(async () => {
                 <div class="flex justify-between">
                   <p class="va-text-secondary text-xs">Duration:</p>
                   <p class="va-text-secondary text-xs">
-                    {{ getFormattedDuration(submittedStudent.startTime, submittedStudent.endTime) }}
+                    {{ format.formatTimeToX(new Date(submittedStudent.endTime), new Date(submittedStudent.startTime)) }}
                   </p>
                 </div>
                 <div class="flex justify-between">
                   <p class="va-text-secondary text-xs">Due Date:</p>
-                  <p class="va-text-secondary text-xs">{{ submittedStudent.endTime }}</p>
+                  <p class="va-text-secondary text-xs">{{ format.formatDate(new Date(submittedStudent.endTime)) }}</p>
                 </div>
               </template>
               <template v-if="submittedStudent.endTime === null">
                 <div class="flex justify-between">
                   <p class="va-text-secondary text-xs">Start time:</p>
-                  <p class="va-text-secondary text-xs">{{ submittedStudent.startTime }}</p>
+                  <p class="va-text-secondary text-xs">{{ format.formatDate(new Date(submittedStudent.startTime)) }}</p>
                 </div>
               </template>
             </VaCardContent>

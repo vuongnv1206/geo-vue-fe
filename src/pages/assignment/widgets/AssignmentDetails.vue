@@ -8,6 +8,7 @@ import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { Student } from '@/pages/classrooms/types'
+import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 
 const loading = ref(true)
 const router = useRouter()
@@ -56,7 +57,7 @@ const getClassById = async () => {
     .getClassById(classId)
     .then((response) => {
       students.value = response.students
-      // console.log('Students:', students.value)
+      console.log('Students:', students.value)
     })
     .catch((error) => {
       notify({
@@ -162,8 +163,14 @@ onMounted(() => {
         <VaCard v-if="assignment">
           <VaCard>
             <VaCardTitle>{{ assignment.name }}</VaCardTitle>
-            <VaCardContent> Start Time: {{ format.formatDate(assignment.startTime) }} </VaCardContent>
-            <VaCardContent> End Time: {{ format.formatDate(assignment.endTime) }} </VaCardContent>
+            <VaCardContent>
+              <VaIcon name="event" class="mr-1 material-symbols-outlined" /> Started at:
+              {{ format.formatDate(assignment.startTime) }}
+            </VaCardContent>
+            <VaCardContent>
+              <VaIcon name="event" class="mr-1 material-symbols-outlined" /> End Time:
+              {{ format.formatDate(assignment.endTime) }}
+            </VaCardContent>
           </VaCard>
           <VaCard>
             <VaCardTitle>Menu</VaCardTitle>
@@ -233,7 +240,13 @@ onMounted(() => {
       <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
         <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
           <VaListItemSection avatar>
-            <VaAvatar :src="student.avatarUrl" />
+            <GeoAvatar
+              class="mr-2"
+              :size="48"
+              color="warning"
+              :image="student.avatarUrl || undefined"
+              :txt="student.firstName.charAt(0).toUpperCase()"
+            />
           </VaListItemSection>
           <VaListItemSection>
             <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
