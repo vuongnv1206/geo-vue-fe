@@ -60,6 +60,7 @@ const handleSelectionChange = (selectedItems: Subject[]) => {
 
 <template>
   <VaDataTable
+    class="min-h-[78vh]"
     hoverable
     clickable
     selectable

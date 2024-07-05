@@ -1,9 +1,79 @@
+<template>
+  <VaCard>
+    <VaCardContent>
+      <div class="flex flex-col md:flex-row gap-2 justify-end">
+        <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedSubject()">
+          Delete
+        </VaButton>
+        <VaButton icon="add" @click="createNewSubject()">Subject</VaButton>
+      </div>
+      <SubjectTable
+        v-model:selectedItemsEmitted="selectedItemsEmitted"
+        :loading="loading"
+        :subjects="subjects"
+        @edit="editSubject"
+        @delete="deleteSubjectWithConfirm"
+      />
+      <div class="flex flex-row justify-between items-center mt-4">
+        <p>
+          {{
+            dataFilter.totalCount <= 1 ? dataFilter.totalCount + ' ' + 'item' : dataFilter.totalCount + ' ' + 'items'
+          }}
+        </p>
+        <VaPagination
+          v-if="dataFilter.totalCount > 0"
+          v-model:page="dataFilter.currentPage"
+          :pages="dataFilter.totalPages"
+          :visible-pages="3"
+          buttons-preset="secondary"
+          gapped
+          @update:modelValue="handlePageChange"
+        />
+        <VaSelect
+          v-if="dataFilter.totalCount > 0"
+          v-model="dataFilter.pageSize"
+          class="w-32"
+          :options="[10, 25, 50, 100, 250]"
+          @update:modelValue="handlePageSizeChange"
+        />
+      </div>
+    </VaCardContent>
+  </VaCard>
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowSubjectFormModal"
+    size="small"
+    stateful
+    close-button
+    mobile-fullscreen
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+    @close="doShowSubjectFormModal = false"
+  >
+    <VaModalHeader>
+      <h3 class="text-lg font-bold">{{ subjectToEdit ? 'Edit' : 'Create' }} Subject</h3>
+    </VaModalHeader>
+    <EditSubjectForm
+      ref="editFormRef"
+      :subject="subjectToEdit"
+      :save-button-label="subjectToEdit === null ? 'Add' : 'Save'"
+      @close="cancel"
+      @save="
+        (subject: Subject) => {
+          onSubjectSaved(subject)
+          ok()
+        }
+      "
+    />
+  </VaModal>
+</template>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { Subject, EmptySubject } from './types'
 import SubjectTable from '@/pages/subject/widgets/SubjectTable.vue'
 import { useSubjectStore } from '@/stores/modules/subject.module'
-import { useModal, useToast } from 'vuestic-ui'
+import { useModal, useToast, VaPagination, VaSelect } from 'vuestic-ui'
 import EditSubjectForm from '@/pages/subject/widgets/EditSubjectForm.vue'
 import { getErrorMessage, notifications } from '@/services/utils'
 
@@ -19,21 +89,35 @@ const { confirm } = useModal()
 
 const dataFilter = ref({
   advancedSearch: {
-    fields: [''],
+    fields: ['name'],
     keyword: '',
   },
-  pageNumber: 0,
+  currentPage: 1,
+  totalPages: 1,
+  totalCount: 1,
   pageSize: 10,
-  orderBy: ['id'],
+  // hasPreviousPage: false,
+  // hasNextPage: false,
+  orderBy: ['createdOn'],
 })
 
-const getSubjects = () => {
+const getSubjects = (filter: typeof dataFilter.value) => {
   loading.value = true
-  dataFilter.value.advancedSearch.fields = ['name']
+  console.log('Sending request with filter:', filter)
   stores
-    .getSubjects(dataFilter.value)
+    .getSubjects(filter)
     .then((response) => {
+      console.log('API response:', response)
       subjects.value = response.data
+      dataFilter.value = {
+        ...dataFilter.value,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        totalCount: response.totalCount,
+        pageSize: response.pageSize,
+        // hasPreviousPage: response.hasPreviousPage,
+        // hasNextPage: response.hasNextPage,
+      }
     })
     .catch((error) => {
       notify({
@@ -46,6 +130,17 @@ const getSubjects = () => {
     })
 }
 
+const handlePageChange = (newPage: number) => {
+  console.log('Page change to:', newPage)
+  dataFilter.value.currentPage = newPage
+  getSubjects(dataFilter.value)
+}
+
+const handlePageSizeChange = (newPageSize: number) => {
+  console.log('Page size change to:', newPageSize)
+  dataFilter.value.pageSize = newPageSize
+  getSubjects(dataFilter.value)
+}
 const createNewSubject = () => {
   subjectToEdit.value = null
   doShowSubjectFormModal.value = true
@@ -66,7 +161,7 @@ const onSubjectSaved = async (subject: Subject) => {
           message: notifications.updatedSuccessfully(subject.name),
           color: 'success',
         })
-        getSubjects()
+        getSubjects(dataFilter.value)
       })
       .catch((error) => {
         notify({
@@ -82,7 +177,7 @@ const onSubjectSaved = async (subject: Subject) => {
           message: notifications.createSuccessfully(subject.name),
           color: 'success',
         })
-        getSubjects()
+        getSubjects(dataFilter.value)
       })
       .catch((error) => {
         notify({
@@ -101,7 +196,7 @@ const deleteSubject = (subject: Subject) => {
         message: notifications.deleteSuccessfully(subject.name),
         color: 'success',
       })
-      getSubjects()
+      getSubjects(dataFilter.value)
     })
     .catch((error) => {
       notify({
@@ -153,53 +248,6 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
 }
 
 onMounted(() => {
-  getSubjects()
+  getSubjects(dataFilter.value)
 })
 </script>
-
-<template>
-  <VaCard>
-    <VaCardContent>
-      <div class="flex flex-col md:flex-row gap-2 justify-end">
-        <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedSubject()">
-          Delete</VaButton
-        >
-        <VaButton icon="add" @click="createNewSubject()">Subject</VaButton>
-      </div>
-      <SubjectTable
-        v-model:selectedItemsEmitted="selectedItemsEmitted"
-        :loading="loading"
-        :subjects="subjects"
-        @edit="editSubject"
-        @delete="deleteSubjectWithConfirm"
-      />
-    </VaCardContent>
-  </VaCard>
-  <VaModal
-    v-slot="{ cancel, ok }"
-    v-model="doShowSubjectFormModal"
-    size="small"
-    stateful
-    close-button
-    mobile-fullscreen
-    hide-default-actions
-    :before-cancel="beforeEditFormModalClose"
-    @close="doShowSubjectFormModal = false"
-  >
-    <VaModalHeader>
-      <h3 class="text-lg font-bold">{{ subjectToEdit ? 'Edit' : 'Create' }} Subject</h3>
-    </VaModalHeader>
-    <EditSubjectForm
-      ref="editFormRef"
-      :subject="subjectToEdit"
-      :save-button-label="subjectToEdit === null ? 'Add' : 'Save'"
-      @close="cancel"
-      @save="
-        (subject: Subject) => {
-          onSubjectSaved(subject)
-          ok()
-        }
-      "
-    />
-  </VaModal>
-</template>

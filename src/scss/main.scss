@@ -62,3 +62,12 @@ pre {
 .va-avatar img {
   object-fit: cover !important;
 }
+
+.dp__input {
+  background-color: var(--va-background-secondary) !important;
+  color: var(--va-text-primary) !important;
+}
+
+// .ql-editor.ql-blank::before {
+//   color: var(--va-input-wrapper-text-color) !important;
+// }
