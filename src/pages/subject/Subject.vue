@@ -14,23 +14,22 @@
         @edit="editSubject"
         @delete="deleteSubjectWithConfirm"
       />
-      <div class="flex flex-row justify-between items-center mt-4">
+      <div v-if="dataFilter.totalCount > 0" class="flex flex-row justify-between items-center mt-4">
         <p>
           {{
             dataFilter.totalCount <= 1 ? dataFilter.totalCount + ' ' + 'item' : dataFilter.totalCount + ' ' + 'items'
           }}
+          Items from {{ startItemIndex }} to {{ endItemIndex }} of total {{ dataFilter.totalCount }}
         </p>
         <VaPagination
-          v-if="dataFilter.totalCount > 0"
-          v-model:page="dataFilter.currentPage"
-          :pages="dataFilter.totalPages"
+          v-model="dataFilter.pageNumber"
+          gapped
           :visible-pages="3"
           buttons-preset="secondary"
-          gapped
+          :pages="dataFilter.totalPages"
           @update:modelValue="handlePageChange"
         />
         <VaSelect
-          v-if="dataFilter.totalCount > 0"
           v-model="dataFilter.pageSize"
           class="w-32"
           :options="[10, 25, 50, 100, 250]"
@@ -69,7 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Subject, EmptySubject } from './types'
 import SubjectTable from '@/pages/subject/widgets/SubjectTable.vue'
 import { useSubjectStore } from '@/stores/modules/subject.module'
@@ -92,7 +91,7 @@ const dataFilter = ref({
     fields: ['name'],
     keyword: '',
   },
-  currentPage: 1,
+  pageNumber: 1,
   totalPages: 1,
   totalCount: 1,
   pageSize: 10,
@@ -111,7 +110,7 @@ const getSubjects = (filter: typeof dataFilter.value) => {
       subjects.value = response.data
       dataFilter.value = {
         ...dataFilter.value,
-        currentPage: response.currentPage,
+        pageNumber: response.currentPage,
         totalPages: response.totalPages,
         totalCount: response.totalCount,
         pageSize: response.pageSize,
@@ -132,7 +131,7 @@ const getSubjects = (filter: typeof dataFilter.value) => {
 
 const handlePageChange = (newPage: number) => {
   console.log('Page change to:', newPage)
-  dataFilter.value.currentPage = newPage
+  dataFilter.value.pageNumber = newPage
   getSubjects(dataFilter.value)
 }
 
@@ -141,6 +140,15 @@ const handlePageSizeChange = (newPageSize: number) => {
   dataFilter.value.pageSize = newPageSize
   getSubjects(dataFilter.value)
 }
+
+const startItemIndex = computed(() => {
+  return (dataFilter.value.pageNumber - 1) * dataFilter.value.pageSize + 1
+})
+
+const endItemIndex = computed(() => {
+  return Math.min(dataFilter.value.pageNumber * dataFilter.value.pageSize, dataFilter.value.totalCount)
+})
+
 const createNewSubject = () => {
   subjectToEdit.value = null
   doShowSubjectFormModal.value = true
