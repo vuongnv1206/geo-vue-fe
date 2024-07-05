@@ -14,5 +14,8 @@
 # But still ignore the dist folder
 dist/**
 
+# Ionic android
+android/**
+
 # Check subdirectories too
 !*/
