@@ -15,12 +15,7 @@
         @delete="deleteSubjectWithConfirm"
       />
       <div v-if="dataFilter.totalCount > 0" class="flex flex-row justify-between items-center mt-4">
-        <p>
-          {{
-            dataFilter.totalCount <= 1 ? dataFilter.totalCount + ' ' + 'item' : dataFilter.totalCount + ' ' + 'items'
-          }}
-          Items from {{ startItemIndex }} to {{ endItemIndex }} of total {{ dataFilter.totalCount }}
-        </p>
+        <p>Items from {{ startItemIndex }} to {{ endItemIndex }} of total {{ dataFilter.totalCount }}</p>
         <VaPagination
           v-model="dataFilter.pageNumber"
           gapped
