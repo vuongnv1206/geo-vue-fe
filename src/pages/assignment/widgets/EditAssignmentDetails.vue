@@ -235,7 +235,7 @@ onMounted(() => {
           />
           <VaSwitch v-model="newAssignmentDetails.canViewResult" size="small" label="Can View Result" />
           <VaSwitch v-model="newAssignmentDetails.requireLoginToSubmit" size="small" label="Require Login to Submit" />
-          <VaLayout class="border rounded-xl pb-4 px-2">
+          <VaLayout class="border rounded-xl pb-2 px-2">
             <template #left>
               <VaSidebar v-model="showSidebar" class="mt-2 rounded" :class="showSidebar ? 'border mr-1' : ''">
                 <VaCard class="mt-1 mx-1">
