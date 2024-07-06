@@ -91,11 +91,11 @@ export type StudentResponse = {
 
 export type Comment = {
   id: string
-  createdBy: string
+  createdBy: Date
   postId: string
   content: string
   numberLikeInComment: number
-  createdOn: string
+  createdOn: Date
   parentId: string | null
   user: Student
   comments?: Comment[]
@@ -122,8 +122,8 @@ export type Post = {
   id: string
   content: string
   numberLikeInThePost: number
-  createdOn: string
-  createdBy: string
+  createdOn: Date
+  createdBy: Date
   isLockComment: boolean
   classesId: string
   user: Student

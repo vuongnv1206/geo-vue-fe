@@ -3,7 +3,12 @@
     <VaCard class="relative bg-white rounded-lg shadow-md mb-2">
       <QuillEditor ref="quillEditor" v-model:content="newPost.content" class="pb-5" content-type="html" />
       <VaCard class="absolute bottom-2 right-2">
-        <VaButton class="mr-2" preset="plain" :icon="postId ? 'lock' : 'lock_open'" />
+        <VaButton
+          class="mr-2"
+          preset="plain"
+          :icon="newPost.isLockComment ? 'lock' : 'lock_open'"
+          @click="newPost.isLockComment = !newPost.isLockComment"
+        />
         <VaButton preset="plain" icon="send" class="mr-2" @click="OnPostsSaved(newPost)" />
       </VaCard>
     </VaCard>
@@ -25,13 +30,8 @@
             />
             <div>
               <h2 class="text-md font-bold text-gray-800">{{ post.owner?.firstName }} {{ post.owner?.lastName }}</h2>
-              <VaPopover
-                class="mb-2"
-                placement="right"
-                color="#FFFFFF"
-                :message="format.formatDate(new Date(post.createdOn))"
-              >
-                <p class="text-xs text-gray-600">{{ format.formatDateFromNow(new Date(post.createdOn)) }}</p>
+              <VaPopover class="mb-2" placement="right" color="#FFFFFF" :message="format.formatDate(post.createdOn)">
+                <p class="text-xs text-gray-600">{{ format.formatDateFromNow(post.createdOn) }}</p>
               </VaPopover>
             </div>
           </div>
@@ -91,9 +91,9 @@
                         class="mb-2"
                         placement="right"
                         color="#FFFFFF"
-                        :message="format.formatDate(new Date(comment.createdOn))"
+                        :message="format.formatDate(comment.createdOn)"
                       >
-                        <p class="text-xs text-gray-600">{{ format.formatDateFromNow(new Date(comment.createdOn)) }}</p>
+                        <p class="text-xs text-gray-600">{{ format.formatDateFromNow(comment.createdOn) }}</p>
                       </VaPopover>
                     </div>
                   </div>
