@@ -1,11 +1,20 @@
 <template>
-  <QuillEditor v-model:content="newComment.content" class="border rounded" theme="bubble" content-type="html" />
-  <div class="w-full flex justify-end mt-4">
-    <VaCard class="inline-flex flex-col-reverse sm:flex-row gap-2 p-2">
+  <VaForm class="flex flex-col gap-2">
+    <div>
+      <label
+        id="input-label-510"
+        aria-hidden="true"
+        class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
+        style="color: var(--va-primary)"
+        >Content</label
+      >
+      <QuillEditor v-model:content="newComment.content" class="border rounded" theme="bubble" content-type="html" />
+    </div>
+    <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="emit('close')">Cancel</VaButton>
       <VaButton @click="emit('save', newComment)">Save</VaButton>
     </VaCard>
-  </div>
+  </VaForm>
 </template>
 
 <script setup lang="ts">

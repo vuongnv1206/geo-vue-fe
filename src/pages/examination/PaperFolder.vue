@@ -703,6 +703,7 @@ const onSharePaperFolderPermission = () => {
     </VaCardTitle>
     <VaCardContent>
       <VaDataTable
+        class="min-h-[73vh]"
         :items="currentItems"
         :columns="tableColumns"
         :loading="loading"

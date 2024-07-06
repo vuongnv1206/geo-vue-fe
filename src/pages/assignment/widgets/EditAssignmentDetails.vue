@@ -213,7 +213,13 @@ onMounted(() => {
             placeholder="Enter assignment name"
             :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
           />
-          <VaCardTitle class="text-sm text-gray-700">Start and End Time</VaCardTitle>
+          <label
+            id="input-label-510"
+            aria-hidden="true"
+            class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
+            style="color: var(--va-primary)"
+            >Start and End Time</label
+          >
           <VueDatePicker
             v-model="date"
             range
