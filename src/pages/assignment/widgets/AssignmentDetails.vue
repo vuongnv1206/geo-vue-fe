@@ -8,8 +8,26 @@
     :left="{ absolute: breakpoints.smDown, order: 2, overlay: breakpoints.smDown && showSidebar }"
     @leftOverlayClick="showSidebar = false"
   >
+    <template #top>
+      <VaNavbar class="py-1 rounded">
+        <template #left>
+          <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
+        </template>
+        <template #right>
+          <div class="flex">
+            <div class="mr-3 flex-grow">
+              <VaInput class="" placeholder="Search">
+                <template #appendInner>
+                  <VaIcon color="secondary" class="material-icons"> search </VaIcon>
+                </template>
+              </VaInput>
+            </div>
+          </div>
+        </template>
+      </VaNavbar>
+    </template>
     <template #left>
-      <VaSidebar v-model="showSidebar" class="mr-2 rounded">
+      <VaCard v-if="showSidebar" class="mr-2 rounded min-w-[500px]">
         <VaCard v-if="assignment" class="min-h-[81vh]">
           <VaCard>
             <VaCardTitle>{{ assignment.name }}</VaCardTitle>
@@ -68,26 +86,9 @@
             </VaCardContent>
           </VaCard>
         </VaCard>
-      </VaSidebar>
+      </VaCard>
     </template>
-    <template #top>
-      <VaNavbar class="py-1 rounded">
-        <template #left>
-          <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
-        </template>
-        <template #right>
-          <div class="flex">
-            <div class="mr-3 flex-grow">
-              <VaInput class="" placeholder="Search">
-                <template #appendInner>
-                  <VaIcon color="secondary" class="material-icons"> search </VaIcon>
-                </template>
-              </VaInput>
-            </div>
-          </div>
-        </template>
-      </VaNavbar>
-    </template>
+
     <template #content>
       <VaCard class="mt-2 p-2 min-h-[75vh]">
         <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
