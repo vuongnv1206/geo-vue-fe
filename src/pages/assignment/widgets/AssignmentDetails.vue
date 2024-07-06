@@ -9,8 +9,8 @@
     @leftOverlayClick="showSidebar = false"
   >
     <template #left>
-      <VaSidebar v-model="showSidebar" class="mr-2">
-        <VaCard v-if="assignment">
+      <VaSidebar v-model="showSidebar" class="mr-2 rounded">
+        <VaCard v-if="assignment" class="min-h-[81vh]">
           <VaCard>
             <VaCardTitle>{{ assignment.name }}</VaCardTitle>
             <VaCardContent>
@@ -89,23 +89,25 @@
       </VaNavbar>
     </template>
     <template #content>
-      <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-        <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
-          <VaListItemSection avatar>
-            <GeoAvatar
-              class="mr-2"
-              :size="48"
-              color="warning"
-              :image="student.avatarUrl || undefined"
-              :txt="student.firstName.charAt(0).toUpperCase()"
-            />
-          </VaListItemSection>
-          <VaListItemSection>
-            <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-            <VaListItemLabel caption> đã nộp/chưa nôp </VaListItemLabel>
-          </VaListItemSection>
-        </VaListItem>
-      </VaList>
+      <VaCard class="mt-2 p-2 min-h-[75vh]">
+        <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+          <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
+            <VaListItemSection avatar>
+              <GeoAvatar
+                class="mr-2"
+                :size="48"
+                color="warning"
+                :image="student.avatarUrl || undefined"
+                :txt="student.firstName.charAt(0).toUpperCase()"
+              />
+            </VaListItemSection>
+            <VaListItemSection>
+              <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
+              <VaListItemLabel caption> đã nộp/chưa nôp </VaListItemLabel>
+            </VaListItemSection>
+          </VaListItem>
+        </VaList>
+      </VaCard>
     </template>
   </VaLayout>
 
