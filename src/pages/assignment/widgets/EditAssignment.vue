@@ -12,7 +12,7 @@ import { computed, onMounted, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useModal, useToast, VaCardTitle } from 'vuestic-ui/web-components'
 import { Attachment, EmptyAssignment } from '../types'
-import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+// import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import { QuillEditor } from '@vueup/vue-quill'
 
 const { init: notify } = useToast()
@@ -217,7 +217,13 @@ onMounted(() => {
             placeholder="Enter assignment name"
             :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
           />
-          <VaCardTitle class="text-sm text-gray-700">Start and End Time</VaCardTitle>
+          <label
+            id="input-label-510"
+            aria-hidden="true"
+            class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
+            style="color: var(--va-primary)"
+            >Start and End Time</label
+          >
           <VueDatePicker
             v-model="date"
             range
@@ -233,13 +239,14 @@ onMounted(() => {
           />
           <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
           <VaCard>
-            <VaCardTitle class="text-sm text-gray-700">Content</VaCardTitle>
-            <QuillEditor
-              v-model:content="newAssignment.content"
-              class="h-15 border rounded"
-              theme="bubble"
-              content-type="html"
-            />
+            <label
+              id="input-label-510"
+              aria-hidden="true"
+              class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
+              style="color: var(--va-primary)"
+              >Content</label
+            >
+            <QuillEditor v-model:content="newAssignment.content" class="h-25 border rounded" content-type="html" />
           </VaCard>
           <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
           <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
@@ -382,4 +389,4 @@ onMounted(() => {
   </VaLayout>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss"></style>

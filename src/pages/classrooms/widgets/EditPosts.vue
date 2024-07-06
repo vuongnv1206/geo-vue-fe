@@ -1,11 +1,21 @@
 <template>
-  <QuillEditor v-model:content="newPost.content" class="border rounded" theme="bubble" content-type="html" />
-  <div class="w-full flex justify-end mt-4">
-    <VaCard class="inline-flex flex-col-reverse sm:flex-row gap-2 p-2">
+  <VaForm class="flex flex-col gap-2">
+    <div>
+      <label
+        id="input-label-510"
+        aria-hidden="true"
+        class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
+        style="color: var(--va-primary)"
+        >Content</label
+      >
+      <QuillEditor v-model:content="newPost.content" class="border rounded" theme="bubble" content-type="html" />
+    </div>
+    <VaSwitch v-model="newPost.isLockComment" size="small" label="Lock Comment" />
+    <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="emit('close')">Cancel</VaButton>
       <VaButton @click="emit('save', newPost)">Save</VaButton>
     </VaCard>
-  </div>
+  </VaForm>
 </template>
 
 <script setup lang="ts">
@@ -13,6 +23,7 @@ import { computed, ref, watch } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import { EmptyPost } from '../types'
+import { VaSwitch } from 'vuestic-ui/web-components'
 
 const props = defineProps<{
   posts: EmptyPost | null

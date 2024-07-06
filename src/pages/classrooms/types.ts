@@ -7,6 +7,10 @@ export type GroupClass = {
   classes: Classrooms[]
 }
 
+export type EmptyGroupClass = {
+  name: string
+}
+
 export type GroupClassResponse = {
   data: GroupClass[]
   currentPage: number
@@ -15,10 +19,6 @@ export type GroupClassResponse = {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
-}
-
-export type EmptyGroupClass = {
-  name: string
 }
 
 export type Classrooms = {
@@ -33,6 +33,12 @@ export type Classrooms = {
   students: Student[]
 }
 
+export type EmptyClassrooms = {
+  name: string
+  schoolYear: string
+  groupClassId: string
+}
+
 export type ClassResponse = {
   data: Classrooms[]
   currentPage: number
@@ -41,12 +47,6 @@ export type ClassResponse = {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
-}
-
-export type EmptyClassrooms = {
-  name: string
-  schoolYear: string
-  groupClassId: string
 }
 
 export type StudentRequest = {
@@ -91,11 +91,11 @@ export type StudentResponse = {
 
 export type Comment = {
   id: string
-  createdBy: string
+  createdBy: Date
   postId: string
   content: string
   numberLikeInComment: number
-  createdOn: string
+  createdOn: Date
   parentId: string | null
   user: Student
   comments?: Comment[]
@@ -122,8 +122,8 @@ export type Post = {
   id: string
   content: string
   numberLikeInThePost: number
-  createdOn: string
-  createdBy: string
+  createdOn: Date
+  createdBy: Date
   isLockComment: boolean
   classesId: string
   user: Student
