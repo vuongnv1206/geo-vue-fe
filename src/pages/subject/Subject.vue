@@ -1,19 +1,21 @@
 <template>
   <VaCard>
-    <VaCardContent>
+    <VaCardContent class="min-h-[85vh]">
       <div class="flex flex-col md:flex-row gap-2 justify-end">
         <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedSubject()">
           Delete
         </VaButton>
         <VaButton icon="add" @click="createNewSubject()">Subject</VaButton>
       </div>
-      <SubjectTable
-        v-model:selectedItemsEmitted="selectedItemsEmitted"
-        :loading="loading"
-        :subjects="subjects"
-        @edit="editSubject"
-        @delete="deleteSubjectWithConfirm"
-      />
+      <VaScrollContainer class="max-h-[72vh]" vertical>
+        <SubjectTable
+          v-model:selectedItemsEmitted="selectedItemsEmitted"
+          :loading="loading"
+          :subjects="subjects"
+          @edit="editSubject"
+          @delete="deleteSubjectWithConfirm"
+        />
+      </VaScrollContainer>
       <div v-if="dataFilter.totalCount > 0" class="flex flex-row justify-between items-center mt-4">
         <p>Items from {{ startItemIndex }} to {{ endItemIndex }} of total {{ dataFilter.totalCount }}</p>
         <VaPagination
@@ -90,18 +92,14 @@ const dataFilter = ref({
   totalPages: 1,
   totalCount: 1,
   pageSize: 10,
-  // hasPreviousPage: false,
-  // hasNextPage: false,
   orderBy: ['createdOn'],
 })
 
 const getSubjects = (filter: typeof dataFilter.value) => {
   loading.value = true
-  console.log('Sending request with filter:', filter)
   stores
     .getSubjects(filter)
     .then((response) => {
-      console.log('API response:', response)
       subjects.value = response.data
       dataFilter.value = {
         ...dataFilter.value,
@@ -109,8 +107,6 @@ const getSubjects = (filter: typeof dataFilter.value) => {
         totalPages: response.totalPages,
         totalCount: response.totalCount,
         pageSize: response.pageSize,
-        // hasPreviousPage: response.hasPreviousPage,
-        // hasNextPage: response.hasNextPage,
       }
     })
     .catch((error) => {
@@ -125,13 +121,11 @@ const getSubjects = (filter: typeof dataFilter.value) => {
 }
 
 const handlePageChange = (newPage: number) => {
-  console.log('Page change to:', newPage)
   dataFilter.value.pageNumber = newPage
   getSubjects(dataFilter.value)
 }
 
 const handlePageSizeChange = (newPageSize: number) => {
-  console.log('Page size change to:', newPageSize)
   dataFilter.value.pageSize = newPageSize
   getSubjects(dataFilter.value)
 }
@@ -156,7 +150,7 @@ const editSubject = (subject: Subject) => {
 
 const onSubjectSaved = async (subject: Subject) => {
   doShowSubjectFormModal.value = false
-  if (subject.id != '') {
+  if (subject.id) {
     stores
       .updateSubject(subject.id, subject as EmptySubject)
       .then(() => {

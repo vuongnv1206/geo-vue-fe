@@ -9,90 +9,70 @@ import EditGroupClass from './widgets/EditGroupClass.vue'
 import { getErrorMessage, notifications } from '@/services/utils'
 import SharedClass from './SharedClass.vue'
 
+const loading = ref(true)
 const editFormRef = ref()
 const { confirm } = useModal()
 const { init: notify } = useToast()
-const loading = ref(true)
-const stores = useClassStore()
-const classrooms = ref<Classrooms[]>([])
-const classToEdit = ref<Classrooms | null>(null)
-const doShowClassFormModal = ref(false)
-const groupClassToEdit = ref<GroupClass | null>(null)
-const doShowGroupClassFormModal = ref(false)
-const store = useGroupClassStore()
-const listGroupClass = ref<GroupClass[]>([])
-const getGroupClassById = (id: string) => listGroupClass.value.find((gc) => gc.id === id)
-const getClassById = (id: string) => classrooms.value.find((c) => c.id === id)
+const filterClassList = ref(true)
 
-const createNewClass = () => {
-  classToEdit.value = null
-  doShowClassFormModal.value = true
-}
-const createNewGroupClass = () => {
-  groupClassToEdit.value = null
-  doShowGroupClassFormModal.value = true
-}
-const editClass = (classrooms: Classrooms) => {
-  classToEdit.value = classrooms
-  doShowClassFormModal.value = true
-}
-const editGroupClass = (gc: GroupClass) => {
-  groupClassToEdit.value = gc
-  doShowGroupClassFormModal.value = true
-}
+const classStore = useClassStore()
+const groupclassStore = useGroupClassStore()
+
+const classrooms = ref<Classrooms[]>([])
+const groupClasses = ref<GroupClass[]>([])
+
+const classToEdit = ref<Classrooms | null>(null)
+const groupClassToEdit = ref<GroupClass | null>(null)
+
+const doShowClassFormModal = ref(false)
+const doShowGroupClassFormModal = ref(false)
 
 const dataFilter = ref({
   advancedSearch: {
-    fields: [''],
+    fields: ['name'],
     keyword: '',
   },
-  pageNumber: 0,
-  pageSize: 100,
-  orderBy: ['id'],
+  pageNumber: 1,
+  totalPages: 1,
+  totalCount: 1,
+  pageSize: 10,
+  orderBy: ['createdOn'],
 })
 
-const getGroupClasses = () => {
+const getGroupClasses = (filter: typeof dataFilter.value) => {
   loading.value = true
-  dataFilter.value.advancedSearch.fields = ['name']
-  store
-    .getGroupClasses(dataFilter)
+  groupclassStore
+    .getGroupClasses(filter)
     .then((response) => {
-      listGroupClass.value = response.data
+      groupClasses.value = response.data
       classrooms.value = response.data.flatMap((gc) => gc.classes)
-      // console.log('Department: ', listGroupClass.value)
+      dataFilter.value = {
+        ...dataFilter.value,
+        pageNumber: response.currentPage,
+        totalPages: response.totalPages,
+        totalCount: response.totalCount,
+        pageSize: response.pageSize,
+      }
+      // console.log('Department: ', groupClasses.value)
       // console.log('Classrooms: ', classrooms.value)
-      loading.value = false
     })
     .catch((error) => {
       notify({
         message: notifications.getFailed('group class') + getErrorMessage(error),
         color: 'error',
       })
+    })
+    .finally(() => {
       loading.value = false
     })
 }
 
-const handlerSearch = (event: Event) => {
-  const input = event.target as HTMLInputElement
-  dataFilter.value.advancedSearch.keyword = input.value
-  console.log('Search: ', dataFilter.value.advancedSearch.keyword)
-  getGroupClasses()
-}
+const getClassById = (id: string) => classrooms.value.find((c) => c.id === id)
+const getGroupClassById = (id: string) => groupClasses.value.find((gc) => gc.id === id)
 
-const handleMenuGroupClassClick = (option: any) => {
-  if (option.text === 'Edit') {
-    editGroupClass(getGroupClassById(option.value) as GroupClass)
-  } else if (option.text === 'Delete') {
-    deletedGroupClass(getGroupClassById(option.value) as GroupClass)
-  }
-}
-
-const handleMenuClassClick = (option: any) => {
-  if (option.text === 'Edit') {
-    editClass(getClassById(option.value) as Classrooms)
-  } else if (option.text === 'Delete') {
-    deleteClass(getClassById(option.value) as Classrooms)
-  }
+const handlerSearch = (input: string) => {
+  dataFilter.value.advancedSearch.keyword = input
+  getGroupClasses(dataFilter.value)
 }
 
 const beforeEditFormModalClose = async (hide: () => unknown) => {
@@ -110,6 +90,60 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   }
 }
 
+const createNewClass = () => {
+  classToEdit.value = null
+  doShowClassFormModal.value = true
+}
+
+const editClass = (classrooms: Classrooms) => {
+  classToEdit.value = classrooms
+  doShowClassFormModal.value = true
+}
+
+const handleMenuClassClick = (option: any) => {
+  if (option.text === 'Edit') {
+    editClass(getClassById(option.value) as Classrooms)
+  } else if (option.text === 'Delete') {
+    deleteClass(getClassById(option.value) as Classrooms)
+  }
+}
+
+const onClassSaved = async (classrooms: Classrooms) => {
+  doShowClassFormModal.value = false
+  if (classrooms.id) {
+    classStore
+      .updateClassroom(classrooms.id, classrooms as Classrooms)
+      .then(() => {
+        notify({
+          message: notifications.updatedSuccessfully(classrooms.name),
+          color: 'success',
+        })
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.updateFailed(classrooms.name) + getErrorMessage(error),
+          color: 'error',
+        })
+      })
+  } else {
+    classStore
+      .addClassroom(classrooms as Classrooms)
+      .then(() => {
+        notify({
+          message: notifications.createSuccessfully('class'),
+          color: 'success',
+        })
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.createFailed('class') + getErrorMessage(error),
+          color: 'error',
+        })
+      })
+  }
+  getGroupClasses(dataFilter.value)
+}
+
 const deleteClass = (classroom: Classrooms) => {
   confirm({
     title: 'Delete Class',
@@ -118,14 +152,14 @@ const deleteClass = (classroom: Classrooms) => {
     if (!agreed) {
       return
     }
-    stores
+    classStore
       .deleteClassroom(classroom.id)
       .then(() => {
         notify({
           message: notifications.deleteSuccessfully(classroom.name),
           color: 'success',
         })
-        getGroupClasses()
+        getGroupClasses(dataFilter.value)
       })
       .catch((error) => {
         notify({
@@ -136,73 +170,28 @@ const deleteClass = (classroom: Classrooms) => {
   })
 }
 
-const deletedGroupClass = (groupClass: GroupClass) => {
-  confirm({
-    title: 'Delete GroupClass',
-    message: notifications.confirmDelete(groupClass.name),
-  }).then((agreed) => {
-    if (!agreed) {
-      return
-    }
-    store
-      .deleteGroupClass(groupClass.id)
-      .then(() => {
-        notify({
-          message: notifications.deleteSuccessfully(groupClass.name),
-          color: 'success',
-        })
-        getGroupClasses()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.deleteFailed(groupClass.name) + getErrorMessage(error),
-          color: 'error',
-        })
-      })
-  })
+const createNewGroupClass = () => {
+  groupClassToEdit.value = null
+  doShowGroupClassFormModal.value = true
 }
 
-const onClassSaved = async (classrooms: Classrooms) => {
-  doShowClassFormModal.value = false
-  if ('id' in classrooms) {
-    stores
-      .updateClassroom(classrooms.id, classrooms as Classrooms)
-      .then(() => {
-        notify({
-          message: notifications.updatedSuccessfully(classrooms.name),
-          color: 'success',
-        })
-        getGroupClasses()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.updateFailed(classrooms.name) + getErrorMessage(error),
-          color: 'error',
-        })
-      })
-  } else {
-    stores
-      .addClassroom(classrooms as Classrooms)
-      .then(() => {
-        notify({
-          message: notifications.createSuccessfully('class'),
-          color: 'success',
-        })
-        getGroupClasses()
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.createFailed('class') + getErrorMessage(error),
-          color: 'error',
-        })
-      })
+const editGroupClass = (gc: GroupClass) => {
+  groupClassToEdit.value = gc
+  doShowGroupClassFormModal.value = true
+}
+
+const handleMenuGroupClassClick = (option: any) => {
+  if (option.text === 'Edit') {
+    editGroupClass(getGroupClassById(option.value) as GroupClass)
+  } else if (option.text === 'Delete') {
+    deletedGroupClass(getGroupClassById(option.value) as GroupClass)
   }
 }
 
 const onGroupClassSaved = async (groupClass: GroupClass) => {
   doShowGroupClassFormModal.value = false
-  if ('id' in groupClass) {
-    await store
+  if (groupClass.id) {
+    await groupclassStore
       .updateGroupClass(groupClass.id, groupClass as GroupClass)
       .then(() => {
         notify({
@@ -217,7 +206,7 @@ const onGroupClassSaved = async (groupClass: GroupClass) => {
         })
       })
   } else {
-    await store
+    await groupclassStore
       .createGroupClass(groupClass as GroupClass)
       .then(() => {
         notify({
@@ -232,13 +221,37 @@ const onGroupClassSaved = async (groupClass: GroupClass) => {
         })
       })
   }
-  getGroupClasses()
+  getGroupClasses(dataFilter.value)
 }
 
-const filterClassList = ref(true)
+const deletedGroupClass = (groupClass: GroupClass) => {
+  confirm({
+    title: 'Delete GroupClass',
+    message: notifications.confirmDelete(groupClass.name),
+  }).then((agreed) => {
+    if (!agreed) {
+      return
+    }
+    groupclassStore
+      .deleteGroupClass(groupClass.id)
+      .then(() => {
+        notify({
+          message: notifications.deleteSuccessfully(groupClass.name),
+          color: 'success',
+        })
+        getGroupClasses(dataFilter.value)
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.deleteFailed(groupClass.name) + getErrorMessage(error),
+          color: 'error',
+        })
+      })
+  })
+}
 
 onMounted(() => {
-  getGroupClasses()
+  getGroupClasses(dataFilter.value)
 })
 </script>
 
@@ -248,7 +261,12 @@ onMounted(() => {
     <VaCard class="flex flex-col md:flex-row gap-2 p-2">
       <VaCard class="flex justify-start items-center flex-grow">
         <VaCard class="flex flex-grow">
-          <VaInput placeholder="Search group class name" class="flex-grow" @input="handlerSearch">
+          <VaInput
+            v-model="dataFilter.advancedSearch.keyword"
+            placeholder="Search group class name"
+            class="flex-grow"
+            @update:modelValue="handlerSearch"
+          >
             <template #appendInner>
               <VaIcon color="secondary" class="material-icons">search</VaIcon>
             </template>
@@ -291,12 +309,12 @@ onMounted(() => {
       </VaCard>
     </VaCard>
 
-    <VaCard v-if="filterClassList">
-      <VaCard v-if="listGroupClass.length > 0" class="mt-5 p-2">
+    <VaCard v-if="filterClassList && !loading">
+      <VaCard v-if="groupClasses.length > 0" class="mt-5 p-2">
         <VaScrollContainer vertical>
           <VaAccordion class="max-W-sm" multiple>
             <VaCollapse
-              v-for="groupClass in listGroupClass"
+              v-for="groupClass in groupClasses"
               :key="groupClass.id"
               :header="groupClass.name"
               solid
@@ -418,5 +436,3 @@ onMounted(() => {
     />
   </VaModal>
 </template>
-
-<style scoped></style>

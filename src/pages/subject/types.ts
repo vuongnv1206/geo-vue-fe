@@ -5,7 +5,6 @@ export type Subject = {
 }
 
 export type EmptySubject = {
-  id: string
   description: string
   name: string
 }

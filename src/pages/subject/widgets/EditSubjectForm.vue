@@ -15,7 +15,6 @@ defineEmits<{
 }>()
 
 const defaultNewSubject: EmptySubject = {
-  id: '',
   name: '',
   description: '',
 }
