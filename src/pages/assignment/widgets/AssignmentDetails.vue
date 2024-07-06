@@ -1,3 +1,142 @@
+<template>
+  <VaLayout>
+    <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'assignments' }" />
+  </VaLayout>
+  <VaDivider />
+  <VaLayout
+    :top="{ order: 1 }"
+    :left="{ absolute: breakpoints.smDown, order: 2, overlay: breakpoints.smDown && showSidebar }"
+    @leftOverlayClick="showSidebar = false"
+  >
+    <template #top>
+      <VaNavbar class="py-1 rounded">
+        <template #left>
+          <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
+        </template>
+        <template #right>
+          <div class="flex">
+            <div class="mr-3 flex-grow">
+              <VaInput class="" placeholder="Search">
+                <template #appendInner>
+                  <VaIcon color="secondary" class="material-icons"> search </VaIcon>
+                </template>
+              </VaInput>
+            </div>
+          </div>
+        </template>
+      </VaNavbar>
+    </template>
+    <template #left>
+      <VaCard v-if="showSidebar" class="mr-2 rounded min-w-[500px]">
+        <VaCard v-if="assignment" class="min-h-[81vh]">
+          <VaCard>
+            <VaCardTitle>{{ assignment.name }}</VaCardTitle>
+            <VaCardContent>
+              <VaIcon name="event" class="mr-1 material-symbols-outlined" /> Started at:
+              {{ format.formatDate(assignment.startTime) }}
+            </VaCardContent>
+            <VaCardContent>
+              <VaIcon name="event" class="mr-1 material-symbols-outlined" /> End Time:
+              {{ format.formatDate(assignment.endTime) }}
+            </VaCardContent>
+          </VaCard>
+          <VaCard>
+            <VaCardTitle>Menu</VaCardTitle>
+            <VaCard outlined class="mx-3">
+              <VaCardActions align="stretch" vertical>
+                <VaButton
+                  icon="edit"
+                  preset="secondary"
+                  :to="{ name: 'edit-assignment-details', params: { id: assignmentId, classId: classId } }"
+                  class="justify-start"
+                  >Setting
+                </VaButton>
+                <VaButton
+                  icon="delete"
+                  preset="secondary"
+                  class="justify-start"
+                  @click="removeAssignmentFromClass(assignmentClass)"
+                >
+                  Delete</VaButton
+                >
+              </VaCardActions>
+            </VaCard>
+          </VaCard>
+          <VaCard>
+            <VaCardTitle>Attachment File</VaCardTitle>
+            <VaCardContent>
+              {{ assignment.attachmentPaths ? assignment.attachmentPaths : 'No attachment file' }}
+            </VaCardContent>
+          </VaCard>
+          <VaCard>
+            <VaCard class="flex flex-row justify-between">
+              <VaCardTitle>Content</VaCardTitle>
+              <VaButton
+                class="pr-6"
+                icon="edit"
+                size="small"
+                preset="plain"
+                @click="editAssignmentContent(assignment)"
+              />
+            </VaCard>
+            <VaCardContent>
+              <!-- eslint-disable vue/no-v-html -->
+              <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
+              <!--eslint-enable-->
+            </VaCardContent>
+          </VaCard>
+        </VaCard>
+      </VaCard>
+    </template>
+
+    <template #content>
+      <VaCard class="mt-2 p-2 min-h-[75vh]">
+        <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+          <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
+            <VaListItemSection avatar>
+              <GeoAvatar
+                class="mr-2"
+                :size="48"
+                color="warning"
+                :image="student.avatarUrl || undefined"
+                :txt="student.firstName.charAt(0).toUpperCase()"
+              />
+            </VaListItemSection>
+            <VaListItemSection>
+              <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
+              <VaListItemLabel caption> đã nộp/chưa nôp </VaListItemLabel>
+            </VaListItemSection>
+          </VaListItem>
+        </VaList>
+      </VaCard>
+    </template>
+  </VaLayout>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowFormModal"
+    size="large"
+    mobile-fullscreen
+    close-button
+    stateful
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+  >
+    <h1 class="va-h5 mb-4">Edit Content</h1>
+    <EditAssignmentContent
+      ref="editFormRef"
+      :assignment-content="assignmentContent"
+      @close="cancel"
+      @save="
+        (assignmentContent: AssignmentContent) => {
+          onAssignmentContent(assignmentContent)
+          ok()
+        }
+      "
+    />
+  </VaModal>
+</template>
+
 <script lang="ts" setup>
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
@@ -147,141 +286,3 @@ onMounted(() => {
   getAssignment(assignmentId)
 })
 </script>
-
-<template>
-  <VaLayout>
-    <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'assignments' }" />
-  </VaLayout>
-  <VaDivider />
-  <VaLayout
-    :top="{ order: 1 }"
-    :left="{ absolute: breakpoints.smDown, order: 2, overlay: breakpoints.smDown && showSidebar }"
-    @leftOverlayClick="showSidebar = false"
-  >
-    <template #left>
-      <VaSidebar v-model="showSidebar" class="mr-2">
-        <VaCard v-if="assignment">
-          <VaCard>
-            <VaCardTitle>{{ assignment.name }}</VaCardTitle>
-            <VaCardContent>
-              <VaIcon name="event" class="mr-1 material-symbols-outlined" /> Started at:
-              {{ format.formatDate(assignment.startTime) }}
-            </VaCardContent>
-            <VaCardContent>
-              <VaIcon name="event" class="mr-1 material-symbols-outlined" /> End Time:
-              {{ format.formatDate(assignment.endTime) }}
-            </VaCardContent>
-          </VaCard>
-          <VaCard>
-            <VaCardTitle>Menu</VaCardTitle>
-            <VaCard outlined class="mx-3">
-              <VaCardActions align="stretch" vertical>
-                <VaButton
-                  icon="edit"
-                  preset="secondary"
-                  :to="{ name: 'edit-assignment-details', params: { id: assignmentId, classId: classId } }"
-                  class="justify-start"
-                  >Setting
-                </VaButton>
-                <VaButton
-                  icon="delete"
-                  preset="secondary"
-                  class="justify-start"
-                  @click="removeAssignmentFromClass(assignmentClass)"
-                >
-                  Delete</VaButton
-                >
-              </VaCardActions>
-            </VaCard>
-          </VaCard>
-          <VaCard>
-            <VaCardTitle>Attachment File</VaCardTitle>
-            <VaCardContent>
-              {{ assignment.attachmentPaths ? assignment.attachmentPaths : 'No attachment file' }}
-            </VaCardContent>
-          </VaCard>
-          <VaCard>
-            <VaCard class="flex flex-row justify-between">
-              <VaCardTitle>Content</VaCardTitle>
-              <VaButton
-                class="pr-6"
-                icon="edit"
-                size="small"
-                preset="plain"
-                @click="editAssignmentContent(assignment)"
-              />
-            </VaCard>
-            <VaCardContent>
-              <!-- eslint-disable vue/no-v-html -->
-              <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
-              <!--eslint-enable-->
-            </VaCardContent>
-          </VaCard>
-        </VaCard>
-      </VaSidebar>
-    </template>
-    <template #top>
-      <VaNavbar class="py-1 rounded">
-        <template #left>
-          <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
-        </template>
-        <template #right>
-          <div class="flex">
-            <div class="mr-3 flex-grow">
-              <VaInput class="" placeholder="Search">
-                <template #appendInner>
-                  <VaIcon color="secondary" class="material-icons"> search </VaIcon>
-                </template>
-              </VaInput>
-            </div>
-          </div>
-        </template>
-      </VaNavbar>
-    </template>
-    <template #content>
-      <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-        <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
-          <VaListItemSection avatar>
-            <GeoAvatar
-              class="mr-2"
-              :size="48"
-              color="warning"
-              :image="student.avatarUrl || undefined"
-              :txt="student.firstName.charAt(0).toUpperCase()"
-            />
-          </VaListItemSection>
-          <VaListItemSection>
-            <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-            <VaListItemLabel caption> đã nộp/chưa nôp </VaListItemLabel>
-          </VaListItemSection>
-        </VaListItem>
-      </VaList>
-    </template>
-  </VaLayout>
-
-  <VaModal
-    v-slot="{ cancel, ok }"
-    v-model="doShowFormModal"
-    size="small"
-    mobile-fullscreen
-    close-button
-    stateful
-    hide-default-actions
-    :before-cancel="beforeEditFormModalClose"
-  >
-    <h1 class="va-h5 mb-4">Edit Content</h1>
-    <EditAssignmentContent
-      ref="editFormRef"
-      :assignment-content="assignmentContent"
-      @close="cancel"
-      @save="
-        (assignmentContent: AssignmentContent) => {
-          onAssignmentContent(assignmentContent)
-          ok()
-        }
-      "
-    />
-  </VaModal>
-</template>
-
-<style lang="scss" scoped></style>

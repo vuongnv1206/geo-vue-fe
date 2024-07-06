@@ -126,6 +126,7 @@ const handlePageChange = (newPage: number) => {
 }
 
 const handlePageSizeChange = (newPageSize: number) => {
+  dataFilter.value.pageNumber = 1
   dataFilter.value.pageSize = newPageSize
   getSubjects(dataFilter.value)
 }
