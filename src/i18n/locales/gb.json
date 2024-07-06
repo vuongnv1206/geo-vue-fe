@@ -469,5 +469,8 @@
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"
+  },
+  "vuestic": {
+    "close": "Close"
   }
 }
