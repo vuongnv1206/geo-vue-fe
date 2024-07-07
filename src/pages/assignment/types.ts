@@ -3,11 +3,11 @@ export type Assignment = {
   name: string
   startTime: Date
   endTime: Date
-  attachmentPaths: Attachment[]
   content: string
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectId: string
+  attachment: string
   createdOn: Date
 }
 
@@ -19,7 +19,7 @@ export type EmptyAssignment = {
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectId: string
-  attachmentPaths: Attachment[] | null
+  attachment: string | null
   classIds: string[]
 }
 
@@ -49,12 +49,6 @@ export type AssignmentContent = {
 
 export type EmptyAssignmentContent = {
   content: string
-}
-
-export type Attachment = {
-  name: string
-  extension: string
-  data: string
 }
 
 export type AssignmentResponse = {

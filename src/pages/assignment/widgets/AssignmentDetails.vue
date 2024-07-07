@@ -65,7 +65,7 @@
           <VaCard>
             <VaCardTitle>Attachment File</VaCardTitle>
             <VaCardContent>
-              {{ assignment.attachmentPaths ? assignment.attachmentPaths : 'No attachment file' }}
+              {{ attachmentPaths ? attachmentPaths : 'No attachment file' }}
             </VaCardContent>
           </VaCard>
           <VaCard>
@@ -169,6 +169,9 @@ const doShowFormModal = ref(false)
 const editFormRef = ref()
 const { confirm } = useModal()
 
+const url = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -3)
+const attachmentPaths = ref<string[]>([])
+
 const getAssignment = (id: string) => {
   loading.value = true
   stores
@@ -177,6 +180,14 @@ const getAssignment = (id: string) => {
       assignment.value = response
       if (assignment.value?.content == '<p><br></p>') {
         assignment.value.content = ''
+      }
+      if (assignment.value?.attachment) {
+        attachmentPaths.value = JSON.parse(assignment.value.attachment)
+        for (let i = 0; i < attachmentPaths.value.length; i++) {
+          const parts = attachmentPaths.value[i].split('_')
+          const newPart = parts.slice(1).join('_')
+          attachmentPaths.value[i] = `${url}${newPart}`
+        }
       }
     })
     .catch((error) => {
@@ -196,7 +207,7 @@ const getClassById = async () => {
     .getClassById(classId)
     .then((response) => {
       students.value = response.students
-      console.log('Students:', students.value)
+      // console.log('Students:', students.value)
     })
     .catch((error) => {
       notify({

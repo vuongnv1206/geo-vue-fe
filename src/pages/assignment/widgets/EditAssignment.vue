@@ -10,30 +10,36 @@ import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { computed, onMounted, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
-import { useForm, useModal, useToast, VaCardTitle } from 'vuestic-ui/web-components'
-import { Attachment, EmptyAssignment } from '../types'
+import { useForm, useModal, useToast, VaCardTitle, VaFileUpload } from 'vuestic-ui/web-components'
+import { EmptyAssignment } from '../types'
 // import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import { QuillEditor } from '@vueup/vue-quill'
+import { useFileStore } from '@/stores/modules/file.module'
 
-const { init: notify } = useToast()
-const { confirm } = useModal()
 const router = useRouter()
-const showSidebar = ref(false)
+const { confirm } = useModal()
+const { init: notify } = useToast()
 const { validate } = useForm('form')
-const subjects = ref<Subject[]>([])
+
+const showSidebar = ref(false)
+const filesUploaded = ref<any>()
+
+const authStore = useAuthStore()
+const fileStore = useFileStore()
 const classStore = useGroupClassStore()
-const groupClasses = ref<GroupClass[]>([])
-const assignmentStore = useAssignmentStore()
 const subjectStore = useSubjectStore()
-const filesUploaded = ref<File[]>([])
-const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
+const assignmentStore = useAssignmentStore()
+
+const subjects = ref<Subject[]>([])
+const groupClasses = ref<GroupClass[]>([])
+
 const selectedClasses = ref<string[]>([])
 const selectedDepartment = ref<GroupClass | null>(null)
-const authStore = useAuthStore()
-const currentUserId = authStore.user?.id
-
 const selectAllClassesState = ref(false)
 const selectedClassesByDepartmentState = ref<{ [key: string]: boolean }>({})
+
+const currentUserId = authStore.user?.id
+const date = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date(new Date().setHours(23, 59, 0, 0))])
 
 const defaultNewAssignment: EmptyAssignment = {
   name: '',
@@ -43,7 +49,7 @@ const defaultNewAssignment: EmptyAssignment = {
   canViewResult: false,
   requireLoginToSubmit: false,
   subjectId: '',
-  attachmentPaths: [] as Attachment[],
+  attachment: '',
   classIds: [] as string[],
 }
 const newAssignment = ref({ ...defaultNewAssignment })
@@ -86,6 +92,20 @@ const getSubjects = () => {
     })
 }
 
+const fileUpload = async () => {
+  fileStore
+    .uploadFile(filesUploaded.value)
+    .then((response) => {
+      newAssignment.value.attachment = JSON.stringify(response)
+      console.log('newAssignment after', newAssignment.value.attachment)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.createFailed('') + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+}
 const isFormHasUnsavedChanges = computed(() => {
   return Object.keys(newAssignment.value).some((key) => {
     return (
@@ -157,31 +177,10 @@ const handleDatePicker = () => {
   newAssignment.value.startTime = date.value[0]
   newAssignment.value.endTime = date.value[1]
 }
-const handleAttachment = async () => {
-  const files = filesUploaded.value
-  newAssignment.value.attachmentPaths = await Promise.all(
-    files.map((file) => {
-      return new Promise<Attachment>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          const base64Data = reader.result?.toString() ?? ''
-          resolve({
-            name: file.name,
-            extension: file.type.split('/')[1],
-            data: base64Data,
-          })
-        }
-        reader.onerror = (error) => reject(error)
-        reader.readAsDataURL(file)
-      })
-    }),
-  )
-}
 
 const handleClickSave = async () => {
   if (validate()) {
     handleDatePicker()
-    await handleAttachment()
     try {
       newAssignment.value.classIds = selectedClasses.value
       await assignmentStore.createAssignment(newAssignment.value as EmptyAssignment)
@@ -237,7 +236,14 @@ onMounted(() => {
             :month-change-on-arrows="true"
             placeholder="Start choosing or typing date and time"
           />
-          <VaFileUpload v-model="filesUploaded" dropzone file-types="jpg,png,pdf" label="Attachment Path" />
+          <VaFileUpload
+            v-model="filesUploaded"
+            dropzone
+            label="Attachment Path"
+            file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
+            flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
+            @fileAdded="fileUpload"
+          />
           <VaCard>
             <label
               id="input-label-510"
