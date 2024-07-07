@@ -63,9 +63,32 @@
             </VaCard>
           </VaCard>
           <VaCard>
-            <VaCardTitle>Attachment File</VaCardTitle>
+            <VaCard class="flex flex-row items-center justify-between">
+              <VaCardTitle>Attachment File</VaCardTitle>
+              <VaPopover class="pr-6" title="Allow file types">
+                <VaIcon name="error" size="small" />
+                <template #body>
+                  <p>Image: .jpg, .png, .jpeg.</p>
+                  <p>Document: .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt.</p>
+                  <p>Archive: .zip, .rar, .7z.</p>
+                  <p>Video: .mp4, .avi, .mkv, .flv, .wmv, .mov, .webm.</p>
+                  <p>Audio: .mp3, .wav, .flac, .ogg, .wma.</p>
+                  <p>Data: .json, .xml, .csv, .tsv.</p>
+                </template>
+              </VaPopover>
+            </VaCard>
             <VaCardContent>
-              {{ attachmentPaths ? attachmentPaths : 'No attachment file' }}
+              <VaCard v-for="(attachmentPath, index) in attachmentPaths" :key="index">
+                <VaButton
+                  class="font-medium geo-text"
+                  icon="description"
+                  size="small"
+                  preset="plain"
+                  :href="`${url}${rawAttachmentPaths[index]}`"
+                >
+                  {{ attachmentPath }}
+                </VaButton>
+              </VaCard>
             </VaCardContent>
           </VaCard>
           <VaCard>
@@ -80,9 +103,7 @@
               />
             </VaCard>
             <VaCardContent>
-              <!-- eslint-disable vue/no-v-html -->
               <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
-              <!--eslint-enable-->
             </VaCardContent>
           </VaCard>
         </VaCard>
@@ -142,7 +163,7 @@ import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent } from '../types'
-import { useBreakpoint, useModal, useToast, VaCard, VaList, VaListItemSection } from 'vuestic-ui'
+import { useBreakpoint, useModal, useToast, VaButton, VaCard, VaList, VaListItemSection } from 'vuestic-ui'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
 import EditAssignmentContent from './EditAssignmentContent.vue'
@@ -161,16 +182,19 @@ const assignmentContent = ref<AssignmentContent | null>(null)
 const students = ref<Student[]>([])
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
+
 const assignmentClass = ref<AssignmentClass>({
   assignmentId: assignmentId,
   classesdId: classId,
 })
+
 const doShowFormModal = ref(false)
 const editFormRef = ref()
 const { confirm } = useModal()
 
 const url = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -3)
 const attachmentPaths = ref<string[]>([])
+const rawAttachmentPaths = ref<string[]>([])
 
 const getAssignment = (id: string) => {
   loading.value = true
@@ -183,10 +207,12 @@ const getAssignment = (id: string) => {
       }
       if (assignment.value?.attachment) {
         attachmentPaths.value = JSON.parse(assignment.value.attachment)
+        rawAttachmentPaths.value = JSON.parse(assignment.value.attachment)
         for (let i = 0; i < attachmentPaths.value.length; i++) {
           const parts = attachmentPaths.value[i].split('_')
           const newPart = parts.slice(1).join('_')
-          attachmentPaths.value[i] = `${url}${newPart}`
+          // attachmentPaths.value[i] = `${url}${newPart}`
+          attachmentPaths.value[i] = `${newPart}`
         }
       }
     })
@@ -293,6 +319,7 @@ watchEffect(() => {
 })
 
 onMounted(() => {
+  console.log('URL:', url)
   getClassById()
   getAssignment(assignmentId)
 })
