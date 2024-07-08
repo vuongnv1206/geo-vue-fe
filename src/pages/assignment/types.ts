@@ -51,6 +51,10 @@ export type EmptyAssignmentContent = {
   content: string
 }
 
+export type EmptyAssignmentAttachment = {
+  attachment: string
+}
+
 export type AssignmentResponse = {
   data: Assignment[]
   currentPage: number

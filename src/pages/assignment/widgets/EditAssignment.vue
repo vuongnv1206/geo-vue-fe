@@ -97,7 +97,6 @@ const fileUpload = async () => {
     .uploadFile(filesUploaded.value)
     .then((response) => {
       newAssignment.value.attachment = JSON.stringify(response)
-      console.log('newAssignment after', newAssignment.value.attachment)
     })
     .catch((error) => {
       notify({

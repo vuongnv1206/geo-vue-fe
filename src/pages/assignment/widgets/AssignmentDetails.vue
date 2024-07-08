@@ -64,18 +64,31 @@
           </VaCard>
           <VaCard>
             <VaCard class="flex flex-row items-center justify-between">
-              <VaCardTitle>Attachment File</VaCardTitle>
-              <VaPopover class="pr-6" title="Allow file types">
-                <VaIcon name="error" size="small" />
-                <template #body>
-                  <p>Image: .jpg, .png, .jpeg.</p>
-                  <p>Document: .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt.</p>
-                  <p>Archive: .zip, .rar, .7z.</p>
-                  <p>Video: .mp4, .avi, .mkv, .flv, .wmv, .mov, .webm.</p>
-                  <p>Audio: .mp3, .wav, .flac, .ogg, .wma.</p>
-                  <p>Data: .json, .xml, .csv, .tsv.</p>
-                </template>
-              </VaPopover>
+              <div class="flex flex-row items-center">
+                <VaCardTitle>Attachment File</VaCardTitle>
+                <VaPopover title="Allow file types" placement="right">
+                  <VaIcon name="error" size="small" />
+                  <template #body>
+                    <p>Image: .jpg, .png, .jpeg.</p>
+                    <p>Document: .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt.</p>
+                    <p>Archive: .zip, .rar, .7z.</p>
+                    <p>Video: .mp4, .avi, .mkv, .flv, .wmv, .mov, .webm.</p>
+                    <p>Audio: .mp3, .wav, .flac, .ogg, .wma.</p>
+                    <p>Data: .json, .xml, .csv, .tsv.</p>
+                  </template>
+                </VaPopover>
+              </div>
+              <VaFileUpload
+                v-model="filesUploaded"
+                class="flex flex-row items-center pr-6"
+                hide-file-list
+                file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
+            flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
+                @fileAdded="fileUpload"
+              >
+                <VaIcon name="upload" />
+                <p>Upload</p>
+              </VaFileUpload>
             </VaCard>
             <VaCardContent>
               <VaCard v-for="(attachmentPath, index) in attachmentPaths" :key="index">
@@ -162,16 +175,33 @@
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent } from '../types'
-import { useBreakpoint, useModal, useToast, VaButton, VaCard, VaList, VaListItemSection } from 'vuestic-ui'
+import {
+  Assignment,
+  AssignmentClass,
+  AssignmentContent,
+  EmptyAssignmentContent,
+  EmptyAssignmentAttachment,
+} from '../types'
+import {
+  useBreakpoint,
+  useModal,
+  useToast,
+  VaButton,
+  VaCard,
+  VaCardContent,
+  VaList,
+  VaListItemSection,
+} from 'vuestic-ui'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { Student } from '@/pages/classrooms/types'
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
+import { useFileStore } from '@/stores/modules/file.module'
 
 const loading = ref(true)
 const router = useRouter()
+const fileStore = useFileStore()
 const stores = useAssignmentStore()
 const classStores = useClassStore()
 const breakpoints = useBreakpoint()
@@ -179,9 +209,11 @@ const { init: notify } = useToast()
 const showSidebar = ref(breakpoints.smUp)
 const assignment = ref<Assignment | null>(null)
 const assignmentContent = ref<AssignmentContent | null>(null)
+const assignmentAttachment = ref<EmptyAssignmentAttachment | null>(null)
 const students = ref<Student[]>([])
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
+const filesUploaded = ref<any>()
 
 const assignmentClass = ref<AssignmentClass>({
   assignmentId: assignmentId,
@@ -288,7 +320,6 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
 }
 
 const onAssignmentContent = async (assignment: AssignmentContent) => {
-  console.log('Assignment content:', assignment)
   doShowFormModal.value = false
   if (assignment.id != '') {
     stores
@@ -309,9 +340,47 @@ const onAssignmentContent = async (assignment: AssignmentContent) => {
   }
 }
 
+const onAssignmentAttachment = async () => {
+  if (assignmentId != '') {
+    stores
+      .updateAssignment(assignmentId, assignmentAttachment.value as EmptyAssignmentAttachment)
+      .then(() => {
+        notify({
+          message: notifications.updatedSuccessfully('assignment'),
+          color: 'success',
+        })
+        getAssignment(assignmentId)
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.updateFailed('assignment') + getErrorMessage(error),
+          color: 'error',
+        })
+      })
+  }
+}
+
 const editAssignmentContent = (assContent: AssignmentContent) => {
   assignmentContent.value = assContent
   doShowFormModal.value = true
+}
+
+const fileUpload = async () => {
+  fileStore
+    .uploadFile(filesUploaded.value)
+    .then((response) => {
+      assignmentAttachment.value = {
+        attachment: JSON.stringify(response),
+      }
+      console.log('Assignment Attachment:', assignmentAttachment.value)
+      onAssignmentAttachment()
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.createFailed('') + getErrorMessage(error),
+        color: 'error',
+      })
+    })
 }
 
 watchEffect(() => {
@@ -319,7 +388,6 @@ watchEffect(() => {
 })
 
 onMounted(() => {
-  console.log('URL:', url)
   getClassById()
   getAssignment(assignmentId)
 })
