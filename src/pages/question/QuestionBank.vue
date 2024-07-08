@@ -606,30 +606,14 @@ onMounted(() => {
                   {{ t('questions.results_per_page') }}
                   <VaSelect v-model="pagination.perPage" class="!w-20" :options="[10, 50, 100]" />
                 </div>
-
                 <div v-if="totalPages > 1" class="flex">
-                  <VaButton
-                    preset="secondary"
-                    icon="va-arrow-left"
-                    aria-label="Previous page"
-                    :disabled="pagination.page === 1"
-                    @click="pagination.page--"
-                  />
-                  <VaButton
-                    class="mr-2"
-                    preset="secondary"
-                    icon="va-arrow-right"
-                    aria-label="Next page"
-                    :disabled="pagination.page === totalPages"
-                    @click="pagination.page++"
-                  />
                   <VaPagination
                     v-model="pagination.page"
                     buttons-preset="secondary"
                     :pages="totalPages"
                     :visible-pages="5"
-                    :boundary-links="false"
-                    :direction-links="false"
+                    :boundary-links="true"
+                    :direction-links="true"
                   />
                 </div>
               </div>

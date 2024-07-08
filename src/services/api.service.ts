@@ -21,7 +21,6 @@ class ApiService {
       async function (config) {
         config.headers.Authorization = JwtService.getAuthHeader()
         config.headers.tenant = JwtService.getTenant()
-
         // if the request url is not /tokens/refresh or /tokens
         // check if the token is expired
         if (config.url !== '/tokens/refresh' && config.url !== '/tokens') {

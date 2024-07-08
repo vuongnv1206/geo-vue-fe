@@ -13,7 +13,9 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "ionic:build": "npm run lint && vue-tsc --noEmit && vite build",
+    "ionic:serve": "vite"
   },
   "lint-staged": {
     "./src/**/*.{ts,js,vue}": [
@@ -21,6 +23,13 @@
     ]
   },
   "dependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/app": "6.0.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/haptics": "6.0.0",
+    "@capacitor/keyboard": "6.0.1",
+    "@capacitor/status-bar": "6.0.0",
     "@gtm-support/vue-gtm": "^2.0.0",
     "@microsoft/signalr": "^8.0.0",
     "@storybook/test": "^8.0.8",
@@ -79,7 +88,7 @@
     "prettier": "^3.1.0",
     "storybook": "^8.0.8",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.2.2",
+    "typescript": "5.2.2",
     "vite": "^4.4.6",
     "vue-eslint-parser": "^9.3.2",
     "vue-tsc": "^1.8.22"
