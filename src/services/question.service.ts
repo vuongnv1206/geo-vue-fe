@@ -1,7 +1,47 @@
 import apiService from '@services/api.service'
-import { QuestionSearchRes, SearchQuestion } from '@/pages/question/types'
+import { QuestionSearchRes, RejectApproveQuestion, SearchQuestion } from '@/pages/question/types'
 
 class QuestionService {
+  async searchMyQuestion(data: SearchQuestion): Promise<QuestionSearchRes> {
+    return apiService
+      .post('/v1/question/search-my-requests', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  async searchPendingQuestion(data: SearchQuestion): Promise<QuestionSearchRes> {
+    return apiService
+      .post('/v1/question/search-approval', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  async rejectPendingQuestion(data: RejectApproveQuestion): Promise<any> {
+    return apiService
+      .put('/v1/question/reject', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  async approvePendingQuestion(data: RejectApproveQuestion): Promise<any> {
+    return apiService
+      .put('/v1/question/approve', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   async searchQuestion(data: SearchQuestion): Promise<QuestionSearchRes> {
     return apiService
       .post('/v1/question/search', data)

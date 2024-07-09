@@ -139,6 +139,13 @@
     }
   },
   "questions": {
+    "approve_all": "Duyệt tất cả",
+    "status": "Trạng thái",
+    "rejectedStatus": "Loại bỏ",
+    "approvedStatus": "Chấp thuận",
+    "pendingStatus": "Đang chờ",
+    "no_my_request": "Bạn không có câu hỏi nào",
+    "no_question_pending": "Không có câu hỏi nào",
     "add_question": "Thêm câu hỏi",
     "folders": "Thư mục",
     "all": "Tất cả",
@@ -176,6 +183,9 @@
     "question_passages": "Câu hỏi đoạn văn"
   },
   "questionFolder": {
+    "pending": "Câu hỏi chưa duyệt ({total})",
+    "pending_title": "Câu hỏi chưa duyệt",
+    "my_questions": "Câu hỏi của tôi",
     "questions": "Câu hỏi",
     "folders": "Thư mục",
     "search": "Tìm kiếm",
