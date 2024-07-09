@@ -63,45 +63,9 @@
             </VaCard>
           </VaCard>
           <VaCard>
-            <VaCard class="flex flex-row items-center justify-between">
-              <div class="flex flex-row items-center">
-                <VaCardTitle>Attachment File</VaCardTitle>
-                <VaPopover title="Allow file types" placement="right">
-                  <VaIcon name="error" size="small" />
-                  <template #body>
-                    <p>Image: .jpg, .png, .jpeg.</p>
-                    <p>Document: .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt.</p>
-                    <p>Archive: .zip, .rar, .7z.</p>
-                    <p>Video: .mp4, .avi, .mkv, .flv, .wmv, .mov, .webm.</p>
-                    <p>Audio: .mp3, .wav, .flac, .ogg, .wma.</p>
-                    <p>Data: .json, .xml, .csv, .tsv.</p>
-                  </template>
-                </VaPopover>
-              </div>
-              <VaFileUpload
-                v-model="filesUploaded"
-                class="flex flex-row items-center pr-6"
-                hide-file-list
-                file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
-            flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
-                @fileAdded="fileUpload"
-              >
-                <VaIcon name="upload" />
-                <p>Upload</p>
-              </VaFileUpload>
-            </VaCard>
+            <VaCardTitle>Attachment File</VaCardTitle>
             <VaCardContent>
-              <VaCard v-for="(attachmentPath, index) in attachmentPaths" :key="index">
-                <VaButton
-                  class="font-medium geo-text"
-                  icon="description"
-                  size="small"
-                  preset="plain"
-                  :href="`${url}${rawAttachmentPaths[index]}`"
-                >
-                  {{ attachmentPath }}
-                </VaButton>
-              </VaCard>
+              {{ assignment.attachmentPaths ? assignment.attachmentPaths : 'No attachment file' }}
             </VaCardContent>
           </VaCard>
           <VaCard>
@@ -116,7 +80,9 @@
               />
             </VaCard>
             <VaCardContent>
+              <!-- eslint-disable vue/no-v-html -->
               <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
+              <!--eslint-enable-->
             </VaCardContent>
           </VaCard>
         </VaCard>
@@ -175,27 +141,16 @@
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
-import {
-  useBreakpoint,
-  useModal,
-  useToast,
-  VaButton,
-  VaCard,
-  VaCardContent,
-  VaList,
-  VaListItemSection,
-} from 'vuestic-ui'
+import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent } from '../types'
+import { useBreakpoint, useModal, useToast, VaCard, VaList, VaListItemSection } from 'vuestic-ui'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { Student } from '@/pages/classrooms/types'
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
-import { useFileStore } from '@/stores/modules/file.module'
 
 const loading = ref(true)
 const router = useRouter()
-const fileStore = useFileStore()
 const stores = useAssignmentStore()
 const classStores = useClassStore()
 const breakpoints = useBreakpoint()
@@ -203,24 +158,16 @@ const { init: notify } = useToast()
 const showSidebar = ref(breakpoints.smUp)
 const assignment = ref<Assignment | null>(null)
 const assignmentContent = ref<AssignmentContent | null>(null)
-const assignmentAttachment = ref<AssignmentAttachment | null>(null)
 const students = ref<Student[]>([])
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
-const filesUploaded = ref<any>()
-
 const assignmentClass = ref<AssignmentClass>({
   assignmentId: assignmentId,
   classesdId: classId,
 })
-
 const doShowFormModal = ref(false)
 const editFormRef = ref()
 const { confirm } = useModal()
-
-const url = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -3)
-const attachmentPaths = ref<string[]>([])
-const rawAttachmentPaths = ref<string[]>([])
 
 const getAssignment = (id: string) => {
   loading.value = true
@@ -230,16 +177,6 @@ const getAssignment = (id: string) => {
       assignment.value = response
       if (assignment.value?.content == '<p><br></p>') {
         assignment.value.content = ''
-      }
-      if (assignment.value?.attachment) {
-        attachmentPaths.value = JSON.parse(assignment.value.attachment)
-        rawAttachmentPaths.value = JSON.parse(assignment.value.attachment)
-        for (let i = 0; i < attachmentPaths.value.length; i++) {
-          const parts = attachmentPaths.value[i].split('_')
-          const newPart = parts.slice(1).join('_')
-          // attachmentPaths.value[i] = `${url}${newPart}`
-          attachmentPaths.value[i] = `${newPart}`
-        }
       }
     })
     .catch((error) => {
@@ -259,7 +196,7 @@ const getClassById = async () => {
     .getClassById(classId)
     .then((response) => {
       students.value = response.students
-      // console.log('Students:', students.value)
+      console.log('Students:', students.value)
     })
     .catch((error) => {
       notify({
@@ -314,6 +251,7 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
 }
 
 const onAssignmentContent = async (assignment: AssignmentContent) => {
+  console.log('Assignment content:', assignment)
   doShowFormModal.value = false
   if (assignment.id != '') {
     stores
@@ -334,48 +272,9 @@ const onAssignmentContent = async (assignment: AssignmentContent) => {
   }
 }
 
-const onAssignmentAttachment = async () => {
-  if (assignmentId != '') {
-    stores
-      .updateAssignment(assignmentId, assignmentAttachment.value as AssignmentAttachment)
-      .then(() => {
-        notify({
-          message: notifications.updatedSuccessfully('assignment'),
-          color: 'success',
-        })
-        getAssignment(assignmentId)
-      })
-      .catch((error) => {
-        notify({
-          message: notifications.updateFailed('assignment') + getErrorMessage(error),
-          color: 'error',
-        })
-      })
-  }
-}
-
 const editAssignmentContent = (assContent: AssignmentContent) => {
   assignmentContent.value = assContent
   doShowFormModal.value = true
-}
-
-const fileUpload = async () => {
-  fileStore
-    .uploadFile(filesUploaded.value)
-    .then((response) => {
-      assignmentAttachment.value = {
-        id: assignmentId,
-        attachment: JSON.stringify(response),
-      }
-      console.log('Assignment Attachment:', assignmentAttachment.value)
-      onAssignmentAttachment()
-    })
-    .catch((error) => {
-      notify({
-        message: notifications.createFailed('') + getErrorMessage(error),
-        color: 'error',
-      })
-    })
 }
 
 watchEffect(() => {
