@@ -105,6 +105,7 @@ export type Question = {
   isSelected?: boolean
   owner?: UserDetail | null
   mark?: number | null
+  questionStatus?: number | null
 }
 
 export type QuestionLable = {
@@ -149,6 +150,10 @@ export type Pagination = {
   total: number
 }
 
+export type RejectApproveQuestion = {
+  questionIds: string[] | null | undefined
+}
+
 export enum QuestionType {
   SingleChoice = 1,
   MultipleChoice = 2,
@@ -162,4 +167,13 @@ export enum QuestionType {
 
 export type CreateQuestionsRequest = {
   questions: Question[]
+}
+
+export type SearchMyQuestion = {
+  pageNumber?: number | null | undefined
+  pageSize?: number | null | undefined
+  orderBy?: string[] | null | undefined
+  questionType?: number | null | undefined
+  content?: string | null | undefined
+  questionStatus?: number | null | undefined
 }
