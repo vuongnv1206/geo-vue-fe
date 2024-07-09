@@ -51,7 +51,8 @@ export type EmptyAssignmentContent = {
   content: string
 }
 
-export type EmptyAssignmentAttachment = {
+export type AssignmentAttachment = {
+  id: string
   attachment: string
 }
 

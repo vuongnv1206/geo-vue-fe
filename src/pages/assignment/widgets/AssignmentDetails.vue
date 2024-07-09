@@ -175,13 +175,7 @@
 import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import {
-  Assignment,
-  AssignmentClass,
-  AssignmentContent,
-  EmptyAssignmentContent,
-  EmptyAssignmentAttachment,
-} from '../types'
+import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
 import {
   useBreakpoint,
   useModal,
@@ -209,7 +203,7 @@ const { init: notify } = useToast()
 const showSidebar = ref(breakpoints.smUp)
 const assignment = ref<Assignment | null>(null)
 const assignmentContent = ref<AssignmentContent | null>(null)
-const assignmentAttachment = ref<EmptyAssignmentAttachment | null>(null)
+const assignmentAttachment = ref<AssignmentAttachment | null>(null)
 const students = ref<Student[]>([])
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
@@ -343,7 +337,7 @@ const onAssignmentContent = async (assignment: AssignmentContent) => {
 const onAssignmentAttachment = async () => {
   if (assignmentId != '') {
     stores
-      .updateAssignment(assignmentId, assignmentAttachment.value as EmptyAssignmentAttachment)
+      .updateAssignment(assignmentId, assignmentAttachment.value as AssignmentAttachment)
       .then(() => {
         notify({
           message: notifications.updatedSuccessfully('assignment'),
@@ -370,6 +364,7 @@ const fileUpload = async () => {
     .uploadFile(filesUploaded.value)
     .then((response) => {
       assignmentAttachment.value = {
+        id: assignmentId,
         attachment: JSON.stringify(response),
       }
       console.log('Assignment Attachment:', assignmentAttachment.value)
