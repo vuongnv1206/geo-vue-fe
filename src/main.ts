@@ -3,22 +3,29 @@ import i18n from './i18n'
 import { createVuestic } from 'vuestic-ui'
 import { createGtm } from '@gtm-support/vue-gtm'
 import { VueReCaptcha } from 'vue-recaptcha-v3'
-import { QuillEditor } from '@vueup/vue-quill'
+import { Quill, QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import BlotFormatter from 'quill-blot-formatter'
+
 import stores from './stores'
 import router from './router'
 import vuesticGlobalConfig from '@services/vuestic-ui/global-config'
 import App from './App.vue'
 import { useAuthStore } from '@modules/auth.module'
 
+// Create Vue application
 const app = createApp(App)
 
+// Use necessary plugins and stores
 app.use(stores)
 app.use(router)
 app.use(i18n)
 app.use(createVuestic({ config: vuesticGlobalConfig }))
 
-// define your options
+// Register quill module
+Quill.register('modules/blotFormatter', BlotFormatter)
+
+// Define global options for QuillEditor
 export const globalOptions = {
   // debug: 'info',
   modules: {
@@ -34,12 +41,15 @@ export const globalOptions = {
       [{ script: 'sub' }, { script: 'super' }],
       ['clean'],
     ],
+    blotFormatter: {}, // Enable blotFormatter module
   },
   placeholder: 'Say something...',
   theme: 'snow',
 }
+
 // set default globalOptions prop
 QuillEditor.props.globalOptions.default = () => globalOptions
+
 // register QuillEditor component
 app.component('QuillEditor', QuillEditor)
 
