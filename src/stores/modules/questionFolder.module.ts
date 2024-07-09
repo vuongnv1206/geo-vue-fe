@@ -3,8 +3,14 @@ import questionFolderService from '@/services/questionFolder.service'
 import { QuestionTree, QuestionTreeEmpty, SharePermission } from '@pages/question/types'
 
 export const useQuestionFolderStore = defineStore('questionFolder', {
-  state: () => ({}),
+  state: () => ({ currentTab: 0, isRefresh: false }),
   actions: {
+    setCurrentTab(tab: number): void {
+      this.currentTab = tab
+    },
+    setRefresh(value: boolean): void {
+      this.isRefresh = value
+    },
     async getQuestionFolders(parentId: string): Promise<QuestionTree> {
       return questionFolderService
         .getQuestionFolders(parentId)

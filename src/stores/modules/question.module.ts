@@ -8,8 +8,52 @@ export const useQuestionStore = defineStore('question', {
     needReloadQuestionFolder: false,
     editMode: false,
     questionToEdit: {} as Question,
+    refresh: false,
   }),
   actions: {
+    setRefresh(value: boolean) {
+      this.refresh = value
+    },
+    async SearchMyQuestion(data: SearchQuestion): Promise<QuestionSearchRes> {
+      return questionService
+        .searchMyQuestion(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async SearchPendingQuestion(data: SearchQuestion): Promise<QuestionSearchRes> {
+      return questionService
+        .searchPendingQuestion(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async RejectPendingQuestion(data: any): Promise<any> {
+      return questionService
+        .rejectPendingQuestion(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async ApprovePendingQuestion(data: any): Promise<any> {
+      return questionService
+        .approvePendingQuestion(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
     async SearchQuestion(data: SearchQuestion): Promise<QuestionSearchRes> {
       return questionService
         .searchQuestion(data)

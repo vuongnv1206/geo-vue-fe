@@ -139,6 +139,13 @@
     }
   },
   "questions": {
+    "approve_all": "Approve All",
+    "status": "Status",
+    "rejectedStatus": "Rejected",
+    "approvedStatus": "Approved",
+    "pendingStatus": "Pending",
+    "no_my_request": "Your request is empty",
+    "no_question_pending": "There is no pending question",
     "add_question": "Add question",
     "folders": "Folders",
     "all": "All",
@@ -176,6 +183,9 @@
     "question_passages": "Question Passages"
   },
   "questionFolder": {
+    "pending": "Approval Queue ({total})",
+    "pending_title": "Approval Queue",
+    "my_questions": "My Requests",
     "questions": "Questions",
     "folders": "Folders",
     "search": "Search",
