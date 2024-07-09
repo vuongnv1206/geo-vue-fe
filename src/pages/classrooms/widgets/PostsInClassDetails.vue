@@ -278,7 +278,7 @@ const getPosts = () => {
   postsStore
     .getPosts(dataFilter.value)
     .then((response) => {
-      posts.value = response.data
+      posts.value = response.data.filter((post) => post.classesId === props.classId)
       console.log('Postsssssssssssssssssssssss:', posts.value)
     })
     .catch((error) => {
