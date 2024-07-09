@@ -20,28 +20,6 @@ app.use(router)
 app.use(i18n)
 app.use(createVuestic({ config: vuesticGlobalConfig }))
 
-// Define global options for QuillEditor
-export const globalOptions = {
-  // debug: 'info',
-  modules: {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      [{ font: [] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ color: [] }, { background: [] }],
-      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-      [{ align: [] }],
-      ['blockquote', 'code-block'],
-      ['link', 'image', 'video', 'formula'],
-      [{ script: 'sub' }, { script: 'super' }],
-      ['clean'],
-    ],
-    blotFormatter: {}, // Enable blotFormatter module
-  },
-  placeholder: 'Say something...',
-  theme: 'snow',
-}
-
 const authStore = useAuthStore()
 authStore.checkAuth()
 router.beforeEach((to, from, next) => {
