@@ -39,7 +39,9 @@ export const validators = {
     /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || t('validateUtils.isDecimalNumber', { fieldName }),
   isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || t('validateUtils.isNumber', { fieldName }),
   email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
-  phone: (v: string) => /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(v) || t('validateUtils.phone'),
+  phone: (v: string) =>
+    /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/.test(v) ||
+    t('validateUtils.phone'),
 }
 
 export const format = {
