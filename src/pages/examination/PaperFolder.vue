@@ -603,14 +603,14 @@ const onSharePaperFolderPermission = () => {
     canDelete: permissionEdit.value.canDelete,
     canShare: permissionEdit.value.canShare,
     folderId: editPermissionValue.value.folderId,
-    userIds: [],
-    groupIds: [],
+    userId: null,
+    groupId: null,
   })
   if (editPermissionValue.value?.user) {
-    sharePermission.value.userIds.push(editPermissionValue.value.user.id)
+    sharePermission.value.userId = editPermissionValue.value.user.id
   }
   if (editPermissionValue.value?.groupTeacherId) {
-    sharePermission.value.groupIds?.push(editPermissionValue.value.groupTeacherId)
+    sharePermission.value.groupId = editPermissionValue.value.groupTeacherId
   }
 
   paperFolderStore
