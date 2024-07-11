@@ -74,7 +74,7 @@ watch(
                 </VaCardContent>
                 <VaCardContent class="text-xs text-gray-600">
                   <p>School year: {{ classItem.schoolYear }}</p>
-                  <p>Member: {{ classItem.numberUserOfClass }}</p>
+                  <p v-if="classItem.numberUserOfClass">Member: {{ classItem.numberUserOfClass }}</p>
                 </VaCardContent>
               </VaCard>
             </VaCard>

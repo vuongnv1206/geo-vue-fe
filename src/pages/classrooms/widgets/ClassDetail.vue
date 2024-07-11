@@ -38,6 +38,7 @@ const defaultClassDetails: Classrooms = {
   numberUserOfClass: 0,
   assignments: [],
   students: [],
+  permissions: [] || null,
 }
 const classDetails = ref({ ...defaultClassDetails })
 
@@ -100,7 +101,7 @@ onMounted(() => {
           </VaCard>
           <StudentsInClassDetails
             v-if="currentTab.title === 'Student list'"
-            :students="classDetails.students"
+            :classroom="classDetails"
             :loading="loading"
             @load="getClassById"
           />

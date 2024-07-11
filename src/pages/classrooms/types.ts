@@ -1,4 +1,5 @@
 import { Assignment } from '../assignment/types'
+import { PermissionInClass } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
 
 export type GroupClass = {
@@ -31,6 +32,7 @@ export type Classrooms = {
   numberUserOfClass: number
   assignments: Assignment[]
   students: Student[]
+  permissions: PermissionInClass[] | null
 }
 
 export type EmptyClassrooms = {

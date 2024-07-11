@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { PropType, ref } from 'vue'
 import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
-import { EmptyStudent, Student } from '../types'
+import { Classrooms, EmptyStudent, Student } from '../types'
 import { notifications, getErrorMessage, format } from '@/services/utils'
 import { useStudentStore } from '@/stores/modules/student.module'
 import EditStudent from './EditStudent.vue'
 
 const props = defineProps({
-  students: {
-    type: Array as PropType<Student[]>,
+  classroom: {
+    type: Object as PropType<Classrooms>,
     required: true,
   },
   loading: {
@@ -167,7 +167,7 @@ const onStudentSaved = async (student: Student) => {
         selectable
         :columns="columns"
         select-mode="multiple"
-        :items="props.students"
+        :items="props.classroom.students"
         :loading="props.loading"
         :disable-client-side-sorting="false"
         @selectionChange="handleSelectionChange($event.currentSelectedItems)"
