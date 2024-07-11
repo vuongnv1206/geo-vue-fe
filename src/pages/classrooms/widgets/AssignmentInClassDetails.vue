@@ -10,7 +10,7 @@
       </VaCard>
       <VaMenu class="justify-end" :options="options" @selected="selectedOption">
         <template #anchor>
-          <VaButton>
+          <VaButton :disabled="disableAssignmentManage">
             <VaIcon name="add" />
             Assignment
           </VaButton>
@@ -18,23 +18,20 @@
       </VaMenu>
     </VaCard>
     <VaScrollContainer vertical class="max-h-[66vh] pb-0">
-      <AcordionOfAssignment :key="forceUpdate" :filtered-grouped-data="filteredGroupedData" />
+      <AccordionOfAssignment :key="forceUpdate" :filtered-grouped-data="filteredGroupedData" />
     </VaScrollContainer>
   </VaCardContent>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, PropType, watch } from 'vue'
-import { format } from '@/services/utils'
+import { ref, computed, PropType, watch, onMounted } from 'vue'
+import { format, notifications } from '@/services/utils'
 import { Classrooms } from '../types'
-import AcordionOfAssignment from './AccordionOfAssignment.vue'
+import AccordionOfAssignment from './AccordionOfAssignment.vue'
 import router from '@/router'
+import { useToast } from 'vuestic-ui'
 
-const forceUpdate = ref(0)
-
-const forceRerender = () => {
-  forceUpdate.value += 1
-}
+const { init: notify } = useToast()
 
 const props = defineProps({
   classDetails: {
@@ -42,6 +39,29 @@ const props = defineProps({
     required: true,
   },
 })
+
+const disableAssignmentManage = ref(false)
+const checkPermissionAssignmentManage = () => {
+  const hasPermissionStudentManageType = props.classDetails.permissions?.some(
+    (permission) => permission.permissionType === 1,
+  )
+  if (!hasPermissionStudentManageType) {
+    disableAssignmentManage.value = true
+    notify({
+      message: notifications.getFailed(`- No permission assignment management`),
+      color: 'danger',
+    })
+  }
+}
+onMounted(() => {
+  checkPermissionAssignmentManage()
+})
+
+const forceUpdate = ref(0)
+
+const forceRerender = () => {
+  forceUpdate.value += 1
+}
 
 const options = ref([
   { text: 'Assignment', value: 'create-assignment', icon: 'description' },
@@ -69,7 +89,7 @@ const papers = ref([
 
 const groupedData = computed(() => {
   const groups: { [key: string]: any } = {}
-  props.classDetails.assignments.forEach((assignment) => {
+  props.classDetails.assignments?.forEach((assignment) => {
     const createOn = format.formatDate(assignment.createdOn)
     if (!groups[createOn]) {
       groups[createOn] = {

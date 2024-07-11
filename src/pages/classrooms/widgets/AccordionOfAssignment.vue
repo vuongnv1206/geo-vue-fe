@@ -16,7 +16,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <VaAccordion class="w-full" multiple>
+  <VaAccordion v-if="props.filteredGroupedData" class="w-full" multiple>
     <!-- Loop through grouped assignments and papers -->
     <VaCollapse
       v-for="(group, index) in props.filteredGroupedData"

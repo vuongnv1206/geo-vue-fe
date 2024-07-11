@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType, ref } from 'vue'
+import { onMounted, PropType, ref } from 'vue'
 import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
 import { Classrooms, EmptyStudent, Student } from '../types'
 import { notifications, getErrorMessage, format } from '@/services/utils'
@@ -150,6 +150,23 @@ const onStudentSaved = async (student: Student) => {
       })
   }
 }
+
+const disableStudentManage = ref(false)
+const checkPermissionStudentManage = () => {
+  const hasPermissionStudentManageType = props.classroom.permissions?.some(
+    (permission) => permission.permissionType === 3,
+  )
+  if (!hasPermissionStudentManageType) {
+    disableStudentManage.value = true
+    notify({
+      message: notifications.getFailed(`- No permission student management`),
+      color: 'danger',
+    })
+  }
+}
+onMounted(() => {
+  checkPermissionStudentManage()
+})
 </script>
 
 <template>
@@ -159,7 +176,7 @@ const onStudentSaved = async (student: Student) => {
         <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedStudent()">
           Delete</VaButton
         >
-        <VaButton icon="add" @click="createNewStudent()">Student</VaButton>
+        <VaButton :disabled="disableStudentManage" icon="add" @click="createNewStudent()">Student</VaButton>
       </div>
       <VaDataTable
         hoverable
@@ -167,7 +184,7 @@ const onStudentSaved = async (student: Student) => {
         selectable
         :columns="columns"
         select-mode="multiple"
-        :items="props.classroom.students"
+        :items="props.classroom.students || []"
         :loading="props.loading"
         :disable-client-side-sorting="false"
         @selectionChange="handleSelectionChange($event.currentSelectedItems)"
@@ -212,9 +229,7 @@ const onStudentSaved = async (student: Student) => {
     :before-cancel="beforeEditFormModalClose"
     @close="doShowStudentFormModal = false"
   >
-    <VaModalHeader>
-      <h3 class="text-lg font-bold">{{ studentToEdit ? 'Edit' : 'Create' }} Student</h3>
-    </VaModalHeader>
+    <h3 class="text-lg font-bold">{{ studentToEdit ? 'Edit' : 'Create' }} Student</h3>
     <EditStudent
       ref="editFormRef"
       :student="studentToEdit"

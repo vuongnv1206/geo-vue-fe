@@ -409,7 +409,7 @@ onMounted(() => {
                         v-for="classroom in classRoomsInGroup"
                         :key="classroom.id"
                         :preset="
-                          classroom.students.some((student) => checkedPermissionsStudentAccess.includes(student.id))
+                          classroom.students?.some((student) => checkedPermissionsStudentAccess.includes(student.id))
                             ? 'primary'
                             : 'secondary'
                         "

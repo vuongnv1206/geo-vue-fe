@@ -161,9 +161,7 @@
     :before-cancel="beforeEditFormModalClose"
     @close="doShowPostFormModal = false"
   >
-    <VaModalHeader>
-      <h3 class="text-lg font-bold">Edit Post</h3>
-    </VaModalHeader>
+    <h3 class="text-lg font-bold">Edit Post</h3>
     <EditPosts
       ref="editFormRef"
       :posts="postToEdit"
@@ -188,9 +186,7 @@
     :before-cancel="beforeEditFormModalClose"
     @close="doShowCommentFormModal = false"
   >
-    <VaModalHeader>
-      <h3 class="text-lg font-bold">Edit Comment</h3>
-    </VaModalHeader>
+    <h3 class="text-lg font-bold">Edit Comment</h3>
     <EditComment
       ref="editFormRef"
       :comment="commentToEdit"
@@ -279,7 +275,6 @@ const getPosts = () => {
     .getPosts(dataFilter.value)
     .then((response) => {
       posts.value = response.data
-      console.log('Postsssssssssssssssssssssss:', posts.value)
     })
     .catch((error) => {
       notify({
@@ -324,7 +319,6 @@ const selectedPostOption = (option: any) => {
 }
 
 const OnPostsSaved = async (post: EmptyPost) => {
-  console.log('post content:', post.content)
   if (post.content != null && post.content.trim() !== '' && post.content !== '<p><br></p>') {
     if (post.id != '') {
       doShowPostFormModal.value = false
@@ -416,7 +410,6 @@ const toggleReplies = (commentId: string) => {
 }
 
 const selectedCommentOption = (option: any) => {
-  console.log('option value:', option.value)
   if (option.text === 'Edit') {
     doShowCommentFormModal.value = true
     commentToEdit.value = option.value
