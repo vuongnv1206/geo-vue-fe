@@ -1,202 +1,3 @@
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
-import '@vuepic/vue-datepicker/dist/main.css'
-import { computed, onMounted, ref } from 'vue'
-import VueDatePicker from '@vuepic/vue-datepicker'
-import { getErrorMessage, notifications, validators } from '@/services/utils'
-import { useForm, useModal, useToast } from 'vuestic-ui/web-components'
-import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
-import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { GroupClass } from '@/pages/classrooms/types'
-import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { useAuthStore } from '@/stores/modules/auth.module'
-
-const router = useRouter()
-const { confirm } = useModal()
-const { validate } = useForm('form')
-const showSidebar = ref(false)
-const { init: notify } = useToast()
-const stores = useAssignmentStore()
-const assignmentDetails = ref<AssignmentDetails | null>(null)
-const assignmentId = router.currentRoute.value.params.id.toString()
-const classId = router.currentRoute.value.params.classId.toString()
-
-const date = ref<[Date, Date]>([new Date(), new Date()])
-const authStore = useAuthStore()
-const currentUserId = authStore.user?.id
-const classStore = useGroupClassStore()
-const groupClasses = ref<GroupClass[]>([])
-const selectedClasses = ref<string[]>([])
-const selectedDepartment = ref<GroupClass | null>(null)
-
-const selectAllClassesState = ref(false)
-const selectedClassesByDepartmentState = ref<{ [key: string]: boolean }>({})
-
-const defaultNewAssignmentDetails: AssignmentDetails = {
-  id: '',
-  name: '',
-  startTime: new Date(),
-  endTime: new Date(),
-  canViewResult: false,
-  requireLoginToSubmit: false,
-  classIds: [],
-}
-
-const newAssignmentDetails = ref({ ...defaultNewAssignmentDetails })
-
-const dataFilter = ref({
-  advancedSearch: {
-    fields: [''],
-    keyword: '',
-  },
-  pageNumber: 0,
-  pageSize: 100,
-  orderBy: ['id'],
-})
-
-const getAssignment = (id: string) => {
-  stores
-    .getAssignment(id)
-    .then((response) => {
-      assignmentDetails.value = response
-      newAssignmentDetails.value = {
-        id: response.id,
-        name: response.name,
-        startTime: response.startTime,
-        endTime: response.endTime,
-        canViewResult: response.canViewResult,
-        requireLoginToSubmit: response.requireLoginToSubmit,
-        classIds: response.classIds,
-      }
-      // console.log('Assignment Details: ', assignmentDetails.value)
-      // console.log('New Assignment Details: ', newAssignmentDetails.value)
-    })
-    .catch((error) => {
-      notify({
-        message: notifications.getFailed('assignments') + getErrorMessage(error),
-        color: 'error',
-      })
-    })
-}
-
-const getGroupClass = () => {
-  classStore
-    .getGroupClasses(dataFilter.value)
-    .then((response) => {
-      groupClasses.value = response.data
-      // console.log('Group Classes: ', groupClasses.value)
-    })
-    .catch((error) => {
-      notify({
-        message: notifications.getFailed('group class') + getErrorMessage(error),
-        color: 'error',
-      })
-    })
-}
-
-const showAllClassesForAllDepartments = () => {
-  selectedDepartment.value = null
-  // selectedClasses.value = []
-}
-
-// Select all classes in a department
-const selectAllClasses = (department: GroupClass) => {
-  const selectedClassIds = selectedClasses.value
-
-  // Kiểm tra xem tất cả các lớp trong phòng ban đã được chọn chưa
-  const allClassesSelected = department.classes.every((cls) => selectedClassIds.includes(cls.id))
-
-  if (allClassesSelected) {
-    // Nếu tất cả các lớp đã được chọn, hãy bỏ chọn chúng
-    selectedClasses.value = selectedClassIds.filter((id) => !department.classes.some((cls) => cls.id === id))
-    selectedClassesByDepartmentState.value[department.id] = false
-  } else {
-    // Nếu không, hãy thêm tất cả các lớp vào danh sách chọn
-    const newClassIds = department.classes.map((cls) => cls.id)
-    selectedClasses.value = [...new Set([...selectedClassIds, ...newClassIds])]
-    selectedClassesByDepartmentState.value[department.id] = true
-  }
-}
-
-const showDepartmentClasses = (groupClass: GroupClass) => {
-  selectedDepartment.value = groupClass
-  // selectedClasses.value = []
-}
-
-// Select all classes across all departments
-const selectAllClassesForAllDepartments = () => {
-  if (selectAllClassesState.value) {
-    selectedClasses.value = []
-  } else {
-    selectedClasses.value = groupClasses.value.flatMap((department) => department.classes.map((cls) => cls.id))
-  }
-  selectAllClassesState.value = !selectAllClassesState.value
-}
-
-const countAllSelectedClasses = computed(() => {
-  return selectedClasses.value.length
-})
-
-const countAllClasses = computed(() => {
-  return groupClasses.value.reduce((total, department) => total + department.classes.length, 0)
-})
-
-const countDepartmentSelectedClasses = (groupClass: GroupClass) => {
-  const selectedClassesInDepartment = groupClass.classes.filter((cls) => selectedClasses.value.includes(cls.id))
-  return selectedClassesInDepartment.length
-}
-
-const isFormHasUnsavedChanges = computed(() => {
-  return Object.keys(newAssignmentDetails.value).some((key) => {
-    return (
-      newAssignmentDetails.value[key as keyof EmptyAssignmentDetails] !==
-      assignmentDetails.value?.[key as keyof EmptyAssignmentDetails]
-    )
-  })
-})
-
-defineExpose({
-  isFormHasUnsavedChanges,
-})
-
-const goBack = async () => {
-  if (isFormHasUnsavedChanges.value) {
-    const agreed = await confirm({
-      maxWidth: '380px',
-      message: notifications.unsavedChanges,
-      size: 'small',
-    })
-    if (!agreed) return
-  }
-  router.push({ name: 'assignment-details', params: { id: assignmentId, classId: classId } })
-}
-
-const dateInputFormat = {
-  format: 'MM/dd/yyyy HH:mm',
-}
-
-const handleClickUpdate = async () => {
-  if (validate()) {
-    newAssignmentDetails.value.startTime = date.value[0]
-    newAssignmentDetails.value.endTime = date.value[1]
-    try {
-      newAssignmentDetails.value.classIds = selectedClasses.value
-      await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
-      console.log('newAssignmentDetails.value: ', newAssignmentDetails.value)
-      notify({ message: notifications.updatedSuccessfully(newAssignmentDetails.value.name), color: 'success' })
-      router.push({ name: 'assignment-details', params: { id: assignmentId } })
-    } catch (error) {
-      notify({ message: notifications.updateFailed(newAssignmentDetails.value.name), color: 'error' })
-    }
-  }
-}
-
-onMounted(() => {
-  getGroupClass()
-  getAssignment(assignmentId)
-})
-</script>
-
 <template>
   <VaLayout>
     <template #top>
@@ -366,4 +167,227 @@ onMounted(() => {
   </VaLayout>
 </template>
 
-<style lang="scss" scoped></style>
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import '@vuepic/vue-datepicker/dist/main.css'
+import { computed, onMounted, ref, watch } from 'vue'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import { getErrorMessage, notifications, validators } from '@/services/utils'
+import { useForm, useModal, useToast } from 'vuestic-ui'
+import { AssignmentDetails, EmptyAssignmentDetails } from '../types'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { GroupClass } from '@/pages/classrooms/types'
+import { useGroupClassStore } from '@/stores/modules/groupclass.module'
+import { useAuthStore } from '@/stores/modules/auth.module'
+
+const router = useRouter()
+const { confirm } = useModal()
+const { validate } = useForm('form')
+const showSidebar = ref(false)
+const { init: notify } = useToast()
+const stores = useAssignmentStore()
+const assignmentDetails = ref<AssignmentDetails | null>(null)
+const assignmentId = router.currentRoute.value.params.id.toString()
+const classId = router.currentRoute.value.params.classId.toString()
+
+const date = ref<[Date, Date]>([new Date(), new Date()])
+const authStore = useAuthStore()
+const currentUserId = authStore.user?.id
+const classStore = useGroupClassStore()
+const groupClasses = ref<GroupClass[]>([])
+const selectedClasses = ref<string[]>([])
+const selectedDepartment = ref<GroupClass | null>(null)
+
+const selectAllClassesState = ref(false)
+const selectedClassesByDepartmentState = ref<{ [key: string]: boolean }>({})
+
+const defaultNewAssignmentDetails: AssignmentDetails = {
+  id: '',
+  name: '',
+  startTime: new Date(),
+  endTime: new Date(),
+  canViewResult: false,
+  requireLoginToSubmit: false,
+  classIds: [],
+}
+
+const newAssignmentDetails = ref({ ...defaultNewAssignmentDetails })
+
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+})
+
+const getAssignment = (id: string) => {
+  stores
+    .getAssignment(id)
+    .then((response) => {
+      assignmentDetails.value = response
+      newAssignmentDetails.value = {
+        id: response.id,
+        name: response.name,
+        startTime: response.startTime,
+        endTime: response.endTime,
+        canViewResult: response.canViewResult,
+        requireLoginToSubmit: response.requireLoginToSubmit,
+        classIds: response.classIds,
+      }
+      // console.log('Assignment Details: ', assignmentDetails.value)
+      // console.log('New Assignment Details: ', newAssignmentDetails.value)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('assignments') + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+}
+
+const getGroupClass = () => {
+  classStore
+    .getGroupClasses(dataFilter.value)
+    .then((response) => {
+      groupClasses.value = response.data
+      // console.log('Group Classes: ', groupClasses.value)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed('group class') + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+}
+
+const showAllClassesForAllDepartments = () => {
+  selectedDepartment.value = null
+  // selectedClasses.value = []
+}
+
+// Select all classes in a department
+const selectAllClasses = (department: GroupClass) => {
+  const selectedClassIds = selectedClasses.value
+
+  // Kiểm tra xem tất cả các lớp trong phòng ban đã được chọn chưa
+  const allClassesSelected = department.classes.every((cls) => selectedClassIds.includes(cls.id))
+
+  if (allClassesSelected) {
+    // Nếu tất cả các lớp đã được chọn, hãy bỏ chọn chúng
+    selectedClasses.value = selectedClassIds.filter((id) => !department.classes.some((cls) => cls.id === id))
+    selectedClassesByDepartmentState.value[department.id] = false
+  } else {
+    // Nếu không, hãy thêm tất cả các lớp vào danh sách chọn
+    const newClassIds = department.classes.map((cls) => cls.id)
+    selectedClasses.value = [...new Set([...selectedClassIds, ...newClassIds])]
+    selectedClassesByDepartmentState.value[department.id] = true
+  }
+
+  // Cập nhật trạng thái tổng thể nếu tất cả các department đều được chọn
+  updateSelectAllClassesState()
+}
+
+const updateSelectAllClassesState = () => {
+  groupClasses.value.forEach((department) => {
+    const allClassesSelected = department.classes.every((cls) => selectedClasses.value.includes(cls.id))
+    selectedClassesByDepartmentState.value[department.id] = allClassesSelected
+  })
+
+  // Cập nhật trạng thái tổng thể nếu tất cả các department đều được chọn
+  selectAllClassesState.value = groupClasses.value.every((department) =>
+    department.classes.every((cls) => selectedClasses.value.includes(cls.id)),
+  )
+}
+
+// Gọi phương thức theo dõi khi chọn tay từng class
+watch(selectedClasses, updateSelectAllClassesState, { deep: true })
+
+const showDepartmentClasses = (groupClass: GroupClass) => {
+  selectedDepartment.value = groupClass
+  // selectedClasses.value = []
+}
+
+// Select all classes across all departments
+const selectAllClassesForAllDepartments = () => {
+  if (selectAllClassesState.value) {
+    selectedClasses.value = []
+    groupClasses.value.forEach((department: GroupClass) => {
+      selectedClassesByDepartmentState.value[department.id] = false
+    })
+  } else {
+    selectedClasses.value = groupClasses.value.flatMap((department: GroupClass) =>
+      department.classes.map((cls: any) => cls.id),
+    )
+    groupClasses.value.forEach((department: GroupClass) => {
+      selectedClassesByDepartmentState.value[department.id] = true
+    })
+  }
+  selectAllClassesState.value = !selectAllClassesState.value
+}
+
+const countAllSelectedClasses = computed(() => {
+  return selectedClasses.value.length
+})
+
+const countAllClasses = computed(() => {
+  return groupClasses.value.reduce((total, department) => total + department.classes.length, 0)
+})
+
+const countDepartmentSelectedClasses = (groupClass: GroupClass) => {
+  const selectedClassesInDepartment = groupClass.classes.filter((cls) => selectedClasses.value.includes(cls.id))
+  return selectedClassesInDepartment.length
+}
+
+const isFormHasUnsavedChanges = computed(() => {
+  return Object.keys(newAssignmentDetails.value).some((key) => {
+    return (
+      newAssignmentDetails.value[key as keyof EmptyAssignmentDetails] !==
+      assignmentDetails.value?.[key as keyof EmptyAssignmentDetails]
+    )
+  })
+})
+
+defineExpose({
+  isFormHasUnsavedChanges,
+})
+
+const goBack = async () => {
+  if (isFormHasUnsavedChanges.value) {
+    const agreed = await confirm({
+      maxWidth: '380px',
+      message: notifications.unsavedChanges,
+      size: 'small',
+    })
+    if (!agreed) return
+  }
+  router.push({ name: 'assignment-details', params: { id: assignmentId, classId: classId } })
+}
+
+const dateInputFormat = {
+  format: 'MM/dd/yyyy HH:mm',
+}
+
+const handleClickUpdate = async () => {
+  if (validate()) {
+    newAssignmentDetails.value.startTime = date.value[0]
+    newAssignmentDetails.value.endTime = date.value[1]
+    try {
+      newAssignmentDetails.value.classIds = selectedClasses.value
+      await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
+      console.log('newAssignmentDetails.value: ', newAssignmentDetails.value)
+      notify({ message: notifications.updatedSuccessfully(newAssignmentDetails.value.name), color: 'success' })
+      router.push({ name: 'assignment-details', params: { id: assignmentId } })
+    } catch (error) {
+      notify({ message: notifications.updateFailed(newAssignmentDetails.value.name), color: 'error' })
+    }
+  }
+}
+
+onMounted(() => {
+  getGroupClass()
+  getAssignment(assignmentId)
+})
+</script>

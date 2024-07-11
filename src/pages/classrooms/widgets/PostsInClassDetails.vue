@@ -12,140 +12,148 @@
         <VaButton preset="plain" icon="send" class="mr-2" @click="OnPostsSaved(newPost)" />
       </VaCard>
     </VaCard>
-    <div
-      v-for="post in posts"
-      :key="post.id"
-      :postId="post.id"
-      class="bg-white rounded-lg shadow-md overflow-hidden mb-6"
-    >
-      <VaCard class="p-6">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center mb-4">
-            <GeoAvatar
-              class="mr-2"
-              :size="48"
-              color="warning"
-              :image="post.owner?.imageUrl || undefined"
-              :txt="post.owner?.firstName?.charAt(0).toUpperCase()"
-            />
-            <div>
-              <h2 class="text-md font-bold text-gray-800">{{ post.owner?.firstName }} {{ post.owner?.lastName }}</h2>
-              <VaPopover class="mb-2" placement="right" color="#FFFFFF" :message="format.formatDate(post.createdOn)">
-                <p class="text-xs text-gray-600">{{ format.formatDateFromNow(post.createdOn) }}</p>
-              </VaPopover>
-            </div>
-          </div>
-          <VaMenu
-            :options="[
-              { text: 'Edit', value: post, icon: 'edit' },
-              { text: 'Delete', value: post, icon: 'delete' },
-            ]"
-            @selected="(v: any) => selectedPostOption(v)"
-          >
-            <template #anchor>
-              <VaCard class="cursor-pointer text-gray-500 hover:text-gray-700" @click.stop>
-                <span class="material-symbols-outlined">more_horiz</span>
-              </VaCard>
-            </template>
-          </VaMenu>
-        </div>
-        <!-- eslint-disable vue/no-v-html -->
-        <div class="text-base text-gray-700 mb-4" v-html="post.content" />
-        <!--eslint-enable-->
-        <VaDivider />
-        <div class="flex items-center justify-start">
-          <VaCard class="mr-auto">
-            <VaButton
-              v-model="isLikePost"
-              preset="plain"
-              icon="favorite"
-              class="mr-4"
-              color="danger"
-              @click="togglePostLike(post)"
-              >{{ post.numberLikeInThePost }}
-            </VaButton>
-            <VaButton class="mr-4" preset="plain" icon="comment" @click="toggleComments(post.id)"
-              >{{ post.comments.length }}
-            </VaButton>
-          </VaCard>
-        </div>
-        <div v-if="selectedPostIds.includes(post.id)">
-          <VaDivider />
-          <VaTreeView :nodes="structureComments(post.comments)" children-by="comments">
-            <template #content="comment">
-              <div class="bg-white p-3 rounded-md shadow-sm mb-2" :commentId="comment.id">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center mb-2">
-                    <GeoAvatar
-                      class="mr-2"
-                      :size="36"
-                      color="warning"
-                      :image="comment.owner?.imageUrl || undefined"
-                      :txt="comment.owner?.firstName?.charAt(0).toUpperCase()"
-                    />
-                    <div class="flex flex-col">
-                      <h2 class="text-sm font-bold text-gray-800">
-                        {{ comment.owner?.firstName }} {{ comment.owner?.lastName }}
-                      </h2>
-                      <VaPopover
-                        class="mb-2"
-                        placement="right"
-                        color="#FFFFFF"
-                        :message="format.formatDate(comment.createdOn)"
-                      >
-                        <p class="text-xs text-gray-600">{{ format.formatDateFromNow(comment.createdOn) }}</p>
-                      </VaPopover>
-                    </div>
-                  </div>
-                  <VaMenu
-                    :options="[
-                      { text: 'Edit', value: comment, icon: 'edit' },
-                      { text: 'Delete', value: comment, icon: 'delete' },
-                    ]"
-                    @selected="(v: any) => selectedCommentOption(v)"
-                  >
-                    <template #anchor>
-                      <VaCard class="cursor-pointer text-gray-500 hover:text-gray-700" @click.stop>
-                        <span class="material-symbols-outlined">more_horiz</span>
-                      </VaCard>
-                    </template>
-                  </VaMenu>
-                </div>
-                <!-- eslint-disable vue/no-v-html -->
-                <div class="text-sm text-gray-700" v-html="comment.content" />
-                <!--eslint-enable-->
-                <div class="my-2 flex items-center justify-start">
-                  <VaButton
-                    v-model="isLikeComment"
-                    class="mr-2"
-                    preset="plain"
-                    size="small"
-                    icon="favorite"
-                    color="danger"
-                    @click="toggleCommentLike(comment)"
-                  >
-                    {{ comment.numberLikeInComment }}
-                  </VaButton>
-                  <VaButton preset="plain" size="small" icon="reply" @click="toggleReplies(comment.id)">
-                    Reply</VaButton
-                  >
-                </div>
-                <div v-if="selectedCommentIds.includes(comment.id)">
-                  <Comments
-                    :post-id="post.id"
-                    :parent-id="comment.id"
-                    @save="(comment: EmptyComment) => OnCommentSaved(comment)"
-                  />
-                </div>
+    <div v-if="posts.length > 0">
+      <div
+        v-for="post in posts"
+        :key="post.id"
+        :postId="post.id"
+        class="bg-white rounded-lg shadow-md overflow-hidden mb-6"
+      >
+        <VaCard class="p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center mb-4">
+              <GeoAvatar
+                class="mr-2"
+                :size="48"
+                color="warning"
+                :image="post.owner?.imageUrl || undefined"
+                :txt="post.owner?.firstName?.charAt(0).toUpperCase()"
+              />
+              <div>
+                <h2 class="text-md font-bold text-gray-800">{{ post.owner?.firstName }} {{ post.owner?.lastName }}</h2>
+                <VaPopover class="mb-2" placement="right" color="#FFFFFF" :message="format.formatDate(post.createdOn)">
+                  <p class="text-xs text-gray-600">{{ format.formatDateFromNow(post.createdOn) }}</p>
+                </VaPopover>
               </div>
-            </template>
-          </VaTreeView>
-          <Comments
-            :post-id="post.id"
-            :parent-id="commentId"
-            @save="(comment: EmptyComment) => OnCommentSaved(comment)"
-          />
-        </div>
+            </div>
+            <VaMenu
+              :options="[
+                { text: 'Edit', value: post, icon: 'edit' },
+                { text: 'Delete', value: post, icon: 'delete' },
+              ]"
+              @selected="(v: any) => selectedPostOption(v)"
+            >
+              <template #anchor>
+                <VaCard class="cursor-pointer text-gray-500 hover:text-gray-700" @click.stop>
+                  <span class="material-symbols-outlined">more_horiz</span>
+                </VaCard>
+              </template>
+            </VaMenu>
+          </div>
+          <!-- eslint-disable vue/no-v-html -->
+          <div class="text-base text-gray-700 mb-4" v-html="post.content" />
+          <!--eslint-enable-->
+          <VaDivider />
+          <div class="flex items-center justify-start">
+            <VaCard class="mr-auto">
+              <VaButton
+                v-model="isLikePost"
+                preset="plain"
+                icon="favorite"
+                class="mr-4"
+                color="danger"
+                @click="togglePostLike(post)"
+                >{{ post.numberLikeInThePost }}
+              </VaButton>
+              <VaButton class="mr-4" preset="plain" icon="comment" @click="toggleComments(post.id)"
+                >{{ post.comments.length }}
+              </VaButton>
+            </VaCard>
+          </div>
+          <div v-if="selectedPostIds.includes(post.id)">
+            <VaDivider />
+            <VaTreeView :nodes="structureComments(post.comments)" children-by="comments">
+              <template #content="comment">
+                <div class="bg-white p-3 rounded-md shadow-sm mb-2" :commentId="comment.id">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center mb-2">
+                      <GeoAvatar
+                        class="mr-2"
+                        :size="36"
+                        color="warning"
+                        :image="comment.owner?.imageUrl || undefined"
+                        :txt="comment.owner?.firstName?.charAt(0).toUpperCase()"
+                      />
+                      <div class="flex flex-col">
+                        <h2 class="text-sm font-bold text-gray-800">
+                          {{ comment.owner?.firstName }} {{ comment.owner?.lastName }}
+                        </h2>
+                        <VaPopover
+                          class="mb-2"
+                          placement="right"
+                          color="#FFFFFF"
+                          :message="format.formatDate(comment.createdOn)"
+                        >
+                          <p class="text-xs text-gray-600">{{ format.formatDateFromNow(comment.createdOn) }}</p>
+                        </VaPopover>
+                      </div>
+                    </div>
+                    <VaMenu
+                      :options="[
+                        { text: 'Edit', value: comment, icon: 'edit' },
+                        { text: 'Delete', value: comment, icon: 'delete' },
+                      ]"
+                      @selected="(v: any) => selectedCommentOption(v)"
+                    >
+                      <template #anchor>
+                        <VaCard class="cursor-pointer text-gray-500 hover:text-gray-700" @click.stop>
+                          <span class="material-symbols-outlined">more_horiz</span>
+                        </VaCard>
+                      </template>
+                    </VaMenu>
+                  </div>
+                  <!-- eslint-disable vue/no-v-html -->
+                  <div class="text-sm text-gray-700" v-html="comment.content" />
+                  <!--eslint-enable-->
+                  <div class="my-2 flex items-center justify-start">
+                    <VaButton
+                      v-model="isLikeComment"
+                      class="mr-2"
+                      preset="plain"
+                      size="small"
+                      icon="favorite"
+                      color="danger"
+                      @click="toggleCommentLike(comment)"
+                    >
+                      {{ comment.numberLikeInComment }}
+                    </VaButton>
+                    <VaButton preset="plain" size="small" icon="reply" @click="toggleReplies(comment.id)">
+                      Reply</VaButton
+                    >
+                  </div>
+                  <div v-if="selectedCommentIds.includes(comment.id)">
+                    <Comments
+                      :post-id="post.id"
+                      :parent-id="comment.id"
+                      @save="(comment: EmptyComment) => OnCommentSaved(comment)"
+                    />
+                  </div>
+                </div>
+              </template>
+            </VaTreeView>
+            <Comments
+              :post-id="post.id"
+              :parent-id="commentId"
+              @save="(comment: EmptyComment) => OnCommentSaved(comment)"
+            />
+          </div>
+        </VaCard>
+      </div>
+    </div>
+    <div v-else>
+      <VaCard class="bg-white rounded-lg shadow-md p-6">
+        <VaIcon class="flex justify-center" name="newspaper" size="4rem" />
+        <VaCardContent class="text-center">There is no news!!</VaCardContent>
       </VaCard>
     </div>
   </div>
@@ -208,7 +216,7 @@ import { format, getErrorMessage, notifications } from '@/services/utils'
 import { onMounted, ref } from 'vue'
 import Comments from './Comments.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { useModal, useToast, VaCard, VaDivider, VaModal } from 'vuestic-ui'
+import { useModal, useToast, VaCard, VaCardContent, VaDivider, VaIcon, VaModal } from 'vuestic-ui'
 import { Comment, EmptyComment, EmptyCommentLike, EmptyPost, EmptyPostLike, Post } from '../types'
 import { usePostsStore } from '@/stores/modules/posts.module'
 import { useCommentStore } from '@/stores/modules/comments.module'

@@ -176,16 +176,7 @@ import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
-import {
-  useBreakpoint,
-  useModal,
-  useToast,
-  VaButton,
-  VaCard,
-  VaCardContent,
-  VaList,
-  VaListItemSection,
-} from 'vuestic-ui'
+import { useBreakpoint, useModal, useToast } from 'vuestic-ui'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
 import EditAssignmentContent from './EditAssignmentContent.vue'

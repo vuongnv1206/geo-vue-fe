@@ -2585,6 +2585,14 @@
   resolved "https://registry.npmjs.org/@types/qs/-/qs-6.9.15.tgz"
   integrity sha512-uXHQKES6DQKKCLh441Xv/dwxOq1TVS3JPUMlEqoEglvlhR6Mxnlew/Xq/LRVHpLyk7iK3zODe1qYHIMltO7XGg==
 
+"@types/quill@^2.0.9":
+  version "2.0.14"
+  resolved "https://registry.npmjs.org/@types/quill/-/quill-2.0.14.tgz"
+  integrity sha512-zvoXCRnc2Dl8g+7/9VSAmRWPN6oH+MVhTPizmCR+GJCITplZ5VRVzMs4+a/nOE3yzNwEZqylJJrMB07bwbM1/g==
+  dependencies:
+    parchment "^1.1.2"
+    quill-delta "^5.1.0"
+
 "@types/range-parser@*":
   version "1.2.7"
   resolved "https://registry.npmjs.org/@types/range-parser/-/range-parser-1.2.7.tgz"
@@ -4824,7 +4832,7 @@ fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   resolved "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz"
   integrity sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==
 
-fast-diff@^1.1.2:
+fast-diff@^1.1.2, fast-diff@^1.3.0:
   version "1.3.0"
   resolved "https://registry.npmjs.org/fast-diff/-/fast-diff-1.3.0.tgz"
   integrity sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==
@@ -6462,6 +6470,11 @@ normalize-range@^0.1.2:
   resolved "https://registry.npmjs.org/normalize-range/-/normalize-range-0.1.2.tgz"
   integrity sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==
 
+normalize-url@^4.5.1:
+  version "4.5.1"
+  resolved "https://registry.npmjs.org/normalize-url/-/normalize-url-4.5.1.tgz"
+  integrity sha512-9UZCFRHQdNrfTpGg8+1INIg93B6zE0aXMVFkw1WFwvO4SlZywU6aLg5Of0Ap/PgcbSw4LNxvMWXMeugwMCX0AA==
+
 npm-run-path@^4.0.1:
   version "4.0.1"
   resolved "https://registry.npmjs.org/npm-run-path/-/npm-run-path-4.0.1.tgz"
@@ -6675,7 +6688,7 @@ pako@~0.2.0:
   resolved "https://registry.npmjs.org/pako/-/pako-0.2.9.tgz"
   integrity sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==
 
-parchment@^1.1.4:
+parchment@^1.1.2, parchment@^1.1.4:
   version "1.1.4"
   resolved "https://registry.npmjs.org/parchment/-/parchment-1.1.4.tgz"
   integrity sha512-J5FBQt/pM2inLzg4hEWmzQx/8h8D0CiDxaG3vyp9rKrQRSDgBlhjdP5jQGgosEajXPSQouXGHOmVdgo7QmJuOg==
@@ -7218,10 +7231,28 @@ quill-delta@^4.2.2:
     lodash.clonedeep "^4.5.0"
     lodash.isequal "^4.5.0"
 
+quill-delta@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.npmjs.org/quill-delta/-/quill-delta-5.1.0.tgz"
+  integrity sha512-X74oCeRI4/p0ucjb5Ma8adTXd9Scumz367kkMK5V/IatcX6A0vlgLgKbzXWy5nZmCGeNJm2oQX0d2Eqj+ZIlCA==
+  dependencies:
+    fast-diff "^1.3.0"
+    lodash.clonedeep "^4.5.0"
+    lodash.isequal "^4.5.0"
+
 quill-image-uploader@^1.3.0:
   version "1.3.0"
   resolved "https://registry.npmjs.org/quill-image-uploader/-/quill-image-uploader-1.3.0.tgz"
   integrity sha512-vO43GEn93rGThje/MlotkQE9OV5nOKBZ4oKhn71L/EjrM/J2P/8iDDVd9GEwlsGsbskeJqPLopsSQ4HlVVIn6A==
+
+quill-magic-url@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.npmjs.org/quill-magic-url/-/quill-magic-url-4.2.0.tgz"
+  integrity sha512-u1tHwsQjrTczhECNtXK5EUkWwAMb8raLpsU3llqiLu344kPlA9ldoenHvY3XW+yI+2IZ9WgKgRmcy+cKGN3gnQ==
+  dependencies:
+    "@types/quill" "^2.0.9"
+    normalize-url "^4.5.1"
+    quill-delta "^3.6.2"
 
 quill@^1.3.4, quill@^1.3.7:
   version "1.3.7"
