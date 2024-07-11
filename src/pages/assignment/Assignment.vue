@@ -1,3 +1,14 @@
+<template>
+  <VaCard>
+    <VaCardContent>
+      <VaCard class="flex flex-col md:flex-row gap-2 justify-end">
+        <VaButton icon="add" :to="{ name: 'create-assignment' }">Assignment</VaButton>
+      </VaCard>
+      <AssignmentTable :loading="loading" :assignments-by-class="assignmentsByClass" />
+    </VaCardContent>
+  </VaCard>
+</template>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import AssignmentTable from '@pages/assignment/widgets/AssignmentTable.vue'
@@ -44,14 +55,3 @@ onMounted(() => {
   getAssignmentByClass()
 })
 </script>
-
-<template>
-  <VaCard>
-    <VaCardContent>
-      <VaCard class="flex flex-col md:flex-row gap-2 justify-end">
-        <VaButton icon="add" :to="{ name: 'create-assignment' }">Assignment</VaButton>
-      </VaCard>
-      <AssignmentTable :loading="loading" :assignments-by-class="assignmentsByClass" />
-    </VaCardContent>
-  </VaCard>
-</template>
