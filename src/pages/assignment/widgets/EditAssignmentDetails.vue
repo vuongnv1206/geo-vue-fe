@@ -170,7 +170,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import '@vuepic/vue-datepicker/dist/main.css'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import { getErrorMessage, notifications, validators } from '@/services/utils'
 import { useForm, useModal, useToast } from 'vuestic-ui'
@@ -285,7 +285,25 @@ const selectAllClasses = (department: GroupClass) => {
     selectedClasses.value = [...new Set([...selectedClassIds, ...newClassIds])]
     selectedClassesByDepartmentState.value[department.id] = true
   }
+
+  // Cập nhật trạng thái tổng thể nếu tất cả các department đều được chọn
+  updateSelectAllClassesState()
 }
+
+const updateSelectAllClassesState = () => {
+  groupClasses.value.forEach((department) => {
+    const allClassesSelected = department.classes.every((cls) => selectedClasses.value.includes(cls.id))
+    selectedClassesByDepartmentState.value[department.id] = allClassesSelected
+  })
+
+  // Cập nhật trạng thái tổng thể nếu tất cả các department đều được chọn
+  selectAllClassesState.value = groupClasses.value.every((department) =>
+    department.classes.every((cls) => selectedClasses.value.includes(cls.id)),
+  )
+}
+
+// Gọi phương thức theo dõi khi chọn tay từng class
+watch(selectedClasses, updateSelectAllClassesState, { deep: true })
 
 const showDepartmentClasses = (groupClass: GroupClass) => {
   selectedDepartment.value = groupClass
@@ -296,8 +314,16 @@ const showDepartmentClasses = (groupClass: GroupClass) => {
 const selectAllClassesForAllDepartments = () => {
   if (selectAllClassesState.value) {
     selectedClasses.value = []
+    groupClasses.value.forEach((department: GroupClass) => {
+      selectedClassesByDepartmentState.value[department.id] = false
+    })
   } else {
-    selectedClasses.value = groupClasses.value.flatMap((department) => department.classes.map((cls) => cls.id))
+    selectedClasses.value = groupClasses.value.flatMap((department: GroupClass) =>
+      department.classes.map((cls: any) => cls.id),
+    )
+    groupClasses.value.forEach((department: GroupClass) => {
+      selectedClassesByDepartmentState.value[department.id] = true
+    })
   }
   selectAllClassesState.value = !selectAllClassesState.value
 }

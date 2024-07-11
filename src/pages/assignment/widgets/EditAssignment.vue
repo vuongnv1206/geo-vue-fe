@@ -210,7 +210,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 
 import { useRouter } from 'vue-router'
 import { QuillEditor } from '@vueup/vue-quill'
-import { computed, onMounted, ref, toRaw } from 'vue'
+import { computed, onMounted, ref, toRaw, watch } from 'vue'
 import { useForm, useModal, useToast } from 'vuestic-ui'
 
 const router = useRouter()
@@ -329,7 +329,9 @@ const showAllClassesForAllDepartments = () => {
 
 const selectAllClasses = (department: GroupClass) => {
   const selectedClassIds = selectedClasses.value
+
   const allClassesSelected = department.classes.every((cls) => selectedClassIds.includes(cls.id))
+
   if (allClassesSelected) {
     selectedClasses.value = selectedClassIds.filter((id) => !department.classes.some((cls) => cls.id === id))
     selectedClassesByDepartmentState.value[department.id] = false
@@ -338,7 +340,22 @@ const selectAllClasses = (department: GroupClass) => {
     selectedClasses.value = [...new Set([...selectedClassIds, ...newClassIds])]
     selectedClassesByDepartmentState.value[department.id] = true
   }
+
+  updateSelectAllClassesState()
 }
+
+const updateSelectAllClassesState = () => {
+  groupClasses.value.forEach((department) => {
+    const allClassesSelected = department.classes.every((cls) => selectedClasses.value.includes(cls.id))
+    selectedClassesByDepartmentState.value[department.id] = allClassesSelected
+  })
+
+  selectAllClassesState.value = groupClasses.value.every((department) =>
+    department.classes.every((cls) => selectedClasses.value.includes(cls.id)),
+  )
+}
+
+watch(selectedClasses, updateSelectAllClassesState, { deep: true })
 
 const showDepartmentClasses = (groupClass: GroupClass) => {
   selectedDepartment.value = groupClass
@@ -347,8 +364,16 @@ const showDepartmentClasses = (groupClass: GroupClass) => {
 const selectAllClassesForAllDepartments = () => {
   if (selectAllClassesState.value) {
     selectedClasses.value = []
+    groupClasses.value.forEach((department: GroupClass) => {
+      selectedClassesByDepartmentState.value[department.id] = false
+    })
   } else {
-    selectedClasses.value = groupClasses.value.flatMap((department) => department.classes.map((cls) => cls.id))
+    selectedClasses.value = groupClasses.value.flatMap((department: GroupClass) =>
+      department.classes.map((cls: any) => cls.id),
+    )
+    groupClasses.value.forEach((department: GroupClass) => {
+      selectedClassesByDepartmentState.value[department.id] = true
+    })
   }
   selectAllClassesState.value = !selectAllClassesState.value
 }
