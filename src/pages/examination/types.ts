@@ -34,9 +34,9 @@ export interface UpdatePaperFolderRequest {
 }
 
 export interface SharePaperFolderRequest {
-  userIds: string[]
+  userId?: string | null
   folderId: string
-  groupIds?: string[]
+  groupId?: string | null
   canView: boolean
   canAdd: boolean
   canUpdate: boolean

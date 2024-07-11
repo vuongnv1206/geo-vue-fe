@@ -393,5 +393,3 @@ onMounted(() => {
     </template>
   </VaLayout>
 </template>
-
-<style lang="scss"></style>

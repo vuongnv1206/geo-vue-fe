@@ -367,7 +367,7 @@ const fileUpload = async () => {
         id: assignmentId,
         attachment: JSON.stringify(response),
       }
-      console.log('Assignment Attachment:', assignmentAttachment.value)
+      // console.log('Assignment Attachment:', assignmentAttachment.value)
       onAssignmentAttachment()
     })
     .catch((error) => {
