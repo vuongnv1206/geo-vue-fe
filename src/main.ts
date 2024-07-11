@@ -6,12 +6,14 @@ import { VueReCaptcha } from 'vue-recaptcha-v3'
 import { Quill, QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import BlotFormatter from 'quill-blot-formatter'
+import ImageUploader from 'quill-image-uploader'
 
 import stores from './stores'
 import router from './router'
 import vuesticGlobalConfig from '@services/vuestic-ui/global-config'
 import App from './App.vue'
 import { useAuthStore } from '@modules/auth.module'
+import { useFileStore } from './stores/modules/file.module'
 
 // Create Vue application
 const app = createApp(App)
@@ -22,7 +24,12 @@ app.use(router)
 app.use(i18n)
 app.use(createVuestic({ config: vuesticGlobalConfig }))
 
+// Register modules for QuillEditor
 Quill.register('modules/blotFormatter', BlotFormatter)
+Quill.register('modules/imageUploader', ImageUploader)
+
+const fileStore = useFileStore()
+const url = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -3)
 
 // Define global options for QuillEditor
 export const globalOptions = {
@@ -41,6 +48,23 @@ export const globalOptions = {
       ['clean'],
     ],
     blotFormatter: {},
+    imageUploader: {
+      upload: (file: any) => {
+        return new Promise((resolve, reject) => {
+          const formData = new FormData()
+          formData.append('Files', file)
+          fileStore
+            .uploadFile(formData)
+            .then((response) => {
+              resolve(url + response)
+            })
+            .catch((error) => {
+              reject('Upload failed')
+              console.error('Error:', error)
+            })
+        })
+      },
+    },
   },
   placeholder: 'Say something...',
   theme: 'snow',

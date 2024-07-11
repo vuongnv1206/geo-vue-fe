@@ -279,7 +279,7 @@ const getPosts = () => {
     .getPosts(dataFilter.value)
     .then((response) => {
       posts.value = response.data.filter((post) => post.classesId === props.classId)
-      console.log('Postsssssssssssssssssssssss:', posts.value)
+      // console.log('Postsssssssssssssssssssssss:', posts.value)
     })
     .catch((error) => {
       notify({
