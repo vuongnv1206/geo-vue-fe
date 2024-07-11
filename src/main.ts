@@ -7,6 +7,7 @@ import { Quill, QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import ImageUploader from 'quill-image-uploader'
 import MagicUrl from 'quill-magic-url'
+import BlotFormatter from 'quill-blot-formatter/dist/BlotFormatter'
 
 import stores from './stores'
 import router from './router'
@@ -25,8 +26,15 @@ app.use(i18n)
 app.use(createVuestic({ config: vuesticGlobalConfig }))
 
 // Register modules for QuillEditor
-Quill.register('modules/imageUploader', ImageUploader)
 Quill.register('modules/magicUrl', MagicUrl)
+Quill.register('modules/imageUploader', ImageUploader)
+Quill.register('modules/blotFormatter', BlotFormatter)
+
+// Quill: Inline Style
+// Quill.register(Quill.import("attributors/class/align"), true);
+// Quill.register(Quill.import("attributors/class/font"), true);
+// Quill.register(Quill.import("attributors/style/align"), true);
+// Quill.register(Quill.import("attributors/style/font"), true);
 
 const fileStore = useFileStore()
 const url = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -3)
@@ -65,6 +73,7 @@ export const globalOptions = {
       },
     },
     magicUrl: true,
+    blotFormatter: {},
   },
   placeholder: 'Say something...',
   theme: 'snow',
