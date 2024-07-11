@@ -94,7 +94,7 @@ const genderOptions = reactive([
       v-model="newStudent.phoneNumber"
       label="Phone Number"
       placeholder="Enter your phone number"
-      :rules="[validators.required2('Phone number'), validators.isNumber('phone number'), validators.phone]"
+      :rules="[validators.isNumber('phone number'), validators.phone]"
     />
     <VaInput
       v-model="newStudent.email"

@@ -212,7 +212,7 @@ import { format, getErrorMessage, notifications } from '@/services/utils'
 import { onMounted, ref } from 'vue'
 import Comments from './Comments.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { useModal, useToast, VaCard, VaDivider, VaModal } from 'vuestic-ui/web-components'
+import { useModal, useToast, VaCard, VaDivider, VaModal } from 'vuestic-ui'
 import { Comment, EmptyComment, EmptyCommentLike, EmptyPost, EmptyPostLike, Post } from '../types'
 import { usePostsStore } from '@/stores/modules/posts.module'
 import { useCommentStore } from '@/stores/modules/comments.module'
@@ -278,8 +278,8 @@ const getPosts = () => {
   postsStore
     .getPosts(dataFilter.value)
     .then((response) => {
-      posts.value = response.data
-      console.log('Postsssssssssssssssssssssss:', posts.value)
+      posts.value = response.data.filter((post) => post.classesId === props.classId)
+      // console.log('Postsssssssssssssssssssssss:', posts.value)
     })
     .catch((error) => {
       notify({
