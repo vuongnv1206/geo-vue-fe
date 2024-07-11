@@ -102,7 +102,6 @@ onMounted(() => {
           <StudentsInClassDetails
             v-if="currentTab.title === 'Student list'"
             :classroom="classDetails"
-            :loading="loading"
             @load="getClassById"
           />
           <AssignmentInClassDetails v-if="currentTab.title === 'Assignment & Exam'" :class-details="classDetails" />

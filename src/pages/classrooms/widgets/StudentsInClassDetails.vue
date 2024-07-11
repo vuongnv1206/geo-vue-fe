@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, PropType, ref } from 'vue'
+import { computed, PropType, ref } from 'vue'
 import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
 import { Classrooms, EmptyStudent, Student } from '../types'
 import { notifications, getErrorMessage, format } from '@/services/utils'
@@ -9,10 +9,6 @@ import EditStudent from './EditStudent.vue'
 const props = defineProps({
   classroom: {
     type: Object as PropType<Classrooms>,
-    required: true,
-  },
-  loading: {
-    type: Boolean,
     required: true,
   },
 })
@@ -151,21 +147,11 @@ const onStudentSaved = async (student: Student) => {
   }
 }
 
-const disableStudentManage = ref(false)
-const checkPermissionStudentManage = () => {
-  const hasPermissionStudentManageType = props.classroom.permissions?.some(
-    (permission) => permission.permissionType === 3,
-  )
-  if (!hasPermissionStudentManageType) {
-    disableStudentManage.value = true
-    notify({
-      message: notifications.getFailed(`- No permission student management`),
-      color: 'danger',
-    })
+const canStudentManage = computed(() => {
+  if (props.classroom.permissions === null || props.classroom.permissions === undefined) {
+    return true
   }
-}
-onMounted(() => {
-  checkPermissionStudentManage()
+  return props.classroom.permissions?.some((permission) => permission.permissionType === 3)
 })
 </script>
 
@@ -176,7 +162,7 @@ onMounted(() => {
         <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedStudent()">
           Delete</VaButton
         >
-        <VaButton :disabled="disableStudentManage" icon="add" @click="createNewStudent()">Student</VaButton>
+        <VaButton :disabled="!canStudentManage" icon="add" @click="createNewStudent()">Student</VaButton>
       </div>
       <VaDataTable
         hoverable
@@ -185,7 +171,6 @@ onMounted(() => {
         :columns="columns"
         select-mode="multiple"
         :items="props.classroom.students || []"
-        :loading="props.loading"
         :disable-client-side-sorting="false"
         @selectionChange="handleSelectionChange($event.currentSelectedItems)"
         @delete="deleteStudentWithConfirm"

@@ -10,7 +10,7 @@
       </VaCard>
       <VaMenu class="justify-end" :options="options" @selected="selectedOption">
         <template #anchor>
-          <VaButton :disabled="disableAssignmentManage">
+          <VaButton :disabled="!canAssignmentManage">
             <VaIcon name="add" />
             Assignment
           </VaButton>
@@ -24,14 +24,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, PropType, watch, onMounted } from 'vue'
-import { format, notifications } from '@/services/utils'
+import { ref, computed, PropType, watch } from 'vue'
+import { format } from '@/services/utils'
 import { Classrooms } from '../types'
 import AccordionOfAssignment from './AccordionOfAssignment.vue'
 import router from '@/router'
-import { useToast } from 'vuestic-ui'
-
-const { init: notify } = useToast()
 
 const props = defineProps({
   classDetails: {
@@ -40,21 +37,11 @@ const props = defineProps({
   },
 })
 
-const disableAssignmentManage = ref(false)
-const checkPermissionAssignmentManage = () => {
-  const hasPermissionStudentManageType = props.classDetails.permissions?.some(
-    (permission) => permission.permissionType === 1,
-  )
-  if (!hasPermissionStudentManageType) {
-    disableAssignmentManage.value = true
-    notify({
-      message: notifications.getFailed(`- No permission assignment management`),
-      color: 'danger',
-    })
+const canAssignmentManage = computed(() => {
+  if (props.classDetails.permissions === null || props.classDetails.permissions === undefined) {
+    return true
   }
-}
-onMounted(() => {
-  checkPermissionAssignmentManage()
+  return props.classDetails.permissions?.some((permission) => permission.permissionType === 1)
 })
 
 const forceUpdate = ref(0)
