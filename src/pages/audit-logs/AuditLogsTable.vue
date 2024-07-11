@@ -10,6 +10,7 @@
           '--va-data-table-grid-tr-border': '1px solid var(--va-background-border)',
         }"
         sticky-header
+        :loading="auditLogsStore?.isLoading"
       >
         <template #cell(user)="{ row }">
           <span class="flex gap-2">
@@ -42,7 +43,7 @@
       </VaDataTable>
     </VaCardContent>
     <VaCardContent>
-      <div class="flex flex-col-reverse md:flex-row gap-2 justify-between md:justify-center items-center p-2">
+      <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center p-2">
         <div>
           <b>
             {{
@@ -66,7 +67,7 @@
             v-model="pageValue"
             gapped
             active-page-color="textPrimary"
-            :visible-pages="4"
+            :visible-pages="5"
             :total="pagination.totalCount"
             :page-size="pagination.pageSize"
             @update:modelValue="handlePageChange"
