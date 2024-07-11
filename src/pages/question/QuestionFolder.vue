@@ -653,7 +653,9 @@ const tabs = computed(() => [
   <VaTabs v-model="tabValue" @update:modelValue="changeTab">
     <template #tabs>
       <VaTab v-for="tab in tabs" :key="tab.id">
+        <!-- eslint-disable vue/no-v-html -->
         <span v-html="tab.title"></span>
+        <!--eslint-enable-->
       </VaTab>
     </template>
   </VaTabs>
