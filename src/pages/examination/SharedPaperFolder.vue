@@ -16,6 +16,7 @@ import { useRouter } from 'vue-router'
 import { CreatePaperFolderRequest } from './types'
 import { computed } from 'vue'
 import { watchEffect } from 'vue'
+import EditPaperFolderForm from '@pages/examination/widgets/EditPaperFolderForm.vue'
 
 const router = useRouter()
 const { init: notify } = useToast()
