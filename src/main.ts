@@ -6,6 +6,7 @@ import { VueReCaptcha } from 'vue-recaptcha-v3'
 import { Quill, QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import ImageUploader from 'quill-image-uploader'
+import MagicUrl from 'quill-magic-url'
 
 import stores from './stores'
 import router from './router'
@@ -25,6 +26,7 @@ app.use(createVuestic({ config: vuesticGlobalConfig }))
 
 // Register modules for QuillEditor
 Quill.register('modules/imageUploader', ImageUploader)
+Quill.register('modules/magicUrl', MagicUrl)
 
 const fileStore = useFileStore()
 const url = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -3)
@@ -62,6 +64,7 @@ export const globalOptions = {
         })
       },
     },
+    magicUrl: true,
   },
   placeholder: 'Say something...',
   theme: 'snow',
