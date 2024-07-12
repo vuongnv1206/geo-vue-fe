@@ -37,6 +37,7 @@
               </div>
             </div>
             <VaMenu
+              v-if="currentUser == post.owner?.id"
               :options="[
                 { text: 'Edit', value: post, icon: 'edit' },
                 { text: 'Delete', value: post, icon: 'delete' },
@@ -265,6 +266,8 @@ const defaultNewPost: EmptyPost = {
   isLockComment: false,
 }
 
+const currentUser = authStore.user?.id
+
 const newPost = ref({ ...defaultNewPost })
 
 const dataFilter = ref({
@@ -275,6 +278,7 @@ const dataFilter = ref({
   pageNumber: 0,
   pageSize: 10,
   orderBy: ['id'],
+  classId: props.classId,
 })
 
 const getPosts = () => {
@@ -282,8 +286,7 @@ const getPosts = () => {
   postsStore
     .getPosts(dataFilter.value)
     .then((response) => {
-      posts.value = response.data.filter((post) => post.classesId === props.classId)
-      // console.log('Postsssssssssssssssssssssss:', posts.value)
+      posts.value = response.data
     })
     .catch((error) => {
       notify({
