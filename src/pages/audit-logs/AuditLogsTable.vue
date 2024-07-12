@@ -1,6 +1,6 @@
 <template>
-  <VaInnerLoading :loading="auditLogsStore?.isLoading" class="z-50">
-    <VaCard outlined>
+  <div>
+    <VaCardContent class="pb-0">
       <VaDataTable
         class="my-table va-table--hoverable"
         :items="items"
@@ -10,6 +10,7 @@
           '--va-data-table-grid-tr-border': '1px solid var(--va-background-border)',
         }"
         sticky-header
+        :loading="auditLogsStore?.isLoading"
       >
         <template #cell(user)="{ row }">
           <span class="flex gap-2">
@@ -40,44 +41,50 @@
           </VaButton>
         </template>
       </VaDataTable>
-    </VaCard>
-  </VaInnerLoading>
-  <div class="flex justify-between mt-4">
-    <p>
-      {{
-        pagination?.totalCount <= 1
-          ? pagination.totalCount + ' ' + t('auditLogs.table.item')
-          : pagination.totalCount + ' ' + t('auditLogs.table.items')
-      }}
-    </p>
-    <VaPagination
-      v-if="pagination.totalCount > 0"
-      v-model="pageValue"
-      gapped
-      active-page-color="textPrimary"
-      :visible-pages="7"
-      :total="pagination.totalCount"
-      :page-size="pagination.pageSize"
-      @update:modelValue="handlePageChange"
-    />
-    <VaSelect
-      v-if="pagination.totalCount > 0"
-      v-model="pagination.pageSize"
-      class="w-32"
-      :options="pageSizeOptions"
-      @update:modelValue="handlePageSizeChange"
-    />
+    </VaCardContent>
+    <VaCardContent>
+      <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center p-2">
+        <div>
+          <b>
+            {{
+              pagination?.totalCount <= 1
+                ? pagination.totalCount + ' ' + t('auditLogs.table.item')
+                : pagination.totalCount + ' ' + t('auditLogs.table.items')
+            }}
+          </b>
+          {{ t('questions.results_per_page') }}
+          <VaSelect
+            v-if="pagination.totalCount > 0"
+            v-model="pagination.pageSize"
+            class="w-32"
+            :options="pageSizeOptions"
+            @update:modelValue="handlePageSizeChange"
+          />
+        </div>
+        <div v-if="pagination.totalCount > 0" class="flex">
+          <VaPagination
+            v-if="pagination.totalCount > 0"
+            v-model="pageValue"
+            gapped
+            active-page-color="textPrimary"
+            :visible-pages="5"
+            :total="pagination.totalCount"
+            :page-size="pagination.pageSize"
+            @update:modelValue="handlePageChange"
+          />
+        </div>
+      </div>
+    </VaCardContent>
+    <VaModal v-model="showModal" hide-default-actions size="large">
+      <template #header>
+        <p class="text-xl font-bold">{{ t('auditLogs.table.titleDetails') }}</p>
+      </template>
+      <AuditLogsDetails :details-information="details" />
+      <template #footer>
+        <VaButton @click="showModal = false">{{ t('auditLogs.table.buttonCloseDetails') }}</VaButton>
+      </template>
+    </VaModal>
   </div>
-
-  <VaModal v-model="showModal" hide-default-actions size="large">
-    <template #header>
-      <p class="text-xl font-bold">{{ t('auditLogs.table.titleDetails') }}</p>
-    </template>
-    <AuditLogsDetails :details-information="details" />
-    <template #footer>
-      <VaButton @click="showModal = false">{{ t('auditLogs.table.buttonCloseDetails') }}</VaButton>
-    </template>
-  </VaModal>
 </template>
 
 <script setup lang="ts">
@@ -194,3 +201,11 @@ const handleShowDetails = async (row: any) => {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.va-data-table {
+  ::v-deep(tbody .va-data-table__table-tr) {
+    border-bottom: 1px solid var(--va-background-border);
+  }
+}
+</style>

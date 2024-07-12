@@ -90,29 +90,29 @@ const approvePendingQuestion = (question: Question) => {
 }
 
 const getQuestionsStatusText = (statusNumber: number | null | undefined) => {
-  switch (statusNumber) {
-    case status.Pending:
-      return t('questions.pendingStatus')
-    case status.Approved:
-      return t('questions.approvedStatus')
-    case status.Rejected:
-      return t('questions.rejectedStatus')
-    default:
-      return 'status'
+  if (statusNumber === status.Pending) {
+    return t('questions.pendingStatus')
   }
+  if (statusNumber === status.Approved) {
+    return t('questions.approvedStatus')
+  }
+  if (statusNumber === status.Rejected) {
+    return t('questions.rejectedStatus')
+  }
+  return 'status'
 }
 
 const getQuestionsStatusColor = (statusNumber: number | null | undefined) => {
-  switch (statusNumber) {
-    case status.Pending:
-      return 'warning'
-    case status.Approved:
-      return 'success'
-    case status.Rejected:
-      return 'danger'
-    default:
-      return 'primary'
+  if (statusNumber === status.Pending) {
+    return 'warning'
   }
+  if (statusNumber === status.Approved) {
+    return 'success'
+  }
+  if (statusNumber === status.Rejected) {
+    return 'danger'
+  }
+  return 'primary'
 }
 </script>
 
