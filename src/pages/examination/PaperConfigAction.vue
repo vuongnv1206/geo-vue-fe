@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PaperDto } from '@/pages/examination/types'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { useToast } from 'vuestic-ui'
+import { useToast, VaCard, VaCardTitle } from 'vuestic-ui'
 
 const paperDetail = ref<PaperDto | null>(null)
 const route = useRoute()
@@ -29,17 +29,26 @@ const configOnline = () => {
   router.push({ name: 'paper-config-online', params: { id: paperId } })
 }
 
+const backToPage = () => {
+  router.push({ name: 'admin-exam-detail', params: { id: paperId } })
+}
+
 onMounted(() => {
   getPaperDetail()
 })
 </script>
 <template>
-  <div class="flex" style="align-items: center">
-    <p class="mr-3 va-h3">Config Exam:</p>
-    <p class="va-h5">{{ paperDetail?.examName }}</p>
-  </div>
   <div class="flex justify-center">
     <div style="max-width: 70%">
+      <VaCard class="flex mb-3">
+        <VaCardTitle class="flex gap-2">
+          <VaButton size="small" @click="backToPage">
+            <VaIcon name="keyboard_arrow_left" />
+          </VaButton>
+          <p class="va-title">Config Exam:</p>
+          <p class="">{{ paperDetail?.examName }}</p>
+        </VaCardTitle>
+      </VaCard>
       <VaCard>
         <VaCardTitle>Online</VaCardTitle>
         <VaCardContent>

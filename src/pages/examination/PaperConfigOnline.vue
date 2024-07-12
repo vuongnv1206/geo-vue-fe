@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { VaButton, VaCardTitle, useToast } from 'vuestic-ui'
+import { VaButton, VaCard, VaCardTitle, VaIcon, useToast } from 'vuestic-ui'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto, ShowQuestionAnswer, ShowResult } from '@/pages/examination/types'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { Classrooms, GroupClass, Student } from '@/pages/classrooms/types'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
@@ -19,6 +19,7 @@ const route = useRoute()
 const paperStore = usePaperStore()
 const classStores = useClassStore()
 const subjectStores = useSubjectStore()
+const router = useRouter()
 const { init: notify } = useToast()
 
 const paperId = route.params.id
@@ -258,6 +259,10 @@ const showQuestionAnswerOptions = computed(() => [
   { label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
 ])
 
+const backToPage = () => {
+  router.push({ name: 'paper-config', params: { id: paperId } })
+}
+
 onMounted(() => {
   getPaperDetail()
   getGroupClasses()
@@ -271,12 +276,12 @@ onMounted(() => {
     </div>
     <VaCard class="mb-3">
       <VaCardTitle class="justify-between align-center">
+        <VaButton size="small" @click="backToPage">
+          <VaIcon name="keyboard_arrow_left" />
+        </VaButton>
         <p>Configuration type</p>
         <VaSwitch v-model="valueSwitch" true-inner-label="Exam" false-inner-label="Practice" />
       </VaCardTitle>
-      <VaCardContent class="va-text-secondary text-xs">
-        Usually use to serious test, security the answer until the exam finished
-      </VaCardContent>
     </VaCard>
     <VaCard class="mb-3">
       <VaCardTitle> General configuration </VaCardTitle>
@@ -437,7 +442,7 @@ onMounted(() => {
             label="Exam password"
             placeholder="Enter password..."
           />
-          <VaCounter label="Submitted" manual-input class="mb-2 w-full pl-1" />
+          <VaCounter v-model="editPaper.duration" label="Submitted" manual-input class="mb-2 w-full pl-1" />
         </div>
       </VaCardContent>
     </VaCard>
