@@ -116,6 +116,7 @@ watch(
         paperAccesses: paperDetail.value.paperAccesses,
         shareType: paperDetail.value.shareType,
         subjectId: paperDetail.value.subjectId,
+        paperFolderId: paperDetail.value.paperFolderId,
       }
 
       valueOption.value = paperDetail.value.shareType as AccessType
