@@ -139,12 +139,19 @@
     }
   },
   "questions": {
+    "restore_success": "Restore questions successfully!",
+    "reject_success": "Reject question successfully!",
+    "approve_success": "Approve question successfully!",
+    "approve_all_success": "Approve all questions successfully!",
+    "delete_all_success": "Delete all questions successfully!",
+    "delete_all": "Delete All",
     "approve_all": "Approve All",
     "status": "Status",
     "rejectedStatus": "Rejected",
     "approvedStatus": "Approved",
     "pendingStatus": "Pending",
     "no_my_request": "Your request is empty",
+    "no_question_deleted": "There is no question",
     "no_question_pending": "There is no pending question",
     "add_question": "Add question",
     "folders": "Folders",
@@ -313,7 +320,6 @@
     "users": "Users",
     "projects": "Projects",
     "audit-logs": "Audit logs",
-
     "questions": "Questions",
     "question-folder": "Question folder",
     "question-bank": "Question bank",
@@ -326,6 +332,11 @@
     "exam": "Exam",
     "assignments": "Assignment",
     "subjects": "Subject"
+  },
+  "bin": {
+    "title": "Trash",
+    "tabExams": "Exams",
+    "tabQuestions": "Questions"
   },
   "messages": {
     "all": "See all messages",

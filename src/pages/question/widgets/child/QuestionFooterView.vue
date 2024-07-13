@@ -5,6 +5,7 @@ import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useQuestionStore } from '@/stores/modules/question.module'
 import { useToast } from 'vuestic-ui/web-components'
 import { useI18n } from 'vue-i18n'
+import { useBinStore } from '@/stores/modules/bin.module'
 
 const props = defineProps<{
   question: Question | null
@@ -28,6 +29,7 @@ const status = {
   Approved: 2,
   Rejected: 3,
 }
+const binStores = useBinStore()
 const stores = useQuestionFolderStore()
 const questionsStore = useQuestionStore()
 const { init } = useToast()
@@ -48,7 +50,7 @@ const rejectPendingQuestion = (question: Question) => {
     .then(() => {
       init({
         title: t('questions.success'),
-        message: 'Reject question successfully!',
+        message: t('questions.reject_success'),
         color: 'success',
       })
       questionsStore.setRefresh(true)
@@ -73,7 +75,7 @@ const approvePendingQuestion = (question: Question) => {
     .then(() => {
       init({
         title: t('questions.success'),
-        message: 'Approve question successfully!',
+        message: t('questions.approve_success'),
         color: 'success',
       })
       questionsStore.setRefresh(true)
@@ -114,6 +116,54 @@ const getQuestionsStatusColor = (statusNumber: number | null | undefined) => {
   }
   return 'primary'
 }
+
+const restoreFromBin = (question: Question) => {
+  const dataRestore = {
+    questionIds: question?.id ? [question.id] : [],
+  }
+  questionsStore
+    .RestoreDeletedQuestion(dataRestore)
+    .then(() => {
+      init({
+        title: t('questions.success'),
+        message: t('questions.restore_success'),
+        color: 'success',
+      })
+      binStores.setRefresh(true)
+    })
+    .catch((err) => {
+      const message = getErrorMessage(err)
+      init({
+        title: t('questions.error'),
+        message: message,
+        color: 'danger',
+      })
+    })
+}
+
+const deleteFromBin = (question: Question) => {
+  const dataRestore = {
+    questionIds: question?.id ? [question.id] : [],
+  }
+  questionsStore
+    .DeleteMultiQuestion(dataRestore)
+    .then(() => {
+      init({
+        title: t('questions.success'),
+        message: t('questions.delete_success'),
+        color: 'success',
+      })
+      binStores.setRefresh(true)
+    })
+    .catch((err) => {
+      const message = getErrorMessage(err)
+      init({
+        title: t('questions.error'),
+        message: message,
+        color: 'danger',
+      })
+    })
+}
 </script>
 
 <template>
@@ -143,8 +193,9 @@ const getQuestionsStatusColor = (statusNumber: number | null | undefined) => {
         </VaMenu>
         <VaIcon
           v-if="
-            stores?.currentTab === tabs.Questions ||
-            (stores?.currentTab === tabs.MyRequests && props.question?.questionStatus === status.Pending)
+            !binStores.isBinQuestion &&
+            (stores?.currentTab === tabs.Questions ||
+              (stores?.currentTab === tabs.MyRequests && props.question?.questionStatus === status.Pending))
           "
           name="mso-edit"
           color="primary"
@@ -152,8 +203,9 @@ const getQuestionsStatusColor = (statusNumber: number | null | undefined) => {
         />
         <VaIcon
           v-if="
-            stores?.currentTab === tabs.Questions ||
-            (stores?.currentTab === tabs.MyRequests && props.question?.questionStatus === status.Pending)
+            !binStores.isBinQuestion &&
+            (stores?.currentTab === tabs.Questions ||
+              (stores?.currentTab === tabs.MyRequests && props.question?.questionStatus === status.Pending))
           "
           name="mso-delete"
           color="danger"
@@ -170,6 +222,18 @@ const getQuestionsStatusColor = (statusNumber: number | null | undefined) => {
           name="close"
           color="danger"
           @click="rejectPendingQuestion(props.question as Question)"
+        />
+        <VaIcon
+          v-if="binStores.isBinQuestion"
+          name="settings_backup_restore"
+          color="success"
+          @click="restoreFromBin(props.question as Question)"
+        />
+        <VaIcon
+          v-if="binStores.isBinQuestion"
+          name="delete_forever"
+          color="danger"
+          @click="deleteFromBin(props.question as Question)"
         />
       </div>
     </div>

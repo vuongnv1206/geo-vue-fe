@@ -90,6 +90,10 @@ class ApiService {
     return this.axios_instance.put(path, data)
   }
 
+  async deleteMultiple(path: string, config: AxiosRequestConfig<any> | undefined) {
+    return this.axios_instance.delete(path, config)
+  }
+
   async delete(path: string) {
     return this.axios_instance.delete(path)
   }

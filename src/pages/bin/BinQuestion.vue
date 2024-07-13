@@ -1,19 +1,21 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue'
 import { watchDebounced } from '@vueuse/core'
-import { Question, QuestionTree, SearchQuestion, QuestionSearchRes, Pagination } from './types'
+import { Question, QuestionTree, SearchQuestion, QuestionSearchRes, Pagination } from '../question/types'
 import { useQuestionEditStore } from '@/stores/modules/questionEdit.module'
 import { useQuestionStore } from '@/stores/modules/question.module'
 import { useModal, useToast, useBreakpoint } from 'vuestic-ui'
 import { useRouter } from 'vue-router'
 import { getErrorMessage } from '@/services/utils'
 import { QuestionTypeColor } from '@services/utils'
-import QuestionView from './widgets/QuestionView.vue'
+import QuestionView from '../question/widgets/QuestionView.vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
+import { useBinStore } from '@/stores/modules/bin.module'
 
 const { t } = useI18n()
 
+const storesBin = useBinStore()
 const storesQuestion = useQuestionStore()
 const storesQEdit = useQuestionEditStore()
 const router = useRouter()
@@ -36,12 +38,6 @@ const QuestionTypeOptions = [
   { id: 100, name: t('questions.other'), questionType: 100 },
 ]
 
-const QuestionSortOptions = [
-  { id: 0, name: t('questions.newest'), questionType: 1 },
-  { id: 1, name: t('questions.oldest'), questionType: 2 },
-  { id: 2, name: t('questions.last_modified'), questionType: 4 },
-]
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const emit = defineEmits<{
   (event: 'edit', questionTree: QuestionTree): void
@@ -50,8 +46,6 @@ const emit = defineEmits<{
 }>()
 
 const QuestionTypeValue = ref(QuestionTypeOptions[0])
-
-const QuestionSortValue = ref(QuestionSortOptions[0])
 
 const testQuestions = ref<Question[]>([])
 const questionSearchRes = ref<QuestionSearchRes | null>(null)
@@ -76,7 +70,7 @@ const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.
 const searchQuestion = (search: SearchQuestion) => {
   loadingQuestion.value = true
   storesQuestion
-    .SearchPendingQuestion(search)
+    .SearchDeletedQuestion(search)
     .then((res) => {
       testQuestions.value = res.data
       questionSearchRes.value = res
@@ -99,7 +93,7 @@ watchDebounced(
   filters.value,
   () => {
     pagination.value.page = 1
-    searchValue.value.keyword = filters.value.keyword
+    searchValue.value.content = filters.value.keyword
     searchQuestion(searchValue.value)
   },
   { debounce: 500, maxWait: 1000 },
@@ -193,36 +187,12 @@ watch(
 )
 
 watch(
-  () => storesQuestion.refresh,
+  () => storesBin.refresh,
   (refresh) => {
     if (refresh) {
       searchQuestion(searchValue.value)
-      storesQuestion.setRefresh(false)
+      storesBin.setRefresh(false)
     }
-  },
-)
-
-const setSearchValueSort = () => {
-  if (QuestionSortValue.value.id === 0) {
-    searchValue.value.orderBy = []
-    searchValue.value.orderBy.push('CreatedOn desc')
-  }
-  if (QuestionSortValue.value.id === 1) {
-    searchValue.value.orderBy = []
-    searchValue.value.orderBy.push('CreatedOn asc')
-  }
-  if (QuestionSortValue.value.id === 2) {
-    searchValue.value.orderBy = []
-    searchValue.value.orderBy.push('LastModifiedOn desc')
-  }
-}
-
-watch(
-  () => QuestionSortValue.value.id,
-  () => {
-    pagination.value.page = 1
-    setSearchValueSort()
-    searchQuestion(searchValue.value)
   },
 )
 
@@ -230,8 +200,12 @@ onMounted(() => {
   searchValue.value.pageNumber = 1
   searchValue.value.pageSize = pagination.value.perPage
   setSearchQuestionWithType()
-  setSearchValueSort()
   searchQuestion(searchValue.value)
+  storesBin.setBinQuestion(true)
+})
+
+onUnmounted(() => {
+  storesBin.setBinQuestion(false)
 })
 
 const breakpoints = useBreakpoint()
@@ -242,20 +216,20 @@ watchEffect(() => {
   isSidebarVisibleChild.value = breakpoints.smUp
 })
 
-const ApproveAllQuestion = () => {
+const DeleteAllFromBin = () => {
   const listIds = testQuestions.value?.map((item) => item.id) || []
   const dataApproveAll = {
     questionIds: listIds,
   }
   storesQuestion
-    .ApprovePendingQuestion(dataApproveAll)
+    .DeleteMultiQuestion(dataApproveAll)
     .then(() => {
       init({
         title: t('questions.success'),
-        message: t('questions.approve_all_success'),
+        message: t('questions.delete_all_success'),
         color: 'success',
       })
-      searchQuestion(searchValue.value)
+      storesBin.setRefresh(true)
     })
     .catch((err) => {
       const message = getErrorMessage(err)
@@ -286,9 +260,7 @@ const ApproveAllQuestion = () => {
         </template>
         <template #right>
           <div v-if="testQuestions?.length > 0" class="flex gap-2">
-            <VaButton color="success" icon="check" @click="ApproveAllQuestion">{{
-              t('questions.approve_all')
-            }}</VaButton>
+            <VaButton color="danger" icon="close" @click="DeleteAllFromBin">{{ t('questions.delete_all') }}</VaButton>
           </div>
         </template>
       </VaNavbar>
@@ -338,40 +310,11 @@ const ApproveAllQuestion = () => {
                   </template>
                 </VaInput>
               </div>
-              <div>
-                <VaSelect
-                  v-model="QuestionSortValue"
-                  track-by="id"
-                  :text-by="(option: any) => (option as any).name"
-                  :placeholder="t('questions.newest')"
-                  :label="t('questions.sort_by')"
-                  :options="QuestionSortOptions"
-                >
-                  <template #content="{ value }">
-                    <VaBadge
-                      :text="(value as any).name"
-                      :color="QuestionTypeColor((value as any).questionType)"
-                      class="mr-2"
-                    />
-                  </template>
-                  <template #option="{ option, selectOption }">
-                    <button class="w-full flex items-center" @click="() => selectOption(option)">
-                      <div class="flex justify-between items-center p-2">
-                        <VaBadge
-                          :text="(option as any).name"
-                          :color="QuestionTypeColor((option as any).questionType)"
-                          class="mr-2"
-                        />
-                      </div>
-                    </button>
-                  </template>
-                </VaSelect>
-              </div>
             </div>
             <VaCard v-if="testQuestions?.length <= 0" class="mb-5 pr-4 flex justify-center">
               <div class="flex flex-col gap-4 w-full">
                 <VaCardContent class="flex flex-col items-center justify-center">
-                  <h2 class="va-h5">{{ t('questions.no_question_pending') }}</h2>
+                  <h2 class="va-h5">{{ t('questions.no_question_deleted') }}</h2>
                 </VaCardContent>
               </div>
             </VaCard>
@@ -397,7 +340,7 @@ const ApproveAllQuestion = () => {
                 <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
                   <div class="flex flex-col gap-4 w-full">
                     <VaCardContent class="flex flex-col items-center justify-center">
-                      <h2 class="va-h5">{{ t('questions.no_question_pending') }}</h2>
+                      <h2 class="va-h5">{{ t('questions.no_question_deleted') }}</h2>
                     </VaCardContent>
                   </div>
                 </VaCard>
