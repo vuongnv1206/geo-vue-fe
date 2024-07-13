@@ -30,8 +30,19 @@
                 size="small"
                 style="width: 100%"
                 class="p-2"
-                :icon="filterClassList ? 'check' : ''"
-                @click="filterClassList = true"
+                :icon="dataFilter.queryType === ClassroomQueryType.All ? 'check' : ''"
+                @click="filterClassHandle(ClassroomQueryType.All)"
+                >All</VaButton
+              >
+            </VaDropdownContent>
+            <VaDropdownContent class="p-0">
+              <VaButton
+                preset="secondary"
+                size="small"
+                style="width: 100%"
+                class="p-2"
+                :icon="dataFilter.queryType === ClassroomQueryType.MyClass ? 'check' : ''"
+                @click="filterClassHandle(ClassroomQueryType.MyClass)"
                 >My class</VaButton
               >
             </VaDropdownContent>
@@ -41,8 +52,8 @@
                 size="small"
                 style="width: 100%"
                 class="p-2"
-                :icon="filterClassList ? '' : 'check'"
-                @click="filterClassList = false"
+                :icon="dataFilter.queryType === ClassroomQueryType.SharedClass ? 'check' : ''"
+                @click="filterClassHandle(ClassroomQueryType.SharedClass)"
               >
                 Shared class
               </VaButton>
@@ -52,7 +63,7 @@
       </VaCard>
     </VaCard>
 
-    <VaCard v-if="filterClassList && !loading">
+    <VaCard v-if="!loading">
       <VaCard v-if="groupClasses.length > 0" class="mt-5 p-2">
         <VaScrollContainer vertical>
           <VaAccordion class="max-W-sm" multiple>
@@ -69,6 +80,7 @@
                   <VaCard class="flex justify-between items-center w-full">
                     <VaCard> {{ text }} </VaCard>
                     <VaMenu
+                      v-if="currentUser == groupClass.createdBy"
                       :options="[
                         { text: 'Edit', value: groupClass.id, icon: 'edit' },
                         { text: 'Delete', value: groupClass.id, icon: 'delete' },
@@ -94,8 +106,12 @@
                   >
                     <VaCard class="p-4">
                       <VaCard class="flex justify-between items-center mb-2">
-                        <VaCardTitle class="text-lg font-bold flex-grow">{{ classItem.name }}</VaCardTitle>
+                        <VaCardTitle class="text-lg font-bold flex-grow gap-2">
+                          {{ classItem.name }}
+                          <VaIcon v-if="currentUser != groupClass.createdBy" name="co_present" />
+                        </VaCardTitle>
                         <VaMenu
+                          v-if="currentUser == groupClass.createdBy"
                           :options="[
                             { text: 'Edit', value: classItem.id, icon: 'edit' },
                             { text: 'Delete', value: classItem.id, icon: 'delete' },
@@ -121,9 +137,6 @@
           </VaAccordion>
         </VaScrollContainer>
       </VaCard>
-    </VaCard>
-    <VaCard v-else>
-      <SharedClass />
     </VaCard>
   </VaCard>
 
@@ -182,24 +195,23 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { Classrooms, GroupClass } from './types'
+import { ClassroomQueryType, Classrooms, GroupClass } from './types'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { useModal, useToast } from 'vuestic-ui'
+import { useModal, useToast, VaIcon } from 'vuestic-ui'
 import EditClass from './widgets/EditClass.vue'
 import EditGroupClass from './widgets/EditGroupClass.vue'
 import { getErrorMessage, notifications } from '@/services/utils'
-import SharedClass from './SharedClass.vue'
+import { useAuthStore } from '@/stores/modules/auth.module'
 
 const loading = ref(true)
 const editFormRef = ref()
 const { confirm } = useModal()
 const { init: notify } = useToast()
-const filterClassList = ref(true)
 
 const classStore = useClassStore()
 const groupclassStore = useGroupClassStore()
-
+const authStore = useAuthStore()
 const classrooms = ref<Classrooms[]>([])
 const groupClasses = ref<GroupClass[]>([])
 
@@ -208,6 +220,8 @@ const groupClassToEdit = ref<GroupClass | null>(null)
 
 const doShowClassFormModal = ref(false)
 const doShowGroupClassFormModal = ref(false)
+
+const currentUser = authStore.user?.id
 
 const dataFilter = ref({
   advancedSearch: {
@@ -219,7 +233,13 @@ const dataFilter = ref({
   totalCount: 1,
   pageSize: 10,
   orderBy: ['createdOn'],
+  queryType: ClassroomQueryType.All,
 })
+
+const filterClassHandle = (filterType: ClassroomQueryType) => {
+  dataFilter.value.queryType = filterType
+  getGroupClasses(dataFilter.value)
+}
 
 const getGroupClasses = (filter: typeof dataFilter.value) => {
   loading.value = true
