@@ -2,15 +2,21 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@modules/auth.module'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
 const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
 const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for testing
+const router = useRouter()
+
+const handleRedirectToBin = () => {
+  router.push({ name: 'bin' })
+}
 </script>
 
 <template>
-  <div class="md:mx-28">
+  <div class="md:mx-28 relative min-h-[75vh]">
     <div v-if="isTeacher" class="col-span-12 grid grid-cols-12 gap-6 mt-4 flex items-center">
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
         <RouterLink :to="{ name: 'questions' }"
@@ -161,6 +167,17 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
         <h2 class="text-lg font-bold">Student can see this</h2>
         <p class="text-3xl font-bold">laho</p>
       </div>
+    </div>
+    <div class="w-fit rounded hover:bg-slate-200 p-1 absolute bottom-0 left-0 md:-bottom-8 md:-left-16">
+      <VaPopover :message="t('bin.title')" :offset="[10, 0]">
+        <VaIcon
+          name="delete"
+          class="cursor-pointer hover:opacity-80"
+          size="2rem"
+          color="#154ec1"
+          @click="handleRedirectToBin"
+        />
+      </VaPopover>
     </div>
   </div>
 </template>

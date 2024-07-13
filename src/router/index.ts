@@ -184,6 +184,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/audit-logs/AuditLogs.vue'),
       },
+      {
+        name: 'bin',
+        path: 'bin',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/bin/Bin.vue'),
+      },
     ],
   },
   {
