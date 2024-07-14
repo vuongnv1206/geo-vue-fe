@@ -156,6 +156,7 @@ export interface UpdatePaperRequest {
   shareType?: number
   paperAccesses?: PaperAccess[] | null
   subjectId?: string | null
+  paperFolderId?: string | null
 }
 
 export enum ShowResult {
@@ -176,7 +177,7 @@ export interface PaperAccess {
 }
 
 export enum AccessType {
-  Everyone = 1,
+  Everyone = 0,
   ByClass = 3,
   ByStudent = 2,
 }
