@@ -177,7 +177,7 @@ export interface PaperAccess {
 }
 
 export enum AccessType {
-  Everyone = 1,
+  Everyone = 0,
   ByClass = 3,
   ByStudent = 2,
 }

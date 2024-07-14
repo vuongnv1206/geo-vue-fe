@@ -18,7 +18,7 @@ const { init: notify } = useToast()
 const { confirm } = useModal()
 const paperDetail = ref<PaperDto | null>(null)
 
-const valueClassInGroupTap = ref<string>(' ')
+const valueClassInGroupTap = ref<string>('')
 
 const paperId = route.params.id as string
 const getPaperDetail = async () => {
@@ -27,7 +27,6 @@ const getPaperDetail = async () => {
     paperDetail.value = res
     if (paperDetail.value.shareType === AccessType.ByClass || paperDetail.value.shareType === AccessType.ByStudent) {
       await getGroupClasses()
-      await groupTabFilter()
     } else if (paperDetail.value.shareType === AccessType.Everyone) {
       const allSubmit = (await getSubmittedStudents()) || null
       submittedStudents.value = allSubmit
@@ -73,20 +72,6 @@ const valueCollapses = ref([])
 
 const showModalDetail = ref(false)
 const showAssignPaperModal = ref(false)
-
-const groupTabFilter = async () => {
-  try {
-    // const studentsInClass = await classStore.getUserInClass(valueClassInGroupTap.value)
-    // if (submittedStudents.value) {
-    //   const allSubmit = await getSubmittedStudents()
-    //   if (allSubmit !== undefined) {
-    //     submittedStudents.value = allSubmit.filter((submitPaper) => studentsInClass.includes(submitPaper.createdBy))
-    //   }
-    // }
-  } catch (error) {
-    console.log(error)
-  }
-}
 
 const deletePaper = async () => {
   const result = await confirm({
@@ -190,9 +175,14 @@ const dataFilterSubmittedStudent = ref({
   pageSize: 10,
   orderBy: ['id'],
   paperId: paperId,
+  classId: null,
 })
-const getSubmittedStudents = async () => {
+const getSubmittedStudents = async (classId?: string) => {
   try {
+    if (paperDetail.value?.shareType === AccessType.ByClass) {
+      dataFilterSubmittedStudent.value.classId === classId
+    }
+
     const res = await paperStore.getSubmittedStudentsInPaper(paperId, dataFilterSubmittedStudent.value)
     return res.data
   } catch (error) {
@@ -220,7 +210,6 @@ const selectedGroupClassName = ref('')
 const classStore = useClassStore()
 const classFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'], groupClassId: '' })
 const selectClassInGroup = async (classId: string) => {
-  valueClassInGroupTap.value = classId
   try {
     const classDetail = await classStore.getClassById(classId)
     classFilter.value.groupClassId = classDetail.groupClassId
@@ -236,6 +225,8 @@ const selectClassInGroup = async (classId: string) => {
     }
     selectedGroupClassName.value = classDetail.groupClassName
     showSelectClassModal.value = false
+
+    await getSubmittedStudents(classId)
   } catch (error) {
     console.error(error)
   }
@@ -243,6 +234,9 @@ const selectClassInGroup = async (classId: string) => {
 
 onMounted(async () => {
   await getPaperDetail()
+  if (groupClasses.value.length > 0 && groupClasses.value[0].classes) {
+    valueClassInGroupTap.value = groupClasses.value[0].classes[0].name
+  }
 })
 </script>
 
@@ -499,10 +493,9 @@ onMounted(async () => {
             <template #tabs>
               <VaTab
                 v-for="classroom in classInSelectedGroup"
-                :key="classroom.id"
-                :name="classroom.id"
+                :key="classroom.name"
+                :name="classroom.name"
                 class="pr-2 pl-2"
-                @click="groupTabFilter"
               >
                 {{ classroom.name }}
               </VaTab>
