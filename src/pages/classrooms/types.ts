@@ -6,6 +6,7 @@ export type GroupClass = {
   id: string
   name: string
   classes: Classrooms[]
+  createdBy?: string
 }
 
 export type EmptyGroupClass = {
@@ -158,4 +159,10 @@ export type EmptyPostLike = {
 export type EmptyCommentLike = {
   userId: string
   commentId: string
+}
+
+export enum ClassroomQueryType {
+  All = 0,
+  MyClass = 1,
+  SharedClass = 2,
 }
