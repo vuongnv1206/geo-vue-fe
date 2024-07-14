@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto, SubmitPaperDto, AccessType, PaperAccess, UpdatePaperRequest } from './types'
+import { PaperDto, AccessType, PaperAccess, UpdatePaperRequest, SubmitPaperResponse } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
 import { Classrooms, GroupClass } from '@/pages/classrooms/types'
@@ -168,7 +168,7 @@ const handleSaveAssigned = async (shareType: AccessType, accessPaperList: PaperA
   }
 }
 
-const submittedStudents = ref<SubmitPaperDto[] | null>(null)
+const submittedStudents = ref<SubmitPaperResponse | null>(null)
 const dataFilterSubmittedStudent = ref({
   keyword: '',
   pageNumber: 0,
@@ -184,7 +184,7 @@ const getSubmittedStudents = async (classId?: string) => {
     }
 
     const res = await paperStore.getSubmittedStudentsInPaper(paperId, dataFilterSubmittedStudent.value)
-    return res.data
+    return res
   } catch (error) {
     notify({
       message: `Failed to get submitted students \n ${error}`,
@@ -230,6 +230,11 @@ const selectClassInGroup = async (classId: string) => {
   } catch (error) {
     console.error(error)
   }
+}
+
+const handlePageChange = (newPage: number) => {
+  dataFilterSubmittedStudent.value.pageNumber = newPage
+  getSubmittedStudents()
 }
 
 onMounted(async () => {
@@ -504,7 +509,7 @@ onMounted(async () => {
         </VaCardContent>
         <VaCardContent class="p-2 grid md:grid-cols-4 xs:grid-cols-2 mt-3">
           <VaCard
-            v-for="submittedStudent in submittedStudents"
+            v-for="submittedStudent in submittedStudents?.data"
             :key="submittedStudent.id"
             outlined
             class="mr-2 cursor-pointer"
@@ -558,7 +563,15 @@ onMounted(async () => {
             </VaCardContent>
           </VaCard>
         </VaCardContent>
-        <VaPagination :pages="10" :visible-pages="3" buttons-preset="secondary" class="justify-center sm:justify-end" />
+        <VaPagination
+          v-if="submittedStudents?.totalPages"
+          v-model="submittedStudents.currentPage"
+          :pages="submittedStudents.totalPages"
+          :visible-pages="3"
+          buttons-preset="secondary"
+          class="justify-center sm:justify-end mr-2"
+          @update:modelValue="handlePageChange"
+        />
       </VaCard>
     </template>
   </VaLayout>
