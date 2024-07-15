@@ -9,7 +9,7 @@ import {
 } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { GroupClass } from '../classrooms/types'
+import { ClassroomQueryType, GroupClass } from '../classrooms/types'
 import { PermissionNameInClass } from './PermissionInClass.enum'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
@@ -39,7 +39,13 @@ const checkedPermissions = ref<{ [key: string]: string[] }>({})
 const optionCheckBox = ref<{ key: string; value: string }[]>([])
 const valueAccordion = ref([])
 const groupClasses = ref<GroupClass[]>([])
-const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
+const groupClassFilter = ref({
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 100,
+  orderBy: ['id'],
+  queryType: ClassroomQueryType.MyClass,
+})
 
 const dataFilter = {
   keyword: '',
@@ -99,7 +105,7 @@ const getTeacherDetail = async () => {
 
 const getGroupClasses = async () => {
   try {
-    const res = await groupClassStores.getGroupClasses(groupClassFilter)
+    const res = await groupClassStores.getGroupClasses(groupClassFilter.value)
     groupClasses.value = res.data
     initializeCheckedPermissions()
   } catch (error) {
