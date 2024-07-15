@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue'
-import { Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
+import { ClassroomQueryType, Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { getErrorMessage, notifications, validators } from '@/services/utils'
 import { useToast, VaSelect } from 'vuestic-ui/web-components'
@@ -32,12 +32,13 @@ const dataFilter = ref({
     fields: [''],
     keyword: '',
   },
+  queryType: ClassroomQueryType.MyClass,
 })
 
 const getGroupClasses = () => {
   loading.value = true
   store
-    .getGroupClasses(dataFilter)
+    .getGroupClasses(dataFilter.value)
     .then((response) => {
       groupClasses.value = response.data
       loading.value = false
