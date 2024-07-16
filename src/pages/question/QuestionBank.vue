@@ -118,7 +118,6 @@ watch(
   () => {
     searchValue.value.pageNumber = pagination.value.page
     searchValue.value.pageSize = pagination.value.perPage
-    console.log('pagination', pagination.value)
     searchQuestion(searchValue.value)
   },
   { immediate: true },
@@ -206,7 +205,6 @@ const isNodeExpanded = (nodeId: string) => {
 
 const handleExpanded = (expanded: string[]) => {
   NodeExpanded.value = expanded
-  console.log(NodeExpanded)
   for (const nodeId of expanded) {
     if (!fetchedChildren.has(nodeId) && checkHasChildren(nodeId)) {
       fetchedChildren.add(nodeId)
@@ -235,7 +233,6 @@ const handleExpanded = (expanded: string[]) => {
 const { editMode, questionToEdit } = storeToRefs(storesQuestion)
 
 const editQuestion = (question: Question) => {
-  console.log('Edit question', question)
   editMode.value = true
   questionToEdit.value = question
   if (currentSelectedFolder.value?.id) {
@@ -277,7 +274,6 @@ const deleteQuestion = (question: Question) => {
 
 const AddNewQuestion = () => {
   // push to add new question page
-  console.log('Add new question')
   editMode.value = false
   if (currentSelectedFolder.value?.id) {
     storesQEdit.clearQuestions()
@@ -296,7 +292,6 @@ watch(
   () => QuestionTypeValue.value.id,
   () => {
     pagination.value.page = 1
-    console.log('Search question with type')
     searchQuestionWithType()
   },
   { immediate: true },
@@ -310,7 +305,6 @@ watch(
     if (QuestionSortValue.value.id === 0) {
       searchValue.value.orderBy = []
       searchValue.value.orderBy.push('CreatedOn desc')
-      console.log(searchValue.value)
     }
     if (QuestionSortValue.value.id === 1) {
       searchValue.value.orderBy = []
@@ -412,7 +406,7 @@ onMounted(() => {
     @leftOverlayClick="isSidebarVisibleChild = false"
   >
     <template #top>
-      <VaNavbar class="py-2">
+      <VaNavbar class="py-2 rounded">
         <template #left>
           <VaButton
             size="small"
@@ -606,30 +600,14 @@ onMounted(() => {
                   {{ t('questions.results_per_page') }}
                   <VaSelect v-model="pagination.perPage" class="!w-20" :options="[10, 50, 100]" />
                 </div>
-
                 <div v-if="totalPages > 1" class="flex">
-                  <VaButton
-                    preset="secondary"
-                    icon="va-arrow-left"
-                    aria-label="Previous page"
-                    :disabled="pagination.page === 1"
-                    @click="pagination.page--"
-                  />
-                  <VaButton
-                    class="mr-2"
-                    preset="secondary"
-                    icon="va-arrow-right"
-                    aria-label="Next page"
-                    :disabled="pagination.page === totalPages"
-                    @click="pagination.page++"
-                  />
                   <VaPagination
                     v-model="pagination.page"
                     buttons-preset="secondary"
                     :pages="totalPages"
                     :visible-pages="5"
-                    :boundary-links="false"
-                    :direction-links="false"
+                    :boundary-links="true"
+                    :direction-links="true"
                   />
                 </div>
               </div>

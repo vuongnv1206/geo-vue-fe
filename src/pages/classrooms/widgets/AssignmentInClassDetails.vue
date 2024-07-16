@@ -2,7 +2,7 @@
   <VaCardContent>
     <VaCard class="flex flex-col md:flex-row gap-2 mb-4">
       <VaCard class="flex-grow justify-start items-center">
-        <VaInput placeholder="Search">
+        <VaInput v-model="searchQuery" placeholder="Search assignment or paper name">
           <template #appendInner>
             <VaIcon color="secondary" class="material-icons">search</VaIcon>
           </template>
@@ -10,64 +10,24 @@
       </VaCard>
       <VaMenu class="justify-end" :options="options" @selected="selectedOption">
         <template #anchor>
-          <VaButton>
+          <VaButton :disabled="!canAssignmentManage">
             <VaIcon name="add" />
             Assignment
           </VaButton>
         </template>
       </VaMenu>
     </VaCard>
-    <VaScrollContainer vertical>
-      <VaAccordion class="w-full" multiple>
-        <!-- Loop through grouped assignments and papers -->
-        <template v-for="(group, index) in groupedData" :key="index">
-          <VaCollapse :header="format.formatDate(group.createOn)" solid class="py-1 font-bold">
-            <template #header="{ value, attrs, iconAttrs, text }">
-              <VaCard v-bind="attrs" class="w-full flex border-2 p-2 items-center">
-                <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" />
-                <VaCard class="flex justify-between items-center w-full">
-                  <VaCard>{{ text }}</VaCard>
-                </VaCard>
-              </VaCard>
-            </template>
-            <!-- List assignments and papers for this date in rows -->
-            <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-              <!-- Loop through assignments -->
-              <template v-for="assignment in group.assignments" :key="assignment.id">
-                <VaCard
-                  class="border border-gray-200 rounded-lg overflow-hidden p-4 mb-4 flex space-x-4"
-                  :to="{ name: 'assignment-details', params: { id: assignment.id, classId: props.classDetails.id } }"
-                >
-                  <VaIcon name="description" size="3rem" class="text-gray-500" />
-                  <div>
-                    <VaCardTitle class="font-medium text-lg">{{ assignment.name }}</VaCardTitle>
-                    <VaCard>{{ assignment.content }}</VaCard>
-                  </div>
-                </VaCard>
-              </template>
-              <!-- Loop through papers -->
-              <template v-for="paper in group.papers" :key="paper.id">
-                <VaCard class="border border-gray-200 rounded-lg overflow-hidden p-4 mb-4 flex space-x-4">
-                  <VaIcon name="article" size="3rem" class="text-gray-500" />
-                  <div>
-                    <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>
-                    <VaCard>Created On: {{ format.formatDate(paper.createOn) }}</VaCard>
-                  </div>
-                </VaCard>
-              </template>
-            </div>
-          </VaCollapse>
-        </template>
-      </VaAccordion>
+    <VaScrollContainer vertical class="max-h-[66vh] pb-0">
+      <AccordionOfAssignment :key="forceUpdate" :filtered-grouped-data="filteredGroupedData" />
     </VaScrollContainer>
   </VaCardContent>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, PropType } from 'vue'
+import { ref, computed, PropType, watch } from 'vue'
 import { format } from '@/services/utils'
 import { Classrooms } from '../types'
-import { VaCard, VaIcon } from 'vuestic-ui/web-components'
+import AccordionOfAssignment from './AccordionOfAssignment.vue'
 import router from '@/router'
 
 const props = defineProps({
@@ -76,6 +36,19 @@ const props = defineProps({
     required: true,
   },
 })
+
+const canAssignmentManage = computed(() => {
+  if (props.classDetails.permissions === null || props.classDetails.permissions === undefined) {
+    return true
+  }
+  return props.classDetails.permissions?.some((permission) => permission.permissionType === 1)
+})
+
+const forceUpdate = ref(0)
+
+const forceRerender = () => {
+  forceUpdate.value += 1
+}
 
 const options = ref([
   { text: 'Assignment', value: 'create-assignment', icon: 'description' },
@@ -90,20 +63,20 @@ const selectedOption = (v: { text: string; value: string }) => {
   }
 }
 
+const searchQuery = ref('')
+
 // Papers data
 const papers = ref([
-  { id: '1', examName: 'Paper 1', createOn: new Date('2024-06-23T03:59:17.437Z') },
-  { id: '2', examName: 'Paper 2', createOn: new Date('2024-06-24T03:59:17.437Z') },
-  { id: '3', examName: 'Paper 3', createOn: new Date('2024-06-25T03:59:17.437Z') },
-  { id: '4', examName: 'Paper 4', createOn: new Date('2024-06-26T03:59:17.437Z') },
-  { id: '5', examName: 'Paper 5', createOn: new Date('2024-06-27T03:59:17.437Z') },
+  { id: '1', examName: 'Paper 1', createOn: '2024-06-30T11:21:35.721019+00:00' },
+  { id: '2', examName: 'Paper 2', createOn: '2024-06-30T11:21:35.721019+00:00' },
+  { id: '3', examName: 'Paper 3', createOn: '2024-06-30T11:21:35.721019+00:00' },
+  { id: '4', examName: 'Paper 4', createOn: '2024-06-30T11:21:35.721019+00:00' },
+  { id: '5', examName: 'Paper 5', createOn: '2024-06-30T11:21:35.721019+00:00' },
 ])
 
-// Combined and grouped data
 const groupedData = computed(() => {
   const groups: { [key: string]: any } = {}
-  // Add assignments to groups
-  props.classDetails.assignments.forEach((assignment) => {
+  props.classDetails.assignments?.forEach((assignment) => {
     const createOn = format.formatDate(assignment.createdOn)
     if (!groups[createOn]) {
       groups[createOn] = {
@@ -115,9 +88,8 @@ const groupedData = computed(() => {
     groups[createOn].assignments.push(assignment)
   })
 
-  // Add papers to groups
   papers.value.forEach((paper) => {
-    const createOn = format.formatDate(paper.createOn)
+    const createOn = format.formatDate(new Date(paper.createOn))
     if (!groups[createOn]) {
       groups[createOn] = {
         createOn: paper.createOn,
@@ -128,6 +100,43 @@ const groupedData = computed(() => {
     groups[createOn].papers.push(paper)
   })
 
-  return Object.values(groups)
+  const sortedGroups = Object.values(groups).sort(
+    (a: any, b: any) => (new Date(b.createOn) as any) - (new Date(a.createOn) as any),
+  )
+  return sortedGroups
+})
+
+const filteredGroupedData = computed(() => {
+  if (!searchQuery.value) {
+    console.log('groupedData.value:', groupedData.value)
+    return groupedData.value
+  }
+  console.log('searchQuery:', searchQuery.value)
+  const filteredGroups = groupedData.value
+    .map((group) => {
+      const filteredAssignments = group.assignments.filter((assignment: any) =>
+        assignment.name.toLowerCase().includes(searchQuery.value),
+      )
+      const filteredPapers = group.papers.filter((paper: any) =>
+        paper.examName.toLowerCase().includes(searchQuery.value),
+      )
+
+      if (filteredAssignments.length > 0 || filteredPapers.length > 0) {
+        return {
+          ...group,
+          assignments: filteredAssignments,
+          papers: filteredPapers,
+        }
+      }
+      return null
+    })
+    .filter((group) => group !== null)
+
+  console.log('filteredGroups:', filteredGroups)
+  return filteredGroups.length > 0 ? filteredGroups : []
+})
+
+watch(filteredGroupedData, () => {
+  forceRerender()
 })
 </script>

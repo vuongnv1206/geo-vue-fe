@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue'
-import { Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
+import { ClassroomQueryType, Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { notifications, validators } from '@/services/utils'
+import { getErrorMessage, notifications, validators } from '@/services/utils'
 import { useToast, VaSelect } from 'vuestic-ui/web-components'
 
 const { init: notify } = useToast()
@@ -32,19 +32,20 @@ const dataFilter = ref({
     fields: [''],
     keyword: '',
   },
+  queryType: ClassroomQueryType.MyClass,
 })
 
 const getGroupClasses = () => {
   loading.value = true
   store
-    .getGroupClasses(dataFilter)
+    .getGroupClasses(dataFilter.value)
     .then((response) => {
       groupClasses.value = response.data
       loading.value = false
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('group class') + error.message,
+        message: notifications.getFailed('group class') + getErrorMessage(error),
         color: 'error',
       })
       loading.value = false
@@ -95,7 +96,7 @@ onMounted(() => {
       v-model="newClass.name"
       label="Class name"
       placeholder="Enter class name"
-      :rules="[validators.required2('Class name'), validators.isCharacter('Class name'), validators.maxLength(50)]"
+      :rules="[validators.required2('Class name'), validators.maxLength(50)]"
     />
     <VaInput
       v-model="newClass.schoolYear"

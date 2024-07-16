@@ -115,7 +115,43 @@
     "settings_updated_successfully": "Cài đặt được cập nhật thành công",
     "general": "Chung"
   },
+  "auditLogs": {
+    "title": "Nhật ký",
+    "form": {
+      "actionType": "Loại Hành Động",
+      "resourceType": "Loại Tài Nguyên"
+    },
+    "table": {
+      "buttonDetails": "Xem chi tiết",
+      "titleDetails": "Chi Tiết Nhật Ký",
+      "buttonCloseDetails": "Đóng",
+      "item": "bản ghi",
+      "items": "bản ghi",
+      "userCol": "người dùng",
+      "resourceCol": "tài nguyên",
+      "actionCol": "hành động",
+      "createdAtCol": "thời gian",
+      "viewDetailsCol": "xem chi tiết"
+    },
+    "details": {
+      "oldData": "Dữ Liệu Cũ",
+      "newData": "Dữ Liệu Mới"
+    }
+  },
   "questions": {
+    "delete_all_success": "Xóa tất cả câu hỏi thành công",
+    "reject_success": "Loại bỏ câu hỏi thành công",
+    "approve_success": "Duyệt câu hỏi thành công",
+    "restore_success": "Khôi phục câu hỏi thành công",
+    "approve_all_success": "Duyệt tất cả câu hỏi thành công",
+    "delete_all": "Xóa tất cả",
+    "approve_all": "Duyệt tất cả",
+    "status": "Trạng thái",
+    "rejectedStatus": "Loại bỏ",
+    "approvedStatus": "Chấp thuận",
+    "pendingStatus": "Đang chờ",
+    "no_my_request": "Bạn không có câu hỏi nào",
+    "no_question_pending": "Không có câu hỏi nào",
     "add_question": "Thêm câu hỏi",
     "folders": "Thư mục",
     "all": "Tất cả",
@@ -135,6 +171,7 @@
     "sort_by": "Sắp xếp theo",
     "no_folder_selected": "Chưa chọn thư mục câu hỏi",
     "select_folder": "Vui lòng chọn một thư mục câu hỏi để xem các câu hỏi của nó",
+    "no_question_deleted": "Không có câu hỏi nào",
     "no_question": "Không có câu hỏi nào trong thư mục này",
     "select_another_folder": "Vui lòng chọn thư mục khác",
     "results": "kết quả",
@@ -153,6 +190,9 @@
     "question_passages": "Câu hỏi đoạn văn"
   },
   "questionFolder": {
+    "pending": "Câu hỏi chưa duyệt ({total})",
+    "pending_title": "Câu hỏi chưa duyệt",
+    "my_questions": "Câu hỏi của tôi",
     "questions": "Câu hỏi",
     "folders": "Thư mục",
     "search": "Tìm kiếm",
@@ -192,7 +232,8 @@
     "create": "Tạo",
     "update": "Cập nhật",
     "delete": "Xóa",
-    "share": "Chia sẻ"
+    "share": "Chia sẻ",
+    "edit": "Chỉnh sửa"
   },
   "questionFolderTable": {
     "folder_name": "Tên thư mục",
@@ -286,7 +327,17 @@
     "teacher-group": "Giáo viên",
     "exam": "Kỳ thi",
     "assignments": "Bài tập",
-    "subjects": "Môn học"
+    "subjects": "Môn học",
+    "audit-logs": "Nhật ký",
+    "help": "Trợ giúp",
+    "infor": "Thông tin"
+  },
+  "bin": {
+    "title": "Thùng rác",
+    "tabExams": "Bài thi",
+    "tabQuestions": "Câu hỏi",
+    "delete_exam_success": "Xóa bài thi thành công!",
+    "restore_exam_success": "Khôi phục bài thi thành công!"
   },
   "messages": {
     "all": "Xem tất cả tin nhắn",

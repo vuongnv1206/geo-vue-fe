@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { onMounted, ref, computed, watch } from 'vue'
-import { QuestionTree, QuestionTreeEmpty, QuestionFolderPermission, SharePermission } from './types'
+import { QuestionTree, QuestionTreeEmpty, QuestionFolderPermission, SharePermission, Permission } from './types'
 import QuestionFolder from './widgets/QuestionFolder.vue'
 import EditQuestionTreeForm from './widgets/EditQuestionTreeForm.vue'
 import QuestionBank from './QuestionBank.vue'
+import QuestionPending from './QuestionPending.vue'
+import MyQuestions from './MyQuestions.vue'
 import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
@@ -15,13 +17,17 @@ import { avatarColor } from '@/services/utils'
 import { useQuestionStore } from '@/stores/modules/question.module'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 
 const { t } = useI18n()
+const router = useRouter()
+const route = useRoute()
 
 const loading = ref(true)
 const currentShowFolderId = ref<string>('')
 
 const stores = useQuestionFolderStore()
+const storesQuestion = useQuestionStore()
 const groupTeacherStore = useGroupTeacherStore()
 const authStore = useAuthStore()
 
@@ -40,6 +46,7 @@ const props = defineProps({
 })
 
 const totalQuestions = ref(0)
+const totalApprovalRequests = ref(0)
 
 const getCurrentShowFolder = (questionTree: QuestionTree) => {
   if (questionTree.currentShow) {
@@ -88,9 +95,7 @@ const doShowShareQuestionTreeFormModal = ref(false)
 const doShowQuestionTreePermisionFormModal = ref(false)
 const doShowQuestionTreePermisionFormAddModal = ref(false)
 
-const storesQuestion = useQuestionStore()
 const { needReloadQuestionFolder } = storeToRefs(storesQuestion)
-
 const editQuestionTree = (questionTree: QuestionTree) => {
   QuestionTreeToEdit.value = questionTree
   doShowQuestionTreeFormModal.value = true
@@ -121,6 +126,8 @@ const permissionEdit = ref({
   canShare: false,
 })
 
+const canEdit = ref(false)
+
 const editPermission = (permission: QuestionFolderPermission) => {
   doShowQuestionTreePermisionFormModal.value = true
   editPermissionValue.value = permission
@@ -130,6 +137,9 @@ const editPermission = (permission: QuestionFolderPermission) => {
     canUpdate: permission.canUpdate,
     canDelete: permission.canDelete,
     canShare: permission.canShare,
+  }
+  if (permission.canAdd && permission.canUpdate && permission.canDelete) {
+    canEdit.value = true
   }
 }
 
@@ -215,15 +225,22 @@ const getTeacherGroups = () => {
 
 const shareQuestionTree = (questionTree: QuestionTree) => {
   const currentUserId = authStore.user?.id
-  console.log(currentUserId)
   // loop through permission to check if current user has permission
   let hasPermission = false
   questionTree.permission.forEach((permission) => {
-    console.log(permission)
     if (permission.user?.id == currentUserId) {
       if (permission.canShare) {
         hasPermission = true
       }
+    }
+    if (permission.groupTeacher?.teacherTeams) {
+      permission.groupTeacher.teacherTeams.forEach((teacherTeam) => {
+        if (teacherTeam.teacherId == currentUserId) {
+          if (permission.canShare) {
+            hasPermission = true
+          }
+        }
+      })
     }
   })
 
@@ -452,7 +469,22 @@ const onShareQuestionFolderPermission = () => {
         color: 'danger',
       })
     })
+    .finally(() => {
+      doShowQuestionTreePermisionFormModal.value = false
+    })
 }
+
+const handleDeletePermission = () => {
+  permissionEdit.value = {
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+  }
+  onShareQuestionFolderPermission()
+}
+
 const tabValue = ref(0)
 
 const { sellectedQuestionFolderId } = storeToRefs(storesQuestion)
@@ -503,28 +535,127 @@ const questionTreesFiltered = computed(() => {
   return filtered
 })
 
+const allPermissionFalse = (permission: Permission) => {
+  return !permission.canView && !permission.canAdd && !permission.canUpdate && !permission.canDelete
+}
+
 watch(
   () => permissionEdit.value,
   (value) => {
     if (!value.canView) {
-      permissionEdit.value.canAdd = false
-      permissionEdit.value.canUpdate = false
-      permissionEdit.value.canDelete = false
+      canEdit.value = false
     }
   },
   { deep: true },
 )
 
+watch(
+  () => canEdit.value,
+  (value) => {
+    if (!value) {
+      permissionEdit.value = {
+        canView: false,
+        canAdd: false,
+        canUpdate: false,
+        canDelete: false,
+        canShare: false,
+      }
+    } else {
+      permissionEdit.value.canView = true
+      permissionEdit.value.canAdd = true
+      permissionEdit.value.canUpdate = true
+      permissionEdit.value.canDelete = true
+    }
+  },
+)
+
+watch(
+  () => permissionEdit.value.canShare,
+  (value) => {
+    if (value) {
+      canEdit.value = true
+    }
+  },
+  { deep: true },
+)
+
+const getValidTabValue = (value: any) => {
+  const tabValues = [0, 1, 2, 3]
+  if (!tabValues.includes(value)) router.push({ name: 'questions' })
+  return value
+}
+
+const approvalRequests = computed(() => totalApprovalRequests.value)
+
+const getTotalApprovalRequests = () => {
+  const data = {
+    pageNumber: 1,
+    pageSize: 1,
+  }
+  storesQuestion
+    .SearchPendingQuestion(data)
+    .then((response) => {
+      totalApprovalRequests.value = response.totalCount
+    })
+    .catch(() => (totalApprovalRequests.value = 0))
+}
+
+watch(
+  () => route?.query,
+  (value) => {
+    if (value?.tab) {
+      const curTab = getValidTabValue(Number(route?.query?.tab))
+      tabValue.value = Number(curTab)
+      changeTab(Number(curTab))
+    }
+  },
+)
+
+watch(
+  () => stores.isRefresh,
+  (value) => {
+    if (value) {
+      getTotalApprovalRequests()
+    }
+  },
+)
+
 onMounted(() => {
   getQuestionFolders()
+  if (route?.query?.tab) {
+    const curTab = getValidTabValue(Number(route?.query?.tab))
+    tabValue.value = Number(curTab)
+    changeTab(Number(curTab))
+  }
+  getTotalApprovalRequests()
 })
+
+const changeTab = (value: number) => {
+  stores.setCurrentTab(value)
+  router.push({ name: 'questions', query: { tab: value } })
+}
+
+const tabs = computed(() => [
+  { id: 0, title: t('questionFolder.questions') },
+  { id: 1, title: t('questionFolder.folders') },
+  {
+    id: 2,
+    title:
+      approvalRequests.value > 0
+        ? `${t('questionFolder.pending_title')} <span class="text-danger">(${approvalRequests.value})</span>`
+        : `${t('questionFolder.pending_title')}`,
+  },
+  { id: 3, title: t('questionFolder.my_questions') },
+])
 </script>
 
 <template>
-  <VaTabs v-model="tabValue">
+  <VaTabs v-model="tabValue" @update:modelValue="changeTab">
     <template #tabs>
-      <VaTab v-for="tab in [t('questionFolder.questions'), t('questionFolder.folders')]" :key="tab">
-        {{ tab }}
+      <VaTab v-for="tab in tabs" :key="tab.id">
+        <!-- eslint-disable vue/no-v-html -->
+        <span v-html="tab.title"></span>
+        <!--eslint-enable-->
       </VaTab>
     </template>
   </VaTabs>
@@ -624,7 +755,24 @@ onMounted(() => {
       />
     </VaCardContent>
   </VaCard>
-  <QuestionBank v-else @edit="editQuestionTree" @delete="deleteQuestionTreeOne" @share="shareQuestionTree" />
+  <QuestionBank
+    v-if="tabValue == 0"
+    @edit="editQuestionTree"
+    @delete="deleteQuestionTreeOne"
+    @share="shareQuestionTree"
+  />
+  <QuestionPending
+    v-if="tabValue == 2"
+    @edit="editQuestionTree"
+    @delete="deleteQuestionTreeOne"
+    @share="shareQuestionTree"
+  />
+  <MyQuestions
+    v-if="tabValue == 3"
+    @edit="editQuestionTree"
+    @delete="deleteQuestionTreeOne"
+    @share="shareQuestionTree"
+  />
   <VaModal
     v-slot="{ cancel, ok }"
     v-model="doShowQuestionTreeFormModal"
@@ -730,13 +878,12 @@ onMounted(() => {
       <VaScrollContainer class="h-80" vertical>
         <VaList>
           <VaListLabel> {{ t('questionFolder.permissions') }} </VaListLabel>
-
           <VaListItem
             v-for="(permission, index) in QuestionTreeToEdit?.permission"
             :key="index"
             class="list__item ml-5"
           >
-            <VaListItemSection avatar>
+            <VaListItemSection v-if="!allPermissionFalse(permission as Permission)" avatar>
               <VaAvatar
                 v-if="permission.user ? true : false"
                 :size="42"
@@ -746,8 +893,7 @@ onMounted(() => {
               </VaAvatar>
               <VaAvatar v-else :size="42" color="warning" icon="group"> </VaAvatar>
             </VaListItemSection>
-
-            <VaListItemSection>
+            <VaListItemSection v-if="!allPermissionFalse(permission as Permission)">
               <VaListItemLabel>
                 {{ getNameUserGroup(permission) }}
               </VaListItemLabel>
@@ -756,8 +902,7 @@ onMounted(() => {
                 {{ permission.user?.email }}
               </VaListItemLabel>
             </VaListItemSection>
-
-            <VaListItemSection icon>
+            <VaListItemSection v-if="!allPermissionFalse(permission as Permission)" icon>
               <VaButton
                 v-if="QuestionTreeToEdit?.owner && QuestionTreeToEdit.owner.id == permission.user?.id"
                 size="small"
@@ -819,7 +964,7 @@ onMounted(() => {
                 color="danger"
                 @click="
                   () => {
-                    console.log('delete')
+                    handleDeletePermission()
                   }
                 "
               >
@@ -831,9 +976,7 @@ onMounted(() => {
       </div>
       <div class="flex flex-col gap-4 p-10">
         <VaCheckbox v-model="permissionEdit.canView" :label="t('questionFolder.view')" />
-        <VaCheckbox v-model="permissionEdit.canAdd" :label="t('questionFolder.create')" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" :label="t('questionFolder.update')" />
-        <VaCheckbox v-model="permissionEdit.canDelete" :label="t('questionFolder.delete')" />
+        <VaCheckbox v-model="canEdit" :label="t('questionFolder.edit')" />
         <VaCheckbox v-model="permissionEdit.canShare" :label="t('questionFolder.share')" />
       </div>
     </VaForm>
@@ -885,9 +1028,8 @@ onMounted(() => {
       </div>
       <div class="flex flex-col gap-4 p-10">
         <VaCheckbox v-model="permissionEdit.canView" :label="t('questionFolder.view')" />
-        <VaCheckbox v-model="permissionEdit.canAdd" :label="t('questionFolder.create')" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" :label="t('questionFolder.update')" />
-        <VaCheckbox v-model="permissionEdit.canDelete" :label="t('questionFolder.delete')" />
+        <VaCheckbox v-model="canEdit" :label="t('questionFolder.edit')" />
+        <VaCheckbox v-model="permissionEdit.canShare" :label="t('questionFolder.share')" />
       </div>
     </VaForm>
   </VaModal>

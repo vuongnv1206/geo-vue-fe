@@ -23,9 +23,11 @@ import { useRouter } from 'vue-router'
 import { getErrorMessage } from '@/services/utils'
 import { useQuestionStore } from '@/stores/modules/question.module'
 import { storeToRefs } from 'pinia'
+import { useQuestionFolderStore } from '@/stores/modules/questionFolder.module'
 
 const breakpoints = useBreakpoint()
 const storesQEdit = useQuestionEditStore()
+const storesQuestionFolder = useQuestionFolderStore()
 const isMobile = ref(false)
 const storesQuestion = useQuestionStore()
 const onResize = () => {
@@ -37,15 +39,17 @@ const listQuestions = ref<Question[]>([])
 const { init } = useToast()
 const router = useRouter()
 
-// check if folder not selected
-if (!storesQEdit.folder?.id) {
-  init({
-    title: 'Error',
-    message: 'Please select a folder to add question',
-    color: 'danger',
-  })
-  // go to question bank
-  router.push({ name: 'question-bank' })
+// check if folder not selected of tab questions
+if (storesQuestionFolder.currentTab === 0) {
+  if (!storesQEdit.folder?.id) {
+    init({
+      title: 'Error',
+      message: 'Please select a folder to add question',
+      color: 'danger',
+    })
+    // go to question bank
+    router.push({ name: 'questions' })
+  }
 }
 
 // sync listQuestions with store
@@ -421,7 +425,7 @@ const infoEditQ = () => {
 
 const { sellectedQuestionFolderId, editMode, questionToEdit } = storeToRefs(storesQuestion)
 const handleBack = () => {
-  sellectedQuestionFolderId.value = storesQEdit.folder?.id
+  if (storesQuestionFolder.currentTab === 0) sellectedQuestionFolderId.value = storesQEdit.folder?.id
   window.history.back()
 }
 
@@ -438,7 +442,7 @@ const handleSaveBtn = () => {
       })
     } else {
       const q = listQuestions.value.at(-1)
-      questionToEdit.value.questionFolderId = storesQEdit.folder?.id
+      if (storesQuestionFolder.currentTab === 0) questionToEdit.value.questionFolderId = storesQEdit.folder?.id
       questionToEdit.value.content = q?.content || ''
       questionToEdit.value.image = q?.image || null
       questionToEdit.value.audio = q?.audio || null
@@ -456,8 +460,12 @@ const handleSaveBtn = () => {
               message: 'Question updated successfully',
               color: 'success',
             })
-            sellectedQuestionFolderId.value = storesQEdit.folder?.id
-            router.push({ name: 'question-bank' })
+            if (storesQuestionFolder.currentTab === 0) {
+              sellectedQuestionFolderId.value = storesQEdit.folder?.id
+              router.push({ name: 'questions' })
+            } else if (storesQuestionFolder.currentTab === 3) {
+              router.push({ name: 'questions', query: { tab: 3 } })
+            }
           })
           .catch((error) => {
             const message = getErrorMessage(error)
@@ -486,8 +494,12 @@ const handleSaveBtn = () => {
           message: 'Questions created successfully',
           color: 'success',
         })
-        sellectedQuestionFolderId.value = storesQEdit.folder?.id
-        router.push({ name: 'question-bank' })
+        if (storesQuestionFolder.currentTab === 0) {
+          sellectedQuestionFolderId.value = storesQEdit.folder?.id
+          router.push({ name: 'questions' })
+        } else if (storesQuestionFolder.currentTab === 3) {
+          router.push({ name: 'questions', query: { tab: 3 } })
+        }
       })
       .catch((error) => {
         const message = getErrorMessage(error)

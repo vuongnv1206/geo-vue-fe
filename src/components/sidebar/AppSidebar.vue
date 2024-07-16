@@ -47,12 +47,35 @@
         </template>
       </VaCollapse>
     </VaAccordion>
+    <VaSpacer />
+    <VaSidebarItem class="wrap-action-sidebar">
+      <VaSidebarItemContent class="flex gap-4 justify-center">
+        <VaPopover :offset="[10, 0]">
+          <template #body>
+            <span class="text-xs">{{ t('menu.infor') }}</span>
+          </template>
+          <VaIcon name="mso-info" class="cursor-pointer hover:opacity-80" />
+        </VaPopover>
+        <VaPopover :offset="[10, 0]">
+          <template #body>
+            <span class="text-xs">{{ t('bin.title') }}</span>
+          </template>
+          <VaIcon name="mso-delete" class="cursor-pointer hover:opacity-80" @click="handleRedirectToBin" />
+        </VaPopover>
+        <VaPopover :offset="[10, 0]">
+          <template #body>
+            <span class="text-xs">{{ t('menu.help') }}</span>
+          </template>
+          <VaIcon name="mso-help" class="cursor-pointer hover:opacity-80" />
+        </VaPopover>
+      </VaSidebarItemContent>
+    </VaSidebarItem>
   </VaSidebar>
 </template>
 
 <script lang="ts">
 import { defineComponent, watch, ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
@@ -72,6 +95,7 @@ export default defineComponent({
   setup: (props, { emit }) => {
     const { getColor, colorToRgba } = useColors()
     const route = useRoute()
+    const router = useRouter()
     const authStore = useAuthStore()
     const { t } = useI18n()
 
@@ -131,6 +155,9 @@ export default defineComponent({
 
     watch(() => route.fullPath, setActiveExpand, { immediate: true })
 
+    const handleRedirectToBin = () => {
+      router.push({ name: 'bin' })
+    }
     return {
       writableVisible,
       sidebarWidth,
@@ -146,7 +173,16 @@ export default defineComponent({
       iconColor,
       textColor,
       arrowDirection,
+      handleRedirectToBin,
     }
   },
 })
 </script>
+
+<style lang="scss" scoped>
+.wrap-action-sidebar {
+  &:hover {
+    background-color: inherit !important;
+  }
+}
+</style>

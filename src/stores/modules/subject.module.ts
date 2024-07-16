@@ -45,7 +45,7 @@ export const useSubjectStore = defineStore('subject', {
           return Promise.reject(error)
         })
     },
-    deleteSubject(id: string): Promise<any> {
+    async deleteSubject(id: string): Promise<any> {
       return subjectService
         .deleteSubject(id)
         .then((response) => {

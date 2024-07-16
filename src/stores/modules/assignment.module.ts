@@ -45,7 +45,7 @@ export const useAssignmentStore = defineStore('assignment', {
           return Promise.reject(error)
         })
     },
-    deleteAssignment(id: string): Promise<any> {
+    async deleteAssignment(id: string): Promise<any> {
       return assignmentService
         .deleteAssignment(id)
         .then((response) => {

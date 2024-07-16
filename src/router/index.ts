@@ -44,6 +44,11 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/examination/PaperFolder.vue'),
           },
           {
+            name: 'shared-paper-folder',
+            path: 'shared-paper-folder',
+            component: () => import('../pages/examination/SharedPaperFolder.vue'),
+          },
+          {
             name: 'create-paper',
             path: 'create-paper/:folderId?',
             component: () => import('../pages/examination/CreatePaper.vue'),
@@ -170,6 +175,22 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: () => import('../pages/notification/Notification.vue'),
+      },
+      {
+        name: 'audit logs',
+        path: 'audit-logs',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/audit-logs/AuditLogs.vue'),
+      },
+      {
+        name: 'bin',
+        path: 'bin',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/bin/Bin.vue'),
       },
     ],
   },

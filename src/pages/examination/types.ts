@@ -34,9 +34,9 @@ export interface UpdatePaperFolderRequest {
 }
 
 export interface SharePaperFolderRequest {
-  userIds: string[]
+  userId?: string | null
   folderId: string
-  groupIds?: string[]
+  groupId?: string | null
   canView: boolean
   canAdd: boolean
   canUpdate: boolean
@@ -50,8 +50,8 @@ export interface PaperInListDto {
   numberOfQuestion?: number
   duration?: number | null
   status?: string | null
-  showMarkResult?: boolean
-  showQuestionAnswer?: boolean
+  showMarkResult?: ShowResult
+  showQuestionAnswer?: ShowQuestionAnswer
   password?: string | null
   type?: string
   paperFolderId?: string | null
@@ -78,8 +78,8 @@ export interface PaperDto {
   startTime?: string | null
   endTime?: string | null
   status?: string | null
-  showMarkResult?: boolean
-  showQuestionAnswer?: boolean
+  showMarkResult?: ShowResult
+  showQuestionAnswer?: ShowQuestionAnswer
   password?: string | null
   type?: string
   paperFolderId?: string | null
@@ -98,6 +98,7 @@ export interface PaperDto {
   maxPoint?: number | undefined
   paperAccesses?: PaperAccess[]
   shareType?: number
+  subjectId?: string | null
 }
 
 export interface PaperLabelDto {
@@ -124,8 +125,8 @@ export interface PaperStudentDto {
   numberOfQuestion?: number
   duration?: number | null
   status?: string | null
-  showMarkResult?: boolean
-  showQuestionAnswer?: boolean
+  showMarkResult?: ShowResult
+  showQuestionAnswer?: ShowQuestionAnswer
   type?: string
   isPublish?: boolean
   examCode?: string
@@ -146,14 +147,28 @@ export interface UpdatePaperRequest {
   paperLabelId?: string
   duration?: number
   shuffle?: boolean
-  showMarkResult?: boolean
-  showQUestionAnswer?: boolean
+  showMarkResult?: ShowResult
+  showQuestionAnswer?: ShowQuestionAnswer
   password?: string
   type: number
   isPublish?: boolean
   description?: string
   shareType?: number
-  paperAccesses?: PaperAccess[]
+  paperAccesses?: PaperAccess[] | null
+  subjectId?: string | null
+  paperFolderId?: string | null
+}
+
+export enum ShowResult {
+  No = 0,
+  WhenSubmitted = 1,
+  WhenAllStudentSubmitted = 2,
+}
+
+export enum ShowQuestionAnswer {
+  No = 0,
+  WhenSubmitted = 1,
+  WhenAllStudentSubmitted = 2,
 }
 
 export interface PaperAccess {
@@ -162,7 +177,7 @@ export interface PaperAccess {
 }
 
 export enum AccessType {
-  Everyone = 1,
+  Everyone = 0,
   ByClass = 3,
   ByStudent = 2,
 }
@@ -323,4 +338,29 @@ export interface SearchSharedPaperFolderRequest {
 export interface SearchSharedPaperRequest {
   paperFolderId?: string | null | undefined
   name?: string | null | undefined
+}
+
+export type SubjectPaperDeleted = {
+  id: string | null | undefined
+  name: string | null | undefined
+  description: string | null | undefined
+}
+
+export type PaperDeleted = {
+  id: string
+  examName: string | null | undefined
+  subject: SubjectPaperDeleted | null | undefined
+  duration: number | null | undefined
+  createdOn: string | null | undefined
+  deletedOn: string | null | undefined
+}
+
+export type PaperDeletedResponse = {
+  data: PaperDeleted[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }

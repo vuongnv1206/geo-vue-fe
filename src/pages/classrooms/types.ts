@@ -1,9 +1,16 @@
 import { Assignment } from '../assignment/types'
+import { PermissionInClass } from '../teacher-group/types'
+import { UserDetail } from '../user/types'
 
 export type GroupClass = {
   id: string
   name: string
   classes: Classrooms[]
+  createdBy?: string
+}
+
+export type EmptyGroupClass = {
+  name: string
 }
 
 export type GroupClassResponse = {
@@ -16,10 +23,6 @@ export type GroupClassResponse = {
   hasNextPage: boolean
 }
 
-export type EmptyGroupClass = {
-  name: string
-}
-
 export type Classrooms = {
   id: string
   name: string
@@ -29,6 +32,14 @@ export type Classrooms = {
   groupClassName: string
   numberUserOfClass: number
   assignments: Assignment[]
+  students: Student[]
+  permissions: PermissionInClass[] | null
+}
+
+export type EmptyClassrooms = {
+  name: string
+  schoolYear: string
+  groupClassId: string
 }
 
 export type ClassResponse = {
@@ -41,68 +52,117 @@ export type ClassResponse = {
   hasNextPage: boolean
 }
 
-export type EmptyClassrooms = {
-  name: string
-  schoolYear: string
-  groupClassId: string
-}
-
-export type UserInClassRequest = {
+export type StudentRequest = {
   userId: string
   classesId: string
 }
 
-export type UserInClass = {
+export type Student = {
   id: string
-  userId: string
-  classesId: string
-  studentCode: string
   firstName: string
   lastName: string
+  avatarUrl: string
+  dateOfBirth: Date
   email: string
-  dob: Date
-  gender: boolean
   phoneNumber: string
+  studentCode: string
+  gender: boolean
+  classesId: string
 }
 
-export type EmptyUserInClass = {
-  userId: string
-  classesId: string
-  studentCode: string
+export type EmptyStudent = {
   firstName: string
   lastName: string
+  avatarUrl: string
+  dateOfBirth: Date
   email: string
-  dob: Date
-  gender: boolean
   phoneNumber: string
+  studentCode: string
+  gender: boolean
+  classesId: string
 }
 
-export type User = {
-  id: string
-  name: string
-  avatar: string
+export type StudentResponse = {
+  data: Student[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
 
 export type Comment = {
   id: string
-  userId: string
+  createdBy: Date
   postId: string
   content: string
-  numberLikeInTheComment: number
-  createdAt: string
+  numberLikeInComment: number
+  createdOn: Date
   parentId: string | null
-  user: User
+  user: Student
   comments?: Comment[]
+}
+
+export type EmptyComment = {
+  id: string
+  postId: string
+  content: string
+  parentId?: string
+}
+
+export type CommentResponse = {
+  data: Comment[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
 
 export type Post = {
   id: string
-  userId: string
   content: string
-  numberLikeInTheNews: number
-  createdAt: string
+  numberLikeInThePost: number
+  createdOn: Date
+  createdBy: Date
   isLockComment: boolean
-  user: User
+  classesId: string
+  user: Student
   comments: Comment[]
-  showComments: boolean
+  owner: UserDetail | null
+}
+
+export type EmptyPost = {
+  id: string
+  classesId: string
+  content: string
+  isLockComment: boolean
+}
+
+export type PostResponse = {
+  data: Post[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type EmptyPostLike = {
+  userId: string
+  postsId: string
+}
+
+export type EmptyCommentLike = {
+  userId: string
+  commentId: string
+}
+
+export enum ClassroomQueryType {
+  All = 0,
+  MyClass = 1,
+  SharedClass = 2,
 }

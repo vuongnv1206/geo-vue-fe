@@ -21,7 +21,6 @@ class ApiService {
       async function (config) {
         config.headers.Authorization = JwtService.getAuthHeader()
         config.headers.tenant = JwtService.getTenant()
-
         // if the request url is not /tokens/refresh or /tokens
         // check if the token is expired
         if (config.url !== '/tokens/refresh' && config.url !== '/tokens') {
@@ -89,6 +88,10 @@ class ApiService {
 
   async put(path: string, data: any) {
     return this.axios_instance.put(path, data)
+  }
+
+  async deleteMultiple(path: string, config: AxiosRequestConfig<any> | undefined) {
+    return this.axios_instance.delete(path, config)
   }
 
   async delete(path: string) {

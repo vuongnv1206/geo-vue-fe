@@ -1,4 +1,4 @@
-import { PaperInListDto, SearchSharedPaperRequest } from './../../pages/examination/types'
+import { PaperDeletedResponse, PaperInListDto, SearchSharedPaperRequest } from './../../pages/examination/types'
 import papersService from '@/services/paper.service'
 import {
   PaperDto,
@@ -10,10 +10,49 @@ import {
 } from '@/pages/examination/types'
 
 import { defineStore } from 'pinia'
+import { dataPaperIds } from '@/pages/bin/types'
 
 export const usePaperStore = defineStore('paper', {
-  state: () => ({}),
+  state: () => ({
+    isRefresh: false,
+  }),
   actions: {
+    setRefresh(value: boolean) {
+      this.isRefresh = value
+    },
+    async restoreDeletedPapers(dataFilter: any): Promise<any> {
+      return await papersService
+        .papers_RestoreDeletedPaper(dataFilter)
+
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async deletedMultiPapers(dataFilter: dataPaperIds): Promise<any> {
+      return await papersService
+        .papers_DeletedMultiPaper(dataFilter)
+
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async searchDeletedPapers(dataFilter: any): Promise<PaperDeletedResponse> {
+      return await papersService
+        .papers_SearchDeletedPaper(dataFilter)
+
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
     async searchPapers(dataFilter: any): Promise<PaperResponse> {
       return await papersService
         .papers_SearchPaper(dataFilter)

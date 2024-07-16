@@ -115,7 +115,44 @@
     "settings_updated_successfully": "Settings updated successfully",
     "general": "General"
   },
+  "auditLogs": {
+    "title": "Audit Logs",
+    "form": {
+      "actionType": "Action Type",
+      "resourceType": "Resource Type"
+    },
+    "table": {
+      "buttonDetails": "View details",
+      "titleDetails": "Audit Logs Details",
+      "buttonCloseDetails": "Close",
+      "item": "item",
+      "items": "items",
+      "userCol": "user",
+      "resourceCol": "resource",
+      "actionCol": "action",
+      "createdAtCol": "created At",
+      "viewDetailsCol": "view Details"
+    },
+    "details": {
+      "oldData": "Old Data",
+      "newData": "New Data"
+    }
+  },
   "questions": {
+    "restore_success": "Restore questions successfully!",
+    "reject_success": "Reject question successfully!",
+    "approve_success": "Approve question successfully!",
+    "approve_all_success": "Approve all questions successfully!",
+    "delete_all_success": "Delete all questions successfully!",
+    "delete_all": "Delete All",
+    "approve_all": "Approve All",
+    "status": "Status",
+    "rejectedStatus": "Rejected",
+    "approvedStatus": "Approved",
+    "pendingStatus": "Pending",
+    "no_my_request": "Your request is empty",
+    "no_question_deleted": "There is no question",
+    "no_question_pending": "There is no pending question",
     "add_question": "Add question",
     "folders": "Folders",
     "all": "All",
@@ -153,10 +190,14 @@
     "question_passages": "Question Passages"
   },
   "questionFolder": {
+    "pending": "Approval Queue ({total})",
+    "pending_title": "Approval Queue",
+    "my_questions": "My Requests",
     "questions": "Questions",
     "folders": "Folders",
     "search": "Search",
     "delete": "Delete",
+    "edit": "Edit",
     "add_folder": "Add Folder",
     "all": "All",
     "my_documents": "My Documents",
@@ -278,6 +319,7 @@
     "faq": "FAQ",
     "users": "Users",
     "projects": "Projects",
+    "audit-logs": "Audit logs",
     "questions": "Questions",
     "question-folder": "Question folder",
     "question-bank": "Question bank",
@@ -289,7 +331,16 @@
     "teacher-group": "Teacher",
     "exam": "Exam",
     "assignments": "Assignment",
-    "subjects": "Subject"
+    "subjects": "Subject",
+    "help": "Help",
+    "infor": "Information"
+  },
+  "bin": {
+    "title": "Trash",
+    "tabExams": "Exams",
+    "tabQuestions": "Questions",
+    "delete_exam_success": "Delete exam successfully!",
+    "restore_exam_success": "Restore exam successfully!"
   },
   "messages": {
     "all": "See all messages",
@@ -443,5 +494,8 @@
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"
+  },
+  "vuestic": {
+    "close": "Close"
   }
 }

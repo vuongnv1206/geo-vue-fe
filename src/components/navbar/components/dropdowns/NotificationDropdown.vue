@@ -16,7 +16,7 @@
         <VaIconNotification v-if="amountOfNewNotification <= 0" class="notification-dropdown__icon" />
       </VaButton>
     </template>
-    <VaDropdownContent class="h-full sm:max-w-[420px] sm:h-auto">
+    <VaDropdownContent class="h-full min-w-[420px] sm:h-auto">
       <div class="flex justify-between items-center">
         <VaButton preset="secondary" color="textPrimary" @click="handleSeeAll">{{ t('notifications.all') }} </VaButton>
         <VaDropdown placement="left-end">
@@ -42,7 +42,7 @@
         </VaDropdown>
       </div>
       <VaInnerLoading :loading="isLoading">
-        <section class="sm:max-h-[350px] p-2 overflow-auto">
+        <section class="sm:max-h-[350px] max-w-[450px] p-2 overflow-y">
           <section v-if="notificationsWithRelativeTime?.length <= 0" class="flex flex-col items-center">
             <VaIcon name="notifications" color="secondary" size="4rem" />
             <p class="text-lg font-semibold">You do not have any notifications</p>

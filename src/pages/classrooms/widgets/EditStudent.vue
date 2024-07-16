@@ -1,37 +1,41 @@
 <script setup lang="ts">
 import { validators } from '@/services/utils'
 import { computed, reactive, ref, watch } from 'vue'
-import { EmptyUserInClass, UserInClass } from '../types'
+import { EmptyStudent, Student } from '../types'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const classId = router.currentRoute.value.params.id.toString()
 
 const props = defineProps<{
-  userInClass: UserInClass | null
+  student: Student | null
   saveButtonLabel: string
 }>()
 
 defineEmits<{
-  (event: 'save', userInClass: UserInClass): void
+  (event: 'save', student: Student): void
   (event: 'close'): void
 }>()
 
-const defaultNewUserInClass: EmptyUserInClass = {
-  userId: '',
-  classesId: '',
-  studentCode: '',
+const defaultNewStudent: EmptyStudent = {
   firstName: '',
   lastName: '',
+  avatarUrl: '',
+  dateOfBirth: new Date(),
   email: '',
-  dob: new Date(),
-  gender: false,
   phoneNumber: '',
+  studentCode: '',
+  gender: false,
+  classesId: '',
 }
 
-const newUserInClass = ref({ ...defaultNewUserInClass })
+const newStudent = ref({ ...defaultNewStudent })
+newStudent.value.classesId = classId
 
 const isFormHasUnsavedChanges = computed(() => {
-  return Object.keys(newUserInClass.value).some((key) => {
+  return Object.keys(newStudent.value).some((key) => {
     return (
-      newUserInClass.value[key as keyof EmptyUserInClass] !==
-      (props.userInClass ?? defaultNewUserInClass)?.[key as keyof EmptyUserInClass]
+      newStudent.value[key as keyof EmptyStudent] !== (props.student ?? defaultNewStudent)?.[key as keyof EmptyStudent]
     )
   })
 })
@@ -41,13 +45,13 @@ defineExpose({
 })
 
 watch(
-  () => props.userInClass,
+  () => props.student,
   () => {
-    if (!props.userInClass) {
+    if (!props.student) {
       return
     }
 
-    newUserInClass.value = { ...props.userInClass }
+    newStudent.value = { ...props.student }
   },
   { immediate: true },
 )
@@ -66,40 +70,41 @@ const genderOptions = reactive([
 <template>
   <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
     <VaInput
-      v-model="newUserInClass.firstName"
+      v-model="newStudent.firstName"
       label="First name"
       placeholder="Enter your first name"
       :rules="[validators.required2('First name'), validators.isCharacter('First name'), validators.maxLength(50)]"
     />
     <VaInput
-      v-model="newUserInClass.lastName"
+      v-model="newStudent.lastName"
       label="Last name"
       placeholder="Enter your last name"
       :rules="[validators.required2('Last name'), validators.isCharacter('Last name'), validators.maxLength(50)]"
     />
+    <VaInput v-model="newStudent.avatarUrl" label="Avatar" placeholder="tam the da" />
     <VaInput
-      v-model="newUserInClass.studentCode"
+      v-model="newStudent.studentCode"
       label="Student code"
       placeholder="Enter your student code"
       :rules="[validators.required2('Student code'), validators.maxLength(50)]"
     />
-    <VaDateInput v-model="newUserInClass.dob" label="Birth date" placeholder="Enter your date of birth" />
-    <VaRadio v-model="newUserInClass.gender" :options="genderOptions" value-by="value" />
+    <VaDateInput v-model="newStudent.dateOfBirth" label="Birth date" placeholder="Enter your date of birth" />
+    <VaRadio v-model="newStudent.gender" :options="genderOptions" value-by="value" />
     <VaInput
-      v-model="newUserInClass.phoneNumber"
+      v-model="newStudent.phoneNumber"
       label="Phone Number"
       placeholder="Enter your phone number"
-      :rules="[validators.required2('Phone number'), validators.isNumber('phone number'), validators.phone]"
+      :rules="[validators.isNumber('phone number'), validators.phone]"
     />
     <VaInput
-      v-model="newUserInClass.email"
+      v-model="newStudent.email"
       label="Email"
       placeholder="Enter your email"
       :rules="[validators.required2('Email'), validators.email]"
     />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
-      <VaButton @click="validate() && $emit('save', newUserInClass as UserInClass)">{{ saveButtonLabel }} </VaButton>
+      <VaButton @click="validate() && $emit('save', newStudent as Student)">{{ saveButtonLabel }} </VaButton>
     </VaCard>
   </VaForm>
 </template>

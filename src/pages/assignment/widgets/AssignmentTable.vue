@@ -1,90 +1,92 @@
 <template v-for="assClass in props.assignmentsByClass" :key="assClass.id" :loading="props.loading">
-  <VaCard>
-    <VaCardContent class="font-bold">Recommend</VaCardContent>
-    <VaList class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <template v-for="assignment in recentAssignments" :key="assignment.id">
-        <VaListItem
-          class="mb-2"
-          :to="{ name: 'assignment-details', params: { id: assignment.id, classId: assignment.classId } }"
-        >
-          <VaCard class="border rounded-lg p-3 hover:scale-105 transition-transform duration-200 w-full">
-            <div class="flex items-center">
-              <VaListItemSection avatar>
-                <VaIcon name="description" size="3rem" />
-              </VaListItemSection>
-              <VaListItemSection>
-                <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
-                <VaListItemLabel caption>
-                  <VaPopover
-                    class="mb-2"
-                    placement="right"
-                    color="#FFFFFF"
-                    :message="format.formatDate(assignment.createdOn)"
-                  >
-                    Create At: {{ format.formatDateFromNow(assignment.createdOn) }}
-                  </VaPopover>
-                </VaListItemLabel>
-                <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
-              </VaListItemSection>
-              <VaListItemSection icon>
-                <VaCard>0/100</VaCard>
-              </VaListItemSection>
-            </div>
-          </VaCard>
-        </VaListItem>
-      </template>
-    </VaList>
-  </VaCard>
-  <VaCard>
-    <VaCardContent class="font-bold">All</VaCardContent>
-    <VaCard class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <template v-for="assClass in props.assignmentsByClass" :key="assClass.id">
-        <VaCard v-if="assClass.assignments.length > 0" class="border p-4 rounded">
-          <div class="flex justify-between items-center mb-4">
-            <span class="font-semibold">{{ assClass.name }}</span>
-            <VaChip v-if="currentUserId != assClass.ownerId" outline class="ml-2" size="small"> Share </VaChip>
-            <div class="flex items-center space-x-2 ml-auto">
-              <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: assClass.id } }"
-                >Show All</VaButton
-              >
-            </div>
-          </div>
-          <VaDivider />
-          <VaList>
-            <template v-for="assignment in assClass.assignments.slice().reverse().slice(0, 2)" :key="assignment.id">
-              <VaListItem
-                class="mb-2"
-                :to="{ name: 'assignment-details', params: { id: assignment.id, classId: assClass.id } }"
-              >
-                <VaCard
-                  class="flex items-center border rounded-lg p-3 w-full hover:scale-105 transition-transform duration-200"
+  <VaCard class="min-h-[78vh]">
+    <VaCard>
+      <VaCardContent class="font-bold">Recommend</VaCardContent>
+      <VaList v-if="recentAssignments" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <template v-for="assignment in recentAssignments" :key="assignment.id">
+          <VaListItem
+            class="mb-2"
+            :to="{ name: 'assignment-details', params: { id: assignment?.id, classId: assignment?.classId } }"
+          >
+            <VaCard class="border rounded-lg p-3 hover:scale-105 transition-transform duration-200 w-full">
+              <div class="flex items-center">
+                <VaListItemSection avatar>
+                  <VaIcon name="description" size="3rem" />
+                </VaListItemSection>
+                <VaListItemSection>
+                  <VaListItemLabel>{{ assignment?.name }}</VaListItemLabel>
+                  <VaListItemLabel caption>
+                    <VaPopover
+                      class="mb-2"
+                      placement="right"
+                      color="#FFFFFF"
+                      :message="format.formatDate(assignment?.createdOn)"
+                    >
+                      Create At: {{ format.formatDateFromNow(assignment?.createdOn) }}
+                    </VaPopover>
+                  </VaListItemLabel>
+                  <VaListItemLabel caption>End Time: {{ format.formatDate(assignment?.endTime) }}</VaListItemLabel>
+                </VaListItemSection>
+                <VaListItemSection icon>
+                  <VaCard>0/100</VaCard>
+                </VaListItemSection>
+              </div>
+            </VaCard>
+          </VaListItem>
+        </template>
+      </VaList>
+    </VaCard>
+    <VaCard>
+      <VaCardContent class="font-bold">All</VaCardContent>
+      <VaCard class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <template v-for="assClass in props.assignmentsByClass" :key="assClass.id">
+          <VaCard v-if="assClass.assignments && assClass.assignments.length > 0" class="border p-4 pb-0 rounded">
+            <div class="flex justify-between items-center mb-4">
+              <span class="font-semibold">{{ assClass.name }}</span>
+              <VaChip v-if="currentUserId != assClass.ownerId" outline class="ml-2" size="small"> Share </VaChip>
+              <div class="flex items-center space-x-2 ml-auto">
+                <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: assClass.id } }"
+                  >Show All</VaButton
                 >
-                  <VaListItemSection avatar>
-                    <VaIcon name="description" size="3rem" />
-                  </VaListItemSection>
-                  <VaListItemSection>
-                    <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
-                    <VaListItemLabel caption>
-                      <VaPopover
-                        class="mb-2"
-                        placement="right"
-                        color="#FFFFFF"
-                        :message="format.formatDate(assignment.createdOn)"
-                      >
-                        Create At: {{ format.formatDateFromNow(assignment.createdOn) }}
-                      </VaPopover>
-                    </VaListItemLabel>
-                    <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
-                  </VaListItemSection>
-                  <VaListItemSection icon>
-                    <VaCard>0/100</VaCard>
-                  </VaListItemSection>
-                </VaCard>
-              </VaListItem>
-            </template>
-          </VaList>
-        </VaCard>
-      </template>
+              </div>
+            </div>
+            <VaDivider />
+            <VaList>
+              <template v-for="assignment in assClass.assignments.slice().reverse().slice(0, 2)" :key="assignment.id">
+                <VaListItem
+                  class="mb-2"
+                  :to="{ name: 'assignment-details', params: { id: assignment.id, classId: assClass.id } }"
+                >
+                  <VaCard
+                    class="flex items-center border rounded-lg p-3 w-full hover:scale-105 transition-transform duration-200"
+                  >
+                    <VaListItemSection avatar>
+                      <VaIcon name="description" size="3rem" />
+                    </VaListItemSection>
+                    <VaListItemSection>
+                      <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
+                      <VaListItemLabel caption>
+                        <VaPopover
+                          class="mb-2"
+                          placement="right"
+                          color="#FFFFFF"
+                          :message="format.formatDate(assignment.createdOn)"
+                        >
+                          Create At: {{ format.formatDateFromNow(assignment.createdOn) }}
+                        </VaPopover>
+                      </VaListItemLabel>
+                      <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
+                    </VaListItemSection>
+                    <VaListItemSection icon>
+                      <VaCard>0/100</VaCard>
+                    </VaListItemSection>
+                  </VaCard>
+                </VaListItem>
+              </template>
+            </VaList>
+          </VaCard>
+        </template>
+      </VaCard>
     </VaCard>
   </VaCard>
 </template>
@@ -110,16 +112,21 @@ const props = defineProps({
 })
 
 const recentAssignments = computed(() => {
-  const allAssignmentsWithClassId = props.assignmentsByClass.flatMap((assClass) =>
-    assClass.assignments.map((assignment) => ({
-      ...assignment,
-      classId: assClass.id,
-      className: assClass.name,
-    })),
+  const allAssignmentsWithClassId = props.assignmentsByClass.flatMap(
+    (assClass) =>
+      assClass.assignments?.map((assignment) => ({
+        ...assignment,
+        classId: assClass.id,
+        className: assClass.name,
+      })) || [],
   )
-  // console.log('All Assignments:', allAssignmentsWithClassId)
-  allAssignmentsWithClassId.sort((a, b) => (new Date(b.createdOn) as any) - (new Date(a.createdOn) as any))
-  // console.log('Abc: ', allAssignmentsWithClassId.slice(0, 4))
+
+  allAssignmentsWithClassId.sort((a, b) => {
+    const dateA = a ? new Date(a.createdOn).getTime() : 0
+    const dateB = b ? new Date(b.createdOn).getTime() : 0
+    return dateB - dateA
+  })
+
   return allAssignmentsWithClassId.slice(0, 4)
 })
 </script>

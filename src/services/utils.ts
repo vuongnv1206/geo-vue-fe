@@ -11,8 +11,8 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 import i18n from './../i18n'
 const { t } = i18n.global
-
 const local = i18n.global.locale.value === 'vi' ? 'vi' : 'en'
+
 dayjs.locale(local)
 
 const currentTimezone = dayjs.tz.guess()
@@ -39,20 +39,30 @@ export const validators = {
     /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || t('validateUtils.isDecimalNumber', { fieldName }),
   isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || t('validateUtils.isNumber', { fieldName }),
   email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
-  phone: (v: string) => /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/.test(v) || t('validateUtils.phone'),
+  phone: (v: string) =>
+    /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/.test(v) ||
+    t('validateUtils.phone'),
 }
 
 export const format = {
   formatDate: (date: Date) => {
     return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
   },
+  formatDateStr: (date: string) => {
+    return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
+  },
   formatDateFromNow: (date: Date) => {
     return dayjs(date).tz(currentTimezone).fromNow()
+  },
+  formatTimeToX: (date1: Date, date2: Date) => {
+    const start = dayjs(date1).tz(currentTimezone)
+    const end = dayjs(date2).tz(currentTimezone)
+    return end.from(start, true)
   },
   getTimeString: (date: string) => {
     const dateTime = dayjs(date).tz(currentTimezone)
     const now = dayjs().tz(currentTimezone)
-    if (now.diff(dateTime, 'day') >= 1) {
+    if (now.diff(dateTime, 'day') >= 365) {
       return dateTime.format('DD/MM/YYYY - HH:mm')
     } else {
       return dateTime.fromNow()
@@ -62,29 +72,29 @@ export const format = {
 
 export const notifications = {
   updatedSuccessfully: (message: string) => {
-    return t('validateUtils.updatedSuccessfully', { message })
+    return t('validateUtils.updatedSuccessfully', { message }) + '\n'
   },
   createSuccessfully: (message: string) => {
-    return t('validateUtils.createSuccessfully', { message })
+    return t('validateUtils.createSuccessfully', { message }) + '\n'
   },
   deleteSuccessfully: (message: string) => {
-    return t('validateUtils.deleteSuccessfully', { message })
+    return t('validateUtils.deleteSuccessfully', { message }) + '\n'
   },
   getFailed: (message: string) => {
-    return t('validateUtils.getFailed', { message })
+    return t('validateUtils.getFailed', { message }) + '\n'
   },
   updateFailed: (message: string) => {
-    return t('validateUtils.updateFailed', { message })
+    return t('validateUtils.updateFailed', { message }) + '\n'
   },
   createFailed: (message: string) => {
-    return t('validateUtils.createFailed', { message })
+    return t('validateUtils.createFailed', { message }) + '\n'
   },
   deleteFailed: (message: string) => {
-    return t('validateUtils.deleteFailed', { message })
+    return t('validateUtils.deleteFailed', { message }) + '\n'
   },
   unsavedChanges: t('validateUtils.unsavedChanges'),
   confirmDelete: (message: string) => {
-    return t('validateUtils.confirmDelete', { message })
+    return t('validateUtils.confirmDelete', { message }) + '\n'
   },
 }
 

@@ -1,3 +1,4 @@
+import { dataPaperIds } from '@/pages/bin/types'
 import {
   PaperDto,
   UpdatePaperRequest,
@@ -6,6 +7,7 @@ import {
   PaperResponse,
   SearchSharedPaperRequest,
   PaperInListDto,
+  PaperDeletedResponse,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -33,6 +35,43 @@ export class PapersService implements IPapersService {
       })
   }
 
+  async papers_RestoreDeletedPaper(dataFilter: any): Promise<any> {
+    const url = '/v1/papers/restore-deleted'
+    return apiService
+      .put(url, dataFilter)
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+  }
+
+  async papers_DeletedMultiPaper(data: dataPaperIds): Promise<any> {
+    const url = '/v1/papers'
+    return apiService
+      .deleteMultiple(url, {
+        data,
+      })
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+  }
+
+  async papers_SearchDeletedPaper(dataFilter: any): Promise<PaperDeletedResponse> {
+    const url = '/v1/papers/search-deleted'
+    return apiService
+      .post(url, dataFilter)
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+  }
   async papers_SearchPaper(dataFilter: any): Promise<PaperResponse> {
     const url = '/v1/papers/search'
 
