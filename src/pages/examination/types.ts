@@ -339,3 +339,28 @@ export interface SearchSharedPaperRequest {
   paperFolderId?: string | null | undefined
   name?: string | null | undefined
 }
+
+export type SubjectPaperDeleted = {
+  id: string | null | undefined
+  name: string | null | undefined
+  description: string | null | undefined
+}
+
+export type PaperDeleted = {
+  id: string
+  examName: string | null | undefined
+  subject: SubjectPaperDeleted | null | undefined
+  duration: number | null | undefined
+  createdOn: string | null | undefined
+  deletedOn: string | null | undefined
+}
+
+export type PaperDeletedResponse = {
+  data: PaperDeleted[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
