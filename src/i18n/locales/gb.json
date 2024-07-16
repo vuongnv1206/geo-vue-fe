@@ -331,12 +331,16 @@
     "teacher-group": "Teacher",
     "exam": "Exam",
     "assignments": "Assignment",
-    "subjects": "Subject"
+    "subjects": "Subject",
+    "help": "Help",
+    "infor": "Information"
   },
   "bin": {
     "title": "Trash",
     "tabExams": "Exams",
-    "tabQuestions": "Questions"
+    "tabQuestions": "Questions",
+    "delete_exam_success": "Delete exam successfully!",
+    "restore_exam_success": "Restore exam successfully!"
   },
   "messages": {
     "all": "See all messages",

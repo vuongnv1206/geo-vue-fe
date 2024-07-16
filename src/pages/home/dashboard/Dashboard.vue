@@ -2,17 +2,11 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@modules/auth.module'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
 const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
 const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for testing
-const router = useRouter()
-
-const handleRedirectToBin = () => {
-  router.push({ name: 'bin' })
-}
 </script>
 
 <template>
@@ -167,17 +161,6 @@ const handleRedirectToBin = () => {
         <h2 class="text-lg font-bold">Student can see this</h2>
         <p class="text-3xl font-bold">laho</p>
       </div>
-    </div>
-    <div class="w-fit rounded hover:bg-slate-200 p-1 absolute bottom-0 left-0 md:-bottom-8 md:-left-16">
-      <VaPopover :message="t('bin.title')" :offset="[10, 0]">
-        <VaIcon
-          name="delete"
-          class="cursor-pointer hover:opacity-80"
-          size="2rem"
-          color="#154ec1"
-          @click="handleRedirectToBin"
-        />
-      </VaPopover>
     </div>
   </div>
 </template>

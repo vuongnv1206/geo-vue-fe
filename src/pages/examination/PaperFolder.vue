@@ -48,7 +48,7 @@ const dataFilterPaper = ref<DataFilterPaper>({
 
 const pagination = ref({
   pageNumber: 1,
-  pageSize: 3,
+  pageSize: 10,
   totalPages: 0,
   totalItems: 0,
 })
@@ -637,8 +637,6 @@ const onSharePaperFolderPermission = () => {
       })
     })
 }
-
-//
 </script>
 
 <template>

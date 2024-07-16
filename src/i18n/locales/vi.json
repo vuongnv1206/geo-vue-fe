@@ -328,12 +328,16 @@
     "exam": "Kỳ thi",
     "assignments": "Bài tập",
     "subjects": "Môn học",
-    "audit-logs": "Nhật ký"
+    "audit-logs": "Nhật ký",
+    "help": "Trợ giúp",
+    "infor": "Thông tin"
   },
   "bin": {
     "title": "Thùng rác",
     "tabExams": "Bài thi",
-    "tabQuestions": "Câu hỏi"
+    "tabQuestions": "Câu hỏi",
+    "delete_exam_success": "Xóa bài thi thành công!",
+    "restore_exam_success": "Khôi phục bài thi thành công!"
   },
   "messages": {
     "all": "Xem tất cả tin nhắn",
