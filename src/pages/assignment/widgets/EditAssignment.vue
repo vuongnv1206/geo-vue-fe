@@ -6,21 +6,22 @@
     <template #content>
       <VaDivider />
       <VaForm ref="form" class="max-w-4xl mx-auto px-4">
-        <VaCardTitle>Create Assignment</VaCardTitle>
+        <VaCardTitle>{{ $t('assignments.create_assignment') }}</VaCardTitle>
         <VaCard class="p-2 flex flex-col gap-2">
           <VaInput
             v-model="newAssignment.name"
-            label="Name"
-            placeholder="Enter assignment name"
-            :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
+            :label="$t('assignments.name')"
+            :placeholder="$t('assignments.enter_name')"
+            :rules="[validators.required2($t('assignments.enter_name')), validators.maxLength(50)]"
           />
           <label
             id="input-label-510"
             aria-hidden="true"
             class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
             style="color: var(--va-primary)"
-            >Start and End Time</label
           >
+            {{ $t('assignments.start_and_end_time') }}
+          </label>
           <VueDatePicker
             v-model="date"
             range
@@ -32,12 +33,14 @@
             :text-input="dateInputFormat"
             :month-change-on-scroll="true"
             :month-change-on-arrows="true"
-            placeholder="Start choosing or typing date and time"
+            :placeholder="$t('assignments.enter_start_and_end_time')"
           />
           <VaFileUpload
             v-model="filesUploaded"
             dropzone
-            label="Attachment Path"
+            :label="$t('assignments.attachments')"
+            :upload-button-text="$t('file_upload.upload_button_text')"
+            :drop-zone-text="$t('file_upload.drop_zone_text')"
             file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
             flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
             @fileAdded="fileUpload"
@@ -48,18 +51,28 @@
               aria-hidden="true"
               class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
               style="color: var(--va-primary)"
-              >Content</label
             >
-            <QuillEditor v-model:content="newAssignment.content" class="h-25 border rounded" content-type="html" />
+              {{ $t('assignments.content') }}
+            </label>
+            <QuillEditor
+              v-model:content="newAssignment.content"
+              class="h-25 border rounded"
+              :placeholder="$t('assignments.enter_content')"
+              content-type="html"
+            />
           </VaCard>
-          <VaSwitch v-model="newAssignment.canViewResult" size="small" label="Can View Result" />
-          <VaSwitch v-model="newAssignment.requireLoginToSubmit" size="small" label="Require Login to Submit" />
+          <VaSwitch v-model="newAssignment.canViewResult" size="small" :label="$t('assignments.can_view_result')" />
+          <VaSwitch
+            v-model="newAssignment.requireLoginToSubmit"
+            size="small"
+            :label="$t('assignments.require_login_to_submit')"
+          />
           <VaSelect
             v-model="newAssignment.subjectId"
             value-by="value"
             :options="subjects.map((subject) => ({ text: subject.name, value: subject.id }))"
-            label="Subject"
-            placeholder="Select a subject"
+            :label="$t('subjects.subject')"
+            :placeholder="$t('subjects.select_subject')"
             clearable
           />
           <VaLayout class="border rounded-xl pb-2 px-2">
@@ -68,15 +81,15 @@
                 <VaCard class="mt-1 mx-1">
                   <VaInput placeholder="Search">
                     <template #appendInner>
-                      <VaIcon color="secondary" class="material-icons"> search </VaIcon>
+                      <VaIcon color="secondary" class="material-icons">search</VaIcon>
                     </template>
                   </VaInput>
                 </VaCard>
                 <VaDivider />
                 <VaScrollContainer class="max-h-80" vertical>
                   <div class="mx-1">
-                    <VaSidebarItem class="cursor-pointer" @click="showAllClassesForAllDepartments"
-                      >All ({{ countAllSelectedClasses }}/{{ countAllClasses }})</VaSidebarItem
+                    <VaSidebarItem class="cursor-pointer" @click="showAllClassesForAllDepartments">
+                      {{ $t('assignments.all') }} ({{ countAllSelectedClasses }}/{{ countAllClasses }})</VaSidebarItem
                     >
                     <div v-for="(groupClass, index) in groupClasses" :key="index">
                       <VaSidebarItem class="cursor-pointer" @click="showDepartmentClasses(groupClass)"
@@ -121,7 +134,9 @@
                             <VaCard class="mr-1">{{ selectedDepartment.name }}</VaCard>
                             <VaButton preset="secondary" size="small" @click="selectAllClasses(selectedDepartment)">
                               {{
-                                selectedClassesByDepartmentState[selectedDepartment.id] ? 'Deselect All' : 'Select All'
+                                selectedClassesByDepartmentState[selectedDepartment.id]
+                                  ? $t('assignments.deselect_all')
+                                  : $t('assignments.select_all')
                               }}
                             </VaButton>
                           </VaCard>
@@ -136,16 +151,18 @@
                               />
                               <label :for="classItem.id">{{ classItem.name }}</label>
                               <VaChip v-if="currentUserId != classItem.ownerId" outline class="ml-2" size="small">
-                                Share
+                                {{ $t('assignments.share') }}
                               </VaChip>
                             </div>
                           </VaCard>
                         </div>
-                        <div v-else>No Class</div>
+                        <div v-else>
+                          {{ $t('classes.no_class') }}
+                        </div>
                       </div>
                       <div v-else>
                         <VaButton preset="secondary" size="small" @click="selectAllClassesForAllDepartments">
-                          {{ selectAllClassesState ? 'Deselect All' : 'Select All' }}
+                          {{ selectAllClassesState ? $t('assignments.deselect_all') : $t('assignments.select_all') }}
                         </VaButton>
                         <div v-for="groupClass in groupClasses" :key="groupClass.id">
                           <VaCard v-if="groupClass.classes.length > 0">
@@ -156,7 +173,11 @@
                                 }})
                               </VaCard>
                               <VaButton preset="secondary" size="small" @click="selectAllClasses(groupClass)">
-                                {{ selectedClassesByDepartmentState[groupClass.id] ? 'Deselect All' : 'Select All' }}
+                                {{
+                                  selectedClassesByDepartmentState[groupClass.id]
+                                    ? $t('assignments.deselect_all')
+                                    : $t('assignments.select_all')
+                                }}
                               </VaButton>
                             </VaCard>
                             <VaCard class="grid grid-cols-2 lg:grid-cols-2 gap-1">
@@ -170,7 +191,7 @@
                                 />
                                 <label :for="classItem.id">{{ classItem.name }}</label>
                                 <VaChip v-if="currentUserId != classItem.ownerId" outline class="ml-2" size="small">
-                                  Share
+                                  {{ $t('assignments.share') }}
                                 </VaChip>
                               </div>
                             </VaCard>
@@ -185,8 +206,8 @@
           </VaLayout>
         </VaCard>
         <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
-          <VaButton preset="secondary" color="secondary" @click="goBack">Cancel</VaButton>
-          <VaButton type="submit" @click="handleClickSave()">Save</VaButton>
+          <VaButton preset="secondary" color="secondary" @click="goBack">{{ $t('settings.cancel') }}</VaButton>
+          <VaButton type="submit" @click="handleClickSave()">{{ $t('settings.save') }}</VaButton>
         </div>
       </VaForm>
     </template>
@@ -212,7 +233,9 @@ import { useRouter } from 'vue-router'
 import { QuillEditor } from '@vueup/vue-quill'
 import { computed, onMounted, ref, toRaw, watch } from 'vue'
 import { useForm, useModal, useToast } from 'vuestic-ui'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const router = useRouter()
 const { confirm } = useModal()
 const { init: notify } = useToast()
@@ -269,7 +292,7 @@ const getGroupClass = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('group class') + getErrorMessage(error),
+        message: notifications.getFailed(t('groupClasses.group_class')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -283,7 +306,7 @@ const getSubjects = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('subject') + getErrorMessage(error),
+        message: notifications.getFailed(t('subjects.subject')) + getErrorMessage(error),
         color: 'error',
       })
     })

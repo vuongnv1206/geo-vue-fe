@@ -18,8 +18,8 @@
       </VaCard>
       <VaCard class="flex justify-end items-center">
         <VaCard class="flex gap-2">
-          <VaButton icon="add" @click="createNewGroupClass()">Group Class</VaButton>
-          <VaButton icon="add" @click="createNewClass()">Class</VaButton>
+          <VaButton icon="add" @click="createNewGroupClass()">{{ $t('groupClasses.group_class') }}</VaButton>
+          <VaButton icon="add" @click="createNewClass()">{{ $t('classes.class') }}</VaButton>
           <VaDropdown placement="bottom-end">
             <template #anchor>
               <VaButton icon="filter_alt" />
@@ -43,8 +43,9 @@
                 class="p-2"
                 :icon="dataFilter.queryType === ClassroomQueryType.MyClass ? 'check' : ''"
                 @click="filterClassHandle(ClassroomQueryType.MyClass)"
-                >My class</VaButton
               >
+                {{ $t('classes.my_class') }}
+              </VaButton>
             </VaDropdownContent>
             <VaDropdownContent class="p-0">
               <VaButton
@@ -55,7 +56,7 @@
                 :icon="dataFilter.queryType === ClassroomQueryType.SharedClass ? 'check' : ''"
                 @click="filterClassHandle(ClassroomQueryType.SharedClass)"
               >
-                Shared class
+                {{ $t('classes.share_class') }}
               </VaButton>
             </VaDropdownContent>
           </VaDropdown>
@@ -82,8 +83,8 @@
                     <VaMenu
                       v-if="currentUser == groupClass.createdBy"
                       :options="[
-                        { text: 'Edit', value: groupClass.id, icon: 'edit' },
-                        { text: 'Delete', value: groupClass.id, icon: 'delete' },
+                        { text: t('settings.edit'), value: groupClass.id, icon: 'edit' },
+                        { text: t('settings.delete'), value: groupClass.id, icon: 'delete' },
                       ]"
                       @selected="(v: any) => handleMenuGroupClassClick(v)"
                     >
@@ -102,19 +103,16 @@
                     color="primary"
                     gradient
                     :to="{ name: 'class-details', params: { id: classItem.id } }"
-                    class="border border-gray-200 rounded-lg overflow-hidden"
+                    class="border rounded-lg overflow-hidden"
                   >
-                    <VaCard class="p-4">
-                      <VaCard class="flex justify-between items-center mb-2">
-                        <VaCardTitle class="text-lg font-bold flex-grow gap-2">
-                          {{ classItem.name }}
-                          <VaIcon v-if="currentUser != groupClass.createdBy" name="co_present" />
-                        </VaCardTitle>
+                    <VaCard class="p-2">
+                      <VaCard class="flex flex-row justify-between items-center">
+                        <VaCardContent class="text-md font-bold flex-grow">{{ classItem.name }}</VaCardContent>
                         <VaMenu
                           v-if="currentUser == groupClass.createdBy"
                           :options="[
-                            { text: 'Edit', value: classItem.id, icon: 'edit' },
-                            { text: 'Delete', value: classItem.id, icon: 'delete' },
+                            { text: t('settings.edit'), value: classItem.id, icon: 'edit' },
+                            { text: t('settings.delete'), value: classItem.id, icon: 'delete' },
                           ]"
                           @selected="(v: any) => handleMenuClassClick(v)"
                         >
@@ -125,10 +123,13 @@
                           </template>
                         </VaMenu>
                       </VaCard>
-                      <VaCard class="flex flex-row justify-between items-center gap-2">
-                        <VaCardContent class="text-sm">Member: {{ classItem.numberUserOfClass }}</VaCardContent>
-                        <VaCardContent class="text-sm">Year: {{ classItem.schoolYear }}</VaCardContent>
-                      </VaCard>
+                      <VaCardContent class="flex flex-row justify-between items-center font-semibold">
+                        <p class="text-sx">{{ $t('classes.students') }}: {{ classItem.numberUserOfClass }}</p>
+                        <p class="text-sx">
+                          {{ $t('classes.school_year') }}: {{ classItem.schoolYear }} -
+                          {{ Number(classItem.schoolYear) + 1 }}
+                        </p>
+                      </VaCardContent>
                     </VaCard>
                   </VaCard>
                 </VaCard>
@@ -150,12 +151,15 @@
     hide-default-actions
     :before-cancel="beforeEditFormModalClose"
   >
-    <h1 v-if="classToEdit === null" class="va-h5 mb-4">Add Class</h1>
-    <h1 v-else class="va-h5 mb-4">Edit Class</h1>
+    <VaModalHeader>
+      <h3 class="text-lg font-bold">
+        {{ classToEdit ? $t('settings.edit') : $t('settings.create') }} {{ $t('classes.class_2') }}
+      </h3>
+    </VaModalHeader>
     <EditClass
       ref="editFormRef"
       :classrooms="classToEdit ?? ({} as Classrooms)"
-      :save-button-label="classToEdit === null ? 'Add' : 'Save'"
+      :save-button-label="classToEdit === null ? $t('settings.add') : $t('settings.save')"
       @close="cancel"
       @save="
         (classrooms: Classrooms) => {
@@ -176,12 +180,15 @@
     hide-default-actions
     :before-cancel="beforeEditFormModalClose"
   >
-    <h1 v-if="groupClassToEdit === null" class="va-h5 mb-4">Add Group Class</h1>
-    <h1 v-else class="va-h5 mb-4">Edit Group Class</h1>
+    <VaModalHeader>
+      <h3 class="text-lg font-bold">
+        {{ groupClassToEdit ? $t('settings.edit') : $t('settings.create') }} {{ $t('groupClasses.group_class_2') }}
+      </h3>
+    </VaModalHeader>
     <EditGroupClass
       ref="editFormRef"
       :group-class="groupClassToEdit ?? ({} as GroupClass)"
-      :save-button-label="groupClassToEdit === null ? 'Add' : 'Save'"
+      :save-button-label="groupClassToEdit === null ? $t('settings.add') : $t('settings.save')"
       @close="cancel"
       @save="
         (gc: GroupClass) => {
@@ -198,12 +205,14 @@ import { onMounted, ref } from 'vue'
 import { ClassroomQueryType, Classrooms, GroupClass } from './types'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { useModal, useToast, VaIcon } from 'vuestic-ui'
+import { useModal, useToast, VaCardContent } from 'vuestic-ui'
 import EditClass from './widgets/EditClass.vue'
 import EditGroupClass from './widgets/EditGroupClass.vue'
 import { getErrorMessage, notifications } from '@/services/utils'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/modules/auth.module'
 
+const { t } = useI18n()
 const loading = ref(true)
 const editFormRef = ref()
 const { confirm } = useModal()
@@ -255,12 +264,10 @@ const getGroupClasses = (filter: typeof dataFilter.value) => {
         totalCount: response.totalCount,
         pageSize: response.pageSize,
       }
-      // console.log('Department: ', groupClasses.value)
-      // console.log('Classrooms: ', classrooms.value)
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('group class') + getErrorMessage(error),
+        message: notifications.getFailed(t('groupClasses.group_class')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -334,13 +341,13 @@ const onClassSaved = async (classrooms: Classrooms) => {
       .then(() => {
         getGroupClasses(dataFilter.value)
         notify({
-          message: notifications.createSuccessfully('class'),
+          message: notifications.createSuccessfully(t('classes.class')),
           color: 'success',
         })
       })
       .catch((error) => {
         notify({
-          message: notifications.createFailed('class') + getErrorMessage(error),
+          message: notifications.createFailed(t('classes.class')) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -349,7 +356,7 @@ const onClassSaved = async (classrooms: Classrooms) => {
 
 const deleteClass = (classroom: Classrooms) => {
   confirm({
-    title: 'Delete Class',
+    title: t('classes.edit_class'),
     message: notifications.confirmDelete(classroom.name),
   }).then((agreed) => {
     if (!agreed) {
@@ -413,13 +420,13 @@ const onGroupClassSaved = async (groupClass: GroupClass) => {
       .createGroupClass(groupClass as GroupClass)
       .then(() => {
         notify({
-          message: notifications.createSuccessfully('Group class'),
+          message: notifications.createSuccessfully(t('groupClasses.group_class')),
           color: 'success',
         })
       })
       .catch((error) => {
         notify({
-          message: notifications.createFailed('Group class') + getErrorMessage(error),
+          message: notifications.createFailed(t('groupClasses.group_class')) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -429,7 +436,7 @@ const onGroupClassSaved = async (groupClass: GroupClass) => {
 
 const deletedGroupClass = (groupClass: GroupClass) => {
   confirm({
-    title: 'Delete GroupClass',
+    title: t('groupClasses.delete_group_class'),
     message: notifications.confirmDelete(groupClass.name),
   }).then((agreed) => {
     if (!agreed) {

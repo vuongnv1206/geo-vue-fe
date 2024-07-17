@@ -5,7 +5,9 @@ import { Classrooms, EmptyStudent, Student } from '../types'
 import { notifications, getErrorMessage, format } from '@/services/utils'
 import { useStudentStore } from '@/stores/modules/student.module'
 import EditStudent from './EditStudent.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   classroom: {
     type: Object as PropType<Classrooms>,
@@ -26,13 +28,13 @@ const selectedItemsEmitted = ref<Student[]>([])
 const studentToEdit = ref<Student | null>(null)
 
 const columns = defineVaDataTableColumns([
-  { label: 'Student Code', key: 'studentCode', sortable: true },
-  { label: 'First Name', key: 'firstName', sortable: true },
-  { label: 'Last Name', key: 'lastName', sortable: true },
-  { label: 'Email', key: 'email', sortable: true },
-  { label: 'Date of Birth', key: 'dateOfBirth', sortable: true },
-  { label: 'Gender', key: 'gender', sortable: true },
-  { label: 'Phone Number', key: 'phoneNumber', sortable: true },
+  { label: t('students.code'), key: 'studentCode', sortable: true },
+  { label: t('students.first_name'), key: 'firstName', sortable: true },
+  { label: t('students.last_name'), key: 'lastName', sortable: true },
+  { label: t('students.email'), key: 'email', sortable: true },
+  { label: t('students.date_of_birth'), key: 'dateOfBirth', sortable: true },
+  { label: t('students.gender'), key: 'gender', sortable: true },
+  { label: t('students.phone_number'), key: 'phoneNumber', sortable: true },
   { label: ' ', key: 'actions' },
 ])
 
@@ -85,7 +87,7 @@ const deleteStudent = (rowData: DataTableItem) => {
 
 const deleteSelectedStudent = () => {
   confirm({
-    title: 'Delete Student',
+    title: t('students.delete_student'),
     message: notifications.confirmDelete(`${selectedItemsEmitted.value.length} students`),
   }).then((agreed) => {
     if (!agreed) {
@@ -99,7 +101,7 @@ const deleteSelectedStudent = () => {
 
 const deleteStudentWithConfirm = (student: Student) => {
   confirm({
-    title: 'Delete Student',
+    title: t('students.delete_student'),
     message: notifications.confirmDelete(student.firstName + ' ' + student.lastName),
   }).then((agreed) => {
     if (!agreed) {
@@ -160,9 +162,11 @@ const canStudentManage = computed(() => {
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 justify-end">
         <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedStudent()">
-          Delete</VaButton
+          {{ t('settings.delete') }}</VaButton
         >
-        <VaButton :disabled="!canStudentManage" icon="add" @click="createNewStudent()">Student</VaButton>
+        <VaButton :disabled="!canStudentManage" icon="add" @click="createNewStudent()">{{
+          t('students.student')
+        }}</VaButton>
       </div>
       <VaDataTable
         hoverable
@@ -187,7 +191,7 @@ const canStudentManage = computed(() => {
               size="small"
               color="primary"
               icon="mso-edit"
-              aria-label="Edit"
+              :aria-label="t('settings.edit')"
               @click="editStudent(rowData)"
             />
             <VaButton
@@ -195,7 +199,7 @@ const canStudentManage = computed(() => {
               size="small"
               icon="mso-delete"
               color="danger"
-              aria-label="Delete"
+              :aria-label="t('settings.delete')"
               @click="deleteStudent(rowData)"
             />
           </div>
@@ -214,11 +218,13 @@ const canStudentManage = computed(() => {
     :before-cancel="beforeEditFormModalClose"
     @close="doShowStudentFormModal = false"
   >
-    <h3 class="text-lg font-bold">{{ studentToEdit ? 'Edit' : 'Create' }} Student</h3>
+    <h3 class="text-lg font-bold">
+      {{ studentToEdit ? $t('settings.edit') : $t('settings.create') }} {{ t('students.student') }}
+    </h3>
     <EditStudent
       ref="editFormRef"
       :student="studentToEdit"
-      :save-button-label="studentToEdit === null ? 'Add' : 'Save'"
+      :save-button-label="studentToEdit === null ? $t('settings.add') : $t('settings.save')"
       @close="cancel"
       @save="
         (student: Student) => {

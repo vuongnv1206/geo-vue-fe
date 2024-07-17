@@ -6,13 +6,19 @@
         aria-hidden="true"
         class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
         style="color: var(--va-primary)"
-        >Content</label
+        >{{ $t('comments.content') }}</label
       >
-      <QuillEditor v-model:content="newComment.content" class="border rounded" theme="bubble" content-type="html" />
+      <QuillEditor
+        v-model:content="newComment.content"
+        class="border rounded"
+        :placeholder="$t('comments.enter_comment')"
+        theme="bubble"
+        content-type="html"
+      />
     </div>
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
-      <VaButton preset="secondary" color="secondary" @click="emit('close')">Cancel</VaButton>
-      <VaButton @click="emit('save', newComment)">Save</VaButton>
+      <VaButton preset="secondary" color="secondary" @click="emit('close')">{{ t('settings.cancel') }}</VaButton>
+      <VaButton @click="emit('save', newComment)">{{ t('settings.save') }}</VaButton>
     </VaCard>
   </VaForm>
 </template>
@@ -22,7 +28,9 @@ import { computed, ref, watch } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import { EmptyComment } from '../types'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   comment: EmptyComment | null
 }>()
