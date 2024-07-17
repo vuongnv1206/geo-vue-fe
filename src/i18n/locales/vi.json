@@ -328,6 +328,7 @@
     "delete_class": "Xóa lớp",
     "edit_class": "Chỉnh sửa lớp",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
+    "all_class": "Tất cả lớp",
     "my_class": "Lớp của tôi",
     "share_class": "Lớp được chia sẻ",
     "no_class": "Không có lớp nào",

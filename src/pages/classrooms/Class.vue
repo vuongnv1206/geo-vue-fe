@@ -32,7 +32,8 @@
                 class="p-2"
                 :icon="dataFilter.queryType === ClassroomQueryType.All ? 'check' : ''"
                 @click="filterClassHandle(ClassroomQueryType.All)"
-                >All</VaButton
+              >
+                {{ $t('classes.all_class') }}</VaButton
               >
             </VaDropdownContent>
             <VaDropdownContent class="p-0">

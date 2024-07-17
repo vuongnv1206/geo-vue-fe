@@ -299,9 +299,7 @@
     "enter_description": "Enter Description",
     "delete_subject": "Delete Subject",
     "edit_subject": "Edit Subject",
-    "success": "Success",
     "delete_all_success": "Successfully deleted all subjects",
-    "fail": "Failure",
     "range": "Items from {start} to {end} of total {total}",
     "select_subject": "Select a Subject"
   },
@@ -328,6 +326,7 @@
     "delete_class": "Delete Class",
     "edit_class": "Edit Class",
     "range": "Items from {start} to {end} of total {total}",
+    "all_class": "All Classes",
     "my_class": "My Class",
     "share_class": "Share Class",
     "no_class": "No class available",
