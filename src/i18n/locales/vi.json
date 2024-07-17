@@ -1,6 +1,6 @@
 {
   "auth": {
-    "forgot_password": "Quên mật khẩu của bạn?",
+    "forgot_password": "Quên mật khẩu?",
     "forgot_password_description": "Nếu bạn quên mật khẩu, đừng lo lắng. Chỉ cần nhập địa chỉ email của bạn dưới đây, và chúng tôi sẽ gửi cho bạn một email với mật khẩu tạm thời. Khôi phục quyền truy cập vào tài khoản của bạn chưa bao giờ dễ dàng hơn.",
     "enter_email": "Nhập email của bạn",
     "send_password": "Gửi mật khẩu",

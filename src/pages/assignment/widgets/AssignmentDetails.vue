@@ -171,32 +171,36 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
-import { useBreakpoint, useModal, useToast, VaCardContent, VaIcon } from 'vuestic-ui'
-import { format, getErrorMessage, notifications } from '@/services/utils'
+import { onMounted, ref, watchEffect } from 'vue'
+import { useFileStore } from '@/stores/modules/file.module'
 import { useClassStore } from '@/stores/modules/class.module'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { format, getErrorMessage, notifications } from '@/services/utils'
+import { useBreakpoint, useModal, useToast, VaCardContent, VaIcon } from 'vuestic-ui'
+import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { Student } from '@/pages/classrooms/types'
-import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
-import { useFileStore } from '@/stores/modules/file.module'
-import { useI18n } from 'vue-i18n'
+import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
 
 const { t } = useI18n()
 const loading = ref(true)
 const router = useRouter()
+
 const fileStore = useFileStore()
 const stores = useAssignmentStore()
 const classStores = useClassStore()
+
 const breakpoints = useBreakpoint()
 const { init: notify } = useToast()
 const showSidebar = ref(breakpoints.smUp)
+
 const assignment = ref<Assignment | null>(null)
 const assignmentContent = ref<AssignmentContent | null>(null)
 const assignmentAttachment = ref<AssignmentAttachment | null>(null)
 const students = ref<Student[] | undefined>([])
+
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
 const filesUploaded = ref<any>()
