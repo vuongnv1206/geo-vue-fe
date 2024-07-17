@@ -433,7 +433,19 @@
     "student_answer": "Đáp án của học sinh",
     "question_passages": "Đoạn văn câu hỏi",
     "point": "Điểm",
-    "request": "Yêu cầu"
+    "request": "Yêu cầu",
+    "duration": "Thời lượng",
+    "minutes": "phút",
+    "exam_time": "Thời gian thi",
+    "number_of_quizzes": "Số lượng câu hỏi",
+    "subject_type": "Loại môn học",
+    "in_turn": "lần lượt",
+    "start_exam": "Bắt đầu thi",
+    "show_tested_history": "Hiển thị lịch sử kiểm tra",
+    "your_work_history": "Lịch sử làm việc của bạn",
+    "empty": "Trống",
+    "correct_amount": "Số lượng đúng",
+    "total_questions": "Tổng số câu hỏi"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",

@@ -4,6 +4,9 @@ import { usePaperStore } from '@/stores/modules/paper.module'
 import { ref, onMounted } from 'vue'
 import { PaperStudentDto, SubmitPaperDto } from '../types'
 import { useToast } from 'vuestic-ui'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const route = useRoute()
 const { init: notify } = useToast()
 const paperStore = usePaperStore()
@@ -87,36 +90,43 @@ onMounted(() => {
 
       <VaCardContent>
         <div class="flex justify-between mt-2 mb-2">
-          <p><VaIcon name="timer" class="material-symbols-outlined mr-2" /> Duration</p>
-          <p class="font-bold">{{ paperDetail?.duration || 0 }} minute(s)</p>
+          <p><VaIcon name="timer" class="material-symbols-outlined mr-2" /> {{ t('papers.duration') }}</p>
+          <p class="font-bold">{{ paperDetail?.duration || 0 }} {{ t('papers.minutes') }}</p>
         </div>
         <div class="flex justify-between mt-2 mb-2">
-          <p><VaIcon name="more_time" class="material-symbols-outlined mr-2" />Exam time</p>
-          <p class="font-bold">Indefinite</p>
+          <p><VaIcon name="more_time" class="material-symbols-outlined mr-2" />{{ t('papers.exam_time') }}</p>
+          <p class="font-bold">{{ t('papers.indefinite') }}</p>
         </div>
         <div class="flex justify-between mt-2 mb-2">
-          <p><VaIcon name="info" class="material-symbols-outlined mr-2" />Number of questions</p>
+          <p><VaIcon name="info" class="material-symbols-outlined mr-2" />{{ t('papers.number_of_questions') }}</p>
           <p class="font-bold">{{ paperDetail?.numberOfQuestion }}</p>
         </div>
         <div class="flex justify-between mt-2 mb-2">
-          <p><VaIcon name="request_page" class="material-symbols-outlined mr-2" />Subject type</p>
+          <p><VaIcon name="request_page" class="material-symbols-outlined mr-2" />{{ t('papers.indefinite') }}</p>
           <p class="font-bold">{{ paperDetail?.type }}</p>
         </div>
         <div class="flex justify-between mt-2 mb-2">
-          <p><VaIcon name="groups" class="material-symbols-outlined mr-2" />Number of quizzes</p>
+          <p><VaIcon name="groups" class="material-symbols-outlined mr-2" />{{ t('papers.number_of_quizzes') }}</p>
           <p class="font-bold">{{ paperDetail?.NumberOfQuizzes || 0 }} in turn</p>
         </div>
-        <VaButton color="success" class="w-full mt-3">Start them exam <VaIcon name="chevron_right" /> </VaButton>
+        <VaButton color="success" class="w-full mt-3"
+          >{{ t('papers.start_exam') }}
+          <VaIcon name="chevron_right" />
+        </VaButton>
       </VaCardContent>
     </VaCard>
   </div>
   <div class="mt-3 mb-3 justify-center" style="display: flex">
-    <VaButton preset="secondary" border-color="secondary" @click="showTestHistory"> Show tested history </VaButton>
+    <VaButton preset="secondary" border-color="secondary" @click="showTestHistory"
+      >{{ t('papers.show_tested_history') }}
+    </VaButton>
   </div>
   <div v-if="isShowHistory">
     <VaCard>
-      <VaCardTitle>Your work history</VaCardTitle>
-      <VaCardContent v-if="submittedStudents === null && submittedStudents === undefined"> Empty </VaCardContent>
+      <VaCardTitle>{{ t('papers.your_work_history') }}</VaCardTitle>
+      <VaCardContent v-if="submittedStudents === null && submittedStudents === undefined"
+        >{{ t('papers.empty') }}
+      </VaCardContent>
       <VaCardContent class="grid grid-cols-3">
         <VaCard
           v-for="submittedStudent in submittedStudents"
@@ -124,23 +134,27 @@ onMounted(() => {
           outlined
           class="cursor-pointer mr-2 mb-2"
         >
-          <VaCardTitle class="justify-center" style="font-size: 0.8rem"
-            >Your score: {{ submittedStudent.totalMark }}</VaCardTitle
-          >
+          <VaCardTitle class="justify-center" style="font-size: 0.8rem">
+            {{ t('papers.your_score') }}: {{ submittedStudent.totalMark }}
+          </VaCardTitle>
           <VaDivider class="m-0" />
           <VaCardContent v-if="submittedStudent.endTime !== null && submittedStudent.endTime !== undefined">
             <div class="flex justify-between mb-2">
-              <p><VaIcon name="timer" class="material-symbols-outlined mr-2" /> Duration</p>
+              <p><VaIcon name="timer" class="material-symbols-outlined mr-2" />{{ t('papers.duration') }}</p>
               <p class="font-semibold">
                 {{ getFormattedDuration(submittedStudent.startTime, submittedStudent.endTime) }}
               </p>
             </div>
             <div class="flex justify-between mt-2 mb-2">
-              <p><VaIcon name="check_circle" color="success" class="material-symbols-outlined mr-2" />Correct amount</p>
+              <p>
+                <VaIcon name="check_circle" color="success" class="material-symbols-outlined mr-2" />{{
+                  t('papers.correct_amount')
+                }}
+              </p>
               <p class="font-semibold">40</p>
             </div>
             <div class="flex justify-between mt-2 mb-2">
-              <p><VaIcon name="info" class="material-symbols-outlined mr-2" />Total questions</p>
+              <p><VaIcon name="info" class="material-symbols-outlined mr-2" />{{ t('papers.total_questions') }}</p>
               <p class="font-semibold">4</p>
             </div>
             <div class="flex justify-end mt-2">

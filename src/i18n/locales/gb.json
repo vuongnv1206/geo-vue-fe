@@ -431,7 +431,22 @@
     "student_answer": "Student's Answer",
     "question_passages": "question passages",
     "point": "Point",
-    "request": "Request"
+    "request": "Request",
+    "duration": "Duration",
+    "minutes": "minutes",
+    "exam_time": "Exam time",
+    "indefinite": "Indefinite",
+    "number_of_questions": "Number of questions",
+    "number_of_quizzes": "Number of quizzes",
+    "subject_type": "Subject type",
+    "in_turn": "in turn",
+    "start_exam": "Start the exam",
+    "show_tested_history": "Show tested history",
+    "your_work_history": "Your work history",
+    "empty": "Empty",
+    "your_score": "Your score",
+    "correct_amount": "Correct amount",
+    "total_questions": "Total questions"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",
