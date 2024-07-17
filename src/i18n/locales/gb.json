@@ -117,7 +117,12 @@
     "cancel": "Cancel",
     "success": "Success",
     "settings_updated_successfully": "Settings updated successfully",
-    "general": "General"
+    "general": "General",
+    "hide": "Hide",
+    "show": "Show",
+    "read_more": "Read more",
+    "read": "Read",
+    "send": "Send"
   },
   "auditLogs": {
     "title": "Audit Logs",
@@ -383,12 +388,12 @@
     "no_post": "No post available",
     "please_enter_content": "Please enter content"
   },
-  "class_permission":{
+  "class_permission": {
     "assign_assignment": "Assign Assignment",
     "marking": "Marking",
     "manage_students": "Manage Student"
   },
-  "teacherGroups":{
+  "teacherGroups": {
     "teacher_group": "Teacher Group",
     "teacher": "Teacher",
     "select_teacher": "Select teacher",
@@ -421,7 +426,12 @@
     "edit_paper": "Edit Paper",
     "range": "Items from {start} to {end} of total {total}",
     "no_paper": "No paper available",
-    "share_paper": "Share Paper"
+    "share_paper": "Share Paper",
+    "correct_answer": "Correct Answer",
+    "student_answer": "Student's Answer",
+    "question_passages": "question passages",
+    "point": "Point",
+    "request": "Request"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",

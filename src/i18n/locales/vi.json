@@ -117,7 +117,12 @@
     "cancel": "Hủy bỏ",
     "success": "Thành công",
     "settings_updated_successfully": "Cài đặt được cập nhật thành công",
-    "general": "Chung"
+    "general": "Chung",
+    "hide": "Ẩn",
+    "show": "Hiển thị",
+    "read_more": "Đọc thêm",
+    "read": "Đọc",
+    "send": "Gửi"
   },
   "auditLogs": {
     "title": "Nhật ký",
@@ -423,7 +428,12 @@
     "edit_paper": "Chỉnh sửa bài thi",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
     "no_paper": "Không có bài thi nào",
-    "share_paper": "Chia sẻ bài thi"
+    "share_paper": "Chia sẻ bài thi",
+    "correct_answer": "Đáp án đúng",
+    "student_answer": "Đáp án của học sinh",
+    "question_passages": "Đoạn văn câu hỏi",
+    "point": "Điểm",
+    "request": "Yêu cầu"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",
