@@ -1,20 +1,9 @@
-<script lang="ts" setup>
-import { computed } from 'vue'
-import { useAuthStore } from '@modules/auth.module'
-import { useI18n } from 'vue-i18n'
-
-const { t } = useI18n()
-const authStore = useAuthStore()
-const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
-const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for testing
-</script>
-
 <template>
   <div class="md:mx-28 relative min-h-[75vh]">
-    <div v-if="isTeacher" class="col-span-12 grid grid-cols-12 gap-6 mt-4 flex items-center">
+    <div v-if="isTeacher" class="col-span-12 grid grid-cols-12 gap-6 mt-4 items-center">
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'questions' }"
-          ><div class="box p-8 zoom-in h-full">
+        <RouterLink :to="{ name: 'questions' }">
+          <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -29,12 +18,12 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
               </svg>
             </span>
             <div class="font-bold text-center text-base mt-3">{{ t('menu.questions') }}</div>
-          </div></RouterLink
-        >
+          </div>
+        </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'paper-folder' }"
-          ><div class="box p-8 zoom-in h-full">
+        <RouterLink :to="{ name: 'paper-folder' }">
+          <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -49,12 +38,12 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
               </svg>
             </span>
             <div class="font-bold text-center text-base mt-3">{{ t('menu.examinations') }}</div>
-          </div></RouterLink
-        >
+          </div>
+        </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'classroom' }"
-          ><div class="box p-8 zoom-in h-full">
+        <RouterLink :to="{ name: 'classroom' }">
+          <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -69,12 +58,12 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
               </svg>
             </span>
             <div class="font-bold text-center text-base mt-3">{{ t('menu.classroom') }}</div>
-          </div></RouterLink
-        >
+          </div>
+        </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'assignments' }"
-          ><div class="box p-8 zoom-in h-full">
+        <RouterLink :to="{ name: 'assignments' }">
+          <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,12 +78,12 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
               </svg>
             </span>
             <div class="font-bold text-center text-base mt-3">{{ t('menu.assignments') }}</div>
-          </div></RouterLink
-        >
+          </div>
+        </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'subjects' }"
-          ><div class="box p-8 zoom-in h-full">
+        <RouterLink :to="{ name: 'subjects' }">
+          <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -109,12 +98,12 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
               </svg>
             </span>
             <div class="font-bold text-center text-base mt-3">{{ t('menu.subjects') }}</div>
-          </div></RouterLink
-        >
+          </div>
+        </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'teacher-group' }"
-          ><div class="box p-8 zoom-in h-full">
+        <RouterLink :to="{ name: 'teacher-group' }">
+          <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -129,12 +118,12 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
               </svg>
             </span>
             <div class="font-bold text-center text-base mt-3">{{ t('menu.teacher-group') }}</div>
-          </div></RouterLink
-        >
+          </div>
+        </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'audit logs' }"
-          ><div class="box p-8 zoom-in h-full">
+        <RouterLink :to="{ name: 'audit logs' }">
+          <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -149,26 +138,126 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
               </svg>
             </span>
             <div class="font-bold text-center text-base mt-3">{{ t('menu.audit-logs') }}</div>
-          </div></RouterLink
-        >
+          </div>
+        </RouterLink>
+      </VaCard>
+    </div>
+    <div v-if="isStudent" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 pt-4">
+      <VaCard class="p-4">
+        <VaCard class="flex flex-row items-center">
+          <!-- <GeoAvatar class="mr-2" :size="48" color="warning" :image="'abc' || undefined" :txt="thangdeptrai" /> -->
+          <VaImage src="https://picsum.photos/1500" class="w-16 h-16 rounded-full" />
+          <div>
+            <!-- <p class="text-lg font-semibold">Nguyen Duc Thang</p>
+            <p class="text-sm font-medium ">Class ABC</p> -->
+            <VaCardContent class="text-lg font-semibold">Nguyen Duc Thang</VaCardContent>
+            <VaCardContent class="text-sm font-medium">Class ABC</VaCardContent>
+          </div>
+        </VaCard>
+        <VaCard class="flex flex-col">
+          <div class="flex flex-row items-center">
+            <VaIcon name="event_available" class="text-primary" size="large" />
+            <VaCardContent class="text-sm font-semibold">Unattempted exercises, exams</VaCardContent>
+          </div>
+          <div class="bg-blue-500 p-2 rounded-lg">
+            <VaCardContent class="text-md font-semibold">Assignment</VaCardContent>
+            <VaCardContent class="text-xs font-medium">Submit At: 11/11/2024</VaCardContent>
+            <VaCardContent class="text-xs font-medium">End Time: 11/11/2024</VaCardContent>
+          </div>
+        </VaCard>
+        <VaCard class="flex flex-col">
+          <div class="flex items-center">
+            <VaIcon name="newspaper" class="text-primary" size="large" />
+            <VaCardContent class="text-sm font-semibold">News board</VaCardContent>
+          </div>
+          <div class="bg-blue-500 p-2 rounded-lg">
+            <VaCardContent class="text-md font-bold">News Content</VaCardContent>
+          </div>
+        </VaCard>
       </VaCard>
     </div>
     <div
-      v-if="isStudent"
-      class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8"
+      v-if="isTeacher"
+      class="w-fit rounded hover:bg-slate-200 p-1 absolute bottom-0 left-0 md:-bottom-8 md:-left-16"
     >
-      <div class="bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-lg font-bold">Student can see this</h2>
-        <p class="text-3xl font-bold">laho</p>
-      </div>
+      <VaPopover :message="t('bin.title')" :offset="[10, 0]">
+        <VaIcon
+          name="delete"
+          class="cursor-pointer hover:opacity-80"
+          size="2rem"
+          color="#154ec1"
+          @click="handleRedirectToBin"
+        />
+      </VaPopover>
     </div>
   </div>
 </template>
+
+<script lang="ts" setup>
+import { computed } from 'vue'
+import { useAuthStore } from '@modules/auth.module'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+const { t } = useI18n()
+// const loading = ref(true)
+const router = useRouter()
+// const { confirm } = useModal()
+// const { init: notify } = useToast()
+const authStore = useAuthStore()
+// const groupClassStores = useGroupClassStore()
+// const classStores = useClassStore()
+
+// const classes = ref<Classrooms[]>([])
+// const groupClasses = ref<GroupClass[]>([])
+
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
+const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for testing
+
+// const dataFilter = ref({
+//   advancedSearch: {
+//     fields: [''],
+//     keyword: '',
+//   },
+//   pageNumber: 1,
+//   totalPages: 1,
+//   totalCount: 1,
+//   pageSize: 10,
+//   orderBy: [''],
+// })
+
+// const getGroupClasses = () => {
+//   loading.value = true
+//   groupClassStores.getGroupClasses(dataFilter).
+//     then((response) => {
+//       groupClasses.value = response.data
+//     })
+//     .catch((error) => {
+//       notify({
+//         message: notifications.getFailed('group class') + getErrorMessage(error),
+//         color: 'error',
+//       })
+//     })
+//     .finally(() => {
+//       loading.value = false
+//     })
+// }
+
+const handleRedirectToBin = () => {
+  router.push({ name: 'bin' })
+}
+
+// onMounted(() => {
+//   getGroupClasses()
+// })
+</script>
+
 <style>
 .hover-scale:hover {
   transform: scale(1.05);
   transition: transform 0.5s ease;
 }
+
 .hover-scale {
   cursor: pointer;
   transition-property:

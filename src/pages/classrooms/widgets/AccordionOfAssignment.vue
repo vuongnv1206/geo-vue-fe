@@ -2,7 +2,7 @@
 import { PropType } from 'vue'
 import { format } from '@/services/utils'
 import { useRouter } from 'vue-router'
-import { VaAccordion, VaCard, VaCollapse, VaIcon } from 'vuestic-ui/web-components'
+import { VaAccordion, VaCollapse } from 'vuestic-ui'
 
 const router = useRouter()
 const classId = router.currentRoute.value.params.id.toString()
@@ -17,7 +17,6 @@ const props = defineProps({
 
 <template>
   <VaAccordion v-if="props.filteredGroupedData" class="w-full" multiple>
-    <!-- Loop through grouped assignments and papers -->
     <VaCollapse
       v-for="(group, index) in props.filteredGroupedData"
       :key="index"
@@ -45,7 +44,7 @@ const props = defineProps({
               <VaIcon name="description" size="3rem" class="text-gray-500" />
               <div>
                 <VaCardTitle class="font-medium text-lg">{{ assignment.name }}</VaCardTitle>
-                <VaCard>Submited: 0/0</VaCard>
+                <VaCard>{{ $t('classes.submited') }}: 0/0</VaCard>
               </div>
             </VaCard>
           </div>
@@ -55,7 +54,7 @@ const props = defineProps({
               <VaIcon name="article" size="3rem" class="text-gray-500" />
               <div>
                 <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>
-                <VaCard>Submited: 0/0</VaCard>
+                <VaCard>{{ $t('classes.submited') }}: 0/0</VaCard>
               </div>
             </VaCard>
           </div>

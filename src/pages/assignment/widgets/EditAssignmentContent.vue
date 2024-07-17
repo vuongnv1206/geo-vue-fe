@@ -1,10 +1,17 @@
 <template>
   <VaCard class="p-2">
     <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
-      <QuillEditor v-model:content="newAssignmentContent.content" class="h-15 border rounded" content-type="html" />
+      <QuillEditor
+        v-model:content="newAssignmentContent.content"
+        class="h-15 border rounded"
+        :placeholder="$t('assignments.enter_content')"
+        content-type="html"
+      />
       <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
-        <VaButton preset="secondary" color="secondary" @click="emit('close')">Cancel</VaButton>
-        <VaButton @click="validate() && emit('save', newAssignmentContent as AssignmentContent)">Save</VaButton>
+        <VaButton preset="secondary" color="secondary" @click="emit('close')">{{ $t('settings.cancel') }}</VaButton>
+        <VaButton @click="validate() && emit('save', newAssignmentContent as AssignmentContent)">{{
+          $t('settings.save')
+        }}</VaButton>
       </div>
     </VaForm>
   </VaCard>

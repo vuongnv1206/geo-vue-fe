@@ -3,7 +3,9 @@ import { validators } from '@/services/utils'
 import { computed, reactive, ref, watch } from 'vue'
 import { EmptyStudent, Student } from '../types'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const router = useRouter()
 const classId = router.currentRoute.value.params.id.toString()
 
@@ -57,11 +59,11 @@ watch(
 )
 const genderOptions = reactive([
   {
-    text: 'Male',
+    text: t('students.male'),
     value: true,
   },
   {
-    text: 'Female',
+    text: t('students.female'),
     value: false,
   },
 ])
@@ -71,39 +73,51 @@ const genderOptions = reactive([
   <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
     <VaInput
       v-model="newStudent.firstName"
-      label="First name"
-      placeholder="Enter your first name"
-      :rules="[validators.required2('First name'), validators.isCharacter('First name'), validators.maxLength(50)]"
+      :label="t('students.first_name')"
+      :laceholder="t('students.enter_first_name')"
+      :rules="[
+        validators.required2(t('students.enter_first_name')),
+        validators.isCharacter(t('students.enter_first_name')),
+        validators.maxLength(50),
+      ]"
     />
     <VaInput
       v-model="newStudent.lastName"
-      label="Last name"
-      placeholder="Enter your last name"
-      :rules="[validators.required2('Last name'), validators.isCharacter('Last name'), validators.maxLength(50)]"
+      :label="t('students.last_name')"
+      :placeholder="t('students.enter_last_name')"
+      :rules="[
+        validators.required2(t('students.last_name')),
+        validators.isCharacter(t('students.last_name')),
+        validators.maxLength(50),
+      ]"
     />
     <VaInput v-model="newStudent.avatarUrl" label="Avatar" placeholder="tam the da" />
     <VaInput
       v-model="newStudent.studentCode"
-      label="Student code"
-      placeholder="Enter your student code"
-      :rules="[validators.required2('Student code'), validators.maxLength(50)]"
+      :label="t('students.code')"
+      :placeholder="t('students.enter_code')"
+      :rules="[validators.required2(t('students.code')), validators.maxLength(50)]"
     />
-    <VaDateInput v-model="newStudent.dateOfBirth" label="Birth date" placeholder="Enter your date of birth" />
+    <VaDateInput
+      v-model="newStudent.dateOfBirth"
+      :label="t('students.date_of_birth')"
+      :placeholder="t('students.enter_date_of_birth')"
+    />
     <VaRadio v-model="newStudent.gender" :options="genderOptions" value-by="value" />
     <VaInput
       v-model="newStudent.phoneNumber"
-      label="Phone Number"
-      placeholder="Enter your phone number"
-      :rules="[validators.isNumber('phone number'), validators.phone]"
+      :label="t('students.phone_number')"
+      :placeholder="t('students.enter_phone_number')"
+      :rules="[validators.isNumber(t('students.phone_number')), validators.phone]"
     />
     <VaInput
       v-model="newStudent.email"
-      label="Email"
-      placeholder="Enter your email"
-      :rules="[validators.required2('Email'), validators.email]"
+      :label="t('students.email')"
+      :placeholder="t('students.enter_email')"
+      :rules="[validators.required2(t('students.email')), validators.email]"
     />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
-      <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
+      <VaButton preset="secondary" color="secondary" @click="$emit('close')">{{ t('settings.cancel') }}</VaButton>
       <VaButton @click="validate() && $emit('save', newStudent as Student)">{{ saveButtonLabel }} </VaButton>
     </VaCard>
   </VaForm>

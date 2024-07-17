@@ -6,21 +6,22 @@
     <template #content>
       <VaDivider />
       <VaForm ref="form" class="max-w-4xl mx-auto px-4">
-        <VaCardTitle>Global Setting</VaCardTitle>
+        <VaCardTitle> {{ $t('assignments.global_settings') }}</VaCardTitle>
         <VaCard class="p-2 flex flex-col gap-2">
           <VaInput
             v-model="newAssignmentDetails.name"
-            label="Name"
-            placeholder="Enter assignment name"
-            :rules="[validators.required2('Assignment name'), validators.maxLength(50)]"
+            :label="$t('assignments.name')"
+            :placeholder="$t('assignments.enter_name')"
+            :rules="[validators.required2($t('assignments.name')), validators.maxLength(50)]"
           />
           <label
             id="input-label-510"
             aria-hidden="true"
             class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
             style="color: var(--va-primary)"
-            >Start and End Time</label
           >
+            {{ $t('assignments.start_and_end_time') }}
+          </label>
           <VueDatePicker
             v-model="date"
             range
@@ -32,10 +33,18 @@
             :text-input="dateInputFormat"
             :month-change-on-scroll="true"
             :month-change-on-arrows="true"
-            placeholder="Start choosing or typing date and time"
+            :placeholder="$t('assignments.enter_start_and_end_time')"
           />
-          <VaSwitch v-model="newAssignmentDetails.canViewResult" size="small" label="Can View Result" />
-          <VaSwitch v-model="newAssignmentDetails.requireLoginToSubmit" size="small" label="Require Login to Submit" />
+          <VaSwitch
+            v-model="newAssignmentDetails.canViewResult"
+            size="small"
+            :label="$t('assignments.can_view_result')"
+          />
+          <VaSwitch
+            v-model="newAssignmentDetails.requireLoginToSubmit"
+            size="small"
+            :label="$t('assignments.require_login_to_submit')"
+          />
           <VaLayout class="border rounded-xl pb-2 px-2">
             <template #left>
               <VaSidebar v-model="showSidebar" class="mt-2 rounded" :class="showSidebar ? 'border mr-1' : ''">
@@ -50,7 +59,7 @@
                 <VaScrollContainer class="max-h-80" vertical>
                   <div class="mx-1">
                     <VaSidebarItem class="cursor-pointer" @click="showAllClassesForAllDepartments">
-                      All ({{ countAllSelectedClasses }}/{{ countAllClasses }})
+                      {{ $t('assignments.all') }} ({{ countAllSelectedClasses }}/{{ countAllClasses }})
                     </VaSidebarItem>
                     <div v-for="(groupClass, index) in groupClasses" :key="index">
                       <VaSidebarItem class="cursor-pointer" @click="showDepartmentClasses(groupClass)"
@@ -95,7 +104,9 @@
                             <VaCard class="mr-1">{{ selectedDepartment.name }}</VaCard>
                             <VaButton preset="secondary" size="small" @click="selectAllClasses(selectedDepartment)">
                               {{
-                                selectedClassesByDepartmentState[selectedDepartment.id] ? 'Deselect All' : 'Select All'
+                                selectedClassesByDepartmentState[selectedDepartment.id]
+                                  ? $t('assignments.deselect_all')
+                                  : $t('assignments.select_all')
                               }}
                             </VaButton>
                           </VaCard>
@@ -110,7 +121,7 @@
                               />
                               <label :for="classItem.id">{{ classItem.name }}</label>
                               <VaChip v-if="currentUserId != classItem.ownerId" outline class="ml-2" size="small">
-                                Share
+                                {{ $t('assignments.share') }}
                               </VaChip>
                             </div>
                           </VaCard>
@@ -119,7 +130,7 @@
                       </div>
                       <div v-else>
                         <VaButton preset="secondary" size="small" @click="selectAllClassesForAllDepartments">
-                          {{ selectAllClassesState ? 'Deselect All' : 'Select All' }}
+                          {{ selectAllClassesState ? $t('assignments.deselect_all') : $t('assignments.select_all') }}
                         </VaButton>
                         <div v-for="groupClass in groupClasses" :key="groupClass.id">
                           <VaCard v-if="groupClass.classes.length > 0">
@@ -130,7 +141,11 @@
                                 }})
                               </VaCard>
                               <VaButton preset="secondary" size="small" @click="selectAllClasses(groupClass)">
-                                {{ selectedClassesByDepartmentState[groupClass.id] ? 'Deselect All' : 'Select All' }}
+                                {{
+                                  selectedClassesByDepartmentState[groupClass.id]
+                                    ? $t('assignments.deselect_all')
+                                    : $t('assignments.select_all')
+                                }}
                               </VaButton>
                             </VaCard>
                             <VaCard class="grid grid-cols-2 lg:grid-cols-2 gap-1">
@@ -144,7 +159,7 @@
                                 />
                                 <label :for="classItem.id">{{ classItem.name }}</label>
                                 <VaChip v-if="currentUserId != classItem.ownerId" outline class="ml-2" size="small">
-                                  Share
+                                  {{ $t('assignments.share') }}
                                 </VaChip>
                               </div>
                             </VaCard>
@@ -159,8 +174,8 @@
           </VaLayout>
         </VaCard>
         <div class="flex flex-col-reverse sm:flex-row mt-4 gap-2 justify-end">
-          <VaButton preset="secondary" color="secondary" @click="goBack()">Cancel</VaButton>
-          <VaButton type="submit" @click="handleClickUpdate">Save</VaButton>
+          <VaButton preset="secondary" color="secondary" @click="goBack()">{{ $t('settings.cancel') }}</VaButton>
+          <VaButton type="submit" @click="handleClickUpdate">{{ $t('settings.save') }}</VaButton>
         </div>
       </VaForm>
     </template>
@@ -179,7 +194,9 @@ import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useAuthStore } from '@/stores/modules/auth.module'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const router = useRouter()
 const { confirm } = useModal()
 const { validate } = useForm('form')
@@ -237,12 +254,10 @@ const getAssignment = (id: string) => {
         requireLoginToSubmit: response.requireLoginToSubmit,
         classIds: response.classIds,
       }
-      // console.log('Assignment Details: ', assignmentDetails.value)
-      // console.log('New Assignment Details: ', newAssignmentDetails.value)
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('assignments') + getErrorMessage(error),
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -253,11 +268,10 @@ const getGroupClass = () => {
     .getGroupClasses(dataFilter.value)
     .then((response) => {
       groupClasses.value = response.data
-      // console.log('Group Classes: ', groupClasses.value)
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('group class') + getErrorMessage(error),
+        message: notifications.getFailed(t('groupClasses.group_class')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -265,7 +279,6 @@ const getGroupClass = () => {
 
 const showAllClassesForAllDepartments = () => {
   selectedDepartment.value = null
-  // selectedClasses.value = []
 }
 
 // Select all classes in a department
@@ -307,7 +320,6 @@ watch(selectedClasses, updateSelectAllClassesState, { deep: true })
 
 const showDepartmentClasses = (groupClass: GroupClass) => {
   selectedDepartment.value = groupClass
-  // selectedClasses.value = []
 }
 
 // Select all classes across all departments
@@ -377,7 +389,6 @@ const handleClickUpdate = async () => {
     try {
       newAssignmentDetails.value.classIds = selectedClasses.value
       await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
-      console.log('newAssignmentDetails.value: ', newAssignmentDetails.value)
       notify({ message: notifications.updatedSuccessfully(newAssignmentDetails.value.name), color: 'success' })
       router.push({ name: 'assignment-details', params: { id: assignmentId } })
     } catch (error) {

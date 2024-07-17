@@ -6,14 +6,20 @@
         aria-hidden="true"
         class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
         style="color: var(--va-primary)"
-        >Content</label
+        >{{ t('posts.content') }}</label
       >
-      <QuillEditor v-model:content="newPost.content" class="border rounded" theme="bubble" content-type="html" />
+      <QuillEditor
+        v-model:content="newPost.content"
+        class="border rounded"
+        :placeholder="$t('posts.enter_content')"
+        theme="bubble"
+        content-type="html"
+      />
     </div>
-    <VaSwitch v-model="newPost.isLockComment" size="small" label="Lock Comment" />
+    <VaSwitch v-model="newPost.isLockComment" size="small" :label="t('posts.lock_comment')" />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
-      <VaButton preset="secondary" color="secondary" @click="emit('close')">Cancel</VaButton>
-      <VaButton @click="emit('save', newPost)">Save</VaButton>
+      <VaButton preset="secondary" color="secondary" @click="emit('close')">{{ t('settings.cancel') }}</VaButton>
+      <VaButton @click="emit('save', newPost)">{{ t('settings.save') }}</VaButton>
     </VaCard>
   </VaForm>
 </template>
@@ -23,8 +29,9 @@ import { computed, ref, watch } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import { EmptyPost } from '../types'
-import { VaSwitch } from 'vuestic-ui/web-components'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   posts: EmptyPost | null
 }>()

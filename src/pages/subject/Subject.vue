@@ -3,9 +3,9 @@
     <VaCardContent class="min-h-[85vh]">
       <div class="flex flex-col md:flex-row gap-2 justify-end">
         <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedSubject()">
-          Delete
+          {{ $t('settings.delete') }}
         </VaButton>
-        <VaButton icon="add" @click="createNewSubject()">Subject</VaButton>
+        <VaButton icon="add" @click="createNewSubject()"> {{ $t('subjects.subject') }}</VaButton>
       </div>
       <VaScrollContainer class="max-h-[72vh]" vertical>
         <SubjectTable
@@ -17,7 +17,7 @@
         />
       </VaScrollContainer>
       <div v-if="dataFilter.totalCount > 0" class="flex flex-row justify-between items-center mt-4">
-        <p>Items from {{ startItemIndex }} to {{ endItemIndex }} of total {{ dataFilter.totalCount }}</p>
+        <p>{{ $t('subjects.range', { start: startItemIndex, end: endItemIndex, total: dataFilter.totalCount }) }}</p>
         <VaPagination
           v-model="dataFilter.pageNumber"
           gapped
@@ -47,12 +47,14 @@
     @close="doShowSubjectFormModal = false"
   >
     <VaModalHeader>
-      <h3 class="text-lg font-bold">{{ subjectToEdit ? 'Edit' : 'Create' }} Subject</h3>
+      <h3 class="text-lg font-bold">
+        {{ subjectToEdit ? $t('settings.edit') : $t('settings.create') }} {{ $t('subjects.subject_2') }}
+      </h3>
     </VaModalHeader>
     <EditSubjectForm
       ref="editFormRef"
       :subject="subjectToEdit"
-      :save-button-label="subjectToEdit === null ? 'Add' : 'Save'"
+      :save-button-label="subjectToEdit === null ? $t('settings.add') : $t('settings.save')"
       @close="cancel"
       @save="
         (subject: Subject) => {
@@ -72,6 +74,9 @@ import { useSubjectStore } from '@/stores/modules/subject.module'
 import { useModal, useToast, VaPagination, VaSelect } from 'vuestic-ui'
 import EditSubjectForm from '@/pages/subject/widgets/EditSubjectForm.vue'
 import { getErrorMessage, notifications } from '@/services/utils'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const loading = ref(true)
 const stores = useSubjectStore()
@@ -111,7 +116,7 @@ const getSubjects = (filter: typeof dataFilter.value) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('subject') + getErrorMessage(error),
+        message: notifications.getFailed(t('subjects.subject')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -206,8 +211,8 @@ const deleteSubject = (subject: Subject) => {
 
 const deleteSelectedSubject = () => {
   confirm({
-    title: 'Delete Subject',
-    message: notifications.confirmDelete(`${selectedItemsEmitted.value.length} subjects`),
+    title: t('subjects.delete_subject'),
+    message: notifications.confirmDelete(`${selectedItemsEmitted.value.length} ` + t('subjects.subject_2')),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -220,7 +225,7 @@ const deleteSelectedSubject = () => {
 
 const deleteSubjectWithConfirm = (subject: Subject) => {
   confirm({
-    title: 'Delete Subject',
+    title: t('subjects.delete_subject'),
     message: notifications.confirmDelete(subject.name),
   }).then((agreed) => {
     if (!agreed) {

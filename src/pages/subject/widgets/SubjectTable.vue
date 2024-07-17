@@ -2,12 +2,14 @@
 import { PropType } from 'vue'
 import { Subject } from '../types'
 import { defineVaDataTableColumns, useMenu } from 'vuestic-ui'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const { show } = useMenu()
 
 const columns = defineVaDataTableColumns([
-  { label: 'Subject', key: 'name', sortable: true },
-  { label: 'Description', key: 'description', sortable: true },
+  { label: t('subjects.subject'), key: 'name', sortable: true },
+  { label: t('subjects.description'), key: 'description', sortable: true },
   { label: ' ', key: 'actions' },
 ])
 
@@ -29,13 +31,12 @@ const props = defineProps({
 })
 
 const contextmenu = (event: any) => {
-  console.log('contextmenu', event)
   event.event.preventDefault()
   show({
     event: event.event,
     options: [
-      { text: 'Rename', icon: 'edit' },
-      { text: 'Delete', icon: 'delete' },
+      { text: t('settings.edit'), icon: 'edit' },
+      { text: t('settings.delete'), icon: 'delete' },
     ],
     onSelected(option) {
       console.log('selected', option)
@@ -71,7 +72,7 @@ const handleSelectionChange = (selectedItems: Subject[]) => {
     @row:contextmenu="contextmenu($event)"
     @selectionChange="handleSelectionChange($event.currentSelectedItems)"
   >
-    <template #cell(name)="{ rowData }">
+    <!-- <template #cell(name)="{ rowData }">
       <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
         <div>
           <span>{{ rowData.name }}</span>
@@ -82,7 +83,7 @@ const handleSelectionChange = (selectedItems: Subject[]) => {
       <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
         <div>{{ rowData.description }}</div>
       </div>
-    </template>
+    </template> -->
     <template #cell(actions)="{ rowData: subject }">
       <div class="flex gap-2 justify-end">
         <VaButton
@@ -90,7 +91,7 @@ const handleSelectionChange = (selectedItems: Subject[]) => {
           size="small"
           color="primary"
           icon="mso-edit"
-          aria-label="Edit subject"
+          :aria-label="$t('subjects.edit_subject')"
           @click="emit('edit', subject as Subject)"
         />
         <VaButton
@@ -98,7 +99,7 @@ const handleSelectionChange = (selectedItems: Subject[]) => {
           size="small"
           icon="mso-delete"
           color="danger"
-          aria-label="Delete subject"
+          :aria-label="$t('subjects.delete_subject')"
           @click="emit('delete', subject as Subject)"
         />
       </div>
