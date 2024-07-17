@@ -4,7 +4,9 @@ import { SubmitPaperDetailDto } from '../types'
 import { Question } from '@/pages/question/types'
 import QuestionHeadView from '@pages/question/widgets/child/QuestionHeadView.vue'
 import QuestionFooterView from '@/pages/question/widgets/child/QuestionFooterView.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   question: Question
   studentAnswers: SubmitPaperDetailDto[]
@@ -35,7 +37,7 @@ const getContentFormat = (question?: Question) => {
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="question" :index="index" />
-    <VaCardTitle>Point: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
+    <VaCardTitle>{{ t('papers.point') }}: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
     <VaCardContent>
       <div class="mt-2">
         <!-- eslint-disable vue/no-v-html -->
@@ -56,7 +58,9 @@ const getContentFormat = (question?: Question) => {
           </span>
         </div>
       </div>
-      <div class="va-text-bold mt-3 va-text-success">Đáp án đúng: {{ getCorrectAnswer(question) }}</div>
+      <div class="va-text-bold mt-3 va-text-success">
+        {{ t('papers.correct_answer') }}: {{ getCorrectAnswer(question) }}
+      </div>
     </VaCardContent>
     <QuestionFooterView :question="question" :show-action-button="props.showActionButton" />
   </VaCard>

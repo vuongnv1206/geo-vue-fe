@@ -2,7 +2,6 @@
 import { computed, ref, watch } from 'vue'
 import { EmptySubject, Subject } from '../types'
 import { validators } from '@/services/utils'
-import { VaCard } from 'vuestic-ui/web-components'
 
 const props = defineProps<{
   subject: Subject | null

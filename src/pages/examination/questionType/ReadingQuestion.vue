@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { Question } from '@/pages/question/types'
 import { SubmitPaperDetailDto } from '../types'
-
 import QuestionHeadView from '@pages/question/widgets/child/QuestionHeadView.vue'
 import QuestionFooterView from '@/pages/question/widgets/child/QuestionFooterView.vue'
 import { onBeforeMount, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   question: Question
   studentAnswers: SubmitPaperDetailDto[]
@@ -67,14 +68,16 @@ onBeforeMount(() => {
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="question" :index="index" />
-    <VaCardTitle>Point: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
+    <VaCardTitle>{{ t('papers.point') }}: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
     <div class="mt-2">
       <span v-if="!readMoreActivated">
         <!-- eslint-disable vue/no-v-html -->
         <div style="line-height: initial" v-html="props.question?.content.slice(0, 500).replace(/\n/g, '<br>')"></div>
         <!--eslint-enable-->
         ...
-        <button href="#" class="text-primary" @click="readMoreActivated = !readMoreActivated">Read more</button>
+        <button href="#" class="text-primary" @click="readMoreActivated = !readMoreActivated">
+          {{ t('settings.read_more') }}
+        </button>
       </span>
       <span v-else>
         <div style="line-height: initial" v-html="props.question?.content.replace(/\n/g, '<br>')"></div>
@@ -89,7 +92,7 @@ onBeforeMount(() => {
         size="small"
         @click="showQuestionPassage = !showQuestionPassage"
       >
-        {{ showQuestionPassage ? 'Hide' : 'Show' }} question passages
+        {{ showQuestionPassage ? t('settings.hide') : t('settings.show') }} {{ t('papers.question_passages') }}
       </VaButton>
     </VaBadge>
     <!-- eslint-disable vue/no-v-html -->

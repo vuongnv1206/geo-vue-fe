@@ -32,8 +32,9 @@
                 class="p-2"
                 :icon="dataFilter.queryType === ClassroomQueryType.All ? 'check' : ''"
                 @click="filterClassHandle(ClassroomQueryType.All)"
-                >All</VaButton
               >
+                {{ $t('classes.all_class') }}
+              </VaButton>
             </VaDropdownContent>
             <VaDropdownContent class="p-0">
               <VaButton
@@ -310,9 +311,9 @@ const editClass = (classrooms: Classrooms) => {
 }
 
 const handleMenuClassClick = (option: any) => {
-  if (option.text === 'Edit') {
+  if (option.text === t('settings.edit')) {
     editClass(getClassById(option.value) as Classrooms)
-  } else if (option.text === 'Delete') {
+  } else if (option.text === t('settings.delete')) {
     deleteClass(getClassById(option.value) as Classrooms)
   }
 }
@@ -391,9 +392,9 @@ const editGroupClass = (gc: GroupClass) => {
 }
 
 const handleMenuGroupClassClick = (option: any) => {
-  if (option.text === 'Edit') {
+  if (option.text === t('settings.edit')) {
     editGroupClass(getGroupClassById(option.value) as GroupClass)
-  } else if (option.text === 'Delete') {
+  } else if (option.text === t('settings.delete')) {
     deletedGroupClass(getGroupClassById(option.value) as GroupClass)
   }
 }

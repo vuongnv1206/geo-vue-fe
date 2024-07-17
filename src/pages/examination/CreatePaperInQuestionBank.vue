@@ -9,7 +9,9 @@ import { validators } from '@services/utils'
 import { useModal, useToast } from 'vuestic-ui'
 import UpdatePaperPurpose from '@/pages/examination/widgets/UpdatePaperPurpose.vue'
 import { usePaperStore } from '../../stores/modules/paper.module'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const { init: notify } = useToast()
@@ -161,14 +163,14 @@ const cancelUpdatePaper = () => {
           <div>
             <VaInput
               v-model.number="questionRequest[index].mark"
-              placeholder="enter point"
-              label="Point"
+              :placeholder="t('papers.enter_point')"
+              :label="t('papers.point')"
               :rules="[validators.required, validators.isNumber]"
               @change="updateTotalPoint"
             />
           </div>
           <div class="flex align-bottom">
-            <VaButton preset="primary" color="danger" icon="delete" @click="deleteQuestion(testQuestion.id)"></VaButton>
+            <VaButton preset="primary" color="danger" icon="delete" @click="deleteQuestion(testQuestion.id)" />
           </div>
         </VaCardTitle>
         <VaCardContent class="p-0 pb-1">

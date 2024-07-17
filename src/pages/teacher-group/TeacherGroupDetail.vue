@@ -13,7 +13,9 @@ import { ClassroomQueryType, GroupClass } from '../classrooms/types'
 import { PermissionNameInClass } from './PermissionInClass.enum'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   group: {
     type: Object as () => GroupTeacher | null,
@@ -28,17 +30,20 @@ const props = defineProps({
 const loading = ref(true)
 const showSelect = ref(false)
 const { init: notify } = useToast()
+
 const stores = useGroupTeacherStore()
-const selectedTeacher = ref<string[]>([])
 const groupClassStores = useGroupClassStore()
+
+const valueAccordion = ref([])
+const selectedTeacher = ref<string[]>([])
+const groupClasses = ref<GroupClass[]>([])
 const groupDetail = ref<GroupTeacher | null>(null)
 const teacherDetail = ref<TeacherTeam | null>(null)
 const teacherOptions = ref<{ label: string; value: string }[]>([])
 const currentSelectedTeacher = ref<{ label: string; value: string }[]>([])
 const checkedPermissions = ref<{ [key: string]: string[] }>({})
 const optionCheckBox = ref<{ key: string; value: string }[]>([])
-const valueAccordion = ref([])
-const groupClasses = ref<GroupClass[]>([])
+
 const groupClassFilter = ref({
   keyword: '',
   pageNumber: 0,
@@ -81,7 +86,7 @@ const getGroupDetail = async () => {
   } catch (error) {
     loading.value = false
     notify({
-      message: notifications.getFailed('group detail') + getErrorMessage(error),
+      message: notifications.getFailed(t('groupClasses.group_detail')) + getErrorMessage(error),
       color: 'danger',
     })
   }
@@ -96,7 +101,7 @@ const getTeacherDetail = async () => {
     loading.value = false
   } catch (error) {
     notify({
-      message: notifications.getFailed('teacher') + getErrorMessage(error),
+      message: notifications.getFailed(t('groupClasses.teacher')) + getErrorMessage(error),
       color: 'danger',
     })
     loading.value = false
@@ -110,7 +115,7 @@ const getGroupClasses = async () => {
     initializeCheckedPermissions()
   } catch (error) {
     notify({
-      message: notifications.getFailed('group class') + getErrorMessage(error),
+      message: notifications.getFailed(t('groupClasses.group_class')) + getErrorMessage(error),
       color: 'danger',
     })
   }
@@ -230,14 +235,14 @@ const updatePermissionGroup = async () => {
       await stores.setPermissionGroupInClass(requestGroup)
       loading.value = false
       notify({
-        message: notifications.updatedSuccessfully('permission'),
+        message: notifications.updatedSuccessfully(t('teacherGroups.permission')),
         color: 'success',
       })
       getGroupDetail()
     } catch (error) {
       loading.value = false
       notify({
-        message: notifications.updateFailed('permission') + getErrorMessage(error),
+        message: notifications.updateFailed(t('teacherGroups.permission')) + getErrorMessage(error),
         color: 'danger',
       })
     }
@@ -252,14 +257,14 @@ const updatePermissionGroup = async () => {
       await stores.setPermissionTeacherInClass(requestTeacher)
       loading.value = false
       notify({
-        message: notifications.updatedSuccessfully('permission'),
+        message: notifications.updatedSuccessfully(t('teacherGroups.permission')),
         color: 'success',
       })
       getTeacherDetail()
     } catch (error) {
       loading.value = false
       notify({
-        message: notifications.updateFailed('permission') + getErrorMessage(error),
+        message: notifications.updateFailed(t('teacherGroups.permission')) + getErrorMessage(error),
         color: 'danger',
       })
     }
@@ -319,7 +324,7 @@ const accordionKey = ref(0)
   <div>
     <VaCard v-if="groupDetail !== null" class="mb-2">
       <VaCardTitle class="gap-2">
-        Member in group: <span v-if="groupDetail">{{ groupDetail.name }}</span>
+        <span v-if="groupDetail">{{ t('teacherGroups.group_member', { name: groupDetail.name }) }}</span>
       </VaCardTitle>
       <VaCardContent>
         <div class="flex gap-2">
@@ -330,7 +335,7 @@ const accordionKey = ref(0)
             <div v-if="showSelect">
               <VaSelect
                 v-model="selectedTeacher"
-                label="Select more"
+                :label="t('teacherGroups.select_teacher')"
                 :options="teacherOptions"
                 text-by="label"
                 value-by="value"
@@ -371,12 +376,14 @@ const accordionKey = ref(0)
       </VaCardContent>
     </VaCard>
     <VaCard class="min-h-[60vh]">
-      <VaCardTitle>Permission management: {{ groupDetail?.name || teacherDetail?.teacherName }}</VaCardTitle>
+      <VaCardTitle>
+        {{ t('teacherGroups.permission_management') }}: {{ groupDetail?.name || teacherDetail?.teacherName }}
+      </VaCardTitle>
       <VaDivider />
       <VaCardContent>
         <VaInnerLoading v-if="groupDetail !== null || teacherDetail !== null" :loading="loading">
           <VaCardContent v-if="groupDetail !== null || teacherDetail !== null" class="p-0 mb-2">
-            <VaInput v-model="searchQuery" placeholder="search class" />
+            <VaInput v-model="searchQuery" :placeholder="t('teacherGroups.search_class')" />
           </VaCardContent>
           <VaScrollContainer vertical>
             <VaAccordion :key="accordionKey" v-model="valueAccordion" class="max-W-sm mb-3 max-h-[60vh]" multiple>
@@ -403,9 +410,9 @@ const accordionKey = ref(0)
           </VaScrollContainer>
           <div v-if="props.group || props.teacherId" class="flex justify-end">
             <VaButton preset="primary" size="small" class="mr-2" @click="initializeCheckedPermissions">
-              Cancel
+              {{ $t('settings.cancel') }}
             </VaButton>
-            <VaButton color="success" size="small" @click="updatePermissionGroup"> Save </VaButton>
+            <VaButton color="success" size="small" @click="updatePermissionGroup">{{ $t('settings.save') }}</VaButton>
           </div>
         </VaInnerLoading>
       </VaCardContent>
