@@ -15,8 +15,8 @@ const onSave = () => {
     <VaDatePicker v-model="dateValue" />
     <VaTimePicker v-model="timeValue" framed class="flex justify-center" />
     <div class="flex justify-end mt-3">
-      <VaButton size="small" color="secondary" class="mr-2">Cancel</VaButton>
-      <VaButton size="small" @click="onSave">Apply</VaButton>
+      <VaButton size="small" color="secondary" class="mr-2">{{ t('settings.cancel') }}</VaButton>
+      <VaButton size="small" @click="onSave">{{ t('settings.save') }}</VaButton>
     </div>
   </div>
 </template>
