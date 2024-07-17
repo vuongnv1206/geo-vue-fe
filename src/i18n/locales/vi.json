@@ -385,6 +385,31 @@
     "no_post": "Không có bài viết nào",
     "please_enter_content": "Vui lòng nhập nội dung"
   },
+  "class_permission": {
+    "assign_assignment": "Giao bài tập",
+    "marking": "Chấm điểm",
+    "manage_students": "Quản lý học sinh"
+  },
+  "teacherGroups": {
+    "teacher_group": "Nhóm giáo viên",
+    "teacher": "Giáo viên",
+    "select_teacher": "Chọn giáo viên",
+    "group_member": "Thành viên trong nhóm {name}",
+    "search_class": "Tìm kiếm lớp",
+    "permission": "Quyền hạn",
+    "group_detail": "Chi tiết nhóm",
+    "group_teacher": "Nhóm giáo viên",
+    "delete_group": "Xóa nhóm",
+    "delete_teacher": "Xóa giáo viên",
+    "search_name_phone_email": "Tìm kiếm theo tên, email hoặc số điện thoại",
+    "group_name": "Tên nhóm",
+    "enter_group_name": "Nhập tên nhóm",
+    "teacher_name": "Tên giáo viên",
+    "enter_teacher_name": "Nhập tên giáo viên",
+    "teacher_contact": "Liên hệ giáo viên",
+    "enter_teacher_contact": "Nhập thông tin liên hệ giáo viên",
+    "permission_management": "Quản lý quyền hạn"
+  },
   "papers": {
     "paper": "Bài thi",
     "paper_2": "bài thi",

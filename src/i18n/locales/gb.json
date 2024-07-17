@@ -383,6 +383,31 @@
     "no_post": "No post available",
     "please_enter_content": "Please enter content"
   },
+  "class_permission":{
+    "assign_assignment": "Assign Assignment",
+    "marking": "Marking",
+    "manage_students": "Manage Student"
+  },
+  "teacherGroups":{
+    "teacher_group": "Teacher Group",
+    "teacher": "Teacher",
+    "select_teacher": "Select teacher",
+    "group_member": "Member In Group {name}",
+    "search_class": "Search class",
+    "permission": "Permission",
+    "group_detail": "Group Detail",
+    "group_teacher": "Group Teacher",
+    "delete_group": "Delete Group",
+    "delete_teacher": "Delete Teacher",
+    "search_name_phone_email": "Search by name, email or phone number",
+    "group_name": "Group Name",
+    "enter_group_name": "Enter Group Name",
+    "teacher_name": "Teacher Name",
+    "enter_teacher_name": "Enter Teacher Name",
+    "teacher_contact": "Teacher Contact",
+    "enter_teacher_contact": "Enter Teacher Contact",
+    "permission_management": "Permission Management"
+  },
   "papers": {
     "paper": "Paper",
     "paper_2": "paper",
