@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const dateValue = ref(new Date())
 const timeValue = ref(new Date())
 const emit = defineEmits(['save'])
