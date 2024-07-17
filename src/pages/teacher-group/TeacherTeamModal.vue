@@ -3,7 +3,9 @@ import { PropType, ref, watch } from 'vue'
 import { TeacherTeamRequest, TeacherTeam } from './types'
 import { useForm } from 'vuestic-ui'
 import { validators } from '@/services/utils'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   teacherTeam: {
     type: Object as PropType<TeacherTeam | null>,
@@ -48,28 +50,26 @@ const onSave = () => {
 
 <template>
   <VaCard>
-    <VaDivider />
     <VaCardContent>
       <VaForm ref="addForm" stateful class="flex flex-col gap-2">
         <VaInput
           v-model="newTeacher.teacherName"
           name="teacherName"
-          label="Teacher name"
-          placeholder="Enter teacher name"
-          :rules="[validators.required2('Teacher name'), validators.maxLength(50)]"
+          :label="t('teacherGroups.teacher_name')"
+          :placeholder="t('teacherGroups.enter_teacher_name')"
+          :rules="[validators.required2(t('teacherGroups.teacher_name')), validators.maxLength(50)]"
         />
         <VaInput
           v-model="newTeacher.contact"
           name="contact"
-          label="Contact"
-          placeholder="Enter contact"
-          :rules="[validators.required2('Teacher name'), validators.maxLength(200)]"
+          :label="t('teacherGroups.teacher_contact')"
+          :placeholder="t('teacherGroups.enter_teacher_contact')"
+          :rules="[validators.required2(t('teacherGroups.teacher_contact')), validators.maxLength(200)]"
         />
       </VaForm>
     </VaCardContent>
-    <VaDivider />
     <div class="flex gap-2 flex-col-reverse items-stretch justify-end w-full sm:flex-row sm:items-center">
-      <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
+      <VaButton preset="secondary" color="secondary" @click="$emit('close')">{{ $t('settings.cancel') }}</VaButton>
       <VaButton @click="onSave">{{ saveButtonLabel }}</VaButton>
     </div>
   </VaCard>

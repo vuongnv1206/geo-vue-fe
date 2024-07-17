@@ -7,7 +7,9 @@ import { getErrorMessage, notifications } from '@/services/utils'
 import { useModal, useToast } from 'vuestic-ui'
 import TeacherGroupModal from './TeacherGroupModal.vue'
 import TeacherTeamModal from './TeacherTeamModal.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const dataFilter = ref({
   advancedSearch: {
     fields: [''],
@@ -53,7 +55,7 @@ const getTeacherGroups = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('group teacher') + getErrorMessage(error),
+        message: notifications.getFailed(t('teacherGroups.group_teacher')) + getErrorMessage(error),
         color: 'danger',
       })
     })
@@ -72,7 +74,7 @@ const getTeacherTeams = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('teacher team') + getErrorMessage(error),
+        message: notifications.getFailed(t('teacherGroups.group_teacher')) + getErrorMessage(error),
         color: 'danger',
       })
     })
@@ -175,11 +177,11 @@ const currentType = computed(() => {
 const saveButtonLabel = computed(() => {
   return titleModal.value === 'Teacher'
     ? modalToTeacherEdit.value
-      ? 'Save'
-      : 'Add'
+      ? t('settings.add')
+      : t('settings.save')
     : modalToGroupEdit.value
-      ? 'Save'
-      : 'Add'
+      ? t('settings.add')
+      : t('settings.save')
 })
 
 const beforeEditFormModalClose = async (hide: () => unknown) => {
@@ -211,7 +213,7 @@ const showEditTeacherModal = (teacher: TeacherTeam) => {
 const confirmDeleteGroupModal = async (groupId: string, groupName: string) => {
   const result = await confirm({
     message: notifications.confirmDelete(groupName),
-    title: 'Delete Group',
+    title: t('teacherGroups.delete_group'),
     okText: 'Confirm',
     size: 'small',
   })
@@ -238,7 +240,7 @@ const confirmDeleteGroupModal = async (groupId: string, groupName: string) => {
 const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string) => {
   const result = await confirm({
     message: notifications.confirmDelete(teacherName),
-    title: 'Delete Teacher',
+    title: t('teacherGroups.delete_teacher'),
     okText: 'Confirm',
     size: 'small',
   })
@@ -281,7 +283,7 @@ const handlerSearch = (event: Event) => {
     <VaCardTitle>
       <div class="flex gap-1">
         <div class="flex-grow">
-          <VaInput class="" placeholder="Search name, phone or email" @input="handlerSearch">
+          <VaInput class="" :placeholder="t('teacherGroups.search_name_phone_email')" @input="handlerSearch">
             <template #appendInner>
               <VaIcon color="secondary" class="material-icons"> search </VaIcon>
             </template>
@@ -294,24 +296,26 @@ const handlerSearch = (event: Event) => {
             </template>
             <VaDropdownContent class="p-0">
               <VaButton
+                icon="add"
                 preset="secondary"
                 size="small"
                 style="width: 100%"
                 class="p-2"
                 @click="showAddTeacherModal('Teacher')"
               >
-                New teacher
+                {{ t('teacherGroups.teacher') }}
               </VaButton>
             </VaDropdownContent>
             <VaDropdownContent class="p-0">
               <VaButton
+                icon="add"
                 preset="secondary"
                 size="small"
                 style="width: 100%"
                 class="p-2"
                 @click="showAddGroupModal('Group')"
               >
-                New teacher group
+                {{ t('teacherGroups.teacher_group') }}
               </VaButton>
             </VaDropdownContent>
           </VaDropdown>
@@ -325,7 +329,9 @@ const handlerSearch = (event: Event) => {
           hide-default-actions
           :before-cancel="beforeEditFormModalClose"
         >
-          <h3 class="va-text-bold">{{ modalToGroupEdit ? 'Edit ' : 'Add ' }} {{ titleModal }}</h3>
+          <h3 class="va-text-bold">
+            {{ modalToGroupEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}
+          </h3>
           <TeacherGroupModal
             ref="editFormRef"
             :group-teacher="modalToGroupEdit"
@@ -349,7 +355,9 @@ const handlerSearch = (event: Event) => {
           hide-default-actions
           :before-cancel="beforeEditFormModalClose"
         >
-          <h3 class="va-text-bold">{{ modalToTeacherEdit ? 'Edit ' : 'Add ' }} {{ titleModal }}</h3>
+          <h3 class="va-text-bold">
+            {{ modalToTeacherEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}
+          </h3>
           <TeacherTeamModal
             ref="editFormRef"
             :user="currentType"
@@ -408,7 +416,7 @@ const handlerSearch = (event: Event) => {
                       class="flex justify-between"
                       @click="showEditGroupModal(group)"
                     >
-                      <VaIcon name="edit_square" class="mr-1" /> Edit
+                      <VaIcon name="edit_square" class="mr-1" /> {{ t('settings.edit') }}
                     </VaButton>
                   </VaDropdownContent>
                   <VaDropdownContent class="p-0">
@@ -419,7 +427,7 @@ const handlerSearch = (event: Event) => {
                       class="flex justify-between"
                       @click="confirmDeleteGroupModal(group.id, group.name)"
                     >
-                      <VaIcon name="delete" class="mr-1" color="danger" /> Delete
+                      <VaIcon name="delete" class="mr-1" color="danger" /> {{ t('settings.delete') }}
                     </VaButton>
                   </VaDropdownContent>
                 </VaDropdown>
@@ -478,7 +486,7 @@ const handlerSearch = (event: Event) => {
                       class="flex justify-between"
                       @click="showEditTeacherModal(teacher)"
                     >
-                      <VaIcon name="edit_square" class="mr-1" /> Edit
+                      <VaIcon name="edit_square" class="mr-1" /> {{ t('settings.edit') }}
                     </VaButton>
                   </VaDropdownContent>
                   <VaDropdownContent class="p-0">
@@ -489,7 +497,7 @@ const handlerSearch = (event: Event) => {
                       class="flex justify-between"
                       @click="confirmDeleteTeacherInTeam(teacher.id, teacher.teacherName)"
                     >
-                      <VaIcon name="delete" class="mr-1" color="danger" /> Delete
+                      <VaIcon name="delete" class="mr-1" color="danger" /> {{ t('settings.delete') }}
                     </VaButton>
                   </VaDropdownContent>
                 </VaDropdown>

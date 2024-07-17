@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Classrooms, Student } from '@/pages/classrooms/types'
 import { onMounted, ref, computed, watch } from 'vue'
-import { VaCard, VaCardContent, VaCardTitle, VaDivider, VaInput, VaCheckbox, VaButton } from 'vuestic-ui'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   students: Student[]
   classRoom: Classrooms | undefined
@@ -55,10 +56,10 @@ const filteredStudents = computed(() => {
     <VaCardTitle> {{ props.classRoom?.name }} </VaCardTitle>
     <VaCardTitle>
       <div class="grid grid-cols-3">
-        <VaInput v-model="searchQuery" placeholder="search student" class="col-span-1" />
+        <VaInput v-model="searchQuery" :placeholder="t('papers.search_student')" class="col-span-1" />
         <VaCardTitle class="col-span-2 va-title justify-end gap-3">
-          <VaCheckbox v-model="selectAll" class="checkbox_custom-style" label="Select all" />
-          <VaCheckbox v-model="selectedAll" class="checkbox_custom-style" label="Selected student" />
+          <VaCheckbox v-model="selectAll" class="checkbox_custom-style" :label="t('papers.select_all')" />
+          <VaCheckbox v-model="selectedAll" class="checkbox_custom-style" :label="t('papers.selected_students')" />
         </VaCardTitle>
       </div>
     </VaCardTitle>
@@ -71,11 +72,11 @@ const filteredStudents = computed(() => {
           :array-value="student.id"
         />
       </template>
-      <p v-if="filteredStudents.length == 0" class="col-span-4">There are no students matching the search</p>
+      <p v-if="filteredStudents.length == 0" class="col-span-4">{{ t('papers.no_matching_students') }}</p>
     </VaCardContent>
     <VaDivider />
     <VaCardContent class="p-0 flex justify-end">
-      <VaButton @click="emit('save', selectionStudent as string[])"> Choose students </VaButton>
+      <VaButton @click="emit('save', selectionStudent as string[])">{{ t('papers.choose_student') }}</VaButton>
     </VaCardContent>
   </VaCard>
 </template>

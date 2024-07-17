@@ -9,7 +9,9 @@ import { QuestionTypeColor } from '@services/utils'
 import QuestionView from '@/pages/question/widgets/QuestionView.vue'
 import { Question, QuestionSearchRes, QuestionTree, SearchQuestion } from '@pages/question/types'
 import { Pagination } from '../../question/types'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const nodes = ref<QuestionTree[]>([])
 const stores = useQuestionFolderStore()
 const storesQuestion = useQuestionStore()
@@ -23,22 +25,22 @@ const { init } = useToast()
 const currentSelectedFolder = ref<QuestionTree | null>(null)
 
 const QuestionTypeOptions = [
-  { id: 0, name: 'All', questionType: 0 },
-  { id: 1, name: 'Single Choice', questionType: 1 },
-  { id: 2, name: 'Multiple Choice', questionType: 2 },
-  { id: 4, name: 'Fill Blank', questionType: 4 },
-  { id: 5, name: 'Matching', questionType: 5 },
-  { id: 6, name: 'Reading', questionType: 6 },
-  { id: 8, name: 'Writing', questionType: 8 },
-  { id: 100, name: 'Other', questionType: 100 },
+  { id: 0, name: t('papers.all'), questionType: 0 },
+  { id: 1, name: t('papers.single_choice'), questionType: 1 },
+  { id: 2, name: t('papers.multiple_choice'), questionType: 2 },
+  { id: 4, name: t('papers.fill_blank'), questionType: 4 },
+  { id: 5, name: t('papers.matching'), questionType: 5 },
+  { id: 6, name: t('papers.reading'), questionType: 6 },
+  { id: 8, name: t('papers.writing'), questionType: 8 },
+  { id: 100, name: t('papers.other'), questionType: 100 },
 ]
 
 const QuestionTypeValue = ref(QuestionTypeOptions[0])
 
 const QuestionSortOptions = [
-  { id: 0, name: 'Newest', questionType: 1 },
-  { id: 1, name: 'Oldest', questionType: 2 },
-  { id: 2, name: 'Last Modified', questionType: 4 },
+  { id: 0, name: t('papers.newest'), questionType: 1 },
+  { id: 1, name: t('papers.oldest'), questionType: 2 },
+  { id: 2, name: t('papers.last_modified'), questionType: 4 },
 ]
 
 const QuestionSortValue = ref(QuestionSortOptions[0])
@@ -106,7 +108,6 @@ watch(
   () => {
     searchValue.value.pageNumber = pagination.value.page
     searchValue.value.pageSize = pagination.value.perPage
-    console.log('pagination', pagination.value)
     searchQuestion(searchValue.value)
   },
   { immediate: true },
@@ -224,7 +225,6 @@ watch(
   () => QuestionTypeValue.value.id,
   () => {
     pagination.value.page = 1
-    console.log('Search question with type')
     searchQuestionWithType()
   },
   { immediate: true },
@@ -299,7 +299,7 @@ onMounted(() => {
         <VaInnerLoading :loading="loading" :size="60">
           <VaCard class="flex flex-col" outlined>
             <VaCardTitle class="flex items-start justify-between">
-              <h1 class="card-title text-secondary font-bold uppercase">Folders</h1>
+              <h1 class="card-title text-secondary font-bold uppercase">{{ t('papers.folder') }}</h1>
               <div class="flex gap-2"></div>
             </VaCardTitle>
             <VaSkeletonGroup v-if="loading" animation="wave" :delay="0">
@@ -343,7 +343,7 @@ onMounted(() => {
         <VaCard class="flex flex-col min-h-[500px]" outlined>
           <VaCardTitle class="flex items-start justify-between">
             <h1 class="card-title text-secondary font-bold uppercase">
-              List question of <b>{{ currentSelectedFolder?.name || '?' }}</b>
+              {{ t('papers.list_question_of') }} <b>{{ currentSelectedFolder?.name || '?' }}</b>
             </h1>
             <div class="flex gap-2"></div>
           </VaCardTitle>
@@ -352,9 +352,9 @@ onMounted(() => {
               <VaSelect
                 v-model="QuestionTypeValue"
                 track-by="id"
-                :text-by="(option) => (option as any).name"
-                placeholder="All"
-                label="Question Type"
+                :text-by="(option: any) => (option as any).name"
+                :placeholder="t('papers.all')"
+                :label="t('papers.question_type')"
                 :options="QuestionTypeOptions"
                 class="col-span-1"
               >
@@ -381,9 +381,9 @@ onMounted(() => {
                 <VaSelect
                   v-model="QuestionSortValue"
                   track-by="id"
-                  :text-by="(option) => (option as any).name"
-                  placeholder="Newest"
-                  label="Sort by"
+                  :text-by="(option: any) => (option as any).name"
+                  :placeholder="t('papers.newest')"
+                  :label="t('papers.sort_by')"
                   :options="QuestionSortOptions"
                 >
                   <template #content="{ value }">
@@ -406,7 +406,12 @@ onMounted(() => {
                   </template>
                 </VaSelect>
               </div>
-              <VaInput v-model="filters.search" label="Search content" placeholder="Search" class="col-span-2">
+              <VaInput
+                v-model="filters.search"
+                :label="t('papers.search_content')"
+                :placeholder="t('papers.search_content')"
+                class="col-span-2"
+              >
                 <template #prependInner>
                   <VaIcon name="search" color="secondary" size="small" />
                 </template>
@@ -416,8 +421,8 @@ onMounted(() => {
           <VaCard v-if="currentSelectedFolder == null" class="mb-5 pr-4 flex justify-center">
             <div class="flex flex-col gap-4 w-full">
               <VaCardContent class="flex flex-col items-center justify-center">
-                <h2 class="va-h5">No question folder selected</h2>
-                <p class="text-base leading-5">Please select a question folder to view its questions</p>
+                <h2 class="va-h5">{{ t('papers.no_question_folder_selected') }}</h2>
+                <p class="text-base leading-5">{{ t('papers.please_select_folder') }}</p>
               </VaCardContent>
             </div>
           </VaCard>
@@ -443,8 +448,8 @@ onMounted(() => {
               <VaCard v-if="testQuestions.length === 0" class="mb-5 pr-4 flex justify-center">
                 <div class="flex flex-col gap-4 w-full">
                   <VaCardContent class="flex flex-col items-center justify-center">
-                    <h2 class="va-h5">No question in this folder</h2>
-                    <p class="text-base leading-5">Please select another folder</p>
+                    <h2 class="va-h5">{{ t('papers.no_question_in_folder') }}</h2>
+                    <p class="text-base leading-5">{{ t('papers.please_select_another_folder') }}</p>
                   </VaCardContent>
                 </div>
               </VaCard>
@@ -453,8 +458,8 @@ onMounted(() => {
           <VaCardContent>
             <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center p-2">
               <div>
-                <b>{{ pagination.total }} results.</b>
-                Results per page
+                <b>{{ pagination.total }} {{ t('papers.result') }}.</b>
+                {{ t('papers.results_per_page') }}
                 <VaSelect v-model="pagination.perPage" class="!w-20" :options="[10, 50, 100]" />
               </div>
 
@@ -462,7 +467,7 @@ onMounted(() => {
                 <VaButton
                   preset="secondary"
                   icon="va-arrow-left"
-                  aria-label="Previous page"
+                  :aria-label="t('papers.previous_page')"
                   :disabled="pagination.page === 1"
                   @click="pagination.page--"
                 />
@@ -470,7 +475,7 @@ onMounted(() => {
                   class="mr-2"
                   preset="secondary"
                   icon="va-arrow-right"
-                  aria-label="Next page"
+                  :aria-label="t('papers.next_page')"
                   :disabled="pagination.page === totalPages"
                   @click="pagination.page++"
                 />
@@ -487,8 +492,8 @@ onMounted(() => {
           </VaCardContent>
         </VaCard>
         <div>
-          <p>Number of questions selected: {{ selectedQuestions.length }}</p>
-          <VaButton @click="saveQuestion">Choose question</VaButton>
+          <p>{{ t('papers.number_of_questions_selected') }}: {{ selectedQuestions.length }}</p>
+          <VaButton @click="saveQuestion">{{ t('papers.choose_question') }}</VaButton>
         </div>
       </div>
     </div>

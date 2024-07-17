@@ -6,7 +6,9 @@ import { validators } from '@services/utils'
 import { useSubjectStore } from '../../../stores/modules/subject.module'
 import { Subject } from '@/pages/subject/types'
 import { useToast } from 'vuestic-ui'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const storeSubject = useSubjectStore()
 const { init: notify } = useToast()
 
@@ -93,28 +95,33 @@ onMounted(() => {
     <VaCardContent class="grid grid-cols-2 gap-2">
       <VaInput
         v-model="paper.examName"
-        placeholder="Enter name..."
-        label="Name"
+        :placeholder="t('papers.enter_exam_name')"
+        :label="t('papers.exam_name')"
         :rules="[validators.required]"
         class="col-span-2"
       />
       <VaSelect
         v-model="paper.subjectId"
-        placeholder="Select a subject"
-        label="Subject"
+        :placeholder="t('papers.select_a_subject')"
+        :label="t('subjects.subject')"
         searchable
         highlight-matched-text
         :options="subjects"
         :text-by="(subject: Subject) => subject.name"
         :value-by="(subject: Subject) => subject.id"
       />
-      <VaInput v-model="paper.password" placeholder="Enter password" label="Password(optional)" />
-      <VaTextarea v-model="paper.description" placeholder="Description..." label="Description" class="col-span-2" />
-      <VaSwitch v-model="isPublished" label="Publish" size="small" class="col-span-2 justify-self-end" />
+      <VaInput v-model="paper.password" :placeholder="t('papers.enter_password')" :label="t('papers.password')" />
+      <VaTextarea
+        v-model="paper.description"
+        :placeholder="t('papers.enter_description')"
+        :label="t('papers.description')"
+        class="col-span-2"
+      />
+      <VaSwitch v-model="isPublished" :label="t('papers.publish')" size="small" class="col-span-2 justify-self-end" />
     </VaCardContent>
   </VaCard>
   <div class="flex justify-end gap-3 mt-3">
-    <VaButton preset="primary" @click="cancelPaper">Cancel</VaButton>
-    <VaButton @click="onSavePaper">Save</VaButton>
+    <VaButton preset="primary" @click="cancelPaper">{{ t('settings.cancel') }}</VaButton>
+    <VaButton @click="onSavePaper">{{ t('settings.save ') }}</VaButton>
   </div>
 </template>

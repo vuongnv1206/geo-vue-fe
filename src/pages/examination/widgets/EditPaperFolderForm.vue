@@ -2,7 +2,10 @@
 import { ref, watch } from 'vue'
 import { PaperFolderDto, UpdatePaperFolderRequest } from '../types'
 import { PropType } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { validators } from '@/services/utils'
 
+const { t } = useI18n()
 const props = defineProps({
   folder: {
     type: Object as PropType<PaperFolderDto | null>,
@@ -42,14 +45,14 @@ watch(
   <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
     <VaInput
       v-model="newPaperFolder.name"
-      label="Folder name"
-      :rules="[(v) => v.length > 0 || `Folder name is required`]"
+      :label="t('papers.folder_name')"
+      :rules="[validators.required2($t('papers.folder_name'))]"
     />
     <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
-      <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
-      <VaButton @click="validate() && $emit('save', newPaperFolder as UpdatePaperFolderRequest)">{{
-        saveButtonLabel
-      }}</VaButton>
+      <VaButton preset="secondary" color="secondary" @click="$emit('close')">{{ t('settings.cancel') }}</VaButton>
+      <VaButton @click="validate() && $emit('save', newPaperFolder as UpdatePaperFolderRequest)">
+        {{ saveButtonLabel }}
+      </VaButton>
     </div>
   </VaForm>
 </template>
