@@ -99,8 +99,8 @@ export interface PaperDto {
   paperAccesses?: PaperAccess[]
   shareType?: number
   subjectId?: string | null
-  publicIpAllowed?: string | null
-  localIpAllowed?: string | null
+  publicIpAllowed?: string
+  localIpAllowed?: string
 }
 
 export interface PaperLabelDto {
@@ -159,8 +159,8 @@ export interface UpdatePaperRequest {
   paperAccesses?: PaperAccess[] | null
   subjectId?: string | null
   paperFolderId?: string | null
-  publicIpAllowed?: string | null
-  localIpAllowed?: string | null
+  publicIpAllowed?: string
+  localIpAllowed?: string
 }
 
 export enum ShowResult {
