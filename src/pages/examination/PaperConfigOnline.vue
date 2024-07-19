@@ -90,6 +90,8 @@ const editPaper = ref<UpdatePaperRequest>({
   paperAccesses: undefined,
   shareType: 1,
   subjectId: undefined,
+  publicIpAllowed: undefined,
+  localIpAllowed: undefined,
 })
 
 const valueOption = ref<AccessType>(AccessType.Everyone)
@@ -117,6 +119,8 @@ watch(
         shareType: paperDetail.value.shareType,
         subjectId: paperDetail.value.subjectId,
         paperFolderId: paperDetail.value.paperFolderId,
+        localIpAllowed: paperDetail.value.localIpAllowed,
+        publicIpAllowed: paperDetail.value.publicIpAllowed,
       }
 
       valueOption.value = paperDetail.value.shareType as AccessType
@@ -444,6 +448,21 @@ onMounted(() => {
             placeholder="Enter password..."
           />
           <VaCounter v-model="editPaper.duration" label="Submitted" manual-input class="mb-2 w-full pl-1" />
+        </div>
+
+        <div class="grid grid-cols-2">
+          <VaInput
+            v-model="editPaper.publicIpAllowed"
+            class="mb-2 pr-1"
+            label="Allowed Public Ip Address"
+            placeholder="Enter Ip Address"
+          />
+          <VaInput
+            v-model="editPaper.localIpAllowed"
+            class="mb-2 pr-1 pl-1"
+            label="Allowed local Ip Address"
+            placeholder="Enter Ip Address"
+          />
         </div>
       </VaCardContent>
     </VaCard>
