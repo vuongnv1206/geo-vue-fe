@@ -3,8 +3,8 @@ import { computed, ref, watch, onMounted } from 'vue'
 import { ClassroomQueryType, Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { getErrorMessage, notifications, validators } from '@/services/utils'
-import { useToast, VaSelect } from 'vuestic-ui'
 import { useI18n } from 'vue-i18n'
+import { useToast, VaSelect } from 'vuestic-ui/web-components'
 
 const { t } = useI18n()
 const { init: notify } = useToast()
