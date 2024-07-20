@@ -176,20 +176,6 @@
         </VaCard>
       </VaCard>
     </div>
-    <div
-      v-if="isTeacher"
-      class="w-fit rounded hover:bg-slate-200 p-1 absolute bottom-0 left-0 md:-bottom-8 md:-left-16"
-    >
-      <VaPopover :message="t('bin.title')" :offset="[10, 0]">
-        <VaIcon
-          name="delete"
-          class="cursor-pointer hover:opacity-80"
-          size="2rem"
-          color="#154ec1"
-          @click="handleRedirectToBin"
-        />
-      </VaPopover>
-    </div>
   </div>
 </template>
 
@@ -197,11 +183,9 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@modules/auth.module'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 // const loading = ref(true)
-const router = useRouter()
 // const { confirm } = useModal()
 // const { init: notify } = useToast()
 const authStore = useAuthStore()
@@ -242,10 +226,6 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
 //       loading.value = false
 //     })
 // }
-
-const handleRedirectToBin = () => {
-  router.push({ name: 'bin' })
-}
 
 // onMounted(() => {
 //   getGroupClasses()
