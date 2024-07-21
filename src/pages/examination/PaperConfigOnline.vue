@@ -92,6 +92,7 @@ const editPaper = ref<UpdatePaperRequest>({
   subjectId: undefined,
   publicIpAllowed: undefined,
   localIpAllowed: undefined,
+  numberAttempt: undefined,
 })
 
 const valueOption = ref<AccessType>(AccessType.Everyone)
@@ -121,6 +122,7 @@ watch(
         paperFolderId: paperDetail.value.paperFolderId,
         localIpAllowed: paperDetail.value.localIpAllowed,
         publicIpAllowed: paperDetail.value.publicIpAllowed,
+        numberAttempt: paperDetail.value.numberAttempt || 1,
       }
 
       valueOption.value = paperDetail.value.shareType as AccessType
@@ -447,7 +449,13 @@ onMounted(() => {
             label="Exam password"
             placeholder="Enter password..."
           />
-          <VaCounter v-model="editPaper.duration" label="Submitted" manual-input class="mb-2 w-full pl-1" />
+          <VaCounter
+            v-model="editPaper.numberAttempt"
+            :rules="[(v: any) => v > 0 || 'Field is required']"
+            label="Submitted"
+            manual-input
+            class="mb-2 w-full pl-1"
+          />
         </div>
 
         <div class="grid grid-cols-2">

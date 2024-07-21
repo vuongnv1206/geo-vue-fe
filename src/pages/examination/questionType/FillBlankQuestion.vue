@@ -40,11 +40,8 @@ const getUserAnswer = (questionId: string | undefined) => {
   return JSON.parse(ans)
 }
 
-const isCorrect = (correctAnswer: Record<string, string>, userAnswer: Record<string, string>) => {
-  for (const key in userAnswer) {
-    if (correctAnswer[key] !== userAnswer[key]) return false
-    return true
-  }
+const isCorrect = (correctAnswer: Record<string, string>, key: number, value: string) => {
+  return correctAnswer[key] === value
 }
 
 const getPointAchieve = (questionId: string | undefined) => {
@@ -66,7 +63,7 @@ const getPointAchieve = (questionId: string | undefined) => {
       <b>{{ t('papers.student_answer') }}:</b>
       <template v-for="(record, index2) in getUserAnswer(props.question.id)" :key="index2">
         <div v-for="(value, key) in record" :key="key" class="border border-dashed border-backgroundBorder p-2">
-          <b :class="isCorrect(getCorrectAnswer(props.question), record) ? 'va-text-success' : 'va-text-danger'">
+          <b :class="isCorrect(getCorrectAnswer(props.question), key, value) ? 'va-text-success' : 'va-text-danger'">
             {{ key }}. {{ value }}
           </b>
         </div>
