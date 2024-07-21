@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { SubmitPaperDetailDto } from '../types'
+import { MarkAnswerRequest, SubmitPaperDetailDto } from '../types'
 import { Question } from '@/pages/question/types'
 import QuestionHeadView from '@pages/question/widgets/child/QuestionHeadView.vue'
 import QuestionFooterView from '@/pages/question/widgets/child/QuestionFooterView.vue'
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, onMounted, ref } from 'vue'
 import { validators } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
+import { useSubmitPaperStore } from '@/stores/modules/submitPaper.module'
+import { useToast } from 'vuestic-ui'
+import { getErrorMessage, notifications } from '@/services/utils'
+const { init: notify } = useToast()
+const submitPaperStore = useSubmitPaperStore()
 
 const { t } = useI18n()
 const props = defineProps<{
@@ -13,6 +18,7 @@ const props = defineProps<{
   studentAnswers: SubmitPaperDetailDto[]
   showActionButton: boolean
   index: number | null
+  submitPaperId: string
 }>()
 
 const readMoreActivated = ref(false)
@@ -34,14 +40,43 @@ const getPointAchieve = (questionId: string | undefined) => {
   const a = props.studentAnswers.find((detail) => detail.questionId === questionId)?.mark || 0
   return a
 }
+
+const markQuestion = ref(0)
+const manualMarkForQuestion = async () => {
+  const markRequest = ref<MarkAnswerRequest>({
+    submitPaperId: props.submitPaperId,
+    questionId: props.question.id,
+    mark: markQuestion.value,
+  })
+
+  await submitPaperStore
+    .markAnswerWriting(markRequest.value)
+    .then(() => {
+      notify({
+        message: `Send mark success`,
+        color: 'success',
+      })
+      getPointAchieve(props.question.id)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(getErrorMessage(error)),
+        color: 'danger',
+      })
+    })
+}
+
+onMounted(() => {
+  markQuestion.value = getPointAchieve(props.question.id)
+})
 </script>
 
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="props.question" :index="props.index" />
-    <VaCardTitle>{{ t('papers.point') }}: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
+    <VaCardTitle>{{ t('papers.point') }}: {{ markQuestion }}/{{ question.mark }}</VaCardTitle>
     <div class="mt-4">
-      <span class="va-text-bold">{{ t('settings.request') }}: </span>
+      <span class="va-text-bold">{{ t('papers.require_title') }}: </span>
       <div class="pl-2 pr-2">
         <span v-if="!readMoreActivated">
           <!-- eslint-disable vue/no-v-html -->
@@ -66,7 +101,7 @@ const getPointAchieve = (questionId: string | undefined) => {
           class="text-primary"
           @click="readMoreAnswerActivated = !readMoreAnswerActivated"
         >
-          {{ t('settings.read') }}
+          {{ t('papers.read') }}
         </button>
       </span>
       <div class="pl-2 pr-2">
@@ -85,7 +120,8 @@ const getPointAchieve = (questionId: string | undefined) => {
     </div>
     <div class="flex">
       <VaInput
-        :rules="[validators.maxValue(props.question.mark ?? 0), validators.isNumber]"
+        v-model="markQuestion"
+        :rules="[validators.maxValue(props.question.mark ?? 0), validators.minValue(0), validators.isNumber]"
         class="max-w-[5rem] mr-2"
         style="padding: 0px"
         placeholder="point"
@@ -94,7 +130,7 @@ const getPointAchieve = (questionId: string | undefined) => {
           <span>/{{ props.question.mark }}</span>
         </template>
       </VaInput>
-      <VaButton size="small">{{ t('settings.send') }}</VaButton>
+      <VaButton size="small" @click="manualMarkForQuestion">{{ t('settings.send') }}</VaButton>
     </div>
     <!-- footer -->
     <QuestionFooterView :question="props.question" :show-action-button="props.showActionButton" />

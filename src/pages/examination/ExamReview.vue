@@ -237,6 +237,7 @@ const filterGroupQuestionType = () => {
                 :student-answers="result?.submitPaperDetails ?? []"
                 :show-action-button="false"
                 :index="index + 1"
+                :submit-paper-id="request.submitPaperId"
               />
               <ReadingQuestion
                 v-if="question.questionType == QuestionType.Reading && (valueTab == 'reading' || valueTab == 'all')"

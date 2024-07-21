@@ -89,10 +89,11 @@ const getPointAchieve = (questionId: string | undefined) => {
         <div v-html="formatContent(question.content || '')"></div>
         <!--eslint-enable-->
       </div>
-      <div class="mt-5">
+      <div class="mt-5 flex gap-3">
         <b>{{ t('papers.student_answer') }}:</b>
+        <span v-if="getUserAnswer(question.id) === ''">{{ t('papers.student_no_submit_answer') }}</span>
       </div>
-      <div class="mb-2 mt-2 flex flex-wrap gap-4">
+      <div v-if="getUserAnswer(question.id) !== ''" class="mb-2 mt-2 flex flex-wrap gap-4">
         <div
           v-for="(pair, index2) in getCorrectAnswer(getUserAnswer(question.id), question as Question)"
           :key="index2"

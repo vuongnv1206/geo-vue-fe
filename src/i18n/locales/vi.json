@@ -431,6 +431,7 @@
     "share_paper": "Chia sẻ bài thi",
     "correct_answer": "Đáp án đúng",
     "student_answer": "Đáp án của học sinh",
+    "student_no_submit_answer": "Học sinh không có đáp án",
     "question_passages": "Đoạn văn câu hỏi",
     "point": "Điểm",
     "enter_point": "Nhập điểm",
@@ -502,7 +503,8 @@
     "content_2": "Tạo nhiều bài kiểm tra chất lượng tương đương từ thiết kế ma trận hiện có của Azota, cung cấp thông tin cấu trúc cơ bản: thời gian, số lượng câu hỏi, cấp độ và định dạng câu hỏi.",
     "supported_format": "Định dạng hỗ trợ: .pdf, .docx, .xlsx.",
     "content_0": "Bạn có thể tải lên các tệp bài tập, bài kiểm tra hoặc phiếu trả lời để chấm ngoại tuyến.",
-    "details": "Chi tiết"
+    "details": "Chi tiết",
+    "require_title": "Đề bài"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",

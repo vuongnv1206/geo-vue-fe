@@ -429,6 +429,7 @@
     "share_paper": "Share Paper",
     "correct_answer": "Correct Answer",
     "student_answer": "Student's Answer",
+    "student_no_submit_answer": "Student hasn't submitted answer",
     "question_passages": "question passages",
     "point": "Point",
     "enter_point": "Enter Point",
@@ -500,7 +501,8 @@
     "content_2": "Create multiple equivalent quality tests from the existing matrix design of Azota, providing basic structure information: time, number of questions, levels, and question formats.",
     "supported_format": "Supported formats: .pdf, .docx, .xlsx.",
     "content_0": "You can upload Exercise Files, Exam Papers, or Answer Sheets for offline grading.",
-    "details": "Details"
+    "details": "Details",
+    "require_title": "Requirement"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",
