@@ -3,11 +3,7 @@
     <VaInput
       v-model="newGroupClass.name"
       :label="$t('groupClasses.name')"
-      :rules="[
-        validators.required2($t('groupClasses.name')),
-        validators.isCharacter($t('groupClasses.name')),
-        validators.maxLength(50),
-      ]"
+      :rules="[validators.required2($t('groupClasses.name')), validators.maxLength(50)]"
     />
     <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">{{ t('settings.cancel') }}</VaButton>
