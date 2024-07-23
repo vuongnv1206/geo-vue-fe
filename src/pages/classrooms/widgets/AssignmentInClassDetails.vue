@@ -12,7 +12,7 @@
         <template #anchor>
           <VaButton :disabled="!canAssignmentManage">
             <VaIcon name="add" />
-            Assignment
+            {{ t('assignments.assignment') }}
           </VaButton>
         </template>
       </VaMenu>
@@ -29,7 +29,9 @@ import { format } from '@/services/utils'
 import { Classrooms } from '../types'
 import AccordionOfAssignment from './AccordionOfAssignment.vue'
 import router from '@/router'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   classDetails: {
     type: Object as PropType<Classrooms>,
@@ -51,8 +53,8 @@ const forceRerender = () => {
 }
 
 const options = ref([
-  { text: 'Assignment', value: 'create-assignment', icon: 'description' },
-  { text: 'Paper', value: 'create-paper', icon: 'article' },
+  { text: t('assignments.assignment'), value: 'create-assignment', icon: 'description' },
+  { text: t('papers.paper'), value: 'create-paper', icon: 'article' },
 ])
 
 const selectedOption = (v: { text: string; value: string }) => {
@@ -108,10 +110,8 @@ const groupedData = computed(() => {
 
 const filteredGroupedData = computed(() => {
   if (!searchQuery.value) {
-    console.log('groupedData.value:', groupedData.value)
     return groupedData.value
   }
-  console.log('searchQuery:', searchQuery.value)
   const filteredGroups = groupedData.value
     .map((group) => {
       const filteredAssignments = group.assignments.filter((assignment: any) =>
@@ -131,8 +131,6 @@ const filteredGroupedData = computed(() => {
       return null
     })
     .filter((group) => group !== null)
-
-  console.log('filteredGroups:', filteredGroups)
   return filteredGroups.length > 0 ? filteredGroups : []
 })
 

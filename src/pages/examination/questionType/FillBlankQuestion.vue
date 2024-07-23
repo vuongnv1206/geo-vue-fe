@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Question } from '@/pages/question/types'
 import { SubmitPaperDetailDto } from '../types'
-
 import QuestionHeadView from '@pages/question/widgets/child/QuestionHeadView.vue'
 import QuestionFooterView from '@/pages/question/widgets/child/QuestionFooterView.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   question: Question
   studentAnswers: SubmitPaperDetailDto[]
@@ -39,11 +40,8 @@ const getUserAnswer = (questionId: string | undefined) => {
   return JSON.parse(ans)
 }
 
-const isCorrect = (correctAnswer: Record<string, string>, userAnswer: Record<string, string>) => {
-  for (const key in userAnswer) {
-    if (correctAnswer[key] !== userAnswer[key]) return false
-    return true
-  }
+const isCorrect = (correctAnswer: Record<string, string>, key: number, value: string) => {
+  return correctAnswer[key] === value
 }
 
 const getPointAchieve = (questionId: string | undefined) => {
@@ -55,24 +53,24 @@ const getPointAchieve = (questionId: string | undefined) => {
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="props.question" :index="props.index" />
-    <VaCardTitle>Point: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
+    <VaCardTitle>{{ t('papers.point') }}: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
     <div class="mt-2">
       <!-- eslint-disable vue/no-v-html -->
       <p style="line-height: initial" v-html="formatContent(props.question?.content || '')"></p>
       <!--eslint-enable-->
     </div>
     <div class="mb-2 mt-5 flex flex-wrap gap-4">
-      <b>Student's answer:</b>
+      <b>{{ t('papers.student_answer') }}:</b>
       <template v-for="(record, index2) in getUserAnswer(props.question.id)" :key="index2">
         <div v-for="(value, key) in record" :key="key" class="border border-dashed border-backgroundBorder p-2">
-          <b :class="isCorrect(getCorrectAnswer(props.question), record) ? 'va-text-success' : 'va-text-danger'"
-            >{{ key }}. {{ value }}
+          <b :class="isCorrect(getCorrectAnswer(props.question), key, value) ? 'va-text-success' : 'va-text-danger'">
+            {{ key }}. {{ value }}
           </b>
         </div>
       </template>
     </div>
     <div class="mb-2 mt-2 flex flex-wrap gap-4">
-      <b class="va-text-success">Correct answer:</b>
+      <b class="va-text-success">{{ t('papers.correct_answer') }}:</b>
       <div
         v-for="(answer, index3) in getCorrectAnswer(props.question as Question)"
         :key="index3"

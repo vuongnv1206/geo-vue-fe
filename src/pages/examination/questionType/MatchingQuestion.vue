@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { Question } from '@/pages/question/types'
 import { SubmitPaperDetailDto } from '../types'
-
 import QuestionHeadView from '@pages/question/widgets/child/QuestionHeadView.vue'
 import QuestionFooterView from '@/pages/question/widgets/child/QuestionFooterView.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{
   question: Question
   studentAnswers: SubmitPaperDetailDto[]
@@ -81,17 +82,18 @@ const getPointAchieve = (questionId: string | undefined) => {
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="question" :index="index" />
-    <VaCardTitle>Point: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
+    <VaCardTitle>{{ t('papers.point') }}: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
     <VaCardContent>
       <div class="mt-2">
         <!-- eslint-disable vue/no-v-html -->
         <div v-html="formatContent(question.content || '')"></div>
         <!--eslint-enable-->
       </div>
-      <div class="mt-5">
-        <b>Student's answers:</b>
+      <div class="mt-5 flex gap-3">
+        <b>{{ t('papers.student_answer') }}:</b>
+        <span v-if="getUserAnswer(question.id) === ''">{{ t('papers.student_no_submit_answer') }}</span>
       </div>
-      <div class="mb-2 mt-2 flex flex-wrap gap-4">
+      <div v-if="getUserAnswer(question.id) !== ''" class="mb-2 mt-2 flex flex-wrap gap-4">
         <div
           v-for="(pair, index2) in getCorrectAnswer(getUserAnswer(question.id), question as Question)"
           :key="index2"
@@ -103,12 +105,12 @@ const getPointAchieve = (questionId: string | undefined) => {
                 ? 'va-text-success'
                 : 'va-text-danger'
             "
-            >{{ pair.A }} - {{ pair.B }}</b
-          >
+            >{{ pair.A }} - {{ pair.B }}
+          </b>
         </div>
       </div>
       <div class="mt-5">
-        <b style="color: var(--va-success)">Correct answer:</b>
+        <b style="color: var(--va-success)"> {{ t('papers.correct_answer') }}: </b>
       </div>
       <div class="mb-2 mt-2 flex flex-wrap gap-4">
         <div

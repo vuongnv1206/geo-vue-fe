@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const folderId = ref(route.params.folderId ?? null)
@@ -19,10 +21,12 @@ onMounted(() => {})
     <div style="flex: 2; margin-right: 20px">
       <VaCard>
         <VaCardContent>
-          <h1>Create New Test</h1>
+          <h1>{{ t('papers.create_test') }}</h1>
           <VaFileUpload
             v-model="basic"
             dropzone
+            :upload-button-text="$t('file_upload.upload_button_text')"
+            :drop-zone-text="$t('file_upload.drop_zone_text')"
             style="border: 2px dashed #ccc; height: 600px; display: flex; align-items: center; justify-content: center"
           >
             <div style="text-align: center">
@@ -33,10 +37,9 @@ onMounted(() => {})
                 style="line-height: initial; display: block; margin: 0 auto"
               />
               <p style="font-size: 18px; margin-top: 10px">Choose File or drag and drop File here</p>
-              <p style="color: gray">Supported formats: .pdf, .docx, .xlsx.</p>
+              <p style="color: gray">{{ t('papers.supported_format') }}</p>
               <p style="color: gray">
-                You can upload Exercise Files, Exam Papers, or Answer Sheets for offline grading.
-                <a href="#">Learn more</a>
+                {{ t('papers.content_0') }}
               </p>
             </div>
           </VaFileUpload>
@@ -53,28 +56,27 @@ onMounted(() => {})
       <VaCard>
         <VaCardContent>
           <VaButton block outline color="primary" style="margin-bottom: 10px" @click="createPaperUseQuestionBank">
-            <VaIcon name="edit" style="margin-right: 10px" /> Create Test/Exercise
+            <VaIcon name="edit" style="margin-right: 10px" /> {{ t('papers.create_test') }}
           </VaButton>
           <p style="margin-left: 40px; color: gray">
-            Use GEO's editor to create Exercises/Tests. Edit from available templates or Copy & Paste from various
-            sources. <a href="#">Learn more</a>
-          </p>
-
-          <VaButton block outline color="primary" style="margin-bottom: 10px">
-            <VaIcon name="business" style="margin-right: 10px" /> Create Test from Matrix
-          </VaButton>
-          <p style="margin-left: 40px; color: gray">
-            Create multiple equivalent quality tests from the existing matrix design of Azota, providing basic structure
-            information: time, number of questions, levels, and question formats.
+            {{ t('papers.content_1') }}
             <a href="#">Learn more</a>
           </p>
 
           <VaButton block outline color="primary" style="margin-bottom: 10px">
-            <VaIcon name="thumb_up" style="margin-right: 10px" /> Create Offline Test Manually
+            <VaIcon name="business" style="margin-right: 10px" /> {{ t('papers.create_test_from_matrix') }}
+          </VaButton>
+          <p style="margin-left: 40px; color: gray">
+            {{ t('papers.content_2') }}
+            <a href="#">Learn more</a>
+          </p>
+
+          <VaButton block outline color="primary" style="margin-bottom: 10px">
+            <VaIcon name="thumb_up" style="margin-right: 10px" /> {{ t('papers.create_offline_test_manually') }}
           </VaButton>
 
           <VaButton block outline color="primary">
-            <VaIcon name="article" style="margin-right: 10px" /> Create Offline Test with Text
+            <VaIcon name="article" style="margin-right: 10px" /> {{ t('papers.create_offline_test_with_text') }}
           </VaButton>
         </VaCardContent>
       </VaCard>

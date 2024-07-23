@@ -3,7 +3,9 @@ import { PropType, ref, watch } from 'vue'
 import { GroupTeacher } from './types'
 import { useForm } from 'vuestic-ui'
 import { validators } from '@/services/utils'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   groupTeacher: {
     type: Object as PropType<GroupTeacher | null>,
@@ -45,21 +47,19 @@ const onSave = () => {
 
 <template>
   <VaCard>
-    <VaDivider />
     <VaCardContent>
       <VaForm ref="addForm" stateful class="flex flex-col gap-2">
         <VaInput
           v-model="newGroup.name"
           name="name"
-          label="Group name"
-          placeholder="Group name"
-          :rules="[validators.required2('group name'), validators.maxLength(50)]"
+          :label="t('teacherGroups.group_name')"
+          :placeholder="t('teacherGroups.enter_group_name')"
+          :rules="[validators.required2(t('teacherGroups.group_name')), validators.maxLength(50)]"
         />
       </VaForm>
     </VaCardContent>
-    <VaDivider />
     <div class="flex gap-2 flex-col-reverse items-stretch justify-end w-full sm:flex-row sm:items-center">
-      <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
+      <VaButton preset="secondary" color="secondary" @click="$emit('close')">{{ $t('settings.cancel') }}</VaButton>
       <VaButton @click="onSave">{{ saveButtonLabel }}</VaButton>
     </div>
   </VaCard>

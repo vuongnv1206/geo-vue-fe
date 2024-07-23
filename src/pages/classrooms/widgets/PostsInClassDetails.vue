@@ -1,7 +1,13 @@
 <template>
   <div class="max-w-2xl min-h-[75vh]">
     <VaCard class="relative bg-white rounded-lg shadow-md mb-2">
-      <QuillEditor ref="quillEditor" v-model:content="newPost.content" class="pb-5" content-type="html" />
+      <QuillEditor
+        ref="quillEditor"
+        v-model:content="newPost.content"
+        class="pb-5"
+        :placeholder="$t('posts.enter_content')"
+        content-type="html"
+      />
       <VaCard class="absolute bottom-2 right-2">
         <VaButton
           class="mr-2"
@@ -39,8 +45,8 @@
             <VaMenu
               v-if="currentUser == post.owner?.id"
               :options="[
-                { text: 'Edit', value: post, icon: 'edit' },
-                { text: 'Delete', value: post, icon: 'delete' },
+                { text: t('settings.edit'), value: post, icon: 'edit' },
+                { text: t('settings.delete'), value: post, icon: 'delete' },
               ]"
               @selected="(v: any) => selectedPostOption(v)"
             >
@@ -101,8 +107,8 @@
                     </div>
                     <VaMenu
                       :options="[
-                        { text: 'Edit', value: comment, icon: 'edit' },
-                        { text: 'Delete', value: comment, icon: 'delete' },
+                        { text: t('settings.edit'), value: comment, icon: 'edit' },
+                        { text: t('settings.delete'), value: comment, icon: 'delete' },
                       ]"
                       @selected="(v: any) => selectedCommentOption(v)"
                     >
@@ -129,7 +135,7 @@
                       {{ comment.numberLikeInComment }}
                     </VaButton>
                     <VaButton preset="plain" size="small" icon="reply" @click="toggleReplies(comment.id)">
-                      Reply</VaButton
+                      {{ t('comments.reply') }}</VaButton
                     >
                   </div>
                   <div v-if="selectedCommentIds.includes(comment.id)">
@@ -154,7 +160,7 @@
     <div v-else>
       <VaCard class="bg-white rounded-lg shadow-md p-6">
         <VaIcon class="flex justify-center" name="newspaper" size="4rem" />
-        <VaCardContent class="text-center">There is no news!!</VaCardContent>
+        <VaCardContent class="text-center">{{ t('posts.no_post') }}</VaCardContent>
       </VaCard>
     </div>
   </div>
@@ -170,7 +176,7 @@
     :before-cancel="beforeEditFormModalClose"
     @close="doShowPostFormModal = false"
   >
-    <h3 class="text-lg font-bold">Edit Post</h3>
+    <h3 class="text-lg font-bold">{{ t('posts.edit_post') }}</h3>
     <EditPosts
       ref="editFormRef"
       :posts="postToEdit"
@@ -195,7 +201,7 @@
     :before-cancel="beforeEditFormModalClose"
     @close="doShowCommentFormModal = false"
   >
-    <h3 class="text-lg font-bold">Edit Comment</h3>
+    <h3 class="text-lg font-bold">{{ t('comments.edit_comment') }}</h3>
     <EditComment
       ref="editFormRef"
       :comment="commentToEdit"
@@ -215,17 +221,19 @@
 <script setup lang="ts">
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { onMounted, ref } from 'vue'
+import { useModal, useToast, VaModal } from 'vuestic-ui'
+import EditPosts from './EditPosts.vue'
+import EditComment from './EditComment.vue'
 import Comments from './Comments.vue'
-import { useAuthStore } from '@/stores/modules/auth.module'
-import { useModal, useToast, VaCard, VaCardContent, VaDivider, VaIcon, VaModal } from 'vuestic-ui'
 import { Comment, EmptyComment, EmptyCommentLike, EmptyPost, EmptyPostLike, Post } from '../types'
+import { useAuthStore } from '@/stores/modules/auth.module'
 import { usePostsStore } from '@/stores/modules/posts.module'
 import { useCommentStore } from '@/stores/modules/comments.module'
 import { Quill, QuillEditor } from '@vueup/vue-quill'
-import EditComment from './EditComment.vue'
-import EditPosts from './EditPosts.vue'
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const loading = ref(true)
 const { init: notify } = useToast()
 const { confirm } = useModal()
@@ -290,7 +298,7 @@ const getPosts = () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('posts') + getErrorMessage(error),
+        message: notifications.getFailed(t('posts.posts')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -322,7 +330,7 @@ const structureComments = (comments: Comment[]): Comment[] => {
 }
 
 const selectedPostOption = (option: any) => {
-  if (option.text === 'Edit') {
+  if (option.text === t('settings.edit')) {
     doShowPostFormModal.value = true
     postToEdit.value = option.value
   } else {
@@ -338,14 +346,14 @@ const OnPostsSaved = async (post: EmptyPost) => {
         .updatePost(post.id, post as EmptyPost)
         .then(() => {
           notify({
-            message: notifications.updatedSuccessfully('post'),
+            message: notifications.updatedSuccessfully(t('posts.posts')),
             color: 'success',
           })
           getPosts()
         })
         .catch((error) => {
           notify({
-            message: notifications.updateFailed('post') + getErrorMessage(error),
+            message: notifications.updateFailed(t('posts.posts')) + getErrorMessage(error),
             color: 'error',
           })
         })
@@ -354,7 +362,7 @@ const OnPostsSaved = async (post: EmptyPost) => {
         .createPost(post as EmptyPost)
         .then(() => {
           notify({
-            message: notifications.createSuccessfully('post'),
+            message: notifications.createSuccessfully(t('posts.posts')),
             color: 'success',
           })
           if (quillInstance.value) {
@@ -364,14 +372,14 @@ const OnPostsSaved = async (post: EmptyPost) => {
         })
         .catch((error) => {
           notify({
-            message: notifications.createFailed('post') + getErrorMessage(error),
+            message: notifications.createFailed(t('posts.posts')) + getErrorMessage(error),
             color: 'error',
           })
         })
     }
   } else {
     notify({
-      message: 'Please enter content',
+      message: t('posts.please_enter_content'),
       color: 'error',
     })
   }
@@ -379,8 +387,8 @@ const OnPostsSaved = async (post: EmptyPost) => {
 
 const deletePosts = (postId: string) => {
   confirm({
-    title: 'Delete Post',
-    message: notifications.confirmDelete('post'),
+    title: t('posts.delete_post'),
+    message: notifications.confirmDelete(t('posts.posts')),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -389,14 +397,14 @@ const deletePosts = (postId: string) => {
       .deletePost(postId)
       .then(() => {
         notify({
-          message: notifications.deleteSuccessfully('post'),
+          message: notifications.deleteSuccessfully(t('posts.posts')),
           color: 'success',
         })
         getPosts()
       })
       .catch((error) => {
         notify({
-          message: notifications.deleteFailed('post') + getErrorMessage(error),
+          message: notifications.deleteFailed(t('posts.posts')) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -422,7 +430,7 @@ const toggleReplies = (commentId: string) => {
 }
 
 const selectedCommentOption = (option: any) => {
-  if (option.text === 'Edit') {
+  if (option.text === t('settings.edit')) {
     doShowCommentFormModal.value = true
     commentToEdit.value = option.value
   } else {
@@ -438,14 +446,14 @@ const OnCommentSaved = async (comment: EmptyComment) => {
         .updateComment(comment.id, comment as EmptyComment)
         .then(() => {
           notify({
-            message: notifications.updatedSuccessfully('comment'),
+            message: notifications.updatedSuccessfully(t('comments.comment')),
             color: 'success',
           })
           getPosts()
         })
         .catch((error) => {
           notify({
-            message: notifications.updateFailed('comment') + getErrorMessage(error),
+            message: notifications.updateFailed(t('comments.comment')) + getErrorMessage(error),
             color: 'error',
           })
         })
@@ -460,21 +468,21 @@ const OnCommentSaved = async (comment: EmptyComment) => {
         .createComment(comm)
         .then(() => {
           notify({
-            message: notifications.createSuccessfully('comment'),
+            message: notifications.createSuccessfully(t('comments.comment')),
             color: 'success',
           })
           getPosts()
         })
         .catch((error) => {
           notify({
-            message: notifications.createFailed('comment') + getErrorMessage(error),
+            message: notifications.createFailed(t('comments.comment')) + getErrorMessage(error),
             color: 'error',
           })
         })
     }
   } else {
     notify({
-      message: 'Please enter content',
+      message: t('comments.please_enter_content'),
       color: 'error',
     })
   }
@@ -482,8 +490,8 @@ const OnCommentSaved = async (comment: EmptyComment) => {
 
 const deleteComment = (commentId: string) => {
   confirm({
-    title: 'Delete Comment',
-    message: notifications.confirmDelete('comment'),
+    title: t('comments.delete_comment'),
+    message: notifications.confirmDelete(t('comments.comment')),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -492,14 +500,14 @@ const deleteComment = (commentId: string) => {
       .deleteComment(commentId)
       .then(() => {
         notify({
-          message: notifications.deleteSuccessfully('comment'),
+          message: notifications.deleteSuccessfully(t('comments.comment')),
           color: 'success',
         })
         getPosts()
       })
       .catch((error) => {
         notify({
-          message: notifications.deleteFailed('comment') + getErrorMessage(error),
+          message: notifications.deleteFailed(t('comments.comment')) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -523,7 +531,7 @@ const likePosts = (postLike: EmptyPostLike) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.updateFailed('post') + getErrorMessage(error),
+        message: notifications.updateFailed(t('posts.posts')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -537,7 +545,7 @@ const dislikePosts = (postDisLike: EmptyPostLike) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.updateFailed('post') + getErrorMessage(error),
+        message: notifications.updateFailed(t('posts.posts')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -560,7 +568,7 @@ const likeComment = (commentLike: EmptyCommentLike) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.updateFailed('comment') + getErrorMessage(error),
+        message: notifications.updateFailed(t('comments.comment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -574,7 +582,7 @@ const dislikeComment = (commentDisLike: EmptyCommentLike) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.updateFailed('comment') + getErrorMessage(error),
+        message: notifications.updateFailed(t('comments.comment')) + getErrorMessage(error),
         color: 'error',
       })
     })

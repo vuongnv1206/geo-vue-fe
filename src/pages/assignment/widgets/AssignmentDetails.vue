@@ -29,52 +29,53 @@
     <template #left>
       <VaCard v-if="showSidebar" class="mr-2 rounded min-w-[500px]">
         <VaCard v-if="assignment" class="min-h-[81vh]">
-          <VaCard>
-            <VaCardTitle>{{ assignment.name }}</VaCardTitle>
-            <VaCardContent>
-              <VaIcon name="event" class="mr-1 material-symbols-outlined" /> Started at:
+          <VaCardContent class="font-bold">{{ assignment.name }}</VaCardContent>
+          <VaCardContent>
+            <div class="flex items-center mb-1">
+              <VaIcon name="event" class="material-symbols-outlined mr-1" />
+              <span class="font-semibold mr-1">{{ $t('assignments.start_time') }} </span>
               {{ format.formatDate(assignment.startTime) }}
-            </VaCardContent>
-            <VaCardContent>
-              <VaIcon name="event" class="mr-1 material-symbols-outlined" /> End Time:
+            </div>
+            <div class="flex items-center">
+              <VaIcon name="event" class="material-symbols-outlined mr-1" />
+              <span class="font-semibold mr-1">{{ $t('assignments.end_time') }}</span>
               {{ format.formatDate(assignment.endTime) }}
-            </VaCardContent>
-          </VaCard>
-          <VaCard>
-            <VaCardTitle>Menu</VaCardTitle>
-            <VaCard outlined class="mx-3">
-              <VaCardActions align="stretch" vertical>
-                <VaButton
-                  icon="edit"
-                  preset="secondary"
-                  :to="{ name: 'edit-assignment-details', params: { id: assignmentId, classId: classId } }"
-                  class="justify-start"
-                  >Setting
-                </VaButton>
-                <VaButton
-                  icon="delete"
-                  preset="secondary"
-                  class="justify-start"
-                  @click="removeAssignmentFromClass(assignmentClass)"
-                >
-                  Delete</VaButton
-                >
-              </VaCardActions>
-            </VaCard>
+            </div>
+          </VaCardContent>
+          <VaCardContent class="font-bold">{{ $t('assignments.menu') }}</VaCardContent>
+          <VaCard outlined class="mx-3">
+            <VaCardActions align="stretch" vertical>
+              <VaButton
+                icon="edit"
+                preset="secondary"
+                :to="{ name: 'edit-assignment-details', params: { id: assignmentId, classId: classId } }"
+                class="justify-start"
+              >
+                {{ $t('assignments.settings') }}
+              </VaButton>
+              <VaButton
+                icon="delete"
+                preset="secondary"
+                class="justify-start"
+                @click="removeAssignmentFromClass(assignmentClass)"
+              >
+                {{ $t('settings.delete') }}
+              </VaButton>
+            </VaCardActions>
           </VaCard>
           <VaCard>
             <VaCard class="flex flex-row items-center justify-between">
               <div class="flex flex-row items-center">
-                <VaCardTitle>Attachment File</VaCardTitle>
-                <VaPopover title="Allow file types" placement="right">
+                <VaCardContent class="font-bold">{{ $t('assignments.attachments') }}</VaCardContent>
+                <VaPopover :title="$t('file_upload.allowed_file_types')" placement="right">
                   <VaIcon name="error" size="small" />
                   <template #body>
-                    <p>Image: .jpg, .png, .jpeg.</p>
-                    <p>Document: .pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt.</p>
-                    <p>Archive: .zip, .rar, .7z.</p>
-                    <p>Video: .mp4, .avi, .mkv, .flv, .wmv, .mov, .webm.</p>
-                    <p>Audio: .mp3, .wav, .flac, .ogg, .wma.</p>
-                    <p>Data: .json, .xml, .csv, .tsv.</p>
+                    <p>{{ $t('file_upload.image') }}</p>
+                    <p>{{ $t('file_upload.document') }}</p>
+                    <p>{{ $t('file_upload.archive') }}</p>
+                    <p>{{ $t('file_upload.video') }}</p>
+                    <p>{{ $t('file_upload.audio') }}</p>
+                    <p>{{ $t('file_upload.data') }}</p>
                   </template>
                 </VaPopover>
               </div>
@@ -83,11 +84,11 @@
                 class="flex flex-row items-center pr-6"
                 hide-file-list
                 file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
-            flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
+              flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
                 @fileAdded="fileUpload"
               >
                 <VaIcon name="upload" />
-                <p>Upload</p>
+                <p class="font-semibold">{{ $t('assignments.upload') }}</p>
               </VaFileUpload>
             </VaCard>
             <VaCardContent>
@@ -104,23 +105,19 @@
               </VaCard>
             </VaCardContent>
           </VaCard>
-          <VaCard>
-            <VaCard class="flex flex-row justify-between">
-              <VaCardTitle>Content</VaCardTitle>
-              <VaButton
-                class="pr-6"
-                icon="edit"
-                size="small"
-                preset="plain"
-                @click="editAssignmentContent(assignment)"
-              />
-            </VaCard>
-            <VaCardContent>
-              <!-- eslint-disable vue/no-v-html -->
-              <div v-html="assignment.content ? assignment.content : 'Content is empty'" />
-              <!--eslint-enable-->
-            </VaCardContent>
+          <VaCard class="flex flex-row justify-between">
+            <VaCardContent class="font-bold">{{ $t('assignments.content') }}</VaCardContent>
+            <VaButton class="pr-6" icon="edit" size="small" preset="plain" @click="editAssignmentContent(assignment)" />
           </VaCard>
+          <VaCardContent>
+            <div v-if="!assignment.content" class="flex flex-col justify-center items-center h-full">
+              <VaIcon name="description" size="large" class="material-symbols-outlined mb-2" />
+              <p>{{ $t('assignments.empty_content') }}</p>
+            </div>
+            <!-- eslint-disable vue/no-v-html -->
+            <div v-html="assignment.content" />
+            <!--eslint-enable-->
+          </VaCardContent>
         </VaCard>
       </VaCard>
     </template>
@@ -158,7 +155,7 @@
     hide-default-actions
     :before-cancel="beforeEditFormModalClose"
   >
-    <h1 class="va-h5 mb-4">Edit Content</h1>
+    <h1 class="va-h5 mb-4">{{ $t('assignments.edit_content') }}</h1>
     <EditAssignmentContent
       ref="editFormRef"
       :assignment-content="assignmentContent"
@@ -174,30 +171,36 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
-import { useBreakpoint, useModal, useToast } from 'vuestic-ui'
-import { format, getErrorMessage, notifications } from '@/services/utils'
+import { onMounted, ref, watchEffect } from 'vue'
+import { useFileStore } from '@/stores/modules/file.module'
 import { useClassStore } from '@/stores/modules/class.module'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { format, getErrorMessage, notifications } from '@/services/utils'
+import { useBreakpoint, useModal, useToast, VaCardContent, VaIcon } from 'vuestic-ui'
+import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { Student } from '@/pages/classrooms/types'
-import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
-import { useFileStore } from '@/stores/modules/file.module'
+import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
 
+const { t } = useI18n()
 const loading = ref(true)
 const router = useRouter()
+
 const fileStore = useFileStore()
 const stores = useAssignmentStore()
 const classStores = useClassStore()
+
 const breakpoints = useBreakpoint()
 const { init: notify } = useToast()
 const showSidebar = ref(breakpoints.smUp)
+
 const assignment = ref<Assignment | null>(null)
 const assignmentContent = ref<AssignmentContent | null>(null)
 const assignmentAttachment = ref<AssignmentAttachment | null>(null)
 const students = ref<Student[] | undefined>([])
+
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
 const filesUploaded = ref<any>()
@@ -237,7 +240,7 @@ const getAssignment = (id: string) => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed('assignment') + getErrorMessage(error),
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -267,8 +270,8 @@ const getClassById = async () => {
 
 const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
   confirm({
-    title: 'Delete Assignment',
-    message: notifications.confirmDelete('assignment'),
+    title: t('assignments.delete_assignment'),
+    message: notifications.confirmDelete(t('assignments.assignment')),
   }).then((agreed) => {
     if (!agreed) {
       return
@@ -278,13 +281,13 @@ const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
       .then(() => {
         router.push({ name: 'assignments' })
         notify({
-          message: notifications.deleteSuccessfully('assignment'),
+          message: notifications.deleteSuccessfully(t('assignments.assignment')),
           color: 'success',
         })
       })
       .catch((error) => {
         notify({
-          message: notifications.deleteFailed('assignment') + getErrorMessage(error),
+          message: notifications.deleteFailed(t('assignments.assignment')) + getErrorMessage(error),
           color: 'error',
         })
       })
@@ -333,14 +336,14 @@ const onAssignmentAttachment = async () => {
       .updateAssignment(assignmentId, assignmentAttachment.value as AssignmentAttachment)
       .then(() => {
         notify({
-          message: notifications.updatedSuccessfully('assignment'),
+          message: notifications.updatedSuccessfully(t('assignments.assignment')),
           color: 'success',
         })
         getAssignment(assignmentId)
       })
       .catch((error) => {
         notify({
-          message: notifications.updateFailed('assignment') + getErrorMessage(error),
+          message: notifications.updateFailed(t('assignments.assignment')) + getErrorMessage(error),
           color: 'error',
         })
       })

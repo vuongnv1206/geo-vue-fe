@@ -269,6 +269,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/404',
     component: () => import('../pages/404.vue'),
   },
+  {
+    name: 'privacy-policy',
+    path: '/privacy',
+    component: () => import('../pages/privacy-policy.vue'),
+  },
 ]
 
 const router = createRouter({

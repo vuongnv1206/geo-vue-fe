@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const dateValue = ref(new Date())
 const timeValue = ref(new Date())
 const emit = defineEmits(['save'])
@@ -15,8 +18,8 @@ const onSave = () => {
     <VaDatePicker v-model="dateValue" />
     <VaTimePicker v-model="timeValue" framed class="flex justify-center" />
     <div class="flex justify-end mt-3">
-      <VaButton size="small" color="secondary" class="mr-2">Cancel</VaButton>
-      <VaButton size="small" @click="onSave">Apply</VaButton>
+      <VaButton size="small" color="secondary" class="mr-2">{{ t('settings.cancel') }}</VaButton>
+      <VaButton size="small" @click="onSave">{{ t('settings.save') }}</VaButton>
     </div>
   </div>
 </template>

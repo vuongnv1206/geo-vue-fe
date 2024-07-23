@@ -5,13 +5,14 @@ import { useRoute } from 'vue-router'
 import { useToast, VaButton, VaCard } from 'vuestic-ui'
 import { Question, QuestionType } from '../question/types'
 import { GetLastResultExamRequest, LastResultExamDto } from './types'
-
 import SingleChoiceQuestion from './questionType/SingleChoiceQuestion.vue'
 import MatchingQuestion from './questionType/MatchingQuestion.vue'
 import FillBlankQuestion from './questionType/FillBlankQuestion.vue'
 import WritingQuestion from './questionType/WritingQuestion.vue'
 import ReadingQuestion from './questionType/ReadingQuestion.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const showSidebar = ref(true)
 const submitPaperStore = useSubmitPaperStore()
@@ -128,15 +129,17 @@ const filterGroupQuestionType = () => {
 
         <VaCardContent>
           <VaCard class="va-text-secondary text-xs">
-            <VaCardTitle class="flex justify-between bg-slate-200"> Thông tin chi tiết </VaCardTitle>
+            <VaCardTitle class="flex justify-between bg-slate-200">{{ t('papers.details') }}</VaCardTitle>
 
             <VaCardActions align="stretch" vertical>
               <VaListItem>
-                <p><b>Điểm:</b> {{ result?.totalMark }}/{{ maxPointInPaper }}</p>
+                <p>
+                  <b>{{ t('papers.point') }}:</b> {{ result?.totalMark }}/{{ maxPointInPaper }}
+                </p>
               </VaListItem>
               <VaListItem>
                 <p>
-                  <b>Trắc nghiệm:</b>({{
+                  <b>{{ t('papers.multiple_choice') }}:</b>({{
                     result?.submitPaperDetails?.filter((detail) => detail.isCorrect).length || 0
                   }}/{{ result?.totalQuestion }} câu)
                 </p>
@@ -234,6 +237,7 @@ const filterGroupQuestionType = () => {
                 :student-answers="result?.submitPaperDetails ?? []"
                 :show-action-button="false"
                 :index="index + 1"
+                :submit-paper-id="request.submitPaperId"
               />
               <ReadingQuestion
                 v-if="question.questionType == QuestionType.Reading && (valueTab == 'reading' || valueTab == 'all')"

@@ -7,7 +7,9 @@ import { Classrooms } from '../../classrooms/types'
 import { useToast } from 'vuestic-ui'
 import { AccessType, PaperAccess, PaperDto } from '../types'
 import StudentListInClassModal from '@pages/examination/widgets/StudentListInClassModal.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({
   paper: {
     type: Object as PropType<PaperDto | null>,
@@ -69,9 +71,9 @@ const onSave = () => {
 }
 
 const accessOptions = [
-  { value: AccessType.Everyone, text: 'Everyone' },
-  { value: AccessType.ByClass, text: 'By Class' },
-  { value: AccessType.ByStudent, text: 'By Student' },
+  { value: AccessType.Everyone, text: t('papers.everyone') },
+  { value: AccessType.ByClass, text: t('papers.by_class') },
+  { value: AccessType.ByStudent, text: t('papers.by_student') },
 ]
 
 const showListStudentModal = ref(false)
@@ -105,7 +107,7 @@ onMounted(() => {
 
 <template>
   <VaCard class="p-0">
-    <b class="pr-3 text-xs"> Who is allowed to take the exam </b>
+    <b class="pr-3 text-xs">{{ t('papers.who_can_take_exam') }}</b>
     <VaRadio v-model="valueOption" :options="accessOptions" value-by="value" class="assign-radio mb-2" />
     <div
       v-if="(valueOption === AccessType.ByClass || valueOption === AccessType.ByStudent) && groupClasses !== null"
@@ -113,7 +115,7 @@ onMounted(() => {
     >
       <VaCard outlined class="border-style col-span-1">
         <div class="p-2">
-          <VaInput placeholder="Search group class" />
+          <VaInput :placeholder="t('papers.search_group_class')" />
         </div>
         <VaDivider class="m-0" />
         <VaCardContent class="p-1">
@@ -133,9 +135,9 @@ onMounted(() => {
 
       <VaCard outlined class="border-style col-span-2">
         <div class="p-2 flex justify-between">
-          <VaButton preset="secondary"> <VaIcon name="menu_open" /></VaButton>
+          <VaButton preset="secondary" icon="menu_open" />
           <div>
-            <VaInput placeholder="Search class in group" class="p-0" />
+            <VaInput :placeholder="t('papers.search_class')" class="p-0" />
           </div>
         </div>
         <VaDivider class="m-0" />
@@ -153,23 +155,24 @@ onMounted(() => {
               <VaButton
                 v-for="classroom in classRoomsInGroup"
                 :key="classroom.id"
+                border-color="primary"
                 :preset="
                   classroom.students?.some((student) => checkedPermissionsStudentAccess.includes(student.id))
                     ? 'primary'
                     : 'secondary'
                 "
-                border-color="primary"
                 @click="getListStudentModal(classroom, classroom.students)"
-                >{{ classroom.name.length > 6 ? `${classroom.name.slice(0, 6)}...` : `${classroom.name}` }}</VaButton
               >
+                {{ classroom.name.length > 6 ? `${classroom.name.slice(0, 6)}...` : `${classroom.name}` }}
+              </VaButton>
             </div>
           </VaScrollContainer>
         </VaCardContent>
       </VaCard>
     </div>
     <div class="d-flex">
-      <VaButton preset="primary" size="small" class="m-1 mt-2">Cancel</VaButton>
-      <VaButton size="small" class="m-1 mt-2" @click="onSave">Save</VaButton>
+      <VaButton preset="primary" size="small" class="m-1 mt-2">{{ t('settings.cancel') }}</VaButton>
+      <VaButton size="small" class="m-1 mt-2" @click="onSave">{{ t('settings.save') }}</VaButton>
     </div>
   </VaCard>
 

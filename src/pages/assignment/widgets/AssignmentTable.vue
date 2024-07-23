@@ -1,7 +1,7 @@
 <template v-for="assClass in props.assignmentsByClass" :key="assClass.id" :loading="props.loading">
   <VaCard class="min-h-[78vh]">
     <VaCard>
-      <VaCardContent class="font-bold">Recommend</VaCardContent>
+      <VaCardContent class="font-bold">{{ $t('assignments.recommend') }}</VaCardContent>
       <VaList v-if="recentAssignments" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <template v-for="assignment in recentAssignments" :key="assignment.id">
           <VaListItem
@@ -14,18 +14,15 @@
                   <VaIcon name="description" size="3rem" />
                 </VaListItemSection>
                 <VaListItemSection>
-                  <VaListItemLabel>{{ assignment?.name }}</VaListItemLabel>
+                  <VaListItemLabel class="font-semibold mb-1">{{ assignment?.name }}</VaListItemLabel>
                   <VaListItemLabel caption>
-                    <VaPopover
-                      class="mb-2"
-                      placement="right"
-                      color="#FFFFFF"
-                      :message="format.formatDate(assignment?.createdOn)"
-                    >
-                      Create At: {{ format.formatDateFromNow(assignment?.createdOn) }}
+                    <VaPopover placement="right" color="#FFFFFF" :message="format.formatDate(assignment?.createdOn)">
+                      {{ $t('assignments.create_at') }} {{ format.formatDateFromNow(assignment?.createdOn) }}
                     </VaPopover>
                   </VaListItemLabel>
-                  <VaListItemLabel caption>End Time: {{ format.formatDate(assignment?.endTime) }}</VaListItemLabel>
+                  <VaListItemLabel caption
+                    >{{ $t('assignments.end_time') }} {{ format.formatDate(assignment?.endTime) }}</VaListItemLabel
+                  >
                 </VaListItemSection>
                 <VaListItemSection icon>
                   <VaCard>0/100</VaCard>
@@ -37,17 +34,17 @@
       </VaList>
     </VaCard>
     <VaCard>
-      <VaCardContent class="font-bold">All</VaCardContent>
+      <VaCardContent class="font-bold">{{ $t('assignments.all') }}</VaCardContent>
       <VaCard class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <template v-for="assClass in props.assignmentsByClass" :key="assClass.id">
           <VaCard v-if="assClass.assignments && assClass.assignments.length > 0" class="border p-4 pb-0 rounded">
             <div class="flex justify-between items-center mb-4">
-              <span class="font-semibold">{{ assClass.name }}</span>
+              <span class="font-bold">{{ assClass.name }}</span>
               <VaChip v-if="currentUserId != assClass.ownerId" outline class="ml-2" size="small"> Share </VaChip>
               <div class="flex items-center space-x-2 ml-auto">
-                <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: assClass.id } }"
-                  >Show All</VaButton
-                >
+                <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: assClass.id } }">{{
+                  $t('assignments.show_all')
+                }}</VaButton>
               </div>
             </div>
             <VaDivider />
@@ -64,18 +61,15 @@
                       <VaIcon name="description" size="3rem" />
                     </VaListItemSection>
                     <VaListItemSection>
-                      <VaListItemLabel>{{ assignment.name }}</VaListItemLabel>
+                      <VaListItemLabel class="font-semibold mb-1">{{ assignment.name }}</VaListItemLabel>
                       <VaListItemLabel caption>
-                        <VaPopover
-                          class="mb-2"
-                          placement="right"
-                          color="#FFFFFF"
-                          :message="format.formatDate(assignment.createdOn)"
-                        >
-                          Create At: {{ format.formatDateFromNow(assignment.createdOn) }}
+                        <VaPopover placement="right" color="#FFFFFF" :message="format.formatDate(assignment.createdOn)">
+                          {{ $t('assignments.create_at') }} {{ format.formatDateFromNow(assignment.createdOn) }}
                         </VaPopover>
                       </VaListItemLabel>
-                      <VaListItemLabel caption>End Time: {{ format.formatDate(assignment.endTime) }}</VaListItemLabel>
+                      <VaListItemLabel caption
+                        >{{ $t('assignments.end_time') }} {{ format.formatDate(assignment.endTime) }}</VaListItemLabel
+                      >
                     </VaListItemSection>
                     <VaListItemSection icon>
                       <VaCard>0/100</VaCard>
@@ -130,5 +124,3 @@ const recentAssignments = computed(() => {
   return allAssignmentsWithClassId.slice(0, 4)
 })
 </script>
-
-<style lang="scss" scoped></style>

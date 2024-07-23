@@ -1,6 +1,12 @@
 <template>
   <div class="relative">
-    <QuillEditor v-model:content="newComment.content" class="border rounded" theme="bubble" content-type="html" />
+    <QuillEditor
+      v-model:content="newComment.content"
+      class="border rounded"
+      :placeholder="$t('comments.enter_comment')"
+      theme="bubble"
+      content-type="html"
+    />
     <VaButton
       class="absolute bottom-0 right-0 transform mb-2 mr-2"
       preset="plain"

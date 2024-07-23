@@ -4,12 +4,13 @@ import { Classrooms } from '../types'
 import AssignmentInClassDetails from './AssignmentInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
-import { useToast, VaCardContent } from 'vuestic-ui/web-components'
+import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
 import StudentsInClassDetails from './StudentsInClassDetails.vue'
-import { VaCard } from 'vuestic-ui'
 import PostsInClassDetails from './PostsInClassDetails.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const loading = ref(true)
 const showTabs = ref(true)
 const router = useRouter()
@@ -18,9 +19,9 @@ const classStore = useClassStore()
 const classId = router.currentRoute.value.params.id.toString()
 
 const tabs = [
-  { title: 'Student list', icon: 'groups' },
-  { title: 'Assignment & Exam', icon: 'assignment_add' },
-  { title: 'News board', icon: 'newspaper' },
+  { title: t('classes.students_list'), icon: 'groups' },
+  { title: t('classes.assignment_and_exam'), icon: 'assignment_add' },
+  { title: t('classes.news_board'), icon: 'newspaper' },
 ]
 const selectedTab = ref(localStorage.getItem('selectedTab') || tabs[0].title)
 
@@ -100,12 +101,15 @@ onMounted(() => {
             </VaCardContent>
           </VaCard>
           <StudentsInClassDetails
-            v-if="currentTab.title === 'Student list'"
+            v-if="currentTab.title === t('classes.students_list')"
             :classroom="classDetails"
             @load="getClassById"
           />
-          <AssignmentInClassDetails v-if="currentTab.title === 'Assignment & Exam'" :class-details="classDetails" />
-          <PostsInClassDetails v-if="currentTab.title === 'News board'" :class-id="classId" />
+          <AssignmentInClassDetails
+            v-if="currentTab.title === t('classes.assignment_and_exam')"
+            :class-details="classDetails"
+          />
+          <PostsInClassDetails v-if="currentTab.title === t('classes.news_board')" :class-id="classId" />
         </VaCard>
       </VaCard>
     </template>

@@ -99,6 +99,9 @@ export interface PaperDto {
   paperAccesses?: PaperAccess[]
   shareType?: number
   subjectId?: string | null
+  publicIpAllowed?: string
+  localIpAllowed?: string
+  numberAttempt?: number
 }
 
 export interface PaperLabelDto {
@@ -157,6 +160,9 @@ export interface UpdatePaperRequest {
   paperAccesses?: PaperAccess[] | null
   subjectId?: string | null
   paperFolderId?: string | null
+  publicIpAllowed?: string
+  localIpAllowed?: string
+  numberAttempt?: number
 }
 
 export enum ShowResult {
@@ -363,4 +369,10 @@ export type PaperDeletedResponse = {
   pageSize: number
   hasPreviousPage: boolean
   hasNextPage: boolean
+}
+
+export type MarkAnswerRequest = {
+  submitPaperId?: string
+  questionId?: string
+  mark?: number
 }

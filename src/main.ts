@@ -15,7 +15,6 @@ import vuesticGlobalConfig from '@services/vuestic-ui/global-config'
 import App from './App.vue'
 import { useAuthStore } from '@modules/auth.module'
 import { useFileStore } from './stores/modules/file.module'
-
 // Create Vue application
 const app = createApp(App)
 
