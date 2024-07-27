@@ -376,3 +376,34 @@ export type MarkAnswerRequest = {
   questionId?: string
   mark?: number
 }
+
+export type BasicStatisticPaperRequest = {
+  paperId: string
+  classId?: string
+}
+
+export type BasicStatisticPaperResponse = {
+  id: string
+  examName: string
+  paperLabelId: string
+  paperLabelName: string
+  subjectId: string
+  subjectName: string
+  totalRegister: number
+  totalNotComplete: number
+  totalDoing: number
+  totalAttendee: number
+  averageMark: number
+  totalPopular: number
+  markPopular: number
+  classrooms: BasicStatisticPaperInClass[]
+}
+
+export type BasicStatisticPaperInClass = {
+  id: string
+  name: string
+  groupClassId: string
+  groupClassName: string
+  totalRegister: number
+  totalTested: number
+}
