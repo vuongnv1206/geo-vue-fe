@@ -3,9 +3,33 @@ import { useRoute } from 'vue-router'
 import BasicPaperStatistic from './widgets/BasicPaperStatistic.vue'
 import ExcelStatisticPaper from './widgets/ExcelStatisticPaper.vue'
 import SpectrumChartPaperStatistic from './widgets/SpectrumChartPaperStatistic.vue'
+import FrequencyTableStatistic from './widgets/FrequencyTableStatistic.vue'
+import { useToast } from 'vuestic-ui'
+import { usePaperStore } from '@/stores/modules/paper.module'
+import { PaperDto } from './types'
+import { onMounted, ref } from 'vue'
 
 const route = useRoute()
+const paperStore = usePaperStore()
 const paperId = route.params.id as string
+const { init: notify } = useToast()
+
+const paperDetail = ref<PaperDto | null>(null)
+const getPaperDetail = async () => {
+  try {
+    const res = await paperStore.paperDetail(paperId)
+    paperDetail.value = res
+  } catch (error) {
+    notify({
+      message: `Not Found ${error}`,
+      color: 'danger',
+    })
+  }
+}
+
+onMounted(async () => {
+  await getPaperDetail()
+})
 </script>
 
 <template>
@@ -20,9 +44,21 @@ const paperId = route.params.id as string
       <ExcelStatisticPaper />
     </VaCard>
   </div>
-  <div>
+  <div class="mb-3">
     <VaCard>
       <SpectrumChartPaperStatistic :paper-id="paperId" />
+    </VaCard>
+  </div>
+  <div class="mb-3">
+    <VaCard>
+      <FrequencyTableStatistic
+        :paper-id="paperId"
+        :classroom-ids="
+          paperDetail?.paperAccesses
+            ?.filter((c) => c.classId !== null && c.classId !== undefined)
+            .map((a) => a.classId as string) || []
+        "
+      />
     </VaCard>
   </div>
 </template>
