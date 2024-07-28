@@ -22,7 +22,7 @@ const paperId = route.params.id as string
   </div>
   <div>
     <VaCard>
-      <SpectrumChartPaperStatistic />
+      <SpectrumChartPaperStatistic :paper-id="paperId" />
     </VaCard>
   </div>
 </template>

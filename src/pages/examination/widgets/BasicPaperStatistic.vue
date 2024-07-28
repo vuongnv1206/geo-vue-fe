@@ -29,8 +29,8 @@ const getBasicStatisticPaper = async (paperId: string) => {
   }
 }
 
-onMounted(() => {
-  getBasicStatisticPaper(props.paperId)
+onMounted(async () => {
+  await getBasicStatisticPaper(props.paperId)
 })
 </script>
 

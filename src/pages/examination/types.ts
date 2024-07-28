@@ -1,3 +1,4 @@
+import { Classrooms, Student } from '../classrooms/types'
 import { Question } from '../question/types'
 import { GroupTeacher } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
@@ -406,4 +407,23 @@ export type BasicStatisticPaperInClass = {
   groupClassName: string
   totalRegister: number
   totalTested: number
+}
+
+export type ClassroomFrequencyMarkRequest = {
+  paperId: string
+  classroomId?: string
+}
+
+export type ClassroomFrequencyMarkResponse = {
+  totalRegister: number
+  totalAttendee: number
+  frequencyMarks: FrequencyMark[]
+  students: Student[]
+  class: Classrooms
+}
+
+export type FrequencyMark = {
+  fromMark: number
+  toMark: number
+  total: number
 }
