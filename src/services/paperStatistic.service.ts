@@ -3,12 +3,15 @@ import {
   BasicStatisticPaperResponse,
   ClassroomFrequencyMarkRequest,
   ClassroomFrequencyMarkResponse,
+  ListQuestionStatisticRequest,
+  ListQuestionStatisticResponse,
 } from '@/pages/examination/types'
 import apiService from './api.service'
 
 export interface IPaperStatisticService {
   basicPaperStatistic(request: BasicStatisticPaperRequest): Promise<BasicStatisticPaperResponse>
   frequencyMarkStatistic(request: ClassroomFrequencyMarkRequest): Promise<ClassroomFrequencyMarkResponse>
+  questionStatistic(request: ListQuestionStatisticRequest): Promise<ListQuestionStatisticResponse>
 }
 
 class PaperStatisticService implements IPaperStatisticService {
@@ -36,6 +39,19 @@ class PaperStatisticService implements IPaperStatisticService {
 
     return apiService
       .get(url)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async questionStatistic(request: ListQuestionStatisticRequest): Promise<ListQuestionStatisticResponse> {
+    const url = '/v1/paperstatistics/list-question-statistic'
+
+    return apiService
+      .post(url, request)
       .then((response) => {
         return Promise.resolve(response.data)
       })

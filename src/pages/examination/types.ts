@@ -427,3 +427,59 @@ export type FrequencyMark = {
   toMark: number
   total: number
 }
+
+export type ListQuestionStatisticRequest = {
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+  paperId: string
+  classId?: string
+}
+
+export type ListQuestionStatisticResponse = {
+  data: QuestionStatistic[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type QuestionStatistic = {
+  id: string
+  paperId: string
+  content: string
+  image?: string
+  audio?: string
+  questionFolderId?: string
+  questionFolderName?: string
+  questionType?: number
+  questionLabelId?: string
+  questionLabelName?: string
+  questionParentId?: string
+  questionPassages?: QuestionStatistic
+  answers?: AnswerStatistic[]
+  rawIndex: number
+  totalTest: number
+  totalAnswered: number
+  totalNotAnswered: number
+  totalCorrect: number
+  totalWrong: number
+  wrongStudents?: WrongStudentInfo[]
+}
+
+export type AnswerStatistic = {
+  id: string
+  content?: string
+  questionId: string
+  isCorrect: boolean
+}
+
+export type WrongStudentInfo = {
+  id: string
+  studentId?: string
+  firstName: string
+  lastName: string
+  classId?: string
+  className?: string
+}

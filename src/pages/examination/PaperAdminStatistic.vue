@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import BasicPaperStatistic from './widgets/BasicPaperStatistic.vue'
 import ExcelStatisticPaper from './widgets/ExcelStatisticPaper.vue'
 import SpectrumChartPaperStatistic from './widgets/SpectrumChartPaperStatistic.vue'
@@ -8,8 +8,10 @@ import { useToast } from 'vuestic-ui'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto } from './types'
 import { onMounted, ref } from 'vue'
+import RatioRightWrongQuestionStatistic from './widgets/RatioRightWrongQuestionStatistic.vue'
 
 const route = useRoute()
+const router = useRouter()
 const paperStore = usePaperStore()
 const paperId = route.params.id as string
 const { init: notify } = useToast()
@@ -27,6 +29,10 @@ const getPaperDetail = async () => {
   }
 }
 
+const backToPaperDetail = () => {
+  router.push({ name: 'admin-exam-detail', params: { id: paperId } })
+}
+
 onMounted(async () => {
   await getPaperDetail()
 })
@@ -34,7 +40,7 @@ onMounted(async () => {
 
 <template>
   <VaCard class="mb-3 p-2">
-    <VaButton size="small" icon="chevron_left" icon-color="#ffffff"> Back </VaButton>
+    <VaButton size="small" icon="chevron_left" icon-color="#ffffff" @click="backToPaperDetail"> Back </VaButton>
   </VaCard>
   <div class="grid xm:grid-cols-1 md:grid-cols-3 gap-3 mb-3">
     <VaCard class="md:col-span-2 xm:col-span-1">
@@ -59,6 +65,11 @@ onMounted(async () => {
             .map((a) => a.classId as string) || []
         "
       />
+    </VaCard>
+  </div>
+  <div class="mb-3">
+    <VaCard>
+      <RatioRightWrongQuestionStatistic :paper-id="paperId" />
     </VaCard>
   </div>
 </template>
