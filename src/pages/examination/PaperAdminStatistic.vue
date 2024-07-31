@@ -9,6 +9,7 @@ import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto } from './types'
 import { onMounted, ref } from 'vue'
 import RatioRightWrongQuestionStatistic from './widgets/RatioRightWrongQuestionStatistic.vue'
+import TranscriptTableStatistic from './widgets/TranscriptTableStatistic.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -70,6 +71,11 @@ onMounted(async () => {
   <div class="mb-3">
     <VaCard>
       <RatioRightWrongQuestionStatistic :paper-id="paperId" />
+    </VaCard>
+  </div>
+  <div class="mb-3">
+    <VaCard>
+      <TranscriptTableStatistic :paper-id="paperId" />
     </VaCard>
   </div>
 </template>

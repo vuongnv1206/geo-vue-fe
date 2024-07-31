@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useStatisticPaperStore } from '@/stores/modules/paperStatistic.module'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'vuestic-ui'
+import { DataTableColumnSource, useToast } from 'vuestic-ui'
 import { ListQuestionStatisticRequest, ListQuestionStatisticResponse, WrongStudentInfo } from '../types'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { QuestionType } from '@/pages/question/types'
@@ -34,7 +34,7 @@ const getQuestionStatistic = async (paperId: string) => {
   }
 }
 
-const columnTable = [
+const columnTable: DataTableColumnSource<string>[] = [
   { key: '', width: '100px' },
   {
     label: 'Raw Index',

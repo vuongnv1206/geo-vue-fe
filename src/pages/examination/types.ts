@@ -483,3 +483,29 @@ export type WrongStudentInfo = {
   classId?: string
   className?: string
 }
+
+export type TranscriptStatisticRequest = {
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+  paperId: string
+  classId?: string
+}
+
+export type TranscriptStatisticResponse = {
+  data: InfoAttendeeTranscript[]
+  averageMark: number
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type InfoAttendeeTranscript = {
+  attendee: Student
+  classroom: string
+  mark: number
+  startedTest: Date
+  finishedTest?: Date
+}
