@@ -12,6 +12,7 @@ import apiService from './api.service'
 
 export interface IPaperStatisticService {
   basicPaperStatistic(request: BasicStatisticPaperRequest): Promise<BasicStatisticPaperResponse>
+  frequencyMarkClassroomStatistic(request: ClassroomFrequencyMarkRequest): Promise<ClassroomFrequencyMarkResponse[]>
   frequencyMarkStatistic(request: ClassroomFrequencyMarkRequest): Promise<ClassroomFrequencyMarkResponse>
   questionStatistic(request: ListQuestionStatisticRequest): Promise<ListQuestionStatisticResponse>
   transcriptStatistic(request: TranscriptStatisticRequest): Promise<TranscriptStatisticResponse>
@@ -31,14 +32,26 @@ class PaperStatisticService implements IPaperStatisticService {
       })
   }
 
-  async frequencyMarkStatistic(request: ClassroomFrequencyMarkRequest): Promise<ClassroomFrequencyMarkResponse> {
-    let url = `/v1/paperstatistics/classroom-frequency-mark?PaperId=${request.paperId}`
-    if (request.classroomId !== undefined) {
-      url += `?classroomId=${request.classroomId}`
-    }
+  async frequencyMarkClassroomStatistic(
+    request: ClassroomFrequencyMarkRequest,
+  ): Promise<ClassroomFrequencyMarkResponse[]> {
+    const url = `/v1/paperstatistics/classroom-frequency-mark`
 
     return apiService
-      .get(url)
+      .post(url, request)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async frequencyMarkStatistic(request: ClassroomFrequencyMarkRequest): Promise<ClassroomFrequencyMarkResponse> {
+    const url = `/v1/paperstatistics/frequency-mark`
+
+    return apiService
+      .post(url, request)
       .then((response) => {
         return Promise.resolve(response.data)
       })

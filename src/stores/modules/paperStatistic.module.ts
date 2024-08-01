@@ -24,6 +24,18 @@ export const useStatisticPaperStore = defineStore('paperStatistic', {
           return Promise.reject(error)
         })
     },
+    async frequencyMarkClassroomStatistic(
+      request: ClassroomFrequencyMarkRequest,
+    ): Promise<ClassroomFrequencyMarkResponse[]> {
+      return await paperStatisticService
+        .frequencyMarkClassroomStatistic(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
     async frequencyMarkStatistic(request: ClassroomFrequencyMarkRequest): Promise<ClassroomFrequencyMarkResponse> {
       return await paperStatisticService
         .frequencyMarkStatistic(request)

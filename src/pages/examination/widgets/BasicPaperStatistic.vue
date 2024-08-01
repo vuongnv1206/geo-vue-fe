@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps, onMounted, ref } from 'vue'
+import { defineProps, ref, watch } from 'vue'
 import { useToast, VaIcon } from 'vuestic-ui'
 import { useStatisticPaperStore } from '@/stores/modules/paperStatistic.module'
 import { BasicStatisticPaperRequest, BasicStatisticPaperResponse } from '../types'
@@ -7,6 +7,7 @@ import { getErrorMessage, notifications } from '@/services/utils'
 
 const props = defineProps<{
   paperId: string
+  classId?: string
 }>()
 const { init: notify } = useToast()
 
@@ -14,9 +15,10 @@ const statisticPaperStore = useStatisticPaperStore()
 
 const data = ref<BasicStatisticPaperResponse>()
 
-const getBasicStatisticPaper = async (paperId: string) => {
+const getBasicStatisticPaper = async (paperId: string, classId?: string) => {
   const request = ref<BasicStatisticPaperRequest>({
     paperId: paperId,
+    classId: classId === '' ? undefined : classId,
   })
   try {
     const res = await statisticPaperStore.basicPaperStatistic(request.value)
@@ -29,9 +31,13 @@ const getBasicStatisticPaper = async (paperId: string) => {
   }
 }
 
-onMounted(async () => {
-  await getBasicStatisticPaper(props.paperId)
-})
+watch(
+  () => props.classId,
+  (newClassId) => {
+    getBasicStatisticPaper(props.paperId, newClassId)
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useStatisticPaperStore } from '@/stores/modules/paperStatistic.module'
-import { onMounted, ref } from 'vue'
+import { ref, watch } from 'vue'
 import { DataTableColumnSource, useToast } from 'vuestic-ui'
 import { ListQuestionStatisticRequest, ListQuestionStatisticResponse, WrongStudentInfo } from '../types'
 import { getErrorMessage, notifications } from '@/services/utils'
@@ -9,6 +9,7 @@ import { QuestionTypeColor, QuestionTypeLabel } from '@services/utils'
 
 const props = defineProps<{
   paperId: string
+  classId?: string
 }>()
 
 const { init: notify } = useToast()
@@ -17,15 +18,15 @@ const statisticPaperStore = useStatisticPaperStore()
 
 const responseData = ref<ListQuestionStatisticResponse>()
 
-const getQuestionStatistic = async (paperId: string) => {
+const getQuestionStatistic = async (paperId: string, classId?: string) => {
   const request = ref<ListQuestionStatisticRequest>({
     paperId: paperId,
+    classId: classId === '' ? undefined : classId,
   })
 
   try {
     const res = await statisticPaperStore.questionStatistic(request.value)
     responseData.value = res
-    console.log(res)
   } catch (error) {
     notify({
       message: notifications.getFailed('question statistic ') + getErrorMessage(error),
@@ -33,6 +34,14 @@ const getQuestionStatistic = async (paperId: string) => {
     })
   }
 }
+
+watch(
+  () => props.classId,
+  async (newClassId) => {
+    await getQuestionStatistic(props.paperId, newClassId)
+  },
+  { immediate: true },
+)
 
 const columnTable: DataTableColumnSource<string>[] = [
   { key: '', width: '100px' },
@@ -103,7 +112,6 @@ const indexToLetter = (index: number) => {
 }
 
 const formatWrongStudents = (wrongStudents: WrongStudentInfo[]) => {
-  console.log(wrongStudents)
   if (!wrongStudents || !Array.isArray(wrongStudents)) {
     return 'No data'
   }
@@ -145,10 +153,6 @@ const formatContent = (content: string) => {
   `
   return html
 }
-
-onMounted(async () => {
-  await getQuestionStatistic(props.paperId)
-})
 </script>
 <template>
   <VaCard>

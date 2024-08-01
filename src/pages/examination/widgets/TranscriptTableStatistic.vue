@@ -2,27 +2,29 @@
 import { useStatisticPaperStore } from '@/stores/modules/paperStatistic.module'
 import { DataTableColumnSource, useToast } from 'vuestic-ui'
 import { TranscriptStatisticRequest, TranscriptStatisticResponse } from '../types'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { format, getErrorMessage, notifications } from '@/services/utils'
+import { useRouter } from 'vue-router'
 const props = defineProps<{
   paperId: string
+  classId?: string
 }>()
 
 const { init: notify } = useToast()
 
 const statisticPaperStore = useStatisticPaperStore()
-
+const router = useRouter()
 const responseData = ref<TranscriptStatisticResponse>()
 
-const getDataTranscriptStatistic = async (paperId: string) => {
+const getDataTranscriptStatistic = async (paperId: string, classId?: string) => {
   const request = ref<TranscriptStatisticRequest>({
     paperId: paperId,
+    classId: classId === '' ? undefined : classId,
   })
 
   try {
     const res = await statisticPaperStore.transcriptStatistic(request.value)
     responseData.value = res
-    console.log(res)
   } catch (error) {
     notify({
       message: notifications.getFailed('question statistic ') + getErrorMessage(error),
@@ -46,14 +48,12 @@ const columnTable: DataTableColumnSource<string>[] = [
     thAlign: 'center',
     tdAlign: 'center',
     sortable: true,
-    width: '150px',
   },
   {
     label: 'Contact',
     key: 'contact',
     thAlign: 'center',
     tdAlign: 'center',
-    width: '150px',
   },
   {
     label: 'Date of birth',
@@ -61,7 +61,6 @@ const columnTable: DataTableColumnSource<string>[] = [
     thAlign: 'center',
     tdAlign: 'center',
     sortable: true,
-    width: '150px',
   },
   {
     label: 'Started test',
@@ -69,7 +68,12 @@ const columnTable: DataTableColumnSource<string>[] = [
     thAlign: 'center',
     tdAlign: 'center',
     sortable: true,
-    width: '150px',
+  },
+  {
+    label: 'Classroom',
+    key: 'classrooms',
+    thAlign: 'center',
+    tdAlign: 'center',
   },
   {
     label: 'Score',
@@ -88,12 +92,25 @@ const formattedData = computed(() => {
     contact: `${item.attendee.email} - ${item.attendee.phoneNumber}`,
     dateOfBirth: format.formatDateNoTime(item.attendee.dateOfBirth),
     startedTest: format.formatDate(item.startedTest),
+    classrooms: item.classrooms,
   }))
 })
 
-onMounted(async () => {
-  await getDataTranscriptStatistic(props.paperId)
-})
+const redirectToClassDetail = (classId: string) => {
+  router.push({ name: 'class-details', params: { id: classId } })
+}
+
+watch(
+  () => props.classId,
+  (newClassId) => {
+    getDataTranscriptStatistic(props.paperId, newClassId)
+  },
+  { immediate: true },
+)
+
+// onMounted(async () => {
+//   await getDataTranscriptStatistic(props.paperId)
+// })
 </script>
 
 <template>
@@ -107,9 +124,20 @@ onMounted(async () => {
         :disable-client-side-sorting="false"
         class="va-data-table-statistic"
       >
+        <template #cell(classrooms)="{ row }">
+          <VaChip
+            v-for="classroom in row.source.classrooms"
+            :key="classroom.id"
+            outline
+            class="cursor-pointer m-1"
+            @click="redirectToClassDetail(classroom.id)"
+          >
+            {{ classroom.name }}
+          </VaChip>
+        </template>
         <template #footer>
           <tr class="va-data-table__table-tr text-center">
-            <td colspan="5" class="va-data-table__table-td">Medium Score</td>
+            <td colspan="6" class="va-data-table__table-td">Medium Score</td>
             <td class="va-data-table__table-td">
               {{ responseData?.averageMark }}
             </td>

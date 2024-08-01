@@ -180,6 +180,7 @@ export enum ShowQuestionAnswer {
 
 export interface PaperAccess {
   classId?: string
+  className?: string
   userId?: string
 }
 
@@ -418,14 +419,14 @@ export type ClassroomFrequencyMarkResponse = {
   totalRegister: number
   totalAttendee: number
   frequencyMarks: FrequencyMark[]
-  students: Student[]
-  class: Classrooms
+  className?: string
 }
 
 export type FrequencyMark = {
   fromMark: number
   toMark: number
   total: number
+  rate: number
 }
 
 export type ListQuestionStatisticRequest = {
@@ -504,7 +505,7 @@ export type TranscriptStatisticResponse = {
 
 export type InfoAttendeeTranscript = {
   attendee: Student
-  classroom: string
+  classrooms?: Classrooms[]
   mark: number
   startedTest: Date
   finishedTest?: Date

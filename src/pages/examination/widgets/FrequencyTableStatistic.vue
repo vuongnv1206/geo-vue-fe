@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { useStatisticPaperStore } from '@/stores/modules/paperStatistic.module'
 import { useToast } from 'vuestic-ui'
-import { ClassroomFrequencyMarkRequest, ClassroomFrequencyMarkResponse } from '../types'
+import { ClassroomFrequencyMarkRequest, ClassroomFrequencyMarkResponse, FrequencyMark } from '../types'
 import { onMounted, ref } from 'vue'
 import { getErrorMessage, notifications } from '@/services/utils'
 
 const props = defineProps<{
   paperId: string
-  classroomIds: string[] | null
+  classId?: string
 }>()
 
 const { init: notify } = useToast()
 
 const statisticPaperStore = useStatisticPaperStore()
 
-const data = ref<ClassroomFrequencyMarkResponse>()
+const data = ref<ClassroomFrequencyMarkResponse[]>()
+
+const frequencyMarkRange = ref<FrequencyMark[]>([])
 
 const getFrequencyMark = async (paperId: string, classId?: string) => {
   const request = ref<ClassroomFrequencyMarkRequest>({
@@ -22,21 +24,17 @@ const getFrequencyMark = async (paperId: string, classId?: string) => {
     classroomId: classId,
   })
   try {
-    const res = await statisticPaperStore.frequencyMarkStatistic(request.value)
+    const res = await statisticPaperStore.frequencyMarkClassroomStatistic(request.value)
     data.value = res
+    if (res) {
+      frequencyMarkRange.value = res[0].frequencyMarks
+    }
   } catch (error) {
     notify({
       message: notifications.getFailed('frequency score ') + getErrorMessage(error),
       color: 'danger',
     })
   }
-}
-
-const calculatePercent = (numberAchieve: number, totalAttendee: number | undefined) => {
-  if (totalAttendee === undefined || totalAttendee === null || totalAttendee === 0) {
-    return 0
-  }
-  return (numberAchieve / totalAttendee) * 100
 }
 
 onMounted(async () => {
@@ -55,7 +53,7 @@ onMounted(async () => {
               <th class="border">Class</th>
               <th colspan="2" class="border">Number of students</th>
               <th
-                v-for="(scoreRange, index) in data?.frequencyMarks"
+                v-for="(scoreRange, index) in frequencyMarkRange"
                 :key="index"
                 colspan="2"
                 class="va-text-center border"
@@ -69,18 +67,18 @@ onMounted(async () => {
               <td class="border"></td>
               <td class="border">Register</td>
               <td class="border">Contest</td>
-              <template v-for="(scoreRange, index) in data?.frequencyMarks" :key="index">
+              <template v-for="(scoreRange, index) in frequencyMarkRange" :key="index">
                 <td class="border">Amount</td>
                 <td class="border">%</td>
               </template>
             </tr>
-            <tr>
-              <td class="border">All of contestants</td>
-              <td class="border">{{ data?.totalRegister }}</td>
-              <td class="border">{{ data?.totalAttendee }}</td>
-              <template v-for="(scoreRange, index) in data?.frequencyMarks" :key="index">
+            <tr v-for="(item, index) in data" :key="index">
+              <td class="border">{{ item.className }}</td>
+              <td class="border">{{ item.totalRegister }}</td>
+              <td class="border">{{ item.totalAttendee }}</td>
+              <template v-for="(scoreRange, index) in item.frequencyMarks" :key="index">
                 <td class="border">{{ scoreRange.total }}</td>
-                <td>{{ calculatePercent(scoreRange.total, data?.totalAttendee) }}</td>
+                <td class="border">{{ scoreRange.rate }}</td>
               </template>
             </tr>
           </tbody>

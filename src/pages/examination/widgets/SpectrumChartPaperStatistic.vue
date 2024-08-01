@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, nextTick, computed, watch } from 'vue'
 import { Chart, registerables } from 'chart.js'
 import { useStatisticPaperStore } from '@/stores/modules/paperStatistic.module'
 import { useToast } from 'vuestic-ui'
@@ -19,6 +19,7 @@ import { getErrorMessage, notifications } from '@/services/utils'
 
 const props = defineProps<{
   paperId: string
+  classId?: string
 }>()
 
 const { init: notify } = useToast()
@@ -26,9 +27,10 @@ const { init: notify } = useToast()
 const statisticPaperStore = useStatisticPaperStore()
 
 const data = ref<ClassroomFrequencyMarkResponse>()
-const getFrequencyMark = async (paperId: string) => {
+const getFrequencyMark = async (paperId: string, classId?: string) => {
   const request = ref<ClassroomFrequencyMarkRequest>({
     paperId: paperId,
+    classroomId: classId === '' ? undefined : classId,
   })
   try {
     const res = await statisticPaperStore.frequencyMarkStatistic(request.value)
@@ -41,26 +43,23 @@ const getFrequencyMark = async (paperId: string) => {
   }
 }
 
-// Register Chart.js components
-Chart.register(...registerables)
-
-// Reactive references
 const canvas = ref<HTMLCanvasElement | null>(null)
+let chartInstance: Chart | null = null // Track the Chart instance
 
-// Computed label scores
 const labelScores = computed(() => {
   return (data.value?.frequencyMarks ?? []).map(({ fromMark, toMark }) => `${fromMark}-${toMark}`)
 })
 
-onMounted(async () => {
-  await getFrequencyMark(props.paperId)
-
-  await nextTick() // Ensure DOM is updated
-
+const renderChart = () => {
   if (canvas.value) {
     const ctx = canvas.value.getContext('2d')
     if (ctx) {
-      new Chart(ctx, {
+      // Destroy the previous chart instance if it exists
+      if (chartInstance) {
+        chartInstance.destroy()
+      }
+
+      chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: labelScores.value,
@@ -103,7 +102,20 @@ onMounted(async () => {
   } else {
     console.error('Canvas element is null')
   }
-})
+}
+
+watch(
+  () => props.classId,
+  async (newClassId) => {
+    await getFrequencyMark(props.paperId, newClassId)
+    await nextTick() // Ensure DOM is updated
+    renderChart() // Re-render the chart
+  },
+  { immediate: true },
+)
+
+// Register Chart.js components
+Chart.register(...registerables)
 </script>
 
 <style lang="scss" scoped>
