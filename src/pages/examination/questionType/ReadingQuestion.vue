@@ -22,9 +22,13 @@ const indexToLetter = (index: number) => {
   return String.fromCharCode(65 + index)
 }
 
-const getPointAchieve = (questionId: string | undefined) => {
-  const a = props.studentAnswers.find((detail) => detail.questionId === questionId)?.mark || 0
-  return a
+const getPointAchieve = () => {
+  let mark = 0
+  props.question.questionPassages?.forEach((childQuestion) => {
+    const a = props.studentAnswers.find((detail) => detail.questionId === childQuestion.id)?.mark || 0
+    mark += a
+  })
+  return mark
 }
 
 // const getUserAnswer = (questionId: string | undefined) => {
@@ -37,10 +41,18 @@ const getQuestionPassage = (question: Question) => {
       if (!passage || !passage.answers || !passage.content) {
         return ''
       }
+
+      const correctAnswer = passage.answers.find((answer) => answer.isCorrect)
+      const studentAnswer = props.studentAnswers.find((detail) => detail.questionId === passage.id)
+      const isCorrectAnswer = correctAnswer && studentAnswer ? studentAnswer.answerRaw === correctAnswer.id : false
+
       const passageAnswers = passage.answers
         .map((answer, index) => {
-          const color = answer.isCorrect ? 'text-success' : ''
+          let color = answer.isCorrect ? 'text-success' : ''
           const fontWeight = answer.isCorrect ? 'font-bold' : ''
+          if (answer.id === studentAnswer?.answerRaw) {
+            color = isCorrectAnswer ? 'text-success' : 'text-danger'
+          }
           return `<li class="mt-2 ${color} ${fontWeight}">${indexToLetter(index)}. ${answer.content}</li>`
         })
         .join('')
@@ -68,7 +80,7 @@ onBeforeMount(() => {
 <template>
   <VaCard outlined class="mb-2 p-2">
     <QuestionHeadView :question="question" :index="index" />
-    <VaCardTitle>{{ t('papers.point') }}: {{ getPointAchieve(question.id) }}/{{ question.mark }}</VaCardTitle>
+    <VaCardTitle>{{ t('papers.point') }}: {{ getPointAchieve() }}/{{ question.mark }}</VaCardTitle>
     <div class="mt-2">
       <span v-if="!readMoreActivated">
         <!-- eslint-disable vue/no-v-html -->
