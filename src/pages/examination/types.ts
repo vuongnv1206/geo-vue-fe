@@ -116,6 +116,7 @@ export interface CombinedData {
   id: string
   name: string
   status?: string | null
+  creatorName?: string | null
   createdBy: string
   createdOn: string
   lastModifiedBy: string | null
