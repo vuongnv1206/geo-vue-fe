@@ -45,6 +45,9 @@ export const validators = {
 }
 
 export const format = {
+  formatDateNoTime: (date: Date) => {
+    return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY')
+  },
   formatDate: (date: Date) => {
     return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
   },

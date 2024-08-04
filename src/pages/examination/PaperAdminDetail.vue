@@ -241,6 +241,10 @@ const handlePageChange = (newPage: number) => {
   getSubmittedStudents()
 }
 
+const statisticExam = () => {
+  router.push({ name: 'admin-exam-statistic', params: { id: route.params.id } })
+}
+
 onMounted(async () => {
   await getPaperDetail()
   if (groupClasses.value.length > 0 && groupClasses.value[0].classes) {
@@ -292,6 +296,9 @@ onMounted(async () => {
                   <VaIcon name="settings" class="material-symbols-outlined" /> Setting
                 </VaMenuItem>
                 <VaMenuItem> <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem>
+                <VaMenuItem @click="statisticExam">
+                  <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics
+                </VaMenuItem>
                 <VaMenuItem @click="examMonitorAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Advanced monitoring
                 </VaMenuItem>
