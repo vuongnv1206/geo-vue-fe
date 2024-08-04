@@ -105,6 +105,10 @@ const paperConfigAction = () => {
   router.push({ name: 'paper-config', params: { id: route.params.id } })
 }
 
+const examMonitorAction = () => {
+  router.push({ name: 'monitor-exam', params: { id: route.params.id } })
+}
+
 const editPaper = ref<UpdatePaperRequest>({
   id: '',
   examName: '',
@@ -288,7 +292,7 @@ onMounted(async () => {
                   <VaIcon name="settings" class="material-symbols-outlined" /> Setting
                 </VaMenuItem>
                 <VaMenuItem> <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem>
-                <VaMenuItem>
+                <VaMenuItem @click="examMonitorAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Advanced monitoring
                 </VaMenuItem>
                 <VaMenuItem class="va-text-danger" @click="deletePaper">
