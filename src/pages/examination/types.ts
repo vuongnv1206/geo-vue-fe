@@ -376,3 +376,29 @@ export type MarkAnswerRequest = {
   questionId?: string
   mark?: number
 }
+
+export type CreateMatrixRequest = {
+  name: string
+  content: string
+  totalPoint: number
+}
+
+export type UpdateMatrixRequest = {
+  id: string
+  name: string
+  content: string
+  totalPoint: number
+}
+
+export type ContentMatrixRequest = {
+  questionFolderId: string
+  criteriaQuestions: CriteriaQuestion[]
+  totalPoint: number
+}
+
+export type CriteriaQuestion = {
+  questionLabelId: string | null
+  questionType?: number
+  numberOfQuestion?: number
+  rawIndex?: string
+}

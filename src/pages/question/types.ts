@@ -177,3 +177,14 @@ export type SearchMyQuestion = {
   content?: string | null | undefined
   questionStatus?: number | null | undefined
 }
+
+export type QuestionLabelRequest = {
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+}
+
+export type QuestionLabelResponse = {
+  data: QuestionLable[]
+}
