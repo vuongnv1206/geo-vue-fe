@@ -1,13 +1,25 @@
-import { CreateMatrixRequest, UpdateMatrixRequest } from '@/pages/examination/types'
+import { CreateMatrixRequest, PaperMatrixTemplate, UpdateMatrixRequest } from '@/pages/examination/types'
 import apiService from './api.service'
 
 export interface IPaperMatricesService {
   createMatrixTemplate(request: CreateMatrixRequest): Promise<string>
   deleteMatrixTemplate(id: string): Promise<any>
   updateMatrixTemplate(request: UpdateMatrixRequest): Promise<string>
+  getListPaperMatrixTemplate(): Promise<PaperMatrixTemplate[]>
 }
 
 export class PaperMatricesService implements IPaperMatricesService {
+  async getListPaperMatrixTemplate(): Promise<PaperMatrixTemplate[]> {
+    const url = '/v1/papermatrices'
+    return apiService
+      .get(url)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   async createMatrixTemplate(request: CreateMatrixRequest): Promise<string> {
     const url = '/v1/papermatrices'
     return apiService

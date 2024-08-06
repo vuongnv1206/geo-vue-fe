@@ -1,4 +1,4 @@
-import { CreateMatrixRequest, UpdateMatrixRequest } from '@/pages/examination/types'
+import { CreateMatrixRequest, PaperMatrixTemplate, UpdateMatrixRequest } from '@/pages/examination/types'
 import paperMatricesService from '@/services/paperMatrices.service'
 import { defineStore } from 'pinia'
 
@@ -28,6 +28,16 @@ export const usePaperMatrixStore = defineStore('paperMatrix', {
     async updateMatrixTemplate(request: UpdateMatrixRequest): Promise<string> {
       return paperMatricesService
         .updateMatrixTemplate(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getListPaperMatrixTemplate(): Promise<PaperMatrixTemplate[]> {
+      return paperMatricesService
+        .getListPaperMatrixTemplate()
         .then((response) => {
           return Promise.resolve(response)
         })

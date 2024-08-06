@@ -402,3 +402,18 @@ export type CriteriaQuestion = {
   numberOfQuestion?: number
   rawIndex?: string
 }
+
+export type PaperMatrixTemplate = {
+  id: string
+  name: string
+  content: string
+  contentItems: ContentMatrixItem[]
+  totalPoint: number
+}
+
+export type ContentMatrixItem = {
+  questionFolderId: string
+  questionFolderName?: string
+  criteriaQuestions: CriteriaQuestion[]
+  totalPoint: number
+}
