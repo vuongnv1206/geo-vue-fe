@@ -146,7 +146,7 @@ export interface PaperStudentDto {
 export interface UpdatePaperRequest {
   id: string
   examName: string
-  status?: number
+  status?: number | null
   startTime?: string
   endTime?: string
   paperLabelId?: string
@@ -551,4 +551,9 @@ export type InfoAttendeeTranscript = {
   mark: number
   startedTest: Date
   finishedTest?: Date
+}
+
+export enum StatusPaper {
+  publish = 1,
+  unpublish = 2,
 }
