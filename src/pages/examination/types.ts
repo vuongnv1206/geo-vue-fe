@@ -380,6 +380,47 @@ export type MarkAnswerRequest = {
   mark?: number
 }
 
+export type CreateMatrixRequest = {
+  name: string
+  content: string
+  totalPoint: number
+}
+
+export type UpdateMatrixRequest = {
+  id: string
+  name: string
+  content: string
+  totalPoint: number
+}
+
+export type ContentMatrixRequest = {
+  questionFolderId: string
+  criteriaQuestions: CriteriaQuestion[]
+  totalPoint: number
+}
+
+export type CriteriaQuestion = {
+  questionLabelId: string | null
+  questionType?: number
+  numberOfQuestion?: number
+  rawIndex?: string
+}
+
+export type PaperMatrixTemplate = {
+  id: string
+  name: string
+  content: string
+  contentItems: ContentMatrixItem[]
+  totalPoint: number
+}
+
+export type ContentMatrixItem = {
+  questionFolderId: string
+  questionFolderName?: string
+  criteriaQuestions: CriteriaQuestion[]
+  totalPoint: number
+}
+
 export type BasicStatisticPaperRequest = {
   paperId: string
   classId?: string
