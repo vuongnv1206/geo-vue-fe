@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto, AccessType, PaperAccess, UpdatePaperRequest, SubmitPaperResponse } from './types'
+import { PaperDto, AccessType, PaperAccess, UpdatePaperRequest, SubmitPaperResponse, StatusPaper } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
 import { Classrooms, GroupClass } from '@/pages/classrooms/types'
@@ -112,7 +112,7 @@ const examMonitorAction = () => {
 const editPaper = ref<UpdatePaperRequest>({
   id: '',
   examName: '',
-  status: 0,
+  status: StatusPaper.unpublish,
   startTime: undefined,
   endTime: undefined,
   paperLabelId: undefined,
@@ -136,7 +136,7 @@ const handleSaveAssigned = async (shareType: AccessType, accessPaperList: PaperA
     editPaper.value = {
       id: paperDetail.value.id,
       examName: paperDetail.value.examName,
-      status: 0,
+      status: paperDetail.value.status === 'Publish' ? StatusPaper.publish : StatusPaper.unpublish,
       startTime: paperDetail.value.startTime ?? undefined,
       endTime: paperDetail.value.endTime ?? undefined,
       paperLabelId: paperDetail.value.paperLabelId ?? undefined,
@@ -295,7 +295,7 @@ onMounted(async () => {
                 <VaMenuItem @click="paperConfigAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Setting
                 </VaMenuItem>
-                <VaMenuItem> <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem>
+                <!-- <VaMenuItem> <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem> -->
                 <VaMenuItem @click="statisticExam">
                   <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics
                 </VaMenuItem>

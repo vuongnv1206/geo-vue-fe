@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { VaButton, VaCard, VaCardTitle, VaIcon, useToast } from 'vuestic-ui'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto, ShowQuestionAnswer, ShowResult } from '@/pages/examination/types'
+import { PaperDto, ShowQuestionAnswer, ShowResult, StatusPaper } from '@/pages/examination/types'
 import { useRoute, useRouter } from 'vue-router'
 import { Classrooms, GroupClass, Student } from '@/pages/classrooms/types'
 import { useClassStore } from '@/stores/modules/class.module'
@@ -75,7 +75,7 @@ const getSubjects = async () => {
 const editPaper = ref<UpdatePaperRequest>({
   id: paperId.toString(),
   examName: '',
-  status: 0,
+  status: StatusPaper.unpublish,
   startTime: undefined,
   endTime: undefined,
   paperLabelId: undefined,
@@ -104,7 +104,7 @@ watch(
       editPaper.value = {
         id: paperDetail.value.id,
         examName: paperDetail.value.examName,
-        status: 0,
+        status: paperDetail.value.status === 'Publish' ? StatusPaper.publish : StatusPaper.unpublish,
         startTime: formatDateTimeForDisplay(paperDetail.value.startTime ?? undefined),
         endTime: formatDateTimeForDisplay(paperDetail.value.endTime ?? undefined),
         paperLabelId: paperDetail.value.paperLabelId ?? undefined,
@@ -196,7 +196,8 @@ const saveDraffPaper = (isPublish: boolean) => {
   editPaper.value.startTime = formatDateTimeForSave(editPaper.value.startTime)
   editPaper.value.endTime = formatDateTimeForSave(editPaper.value.endTime)
   if (isPublish) {
-    editPaper.value.isPublish = true
+    editPaper.value.isPublish = isPublish
+    editPaper.value.status = StatusPaper.publish
   }
   const accessPaperSet = ref<PaperAccess[] | null>(null)
 
