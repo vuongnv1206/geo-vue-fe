@@ -5,7 +5,7 @@ import { QuestionLabelRequest, QuestionLabelResponse, QuestionTree, QuestionType
 import { computed, onMounted, ref, watch } from 'vue'
 import { useToast, VaIcon, VaInput } from 'vuestic-ui'
 import { getErrorMessage, notifications, validators } from '@/services/utils'
-import { ContentMatrixRequest, CreateMatrixRequest, PaperMatrixTemplate } from './types'
+import { ContentMatrixRequest, CreateMatrixRequest, PaperMatrixTemplate, UpdateMatrixRequest } from './types'
 import { useI18n } from 'vue-i18n'
 import { QuestionTypeColor } from '@services/utils'
 import { usePaperMatrixStore } from '@/stores/modules/paperMatrices.module'
@@ -38,7 +38,7 @@ const getQuestionLabel = async () => {
 
 const totalPointPaper = computed(() => {
   return contentMatrixRequestList.value.reduce((accumulator, item) => {
-    return accumulator + item.totalPoint
+    return accumulator + (Number(item.totalPoint) || 0)
   }, 0)
 })
 
@@ -69,15 +69,20 @@ const handleFolderSelected = (node: QuestionTree) => {
     totalPoint: 1,
   })
 
-  createMatrixRequest.value.totalPoint = totalPointPaper.value
-  createMatrixRequest.value.content = JSON.stringify(contentMatrixRequestList.value)
+  updateCreateMatrixRequest()
 }
 
 const removeFolder = (folderId: string, index: number) => {
   if (index >= 0 && index < selectedFolderList.value.length) {
     selectedFolderList.value.splice(index, 1)
     contentMatrixRequestList.value.splice(index, 1)
+    updateCreateMatrixRequest()
   }
+}
+
+const updateCreateMatrixRequest = () => {
+  createMatrixRequest.value.totalPoint = totalPointPaper.value
+  createMatrixRequest.value.content = JSON.stringify(contentMatrixRequestList.value)
 }
 
 const createMatrixRequest = ref<CreateMatrixRequest>({
@@ -86,16 +91,9 @@ const createMatrixRequest = ref<CreateMatrixRequest>({
   content: JSON.stringify(contentMatrixRequestList.value),
 })
 
-watch(
-  contentMatrixRequestList,
-  () => {
-    createMatrixRequest.value.totalPoint = totalPointPaper.value
-    createMatrixRequest.value.content = JSON.stringify(contentMatrixRequestList.value)
-  },
-  { deep: true },
-)
+watch(contentMatrixRequestList, updateCreateMatrixRequest, { deep: true })
 
-const continueCreatePaper = () => {
+const continueCreatePaper = async () => {
   if (!createMatrixRequest.value.name?.trim()) {
     notify({
       message: "Please enter matrix's name",
@@ -107,14 +105,40 @@ const continueCreatePaper = () => {
       color: 'danger',
     })
   } else {
-    createNewPaperMatrix()
+    if (paperMatrixSelected.value) {
+      const updateMatrixRequest = ref<UpdateMatrixRequest>({
+        id: paperMatrixSelected.value.id,
+        name: createMatrixRequest.value.name,
+        content: createMatrixRequest.value.content,
+        totalPoint: createMatrixRequest.value.totalPoint,
+      })
+
+      await updatePaperMatrix(updateMatrixRequest.value)
+    } else {
+      await createNewPaperMatrix()
+    }
   }
 }
 
-const createNewPaperMatrix = () => {
-  paperMatrixStore
+const createNewPaperMatrix = async () => {
+  await paperMatrixStore
     .createMatrixTemplate(createMatrixRequest.value)
-    .then(() => notify({ message: 'Create a matrix successfully', color: 'success' }))
+    .then(async () => {
+      notify({ message: 'Create a matrix successfully', color: 'success' })
+      await getListPaperMatrix()
+    })
+    .catch((error) =>
+      notify({ message: notifications.createFailed('paper matrix' + getErrorMessage(error)), color: 'danger' }),
+    )
+}
+
+const updatePaperMatrix = async (request: UpdateMatrixRequest) => {
+  await paperMatrixStore
+    .updateMatrixTemplate(request)
+    .then(async () => {
+      notify({ message: 'Update matrix successfully', color: 'success' })
+      await getListPaperMatrix()
+    })
     .catch((error) =>
       notify({ message: notifications.createFailed('paper matrix' + getErrorMessage(error)), color: 'danger' }),
     )
@@ -179,12 +203,8 @@ const getListPaperMatrix = async () => {
 }
 
 const handleChangeSelectionMatrix = (selection?: PaperMatrixTemplate) => {
-  if (selection === undefined || selection === null) {
-    isLoading.value = true
-    createMatrixRequest.value.name = ''
-    selectedFolderList.value = []
-  } else {
-    isLoading.value = true
+  isLoading.value = true
+  if (selection) {
     createMatrixRequest.value.name = selection.name
     selectedFolderList.value = selection.contentItems.map((item) => ({
       id: item.questionFolderId,
@@ -206,6 +226,10 @@ const handleChangeSelectionMatrix = (selection?: PaperMatrixTemplate) => {
       criteriaQuestions: item.criteriaQuestions,
       totalPoint: item.totalPoint,
     }))
+  } else {
+    createMatrixRequest.value.name = ''
+    selectedFolderList.value = []
+    contentMatrixRequestList.value = []
   }
   isLoading.value = false
 }
