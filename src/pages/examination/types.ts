@@ -1,3 +1,4 @@
+import { Classrooms, Student } from '../classrooms/types'
 import { Question } from '../question/types'
 import { GroupTeacher } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
@@ -115,6 +116,7 @@ export interface CombinedData {
   id: string
   name: string
   status?: string | null
+  creatorName?: string | null
   createdBy: string
   createdOn: string
   lastModifiedBy: string | null
@@ -179,6 +181,7 @@ export enum ShowQuestionAnswer {
 
 export interface PaperAccess {
   classId?: string
+  className?: string
   userId?: string
 }
 
@@ -416,4 +419,136 @@ export type ContentMatrixItem = {
   questionFolderName?: string
   criteriaQuestions: CriteriaQuestion[]
   totalPoint: number
+}
+
+export type BasicStatisticPaperRequest = {
+  paperId: string
+  classId?: string
+}
+
+export type BasicStatisticPaperResponse = {
+  id: string
+  examName: string
+  paperLabelId: string
+  paperLabelName: string
+  subjectId: string
+  subjectName: string
+  totalRegister: number
+  totalNotComplete: number
+  totalDoing: number
+  totalAttendee: number
+  averageMark: number
+  totalPopular: number
+  markPopular: number
+  classrooms: BasicStatisticPaperInClass[]
+}
+
+export type BasicStatisticPaperInClass = {
+  id: string
+  name: string
+  groupClassId: string
+  groupClassName: string
+  totalRegister: number
+  totalTested: number
+}
+
+export type ClassroomFrequencyMarkRequest = {
+  paperId: string
+  classroomId?: string
+}
+
+export type ClassroomFrequencyMarkResponse = {
+  totalRegister: number
+  totalAttendee: number
+  frequencyMarks: FrequencyMark[]
+  className?: string
+}
+
+export type FrequencyMark = {
+  fromMark: number
+  toMark: number
+  total: number
+  rate: number
+}
+
+export type ListQuestionStatisticRequest = {
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+  paperId: string
+  classId?: string
+}
+
+export type ListQuestionStatisticResponse = {
+  data: QuestionStatistic[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type QuestionStatistic = {
+  id: string
+  paperId: string
+  content: string
+  image?: string
+  audio?: string
+  questionFolderId?: string
+  questionFolderName?: string
+  questionType?: number
+  questionLabelId?: string
+  questionLabelName?: string
+  questionParentId?: string
+  questionPassages?: QuestionStatistic
+  answers?: AnswerStatistic[]
+  rawIndex: number
+  totalTest: number
+  totalAnswered: number
+  totalNotAnswered: number
+  totalCorrect: number
+  totalWrong: number
+  wrongStudents?: WrongStudentInfo[]
+}
+
+export type AnswerStatistic = {
+  id: string
+  content?: string
+  questionId: string
+  isCorrect: boolean
+}
+
+export type WrongStudentInfo = {
+  id: string
+  studentId?: string
+  firstName: string
+  lastName: string
+  classId?: string
+  className?: string
+}
+
+export type TranscriptStatisticRequest = {
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+  paperId: string
+  classId?: string
+}
+
+export type TranscriptStatisticResponse = {
+  data: InfoAttendeeTranscript[]
+  averageMark: number
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type InfoAttendeeTranscript = {
+  attendee: Student
+  classrooms?: Classrooms[]
+  mark: number
+  startedTest: Date
+  finishedTest?: Date
 }

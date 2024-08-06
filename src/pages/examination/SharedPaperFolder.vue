@@ -359,6 +359,7 @@ const onDeleteSelectedItems = async () => {
 const tableColumns = computed(() => {
   const columns = [
     { label: 'Name', key: 'name', sortable: true },
+    { label: 'Creator', key: 'creatorName', sortable: true },
     { label: 'Status', key: 'status', sortable: true },
     { label: 'Created On', key: 'createdOn', sortable: true },
     { label: 'Last Modified On', key: 'lastModifiedOn', sortable: true },
@@ -378,6 +379,7 @@ const combinedData = computed(() => {
   const resolvedFolders = paperFolderDtos.value.map((folder) => ({
     ...folder,
     name: folder.name,
+    creatorName: folder.creatorName || '',
     status: '',
     createdOn: folder.createdOn || '',
     lastModifiedOn: folder.lastModifiedOn || '',
@@ -392,6 +394,7 @@ const combinedData = computed(() => {
   const resolvedPapers = papers.value.map((paper) => ({
     ...paper,
     name: paper.examName,
+    creatorName: paper.creatorName || '',
     status: paper.status,
     createdOn: paper.createdOn || '',
     lastModifiedOn: paper.lastModifiedOn || '',
