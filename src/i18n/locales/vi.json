@@ -122,7 +122,8 @@
     "show": "Hiển thị",
     "read_more": "Đọc thêm",
     "read": "Đọc",
-    "send": "Gửi"
+    "send": "Gửi",
+    "see_more": "Xem thêm"
   },
   "auditLogs": {
     "title": "Nhật ký",
@@ -293,7 +294,8 @@
     "upload": "Tải lên",
     "select_all": "Chọn tất cả",
     "deselect_all": "Bỏ chọn tất cả",
-    "share": "Chia sẻ"
+    "share": "Chia sẻ",
+    "unattemped_ass_exam": "Bài tập, bài kiểm tra chưa làm"
   },
   "subjects": {
     "subject": "Môn học",
@@ -388,7 +390,9 @@
     "edit_post": "Chỉnh sửa bài viết",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
     "no_post": "Không có bài viết nào",
-    "please_enter_content": "Vui lòng nhập nội dung"
+    "please_enter_content": "Vui lòng nhập nội dung",
+    "news_board": "Bảng tin"
+    
   },
   "class_permission": {
     "assign_assignment": "Giao bài tập",

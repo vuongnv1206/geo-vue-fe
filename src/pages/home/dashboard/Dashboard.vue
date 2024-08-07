@@ -143,93 +143,145 @@
       </VaCard>
     </div>
     <div v-if="isStudent" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 pt-4">
-      <VaCard class="p-4">
-        <VaCard class="flex flex-row items-center">
-          <!-- <GeoAvatar class="mr-2" :size="48" color="warning" :image="'abc' || undefined" :txt="thangdeptrai" /> -->
-          <VaImage src="https://picsum.photos/1500" class="w-16 h-16 rounded-full" />
-          <div>
-            <!-- <p class="text-lg font-semibold">Nguyen Duc Thang</p>
-            <p class="text-sm font-medium ">Class ABC</p> -->
-            <VaCardContent class="text-lg font-semibold">Nguyen Duc Thang</VaCardContent>
-            <VaCardContent class="text-sm font-medium">Class ABC</VaCardContent>
-          </div>
-        </VaCard>
-        <VaCard class="flex flex-col">
-          <div class="flex flex-row items-center">
-            <VaIcon name="event_available" class="text-primary" size="large" />
-            <VaCardContent class="text-sm font-semibold">Unattempted exercises, exams</VaCardContent>
-          </div>
-          <div class="bg-blue-500 p-2 rounded-lg">
-            <VaCardContent class="text-md font-semibold">Assignment</VaCardContent>
-            <VaCardContent class="text-xs font-medium">Submit At: 11/11/2024</VaCardContent>
-            <VaCardContent class="text-xs font-medium">End Time: 11/11/2024</VaCardContent>
-          </div>
-        </VaCard>
-        <VaCard class="flex flex-col">
-          <div class="flex items-center">
-            <VaIcon name="newspaper" class="text-primary" size="large" />
-            <VaCardContent class="text-sm font-semibold">News board</VaCardContent>
-          </div>
-          <div class="bg-blue-500 p-2 rounded-lg">
-            <VaCardContent class="text-md font-bold">News Content</VaCardContent>
-          </div>
-        </VaCard>
+      <VaCard v-for="class1 in classes" :key="class1.id" class="p-4 shadow-lg rounded-lg border border-gray-200">
+        <div v-if="(class1.assignments && class1.assignments.length > 0) || (class1.posts && class1.posts.length > 0)">
+          <VaCard class="flex flex-row items-center p-4 bg-white rounded-lg shadow-sm">
+            <!-- <GeoAvatar class="mr-2" :size="48" color="warning" :image="post.owner?.imageUrl || undefined" :txt="post.owner?.firstName?.charAt(0).toUpperCase()" /> -->
+            <!-- <GeoAvatar class="mr-2" :size="48" color="warning" :image="'abc' || undefined" :txt="thangdeptrai" /> -->
+            <VaImage src="https://picsum.photos/1500" class="w-16 h-16 rounded-full mr-4" />
+            <div>
+              <VaCardContent class="text-lg font-semibold text-gray-800">Nguyen Duc Thang</VaCardContent>
+              <VaCardContent class="text-sm font-medium text-gray-600">{{ class1.name }}</VaCardContent>
+            </div>
+          </VaCard>
+
+          <VaCard class="flex flex-col mb-2 px-4 bg-white rounded-lg shadow-sm">
+            <div class="flex flex-row items-center mb-2">
+              <VaIcon name="event_available" class="text-primary" size="large" />
+              <VaCardContent class="text-sm font-semibold text-gray-800 ml-2">
+                {{ $t('assignments.unattemped_ass_exam') }}
+              </VaCardContent>
+            </div>
+            <div v-for="ass in class1.assignments.slice(0, 2)" :key="ass.id" class="bg-blue-100 px-4 rounded-lg mb-2">
+              <VaCardContent class="text-md font-semibold text-gray-800">{{ ass.name }}</VaCardContent>
+              <VaCardContent class="text-xs font-medium text-gray-600">
+                {{ $t('assignments.start_time') }} {{ format.formatDate(ass.startTime) }}
+              </VaCardContent>
+              <VaCardContent class="text-xs font-medium text-gray-600">
+                {{ $t('assignments.end_time') }} {{ format.formatDate(ass.endTime) }}
+              </VaCardContent>
+            </div>
+            <div v-if="class1.assignments.length > 2" class="flex justify-center items-center">
+              <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: class1.id } }">
+                {{ $t('settings.see_more') }}
+              </VaButton>
+            </div>
+          </VaCard>
+
+          <VaCard class="flex flex-col px-4 bg-white rounded-lg shadow-sm">
+            <div class="flex items-center mb-2">
+              <VaIcon name="newspaper" class="text-primary" size="large" />
+              <VaCardContent class="text-sm font-semibold text-gray-800 ml-2">{{
+                $t('posts.news_board')
+              }}</VaCardContent>
+            </div>
+            <div v-for="posts1 in class1.posts?.slice(0, 2)" :key="posts1.id" class="bg-blue-100 px-4 rounded-lg mb-2">
+              <VaCardContent class="text-md font-bold text-gray-800">
+                <!-- eslint-disable vue/no-v-html -->
+                <div class="text-base text-gray-700" v-html="posts1.content" />
+                <!--eslint-enable-->
+              </VaCardContent>
+            </div>
+            <div v-if="(class1.posts?.length || 0) > 2" class="flex justify-center items-center">
+              <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: class1.id } }">
+                {{ $t('settings.see_more') }}
+              </VaButton>
+            </div>
+          </VaCard>
+        </div>
       </VaCard>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@modules/auth.module'
 import { useI18n } from 'vue-i18n'
+import { useToast } from 'vuestic-ui/web-components'
+import { useClassStore } from '@/stores/modules/class.module'
+import { ClassroomWithPosts } from '@/pages/classrooms/types'
+import { format, getErrorMessage, notifications } from '@/services/utils'
+import { usePostsStore } from '@/stores/modules/posts.module'
 
 const { t } = useI18n()
-// const loading = ref(true)
-// const { confirm } = useModal()
-// const { init: notify } = useToast()
+const loading = ref(true)
+const { init: notify } = useToast()
 const authStore = useAuthStore()
-// const groupClassStores = useGroupClassStore()
-// const classStores = useClassStore()
+const classStores = useClassStore()
+const postStores = usePostsStore()
 
-// const classes = ref<Classrooms[]>([])
-// const groupClasses = ref<GroupClass[]>([])
+const classes = ref<ClassroomWithPosts[]>([])
 
 const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
 const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for testing
 
-// const dataFilter = ref({
-//   advancedSearch: {
-//     fields: [''],
-//     keyword: '',
-//   },
-//   pageNumber: 1,
-//   totalPages: 1,
-//   totalCount: 1,
-//   pageSize: 10,
-//   orderBy: [''],
-// })
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 1,
+  totalPages: 1,
+  totalCount: 1,
+  pageSize: 10,
+  orderBy: [''],
+})
 
-// const getGroupClasses = () => {
-//   loading.value = true
-//   groupClassStores.getGroupClasses(dataFilter).
-//     then((response) => {
-//       groupClasses.value = response.data
-//     })
-//     .catch((error) => {
-//       notify({
-//         message: notifications.getFailed('group class') + getErrorMessage(error),
-//         color: 'error',
-//       })
-//     })
-//     .finally(() => {
-//       loading.value = false
-//     })
-// }
+const getClasses = async () => {
+  loading.value = true
+  try {
+    const response = await classStores.getClasses(dataFilter)
+    classes.value = await Promise.all(
+      response.data.map(async (item: any) => {
+        const posts = (await getPosts(item.id)) || []
+        return {
+          ...item,
+          posts,
+        }
+      }),
+    )
+  } catch (error) {
+    notify({
+      message: notifications.getFailed('class') + getErrorMessage(error),
+      color: 'error',
+    })
+  } finally {
+    loading.value = false
+  }
+}
 
-// onMounted(() => {
-//   getGroupClasses()
-// })
+const getPosts = async (classId: any) => {
+  loading.value = true
+  const request = {
+    classId: classId,
+  }
+  try {
+    const response = await postStores.getPosts(request)
+    return response.data
+  } catch (error) {
+    notify({
+      message: notifications.getFailed('post') + getErrorMessage(error),
+      color: 'error',
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  getClasses()
+})
 </script>
 
 <style>

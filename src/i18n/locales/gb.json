@@ -122,7 +122,8 @@
     "show": "Show",
     "read_more": "Read more",
     "read": "Read",
-    "send": "Send"
+    "send": "Send",
+    "see_more": "See more"
   },
   "auditLogs": {
     "title": "Audit Logs",
@@ -293,7 +294,8 @@
     "upload": "Upload",
     "select_all": "Select All",
     "deselect_all": "Deselect All",
-    "share": "Share"
+    "share": "Share",
+    "unattemped_ass_exam":"Unattempted exercises, exams"
   },
   "subjects": {
     "subject": "Subject",
@@ -386,7 +388,8 @@
     "edit_post": "Edit Post",
     "range": "Items from {start} to {end} of total {total}",
     "no_post": "No post available",
-    "please_enter_content": "Please enter content"
+    "please_enter_content": "Please enter content",
+    "news_board": "News Board"
   },
   "class_permission": {
     "assign_assignment": "Assign Assignment",

@@ -36,6 +36,20 @@ export type Classrooms = {
   permissions: PermissionInClass[] | null
 }
 
+export type ClassroomWithPosts = {
+  id: string
+  name: string
+  schoolYear: string
+  ownerId: string
+  groupClassId: string
+  groupClassName: string
+  numberUserOfClass: number
+  assignments: Assignment[]
+  students: Student[]
+  permissions: PermissionInClass[] | null
+  posts?: Post[]
+}
+
 export type EmptyClassrooms = {
   name: string
   schoolYear: string

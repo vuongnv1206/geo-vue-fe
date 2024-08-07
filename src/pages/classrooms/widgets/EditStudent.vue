@@ -74,7 +74,7 @@ const genderOptions = reactive([
     <VaInput
       v-model="newStudent.firstName"
       :label="t('students.first_name')"
-      :laceholder="t('students.enter_first_name')"
+      :placeholder="t('students.enter_first_name')"
       :rules="[
         validators.required2(t('students.enter_first_name')),
         validators.isCharacter(t('students.enter_first_name')),
