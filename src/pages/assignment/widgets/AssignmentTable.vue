@@ -6,8 +6,20 @@
         <template v-for="assignment in recentAssignments" :key="assignment.id">
           <VaListItem
             class="mb-2"
-            :to="{ name: 'assignment-details', params: { id: assignment?.id, classId: assignment?.classId } }"
+            :to="
+              isTeacher
+                ? { name: 'assignment-details', params: { id: assignment?.id, classId: assignment?.classId } }
+                : null
+            "
           >
+            <!-- <VaListItem
+            class="mb-2"
+            :to="
+              isTeacher
+                ? { name: 'assignment-details', params: { id: assignment?.id, classId: assignment?.classId } }
+                : { name: 'assignment-submit', params: { id: assignment?.id, classId: assignment?.classId } }
+            "
+          > -->
             <VaCard class="border rounded-lg p-3 hover:scale-105 transition-transform duration-200 w-full">
               <div class="flex items-center">
                 <VaListItemSection avatar>
@@ -21,8 +33,8 @@
                     </VaPopover>
                   </VaListItemLabel>
                   <VaListItemLabel caption
-                    >{{ $t('assignments.end_time') }} {{ format.formatDate(assignment?.endTime) }}</VaListItemLabel
-                  >
+                    >{{ $t('assignments.end_time') }} {{ format.formatDate(assignment?.endTime) }}
+                  </VaListItemLabel>
                 </VaListItemSection>
                 <VaListItemSection icon>
                   <VaCard>0/100</VaCard>
@@ -40,11 +52,13 @@
           <VaCard v-if="assClass.assignments && assClass.assignments.length > 0" class="border p-4 pb-0 rounded">
             <div class="flex justify-between items-center mb-4">
               <span class="font-bold">{{ assClass.name }}</span>
-              <VaChip v-if="currentUserId != assClass.ownerId" outline class="ml-2" size="small"> Share </VaChip>
+              <VaChip v-if="currentUserId != assClass.ownerId && isTeacher" outline class="ml-2" size="small">
+                {{ $t('settings.share') }}
+              </VaChip>
               <div class="flex items-center space-x-2 ml-auto">
-                <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: assClass.id } }">{{
-                  $t('assignments.show_all')
-                }}</VaButton>
+                <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: assClass.id } }">
+                  {{ $t('assignments.show_all') }}
+                </VaButton>
               </div>
             </div>
             <VaDivider />
@@ -52,8 +66,20 @@
               <template v-for="assignment in assClass.assignments.slice().reverse().slice(0, 2)" :key="assignment.id">
                 <VaListItem
                   class="mb-2"
-                  :to="{ name: 'assignment-details', params: { id: assignment.id, classId: assClass.id } }"
+                  :to="
+                    isTeacher
+                      ? { name: 'assignment-details', params: { id: assignment?.id, classId: assClass.id } }
+                      : null
+                  "
                 >
+                  <!-- <VaListItem
+            class="mb-2"
+            :to="
+              isTeacher
+                ? { name: 'assignment-details', params: { id: assignment?.id, classId: assClass.id } }
+                : { name: 'assignment-submit', params: { id: assignment?.id, classId: assClass.id  } }
+            "
+          > -->
                   <VaCard
                     class="flex items-center border rounded-lg p-3 w-full hover:scale-105 transition-transform duration-200"
                   >
@@ -93,6 +119,7 @@ import { useAuthStore } from '@/stores/modules/auth.module'
 
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 
 const props = defineProps({
   assignmentsByClass: {

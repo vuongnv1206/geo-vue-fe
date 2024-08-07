@@ -145,17 +145,25 @@
     <div v-if="isStudent" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 pt-4">
       <VaCard v-for="class1 in classes" :key="class1.id" class="p-4 shadow-lg rounded-lg border border-gray-200">
         <div v-if="(class1.assignments && class1.assignments.length > 0) || (class1.posts && class1.posts.length > 0)">
+          <!-- Header Section -->
           <VaCard class="flex flex-row items-center p-4 bg-white rounded-lg shadow-sm">
             <!-- <GeoAvatar class="mr-2" :size="48" color="warning" :image="post.owner?.imageUrl || undefined" :txt="post.owner?.firstName?.charAt(0).toUpperCase()" /> -->
-            <!-- <GeoAvatar class="mr-2" :size="48" color="warning" :image="'abc' || undefined" :txt="thangdeptrai" /> -->
+            <!-- <GeoAvatar
+              class="mr-2"
+              :size="48"
+              color="warning"
+              :image="'https://picsum.photos/1500'"
+              :txt="class1.ownerId?.charAt(0).toUpperCase()"
+            /> -->
             <VaImage src="https://picsum.photos/1500" class="w-16 h-16 rounded-full mr-4" />
-            <div>
-              <VaCardContent class="text-lg font-semibold text-gray-800">Nguyen Duc Thang</VaCardContent>
+            <VaCard :to="{ name: 'class-details', params: { id: class1.id } }">
+              <VaCardContent class="text-md font-semibold text-gray-800">Nguyen Duc Thang</VaCardContent>
               <VaCardContent class="text-sm font-medium text-gray-600">{{ class1.name }}</VaCardContent>
-            </div>
+            </VaCard>
           </VaCard>
 
-          <VaCard class="flex flex-col mb-2 px-4 bg-white rounded-lg shadow-sm">
+          <!-- Assignments Section -->
+          <VaCard class="flex flex-col mb-2 px-4 bg-white rounded-lg">
             <div class="flex flex-row items-center mb-2">
               <VaIcon name="event_available" class="text-primary" size="large" />
               <VaCardContent class="text-sm font-semibold text-gray-800 ml-2">
@@ -177,8 +185,8 @@
               </VaButton>
             </div>
           </VaCard>
-
-          <VaCard class="flex flex-col px-4 bg-white rounded-lg shadow-sm">
+          <!-- News Section -->
+          <VaCard class="flex flex-col px-4 bg-white rounded-lg">
             <div class="flex items-center mb-2">
               <VaIcon name="newspaper" class="text-primary" size="large" />
               <VaCardContent class="text-sm font-semibold text-gray-800 ml-2">{{
@@ -208,7 +216,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@modules/auth.module'
 import { useI18n } from 'vue-i18n'
-import { useToast } from 'vuestic-ui/web-components'
+import { useToast, VaCard } from 'vuestic-ui/web-components'
 import { useClassStore } from '@/stores/modules/class.module'
 import { ClassroomWithPosts } from '@/pages/classrooms/types'
 import { format, getErrorMessage, notifications } from '@/services/utils'

@@ -123,7 +123,9 @@
     "read_more": "Đọc thêm",
     "read": "Đọc",
     "send": "Gửi",
-    "see_more": "Xem thêm"
+    "see_more": "Xem thêm",
+    "share": "Chia sẻ",
+    "search": "Tìm kiếm"
   },
   "auditLogs": {
     "title": "Nhật ký",
@@ -320,7 +322,8 @@
     "delete_group_class": "Xóa nhóm lớp",
     "edit_group_class": "Chỉnh sửa nhóm lớp",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
-    "select_group_class": "Chọn một nhóm lớp"
+    "select_group_class": "Chọn một nhóm lớp",
+    "search_group_class_name":  "Tìm kiếm tên nhóm lớp"
   },
   "classes": {
     "class": "Lớp",
@@ -342,7 +345,8 @@
     "submited": "Đã nộp",
     "students_list": "Danh sách học sinh",
     "assignment_and_exam": "Bài tập & bài thi",
-    "news_board": "Bảng tin"
+    "news_board": "Bảng tin",
+    "search_assignment_paper": "Tìm kiếm bài tập hoặc bài thi"
   },
   "students": {
     "student": "Học sinh",

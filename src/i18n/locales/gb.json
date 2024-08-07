@@ -123,7 +123,9 @@
     "read_more": "Read more",
     "read": "Read",
     "send": "Send",
-    "see_more": "See more"
+    "see_more": "See more",
+    "share": "Share",
+    "search": "Search"
   },
   "auditLogs": {
     "title": "Audit Logs",
@@ -318,7 +320,8 @@
     "delete_group_class": "Delete Group Class",
     "edit_group_class": "Edit Group Class",
     "range": "Items from {start} to {end} of total {total}",
-    "select_group_class": "Select a Group Class"
+    "select_group_class": "Select a Group Class",
+    "search_group_class_name": "Search group class name"
   },
   "classes": {
     "class": "Class",
@@ -340,7 +343,8 @@
     "submited": "Submited",
     "students_list": "Students List",
     "assignment_and_exam": "Assignment & Exam",
-    "news_board": "News Board"
+    "news_board": "News Board",
+    "search_assignment_paper": "Search assignment or paper"
   },
   "students": {
     "student": "Student",

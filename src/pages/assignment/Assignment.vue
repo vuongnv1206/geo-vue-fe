@@ -1,7 +1,7 @@
 <template>
   <VaCard>
     <VaCardContent>
-      <VaCard class="flex flex-col md:flex-row gap-2 justify-end">
+      <VaCard v-if="isTeacher" class="flex flex-col md:flex-row gap-2 justify-end">
         <VaButton icon="add" :to="{ name: 'create-assignment' }">{{ $t('assignments.assignment') }}</VaButton>
       </VaCard>
       <AssignmentTable :loading="loading" :assignments-by-class="assignmentsByClass" />
@@ -10,7 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useAuthStore } from '@modules/auth.module'
 import AssignmentTable from '@pages/assignment/widgets/AssignmentTable.vue'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
@@ -21,8 +22,11 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const loading = ref(true)
 const { init: notify } = useToast()
+const authStore = useAuthStore()
 const classStores = useClassStore()
 const assignmentsByClass = ref<Classrooms[]>([])
+
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
 
 const dataFilter = ref({
   advancedSearch: {

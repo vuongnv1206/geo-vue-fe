@@ -6,7 +6,7 @@
         <VaCard class="flex flex-grow">
           <VaInput
             v-model="dataFilter.advancedSearch.keyword"
-            placeholder="Search group class name"
+            :placeholder="$t('groupClasses.search_group_class_name')"
             class="flex-grow"
             @update:modelValue="handlerSearch"
           >
@@ -17,8 +17,8 @@
         </VaCard>
       </VaCard>
       <VaCard class="flex justify-end items-center">
-        <VaCard class="flex gap-2">
-          <VaButton icon="add" @click="createNewGroupClass()">{{ $t('groupClasses.group_class') }}</VaButton>
+        <VaCard v-if="isTeacher" class="flex gap-2">
+          <VaButton icon="add" @click="createNewGroupClass()">{{ $t('groupClasses.group_class') }} </VaButton>
           <VaButton icon="add" @click="createNewClass()">{{ $t('classes.class') }}</VaButton>
           <VaDropdown placement="bottom-end">
             <template #anchor>
@@ -202,7 +202,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { ClassroomQueryType, Classrooms, GroupClass } from './types'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
@@ -232,6 +232,7 @@ const doShowClassFormModal = ref(false)
 const doShowGroupClassFormModal = ref(false)
 
 const currentUser = authStore.user?.id
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 
 const dataFilter = ref({
   advancedSearch: {

@@ -2,13 +2,13 @@
   <VaCardContent>
     <VaCard class="flex flex-col md:flex-row gap-2 mb-4">
       <VaCard class="flex-grow justify-start items-center">
-        <VaInput v-model="searchQuery" placeholder="Search assignment or paper name">
+        <VaInput v-model="searchQuery" :placeholder="$t('classes.search_assignment_paper')">
           <template #appendInner>
             <VaIcon color="secondary" class="material-icons">search</VaIcon>
           </template>
         </VaInput>
       </VaCard>
-      <VaMenu class="justify-end" :options="options" @selected="selectedOption">
+      <VaMenu v-if="isTeacher" class="justify-end" :options="options" @selected="selectedOption">
         <template #anchor>
           <VaButton :disabled="!canAssignmentManage">
             <VaIcon name="add" />
@@ -30,6 +30,7 @@ import { Classrooms } from '../types'
 import AccordionOfAssignment from './AccordionOfAssignment.vue'
 import router from '@/router'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/modules/auth.module'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -38,7 +39,9 @@ const props = defineProps({
     required: true,
   },
 })
+const authStore = useAuthStore()
 
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 const canAssignmentManage = computed(() => {
   if (props.classDetails.permissions === null || props.classDetails.permissions === undefined) {
     return true
