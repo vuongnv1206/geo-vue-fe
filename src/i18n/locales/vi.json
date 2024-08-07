@@ -323,7 +323,7 @@
     "edit_group_class": "Chỉnh sửa nhóm lớp",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
     "select_group_class": "Chọn một nhóm lớp",
-    "search_group_class_name":  "Tìm kiếm tên nhóm lớp"
+    "search_group_class_name": "Tìm kiếm tên nhóm lớp"
   },
   "classes": {
     "class": "Lớp",
