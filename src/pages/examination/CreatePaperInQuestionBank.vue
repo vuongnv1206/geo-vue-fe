@@ -126,7 +126,7 @@ const cancelUpdatePaper = () => {
     <VaCardContent>
       <div class="flex justify-between">
         <p>
-          <b>{{ questionsInPaper.length }} question(s)</b> ({{ totalPointPaper }} point)
+          <b>{{ questionsInPaper.length }} question(s)</b> ({{ totalPointPaper }} {{ t('papers.point') }})
         </p>
         <VaButton
           border-color="primary"

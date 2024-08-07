@@ -8,6 +8,7 @@ import {
   SearchSharedPaperRequest,
   PaperInListDto,
   PaperDeletedResponse,
+  QuestionGenerateToMatrix,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -21,9 +22,25 @@ export interface IPapersService {
   paperUpdate(id: string, request: UpdatePaperRequest): Promise<any>
 
   papers_SearchSharedPaper(request: SearchSharedPaperRequest): Promise<PaperInListDto[]>
+
+  getQuestionFromMatrix(matrixId: string): Promise<QuestionGenerateToMatrix[]>
 }
 
 export class PapersService implements IPapersService {
+  getQuestionFromMatrix(matrixId: string): Promise<QuestionGenerateToMatrix[]> {
+    const url = '/v1/papers/get-questions-from-matrix'
+    const request = {
+      matrixId: matrixId,
+    }
+    return apiService
+      .post(url, request)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   async paperUpdate(id: string, request: UpdatePaperRequest): Promise<any> {
     return apiService
       .put(`/v1/papers/${id}`, request)

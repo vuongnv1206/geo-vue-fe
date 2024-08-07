@@ -557,3 +557,9 @@ export enum StatusPaper {
   publish = 1,
   unpublish = 2,
 }
+
+export type QuestionGenerateToMatrix = {
+  question: Question
+  mark: number
+  rawIndex: number
+}

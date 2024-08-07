@@ -55,7 +55,12 @@ const routes: Array<RouteRecordRaw> = [
           },
           {
             name: 'create-paper-matrix',
-            path: 'create-paper/:folderId?/question-matrix',
+            path: 'create-paper/:folderId?/matrix-template',
+            component: () => import('../pages/examination/CreateMatrixTemplate.vue'),
+          },
+          {
+            name: 'generate-paper-matrix',
+            path: 'create-paper/:folderId?/paper-matrix/:matrixId',
             component: () => import('../pages/examination/CreatePaperMatrix.vue'),
           },
           {

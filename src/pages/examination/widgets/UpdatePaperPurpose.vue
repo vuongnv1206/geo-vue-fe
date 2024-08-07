@@ -122,6 +122,6 @@ onMounted(() => {
   </VaCard>
   <div class="flex justify-end gap-3 mt-3">
     <VaButton preset="primary" @click="cancelPaper">{{ t('settings.cancel') }}</VaButton>
-    <VaButton @click="onSavePaper">{{ t('settings.save ') }}</VaButton>
+    <VaButton @click="onSavePaper">{{ t('settings.save') }}</VaButton>
   </div>
 </template>
