@@ -295,7 +295,7 @@
     "select_all": "Select All",
     "deselect_all": "Deselect All",
     "share": "Share",
-    "unattemped_ass_exam":"Unattempted exercises, exams"
+    "unattemped_ass_exam": "Unattempted exercises, exams"
   },
   "subjects": {
     "subject": "Subject",
