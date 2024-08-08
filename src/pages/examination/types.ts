@@ -106,8 +106,22 @@ export interface PaperDto {
 }
 
 export interface PaperLabelDto {
-  id?: string
-  name?: string
+  id: string
+  name: string
+}
+
+export interface CreatePaperLabelRequest {
+  name: string
+}
+
+export interface PaperLabelResponse {
+  data: PaperLabelDto[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }
 
 export interface CombinedData {

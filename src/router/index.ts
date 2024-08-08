@@ -85,6 +85,11 @@ const routes: Array<RouteRecordRaw> = [
             path: 'admin/exam-statistic/:id',
             component: () => import('../pages/examination/PaperAdminStatistic.vue'),
           },
+          {
+            name: 'paper-label',
+            path: 'paper-label',
+            component: () => import('../pages/examination/PaperLabel.vue'),
+          },
         ],
       },
       {
