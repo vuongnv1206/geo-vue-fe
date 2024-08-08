@@ -171,18 +171,24 @@
               </VaCardContent>
             </div>
             <div v-for="ass in class1.assignments.slice(0, 2)" :key="ass.id" class="bg-blue-100 px-4 rounded-lg mb-2">
-              <VaCardContent
-                :to="{ name: 'assignment-submissions', params: { id: ass.id, classId: class1.id } }"
-                class="text-md font-semibold text-gray-800"
-              >
-                {{ ass.name }}
-              </VaCardContent>
-              <VaCardContent class="text-xs font-medium text-gray-600">
-                {{ $t('assignments.start_time') }} {{ format.formatDate(ass.startTime) }}
-              </VaCardContent>
-              <VaCardContent class="text-xs font-medium text-gray-600">
-                {{ $t('assignments.end_time') }} {{ format.formatDate(ass.endTime) }}
-              </VaCardContent>
+              <RouterLink :to="{ name: 'assignment-submissions', params: { id: ass.id, classId: class1.id } }">
+                <VaCardContent class="text-md font-semibold text-gray-800">
+                  {{ ass.name }}
+                </VaCardContent>
+
+                <VaCardContent class="text-xs font-medium text-gray-600">
+                  <div class="flex items-center mb-1">
+                    <VaIcon name="event" class="material-symbols-outlined mr-1" />
+                    <span class="font-semibold mr-1">{{ $t('assignments.start_time') }} </span>
+                    {{ format.formatDate(ass.startTime) }}
+                  </div>
+                  <div class="flex items-center">
+                    <VaIcon name="event" class="material-symbols-outlined mr-1" />
+                    <span class="font-semibold mr-1">{{ $t('assignments.end_time') }}</span>
+                    {{ format.formatDate(ass.endTime) }}
+                  </div>
+                </VaCardContent>
+              </RouterLink>
             </div>
             <div v-if="class1.assignments.length > 2" class="flex justify-center items-center">
               <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: class1.id } }">
@@ -190,6 +196,7 @@
               </VaButton>
             </div>
           </VaCard>
+
           <!-- News Section -->
           <VaCard class="flex flex-col px-4 bg-white rounded-lg">
             <div class="flex items-center mb-2">
