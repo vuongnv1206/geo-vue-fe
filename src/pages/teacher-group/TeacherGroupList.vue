@@ -466,7 +466,7 @@ const handlerSearch = (event: Event) => {
                   />
                 </VaListItemLabel>
                 <VaListItemLabel caption>
-                  {{ teacher.email }}
+                  {{ (teacher.email ?? '').toLowerCase() }}
                   {{ teacher.phone }}
                 </VaListItemLabel>
               </VaListItemSection>
