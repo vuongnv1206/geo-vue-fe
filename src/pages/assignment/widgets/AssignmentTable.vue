@@ -9,17 +9,9 @@
             :to="
               isTeacher
                 ? { name: 'assignment-details', params: { id: assignment?.id, classId: assignment?.classId } }
-                : null
+                : { name: 'assignment-submissions', params: { id: assignment?.id, classId: assignment?.classId } }
             "
           >
-            <!-- <VaListItem
-            class="mb-2"
-            :to="
-              isTeacher
-                ? { name: 'assignment-details', params: { id: assignment?.id, classId: assignment?.classId } }
-                : { name: 'assignment-submit', params: { id: assignment?.id, classId: assignment?.classId } }
-            "
-          > -->
             <VaCard class="border rounded-lg p-3 hover:scale-105 transition-transform duration-200 w-full">
               <div class="flex items-center">
                 <VaListItemSection avatar>
@@ -69,17 +61,9 @@
                   :to="
                     isTeacher
                       ? { name: 'assignment-details', params: { id: assignment?.id, classId: assClass.id } }
-                      : null
+                      : { name: 'assignment-submissions', params: { id: assignment?.id, classId: assClass.id } }
                   "
                 >
-                  <!-- <VaListItem
-            class="mb-2"
-            :to="
-              isTeacher
-                ? { name: 'assignment-details', params: { id: assignment?.id, classId: assClass.id } }
-                : { name: 'assignment-submit', params: { id: assignment?.id, classId: assClass.id  } }
-            "
-          > -->
                   <VaCard
                     class="flex items-center border rounded-lg p-3 w-full hover:scale-105 transition-transform duration-200"
                   >

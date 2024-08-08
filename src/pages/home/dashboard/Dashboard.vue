@@ -171,7 +171,12 @@
               </VaCardContent>
             </div>
             <div v-for="ass in class1.assignments.slice(0, 2)" :key="ass.id" class="bg-blue-100 px-4 rounded-lg mb-2">
-              <VaCardContent class="text-md font-semibold text-gray-800">{{ ass.name }}</VaCardContent>
+              <VaCardContent
+                :to="{ name: 'assignment-submissions', params: { id: ass.id, classId: class1.id } }"
+                class="text-md font-semibold text-gray-800"
+              >
+                {{ ass.name }}
+              </VaCardContent>
               <VaCardContent class="text-xs font-medium text-gray-600">
                 {{ $t('assignments.start_time') }} {{ format.formatDate(ass.startTime) }}
               </VaCardContent>
