@@ -70,15 +70,6 @@ const selectedOption = (v: { text: string; value: string }) => {
 
 const searchQuery = ref('')
 
-// Papers data
-const papers = ref([
-  { id: '1', examName: 'Paper 1', createOn: '2024-06-30T11:21:35.721019+00:00' },
-  { id: '2', examName: 'Paper 2', createOn: '2024-06-30T11:21:35.721019+00:00' },
-  { id: '3', examName: 'Paper 3', createOn: '2024-06-30T11:21:35.721019+00:00' },
-  { id: '4', examName: 'Paper 4', createOn: '2024-06-30T11:21:35.721019+00:00' },
-  { id: '5', examName: 'Paper 5', createOn: '2024-06-30T11:21:35.721019+00:00' },
-])
-
 const groupedData = computed(() => {
   const groups: { [key: string]: any } = {}
   props.classDetails.assignments?.forEach((assignment) => {
@@ -93,11 +84,11 @@ const groupedData = computed(() => {
     groups[createOn].assignments.push(assignment)
   })
 
-  papers.value.forEach((paper) => {
-    const createOn = format.formatDate(new Date(paper.createOn))
+  props.classDetails.papers?.forEach((paper) => {
+    const createOn = format.formatDate(new Date(paper.createdOn))
     if (!groups[createOn]) {
       groups[createOn] = {
-        createOn: paper.createOn,
+        createOn: new Date(paper.createdOn),
         assignments: [],
         papers: [],
       }

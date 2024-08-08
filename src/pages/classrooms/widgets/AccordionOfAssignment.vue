@@ -50,7 +50,10 @@ const props = defineProps({
           </div>
           <!-- Loop through papers -->
           <div v-for="(paper, index3) in group.papers" :key="index3">
-            <VaCard class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4">
+            <VaCard
+              class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
+              :to="{ name: 'admin-exam-detail', params: { id: paper.id } }"
+            >
               <VaIcon name="article" size="3rem" class="text-gray-500" />
               <div>
                 <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>

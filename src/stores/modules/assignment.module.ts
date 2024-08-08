@@ -55,5 +55,15 @@ export const useAssignmentStore = defineStore('assignment', {
           return Promise.reject(error)
         })
     },
+    async submitAssignment(data: any): Promise<any> {
+      return assignmentService
+        .submitAssignment(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })

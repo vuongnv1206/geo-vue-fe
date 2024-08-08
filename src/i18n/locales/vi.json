@@ -125,7 +125,8 @@
     "send": "Gửi",
     "see_more": "Xem thêm",
     "share": "Chia sẻ",
-    "search": "Tìm kiếm"
+    "search": "Tìm kiếm",
+    "submit": "Nộp bài"
   },
   "auditLogs": {
     "title": "Nhật ký",
@@ -280,6 +281,7 @@
     "enter_end_time": "Nhập thời gian kết thúc",
     "enter_content": "Nhập nội dung",
     "empty_content": "Nội dung trống",
+    "empty_file": "Tệp đính kèm trống",
     "enter_start_and_end_time": "Bắt đầu chọn hoặc nhập ngày và giờ",
     "settings": "Cài đặt",
     "global_settings": "Cài Đặt Chung",
@@ -297,7 +299,10 @@
     "select_all": "Chọn tất cả",
     "deselect_all": "Bỏ chọn tất cả",
     "share": "Chia sẻ",
-    "unattemped_ass_exam": "Bài tập, bài kiểm tra chưa làm"
+    "unattemped_ass_exam": "Bài tập, bài kiểm tra chưa làm",
+    "submit": "Nộp",
+    "submit_homeworks": "Nộp bài",
+    "submission_time_over": "Đã hết thời gian nộp bài tập"
   },
   "subjects": {
     "subject": "Môn học",

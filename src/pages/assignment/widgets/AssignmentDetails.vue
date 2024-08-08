@@ -125,7 +125,12 @@
     <template #content>
       <VaCard class="mt-2 p-2 min-h-[75vh]">
         <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
+          <VaListItem
+            v-for="student in students"
+            :key="student.id"
+            class="border rounded p-4"
+            :to="{ name: 'assignment-marking', params: { id: student.id, classId: classId } }"
+          >
             <VaListItemSection avatar>
               <GeoAvatar
                 class="mr-2"
@@ -255,7 +260,6 @@ const getClassById = async () => {
     .getClassById(classId)
     .then((response) => {
       students.value = response.students
-      // console.log('Students:', students.value)
     })
     .catch((error) => {
       notify({

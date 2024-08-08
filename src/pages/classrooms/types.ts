@@ -1,4 +1,5 @@
 import { Assignment } from '../assignment/types'
+import { PaperInListDto } from '../examination/types'
 import { PermissionInClass } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
 
@@ -32,6 +33,7 @@ export type Classrooms = {
   groupClassName: string
   numberUserOfClass: number
   assignments: Assignment[]
+  papers: PaperInListDto[]
   students: Student[]
   permissions: PermissionInClass[] | null
 }

@@ -56,6 +56,12 @@ export type AssignmentAttachment = {
   attachment: string
 }
 
+export type AssignmentSubmit = {
+  assignmentId: string
+  answerRaw: string
+  attachmentPath: string
+}
+
 export type AssignmentResponse = {
   data: Assignment[]
   currentPage: number

@@ -125,7 +125,9 @@
     "send": "Send",
     "see_more": "See more",
     "share": "Share",
-    "search": "Search"
+    "search": "Search",
+    "submit": "Submit",
+    "submit_homeworks": "Submit homeworks"
   },
   "auditLogs": {
     "title": "Audit Logs",
@@ -280,6 +282,7 @@
     "enter_end_time": "Enter End Time",
     "enter_content": "Enter Content",
     "empty_content": "Empty Content",
+    "empty_file": "Empty Attachment File",
     "enter_start_and_end_time": "Start selecting or entering date and time",
     "settings": "Settings",
     "global_settings": "Global Settings",
@@ -297,7 +300,10 @@
     "select_all": "Select All",
     "deselect_all": "Deselect All",
     "share": "Share",
-    "unattemped_ass_exam": "Unattempted exercises, exams"
+    "unattemped_ass_exam": "Unattempted exercises, exams",
+    "submit": "Submit",
+    "submit_homeworks": "Submit homeworks",
+    "submission_time_over": "Time to submit assignment is over"
   },
   "subjects": {
     "subject": "Subject",

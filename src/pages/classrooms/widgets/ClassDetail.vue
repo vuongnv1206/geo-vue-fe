@@ -61,6 +61,7 @@ const getClassById = () => {
     .getClassById(classId)
     .then((response) => {
       classDetails.value = response
+      console.log('Class Details:', classDetails.value)
     })
     .catch((error) => {
       notify({
