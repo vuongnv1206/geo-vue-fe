@@ -504,7 +504,8 @@
     "supported_format": "Định dạng hỗ trợ: .pdf, .docx, .xlsx.",
     "content_0": "Bạn có thể tải lên các tệp bài tập, bài kiểm tra hoặc phiếu trả lời để chấm ngoại tuyến.",
     "details": "Chi tiết",
-    "require_title": "Đề bài"
+    "require_title": "Đề bài",
+    "rawIndex": "STT"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",

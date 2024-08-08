@@ -1,4 +1,9 @@
-import { PaperDeletedResponse, PaperInListDto, SearchSharedPaperRequest } from './../../pages/examination/types'
+import {
+  PaperDeletedResponse,
+  PaperInListDto,
+  QuestionGenerateToMatrix,
+  SearchSharedPaperRequest,
+} from './../../pages/examination/types'
 import papersService from '@/services/paper.service'
 import {
   PaperDto,
@@ -127,6 +132,16 @@ export const usePaperStore = defineStore('paper', {
     async searchSharedPapers(request: SearchSharedPaperRequest): Promise<PaperInListDto[]> {
       return await papersService
         .papers_SearchSharedPaper(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getQuestionFromMatrix(matrixId: string): Promise<QuestionGenerateToMatrix[]> {
+      return await papersService
+        .getQuestionFromMatrix(matrixId)
         .then((response) => {
           return Promise.resolve(response)
         })

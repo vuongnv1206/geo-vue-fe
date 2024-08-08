@@ -502,7 +502,8 @@
     "supported_format": "Supported formats: .pdf, .docx, .xlsx.",
     "content_0": "You can upload Exercise Files, Exam Papers, or Answer Sheets for offline grading.",
     "details": "Details",
-    "require_title": "Requirement"
+    "require_title": "Requirement",
+    "rawIndex": "No"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",
