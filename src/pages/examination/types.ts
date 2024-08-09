@@ -440,6 +440,10 @@ export type BasicStatisticPaperResponse = {
   averageMark: number
   totalPopular: number
   markPopular: number
+  totalHighestMark: number
+  totalLowestMark: number
+  highestMark: number
+  lowestMark: number
   classrooms: BasicStatisticPaperInClass[]
 }
 
