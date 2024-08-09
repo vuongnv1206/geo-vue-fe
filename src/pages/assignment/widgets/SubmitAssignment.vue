@@ -8,7 +8,6 @@ import { onMounted, ref } from 'vue'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useFileStore } from '@/stores/modules/file.module'
 import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -21,13 +20,17 @@ const assignmentStores = useAssignmentStore()
 const attachmentPaths = ref<string[]>([])
 const rawAttachmentPaths = ref<string[]>([])
 const filesUploaded = ref<any>()
-const attachmentString = ref<string>('')
-const answerString = ref<string>('')
 
 const assignment = ref<Assignment | null>(null)
 const assignmentId = router.currentRoute.value.params.id.toString()
 const url = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -3)
-const assignmentSubmit = ref<AssignmentSubmit | null>(null)
+
+const defaultAssignmentSubmit: AssignmentSubmit = {
+  assignmentId: assignmentId,
+  answerRaw: '',
+  attachmentPath: '',
+}
+const newAssignmentSubmit = ref<AssignmentSubmit>({ ...defaultAssignmentSubmit })
 
 const getAssignment = () => {
   assignmentStores
@@ -63,7 +66,7 @@ const fileUpload = async () => {
   fileStore
     .uploadFile(filesUploaded.value)
     .then((response) => {
-      attachmentString.value = JSON.stringify(response)
+      newAssignmentSubmit.value.attachmentPath = JSON.stringify(response)
     })
     .catch((error) => {
       notify({
@@ -74,13 +77,8 @@ const fileUpload = async () => {
 }
 
 const onAssignmentSubmit = async () => {
-  assignmentSubmit.value = {
-    assignmentId: assignmentId,
-    answerRaw: answerString.value,
-    attachmentPath: attachmentString.value,
-  }
   assignmentStores
-    .submitAssignment(assignmentSubmit.value)
+    .submitAssignment(newAssignmentSubmit.value)
     .then(() => {
       notify({
         message: t('assignments.assignment'),
@@ -153,11 +151,11 @@ onMounted(() => {
         class="px-3.5"
       >
         <QuillEditor
-          v-model:content="answerString"
+          v-model:content="newAssignmentSubmit.answerRaw"
           class="border rounded"
           :placeholder="$t('posts.enter_content')"
-          theme="bubble"
           content-type="html"
+          style="height: 200px"
         />
         <VaCardContent class="flex flex-col items-center">
           <VaFileUpload

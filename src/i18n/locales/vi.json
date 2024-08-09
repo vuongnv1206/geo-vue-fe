@@ -302,7 +302,12 @@
     "unattemped_ass_exam": "Bài tập, bài kiểm tra chưa làm",
     "submit": "Nộp",
     "submit_homeworks": "Nộp bài",
-    "submission_time_over": "Đã hết thời gian nộp bài tập"
+    "submission_time_over": "Đã hết thời gian nộp bài tập",
+    "is_not_submited": "Chưa nộp bài",
+    "score": "Score",
+    "enter_score": "Nhập diểm",
+    "comment": "Nhận xét",
+    "answers": "Câu trả lời"
   },
   "subjects": {
     "subject": "Môn học",

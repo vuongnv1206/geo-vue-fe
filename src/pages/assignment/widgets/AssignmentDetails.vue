@@ -129,7 +129,10 @@
             v-for="student in students"
             :key="student.id"
             class="border rounded p-4"
-            :to="{ name: 'assignment-marking', params: { id: student.id, classId: classId } }"
+            :to="{
+              name: 'assignment-marking',
+              params: { id: assignment?.id, classId: classId, studentId: student.id },
+            }"
           >
             <VaListItemSection avatar>
               <GeoAvatar

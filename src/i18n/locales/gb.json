@@ -303,7 +303,12 @@
     "unattemped_ass_exam": "Unattempted exercises, exams",
     "submit": "Submit",
     "submit_homeworks": "Submit homeworks",
-    "submission_time_over": "Time to submit assignment is over"
+    "submission_time_over": "Time to submit assignment is over",
+    "is_not_submited": "Not submitted yet",
+    "score":"Score",
+    "enter_score": "Enter score",
+    "comment": "Comment",
+    "answers": "Answers"
   },
   "subjects": {
     "subject": "Subject",

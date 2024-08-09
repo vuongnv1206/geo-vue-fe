@@ -171,7 +171,7 @@
               </VaCardContent>
             </div>
             <div v-for="ass in class1.assignments.slice(0, 2)" :key="ass.id" class="bg-blue-100 px-4 rounded-lg mb-2">
-              <RouterLink :to="{ name: 'assignment-submissions', params: { id: ass.id, classId: class1.id } }">
+              <RouterLink :to="{ name: 'assignment-submission', params: { id: ass.id, classId: class1.id } }">
                 <VaCardContent class="text-md font-semibold text-gray-800">
                   {{ ass.name }}
                 </VaCardContent>

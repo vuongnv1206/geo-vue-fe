@@ -9,7 +9,7 @@
             :to="
               isTeacher
                 ? { name: 'assignment-details', params: { id: assignment?.id, classId: assignment?.classId } }
-                : { name: 'assignment-submissions', params: { id: assignment?.id, classId: assignment?.classId } }
+                : { name: 'assignment-submission', params: { id: assignment?.id, classId: assignment?.classId } }
             "
           >
             <VaCard class="border rounded-lg p-3 hover:scale-105 transition-transform duration-200 w-full">
@@ -61,7 +61,7 @@
                   :to="
                     isTeacher
                       ? { name: 'assignment-details', params: { id: assignment?.id, classId: assClass.id } }
-                      : { name: 'assignment-submissions', params: { id: assignment?.id, classId: assClass.id } }
+                      : { name: 'assignment-submission', params: { id: assignment?.id, classId: assClass.id } }
                   "
                 >
                   <VaCard
