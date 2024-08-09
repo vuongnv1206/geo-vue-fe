@@ -91,6 +91,22 @@ watch(
           >
         </p>
       </div>
+      <div class="flex gap-2 m-2 va-text-secondary">
+        <p class="text-xs">
+          <span
+            >Highest SCORE: <span class="va-text-bold">{{ data?.highestMark }}</span> - NUMBER:
+            <span class="va-text-bold">{{ data?.totalHighestMark }}</span></span
+          >
+        </p>
+      </div>
+      <div class="flex gap-2 m-2 va-text-secondary">
+        <p class="text-xs">
+          <span
+            >Lowest SCORE: <span class="va-text-bold">{{ data?.lowestMark }}</span> - NUMBER:
+            <span class="va-text-bold">{{ data?.totalLowestMark }}</span></span
+          >
+        </p>
+      </div>
     </div>
   </VaCardContent>
 </template>

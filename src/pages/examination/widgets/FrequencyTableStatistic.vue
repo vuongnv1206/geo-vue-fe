@@ -14,7 +14,7 @@ const { init: notify } = useToast()
 
 const statisticPaperStore = useStatisticPaperStore()
 
-const data = ref<ClassroomFrequencyMarkResponse[]>()
+const data = ref<ClassroomFrequencyMarkResponse[]>([])
 
 const frequencyMarkRange = ref<FrequencyMark[]>([])
 
@@ -26,12 +26,12 @@ const getFrequencyMark = async (paperId: string, classId?: string) => {
   try {
     const res = await statisticPaperStore.frequencyMarkClassroomStatistic(request.value)
     data.value = res
-    if (res) {
+    if (res.length > 0) {
       frequencyMarkRange.value = res[0].frequencyMarks
     }
   } catch (error) {
     notify({
-      message: notifications.getFailed('frequency score ') + getErrorMessage(error),
+      message: notifications.getFailed('frequency score class') + getErrorMessage(error),
       color: 'danger',
     })
   }
@@ -72,15 +72,24 @@ onMounted(async () => {
                 <td class="border">%</td>
               </template>
             </tr>
-            <tr v-for="(item, index) in data" :key="index">
-              <td class="border">{{ item.className }}</td>
-              <td class="border">{{ item.totalRegister }}</td>
-              <td class="border">{{ item.totalAttendee }}</td>
-              <template v-for="(scoreRange, index) in item.frequencyMarks" :key="index">
-                <td class="border">{{ scoreRange.total }}</td>
-                <td class="border">{{ scoreRange.rate }}</td>
-              </template>
-            </tr>
+            <template v-if="data.length > 0">
+              <tr v-for="(item, index) in data" :key="index">
+                <td class="border">{{ item.className }}</td>
+                <td class="border">{{ item.totalRegister }}</td>
+                <td class="border">{{ item.totalAttendee }}</td>
+                <template v-for="(scoreRange, index) in item.frequencyMarks" :key="index">
+                  <td class="border">{{ scoreRange.total }}</td>
+                  <td class="border">{{ scoreRange.rate }}</td>
+                </template>
+              </tr>
+            </template>
+            <template v-else>
+              <tr>
+                <td></td>
+                <td class="border">0</td>
+                <td class="border">0</td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
