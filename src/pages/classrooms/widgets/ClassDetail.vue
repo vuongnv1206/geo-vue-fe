@@ -50,6 +50,7 @@ const defaultClassDetails: Classrooms = {
   groupClassName: '',
   numberUserOfClass: 0,
   assignments: [],
+  papers: [],
   students: [],
   permissions: [],
 }
