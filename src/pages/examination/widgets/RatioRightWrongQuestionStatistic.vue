@@ -200,7 +200,10 @@ const formatContent = (content: string) => {
 
         <template #expandableRow="{ rowData }">
           <div v-if="(rowData.questionType as QuestionType) === QuestionType.Matching" class="p-4">
+            <!-- eslint-disable vue/no-v-html -->
             <div v-html="formatContent(rowData.content || '')"></div>
+            <!-- eslint-enable -->
+
             <div v-if="rowData.answers">
               <p v-for="ans in rowData.answers" :key="ans.id">{{ ans.content }}</p>
             </div>

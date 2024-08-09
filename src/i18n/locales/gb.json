@@ -122,7 +122,12 @@
     "show": "Show",
     "read_more": "Read more",
     "read": "Read",
-    "send": "Send"
+    "send": "Send",
+    "see_more": "See more",
+    "share": "Share",
+    "search": "Search",
+    "submit": "Submit",
+    "submit_homeworks": "Submit homeworks"
   },
   "auditLogs": {
     "title": "Audit Logs",
@@ -277,6 +282,7 @@
     "enter_end_time": "Enter End Time",
     "enter_content": "Enter Content",
     "empty_content": "Empty Content",
+    "empty_file": "Empty Attachment File",
     "enter_start_and_end_time": "Start selecting or entering date and time",
     "settings": "Settings",
     "global_settings": "Global Settings",
@@ -293,7 +299,16 @@
     "upload": "Upload",
     "select_all": "Select All",
     "deselect_all": "Deselect All",
-    "share": "Share"
+    "share": "Share",
+    "unattemped_ass_exam": "Unattempted exercises, exams",
+    "submit": "Submit",
+    "submit_homeworks": "Submit homeworks",
+    "submission_time_over": "Time to submit assignment is over",
+    "is_not_submited": "Not submitted yet",
+    "score": "Score",
+    "enter_score": "Enter score",
+    "comment": "Comment",
+    "answers": "Answers"
   },
   "subjects": {
     "subject": "Subject",
@@ -316,7 +331,8 @@
     "delete_group_class": "Delete Group Class",
     "edit_group_class": "Edit Group Class",
     "range": "Items from {start} to {end} of total {total}",
-    "select_group_class": "Select a Group Class"
+    "select_group_class": "Select a Group Class",
+    "search_group_class_name": "Search group class name"
   },
   "classes": {
     "class": "Class",
@@ -338,7 +354,8 @@
     "submited": "Submited",
     "students_list": "Students List",
     "assignment_and_exam": "Assignment & Exam",
-    "news_board": "News Board"
+    "news_board": "News Board",
+    "search_assignment_paper": "Search assignment or paper"
   },
   "students": {
     "student": "Student",
@@ -386,7 +403,8 @@
     "edit_post": "Edit Post",
     "range": "Items from {start} to {end} of total {total}",
     "no_post": "No post available",
-    "please_enter_content": "Please enter content"
+    "please_enter_content": "Please enter content",
+    "news_board": "News Board"
   },
   "class_permission": {
     "assign_assignment": "Assign Assignment",

@@ -48,6 +48,35 @@ class AssignmentService {
         return Promise.reject(error)
       })
   }
+
+  async submitAssignment(data: any): Promise<any> {
+    return ApiService.post('/v1/assignments/submit', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async getAssignmentSubmissions(data: any): Promise<any> {
+    return ApiService.post('/v1/assignments/submission', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  async markAssignment(data: any): Promise<any> {
+    return ApiService.post('/v1/assignments/mark', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new AssignmentService()

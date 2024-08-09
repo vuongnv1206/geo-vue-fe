@@ -169,6 +169,16 @@ const routes: Array<RouteRecordRaw> = [
             path: '/assignments/create',
             component: () => import('../pages/assignment/widgets/EditAssignment.vue'),
           },
+          {
+            name: 'assignment-submission',
+            path: '/assignments/submission/:id/:classId',
+            component: () => import('../pages/assignment/widgets/SubmitAssignment.vue'),
+          },
+          {
+            name: 'assignment-marking',
+            path: '/assignments/marking/:id/:classId/:studentId',
+            component: () => import('../pages/assignment/widgets/MarkAssignment.vue'),
+          },
         ],
       },
       {

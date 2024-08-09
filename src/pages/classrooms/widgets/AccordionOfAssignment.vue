@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { PropType } from 'vue'
+import { computed, PropType } from 'vue'
 import { format } from '@/services/utils'
 import { useRouter } from 'vue-router'
 import { VaAccordion, VaCollapse } from 'vuestic-ui'
+import { useAuthStore } from '@/stores/modules/auth.module'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
 const classId = router.currentRoute.value.params.id.toString()
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 
 const props = defineProps({
   filteredGroupedData: {
@@ -39,7 +43,11 @@ const props = defineProps({
           <div v-for="(assignment, index2) in group.assignments" :key="index2">
             <VaCard
               class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
-              :to="{ name: 'assignment-details', params: { id: assignment.id, classId: classId } }"
+              :to="
+                isTeacher
+                  ? { name: 'assignment-details', params: { id: assignment.id, classId: classId } }
+                  : { name: 'assignment-submission', params: { id: assignment.id, classId: classId } }
+              "
             >
               <VaIcon name="description" size="3rem" class="text-gray-500" />
               <div>
@@ -50,7 +58,10 @@ const props = defineProps({
           </div>
           <!-- Loop through papers -->
           <div v-for="(paper, index3) in group.papers" :key="index3">
-            <VaCard class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4">
+            <VaCard
+              class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
+              :to="{ name: 'admin-exam-detail', params: { id: paper.id } }"
+            >
               <VaIcon name="article" size="3rem" class="text-gray-500" />
               <div>
                 <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>

@@ -2,13 +2,14 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import { Classrooms } from '../types'
 import AssignmentInClassDetails from './AssignmentInClassDetails.vue'
+import StudentsInClassDetails from './StudentsInClassDetails.vue'
+import PostsInClassDetails from './PostsInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
-import StudentsInClassDetails from './StudentsInClassDetails.vue'
-import PostsInClassDetails from './PostsInClassDetails.vue'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/modules/auth.module'
 
 const { t } = useI18n()
 const loading = ref(true)
@@ -16,19 +17,30 @@ const showTabs = ref(true)
 const router = useRouter()
 const { init: notify } = useToast()
 const classStore = useClassStore()
+const authStore = useAuthStore()
 const classId = router.currentRoute.value.params.id.toString()
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 
-const tabs = [
-  { title: t('classes.students_list'), icon: 'groups' },
-  { title: t('classes.assignment_and_exam'), icon: 'assignment_add' },
-  { title: t('classes.news_board'), icon: 'newspaper' },
-]
-const selectedTab = ref(localStorage.getItem('selectedTab') || tabs[0].title)
+// Define tabs based on the user role
+const tabs = computed(() => {
+  const baseTabs = [
+    { title: t('classes.assignment_and_exam'), icon: 'assignment_add' },
+    { title: t('classes.news_board'), icon: 'newspaper' },
+  ]
+  if (isTeacher.value) {
+    baseTabs.unshift({ title: t('classes.students_list'), icon: 'groups' })
+  }
+  return baseTabs
+})
+
+const selectedTab = ref(localStorage.getItem('selectedTab') || tabs.value[0].title)
 
 watch(selectedTab, (value) => {
   localStorage.setItem('selectedTab', value)
 })
-const currentTab = computed(() => tabs.find((tab) => tab.title === selectedTab.value) || tabs[0])
+
+const currentTab = computed(() => tabs.value.find((tab) => tab.title === selectedTab.value) || tabs.value[0])
+
 const defaultClassDetails: Classrooms = {
   id: '',
   name: '',
@@ -38,8 +50,9 @@ const defaultClassDetails: Classrooms = {
   groupClassName: '',
   numberUserOfClass: 0,
   assignments: [],
+  papers: [],
   students: [],
-  permissions: [] || null,
+  permissions: [],
 }
 const classDetails = ref({ ...defaultClassDetails })
 
@@ -49,6 +62,7 @@ const getClassById = () => {
     .getClassById(classId)
     .then((response) => {
       classDetails.value = response
+      console.log('Class Details:', classDetails.value)
     })
     .catch((error) => {
       notify({
@@ -65,7 +79,6 @@ onMounted(() => {
   getClassById()
 })
 </script>
-
 <template>
   <VaLayout>
     <template #top>

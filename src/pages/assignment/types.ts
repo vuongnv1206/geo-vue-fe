@@ -1,3 +1,5 @@
+import { Student } from '../classrooms/types'
+
 export type Assignment = {
   id: string
   name: string
@@ -56,6 +58,12 @@ export type AssignmentAttachment = {
   attachment: string
 }
 
+export type AssignmentSubmit = {
+  assignmentId: string
+  answerRaw: string
+  attachmentPath: string
+}
+
 export type AssignmentResponse = {
   data: Assignment[]
   currentPage: number
@@ -69,4 +77,27 @@ export type AssignmentResponse = {
 export type AssignmentClass = {
   assignmentId: string
   classesdId: string
+}
+
+export type AssignmentSub = {
+  assignmentId: string
+  classId: string
+}
+
+export type AssignmentSubmission = {
+  assignmentId: string
+  studentId: string
+  status: string
+  answerRaw: string
+  attachmentPath: string
+  score: number
+  comment: string
+  student: Student
+}
+
+export type MarkAssignment = {
+  assignmentId: string
+  studentId: string
+  score: number
+  comment: string
 }
