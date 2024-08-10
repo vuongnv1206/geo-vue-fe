@@ -9,7 +9,7 @@ import { Classrooms, GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useClassStore } from '../../stores/modules/class.module'
 import { format } from '@/services/utils'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
