@@ -221,6 +221,22 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/bin/Bin.vue'),
       },
+      {
+        name: 'subscription',
+        path: 'subscription',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/subscription/Subscription.vue'),
+      },
+      {
+        name: 'orders',
+        path: 'orders',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/orders/Orders.vue'),
+      },
     ],
   },
   {

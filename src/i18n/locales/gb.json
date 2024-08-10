@@ -152,6 +152,38 @@
       "newData": "New Data"
     }
   },
+  "subscription": {
+    "btn_subscribe": "Register a subscription",
+    "choose_subscription": "Choose your subscription",
+    "confirmation_title": "Subscription confirmation",
+    "confirmation_text": "Are you sure want to register this subscription ?",
+    "alert_title": "DONE",
+    "alert_text": "Please wait a moment, the system is processing!",
+    "ok": "OK",
+    "buy": "Buy",
+    "confirm_paid": "I have already paid",
+    "yes": "Confirm",
+    "no": "Cancel",
+    "text_describe_qr": "Scan this QR to pay your subscription",
+    "orders": {
+      "title": "Orders List",
+      "show_qr": "Show Payment QR",
+      "cancel_order": "Cancel Order",
+      "orderNo": "Order No",
+      "subscription": "Subscription",
+      "activeTime": "Active Time",
+      "status": "Payment Status",
+      "expired": "Expired",
+      "createdOn": "Created On",
+      "action": "Action",
+      "success": "Success",
+      "cancel_success": "Cancel order successfully!",
+      "all": "All",
+      "pending": "Pending",
+      "completed": "Completed",
+      "canceled": "Canceled"
+    }
+  },
   "questions": {
     "restore_success": "Restore questions successfully!",
     "reject_success": "Reject question successfully!",
@@ -616,7 +648,8 @@
     "assignments": "Assignment",
     "subjects": "Subject",
     "help": "Help",
-    "infor": "Information"
+    "infor": "Information",
+    "orders": "Orders"
   },
   "bin": {
     "title": "Trash",
