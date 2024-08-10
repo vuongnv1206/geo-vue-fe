@@ -17,7 +17,7 @@
         </template>
         <template #cell(activeTime)="{ row }">
           <span v-if="row?.rowData?.startDate && row?.rowData?.endDate">
-            >{{ format.formatDateNoTime(row?.rowData?.startDate) }} -
+            {{ format.formatDateNoTime(row?.rowData?.startDate) }} -
             {{ format.formatDateNoTime(row?.rowData?.endDate) }}
           </span>
           <span v-if="!row?.rowData?.startDate || !row?.rowData?.endDate">N/A</span>
