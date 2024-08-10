@@ -1,4 +1,5 @@
 import {
+  AddQuestionsInPaperRequest,
   PaperDeletedResponse,
   PaperInListDto,
   QuestionGenerateToMatrix,
@@ -144,6 +145,26 @@ export const usePaperStore = defineStore('paper', {
         .getQuestionFromMatrix(matrixId)
         .then((response) => {
           return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async deleteQuestionInPaper(paperId: string, questionId: string): Promise<any> {
+      return await papersService
+        .deleteQuestionInPaper(paperId, questionId)
+        .then((res) => {
+          return Promise.resolve(res.data)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async addQuestionsInPaper(paperId: string, request: AddQuestionsInPaperRequest): Promise<any> {
+      return await papersService
+        .addQuestionsInPaper(paperId, request)
+        .then((res) => {
+          return Promise.resolve(res.data)
         })
         .catch((error) => {
           return Promise.reject(error)

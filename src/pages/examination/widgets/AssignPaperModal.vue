@@ -71,7 +71,6 @@ const onSave = () => {
 }
 
 const accessOptions = [
-  { value: AccessType.Everyone, text: t('papers.everyone') },
   { value: AccessType.ByClass, text: t('papers.by_class') },
   { value: AccessType.ByStudent, text: t('papers.by_student') },
 ]

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import { useRoute, useRouter } from 'vue-router'
+import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto, AccessType, PaperAccess, UpdatePaperRequest, SubmitPaperResponse, StatusPaper } from './types'
 import { useToast, useModal } from 'vuestic-ui'
@@ -10,6 +9,7 @@ import { Classrooms, GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useClassStore } from '../../stores/modules/class.module'
 import { format } from '@/services/utils'
+import { ref } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,9 +27,6 @@ const getPaperDetail = async () => {
     paperDetail.value = res
     if (paperDetail.value.shareType === AccessType.ByClass || paperDetail.value.shareType === AccessType.ByStudent) {
       await getGroupClasses()
-    } else if (paperDetail.value.shareType === AccessType.Everyone) {
-      const allSubmit = (await getSubmittedStudents()) || null
-      submittedStudents.value = allSubmit
     }
   } catch (error) {
     notify({
@@ -333,17 +330,6 @@ onMounted(async () => {
               />
             </VaModal>
             <VaCardContent class="p-0">
-              <VaButton
-                v-if="paperDetail?.shareType == AccessType.Everyone"
-                preset="secondary"
-                border-color="none"
-                size="small"
-                text-color="secondary"
-                class="w-full"
-                @click="showAssignPaperModal = !showAssignPaperModal"
-              >
-                Everyone
-              </VaButton>
               <div
                 v-if="paperDetail?.shareType === AccessType.ByClass || paperDetail?.shareType === AccessType.ByStudent"
               >

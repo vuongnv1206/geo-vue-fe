@@ -8,12 +8,12 @@ import { Classrooms, GroupClass, Student } from '@/pages/classrooms/types'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { UpdatePaperRequest, PaperAccess, AccessType } from './types'
-import DatePickerModal from '@/pages/examination/widgets/DatePickerModal.vue'
 import StudentListInClassModal from '@pages/examination/widgets/StudentListInClassModal.vue'
 import { useSubjectStore } from '@/stores/modules/subject.module'
 import { Subject } from '../subject/types'
 import { getErrorMessage, notifications } from '@/services/utils'
-
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 const paperDetail = ref<PaperDto | null>(null)
 const route = useRoute()
 const paperStore = usePaperStore()
@@ -38,17 +38,8 @@ const getPaperDetail = () => {
     })
 }
 
-const formatDateTimeForDisplay = (dateTime: string | undefined): string | undefined => {
-  if (!dateTime) return undefined
-  const [date, timeWithZone] = dateTime.split('T')
-  const [time] = timeWithZone ? timeWithZone.split('+') : ['00:00:00']
-  return `${date} ${time}`
-}
-
-const formatDateTimeForSave = (dateTime: string | undefined): string | undefined => {
-  if (!dateTime) return undefined
-  const [date, time] = dateTime.split(' ')
-  return `${date}T${time}`
+const dateInputFormat = {
+  format: 'MM/dd/yyyy HH:mm',
 }
 
 const subjects = ref<Subject[]>([])
@@ -95,7 +86,7 @@ const editPaper = ref<UpdatePaperRequest>({
   numberAttempt: undefined,
 })
 
-const valueOption = ref<AccessType>(AccessType.Everyone)
+const valueOption = ref<AccessType>(AccessType.ByClass)
 
 watch(
   () => paperDetail.value,
@@ -105,8 +96,8 @@ watch(
         id: paperDetail.value.id,
         examName: paperDetail.value.examName,
         status: paperDetail.value.status === 'Publish' ? StatusPaper.publish : StatusPaper.unpublish,
-        startTime: formatDateTimeForDisplay(paperDetail.value.startTime ?? undefined),
-        endTime: formatDateTimeForDisplay(paperDetail.value.endTime ?? undefined),
+        startTime: paperDetail.value.startTime ?? undefined,
+        endTime: paperDetail.value.endTime ?? undefined,
         paperLabelId: paperDetail.value.paperLabelId ?? undefined,
         duration: paperDetail.value.duration ?? 0,
         shuffle: false, // Assuming a default value
@@ -144,7 +135,6 @@ watch(
 const valueSwitch = ref(true)
 
 const accessOptions = [
-  { value: AccessType.Everyone, text: 'Everyone' },
   { value: AccessType.ByClass, text: 'By Class' },
   { value: AccessType.ByStudent, text: 'By Student' },
 ]
@@ -182,19 +172,7 @@ const getGroupClasses = async () => {
   }
 }
 
-const showFromDatePickerModal = ref(false)
-const showToDatePickerModal = ref(false)
-const getDatePickerModal = (date: string, type: string) => {
-  if (type === 'fromDate') {
-    editPaper.value.startTime = formatDateTimeForDisplay(date)
-  } else {
-    editPaper.value.endTime = formatDateTimeForDisplay(date)
-  }
-}
-
 const saveDraffPaper = (isPublish: boolean) => {
-  editPaper.value.startTime = formatDateTimeForSave(editPaper.value.startTime)
-  editPaper.value.endTime = formatDateTimeForSave(editPaper.value.endTime)
   if (isPublish) {
     editPaper.value.isPublish = isPublish
     editPaper.value.status = StatusPaper.publish
@@ -223,8 +201,6 @@ const saveDraffPaper = (isPublish: boolean) => {
         message: 'Update successfully',
         color: 'success',
       })
-      editPaper.value.startTime = formatDateTimeForDisplay(editPaper.value.startTime)
-      editPaper.value.endTime = formatDateTimeForDisplay(editPaper.value.endTime)
     })
     .catch((error) => {
       notify({
@@ -318,58 +294,39 @@ onMounted(() => {
             class="mb-2 w-full pl-1"
           />
           <div class="mb-2 pr-1">
-            <VaInput
+            <VueDatePicker
               v-model="editPaper.startTime"
-              label="Access time"
-              placeholder="From"
-              readonly
-              @focus="showFromDatePickerModal = !showFromDatePickerModal"
-            >
-              <template #appendInner>
-                <VaIcon name="calendar_today" color="secondary" />
-              </template>
-            </VaInput>
-            <VaModal v-slot="{ cancel, ok }" v-model="showFromDatePickerModal" size="auto" hide-default-actions>
-              <DatePickerModal
-                @close="cancel"
-                @save="
-                  (data: string) => {
-                    getDatePickerModal(data, 'fromDate')
-                    ok()
-                  }
-                "
-              />
-            </VaModal>
+              range
+              model-auto
+              :action-row="{ showNow: true }"
+              :is-24="true"
+              enable-seconds
+              :clearable="true"
+              :text-input="dateInputFormat"
+              :month-change-on-scroll="true"
+              :month-change-on-arrows="true"
+              :placeholder="$t('assignments.enter_start_and_end_time')"
+            />
           </div>
           <div class="mb-2 pr-1">
-            <VaInput
+            <VueDatePicker
               v-model="editPaper.endTime"
-              class="mb-2 pl-1"
-              label=" "
-              placeholder="To"
-              readonly
-              @focus="showToDatePickerModal = !showToDatePickerModal"
-            >
-              <template #appendInner>
-                <VaIcon name="calendar_today" color="secondary" />
-              </template>
-            </VaInput>
-            <VaModal v-slot="{ cancel, ok }" v-model="showToDatePickerModal" size="auto" hide-default-actions>
-              <DatePickerModal
-                @close="cancel"
-                @save="
-                  (data: string) => {
-                    getDatePickerModal(data, 'toDate')
-                    ok()
-                  }
-                "
-              />
-            </VaModal>
+              range
+              model-auto
+              :action-row="{ showNow: true }"
+              :is-24="true"
+              enable-seconds
+              :clearable="true"
+              :text-input="dateInputFormat"
+              :month-change-on-scroll="true"
+              :month-change-on-arrows="true"
+              :placeholder="$t('assignments.enter_start_and_end_time')"
+            />
           </div>
           <div class="col-span-2 justify-end flex">
             <VaButton size="small" preset="secondary" border-color="primary" @click="resetAccessTime"
-              >Reset time</VaButton
-            >
+              >Reset time
+            </VaButton>
           </div>
           <div class="col-span-2">
             <p class="mt-2 text-xs va-text-bold">Who is allowed to take the exam?</p>
@@ -509,8 +466,8 @@ onMounted(() => {
 
     <div class="flex justify-end">
       <VaButton color="warning" size="small" class="p-1 pr-2 pl-2 mr-1" @click="saveDraffPaper(false)"
-        >Save draft</VaButton
-      >
+        >Save draft
+      </VaButton>
       <VaButton size="small" class="p-1 pr-2 pl-2 ml-1" @click="saveDraffPaper(true)">Publish</VaButton>
     </div>
   </div>
