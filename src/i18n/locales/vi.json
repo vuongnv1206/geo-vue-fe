@@ -151,6 +151,38 @@
       "newData": "Dữ Liệu Mới"
     }
   },
+  "subscription": {
+    "btn_subscribe": "Đăng ký gói",
+    "choose_subscription": "Chọn gói đăng ký",
+    "confirmation_title": "Xác nhận đăng ký",
+    "confirmation_text": "Bạn có chắc chắn muốn đăng ký gói này không ?",
+    "alert_title": "XONG",
+    "alert_text": "Vui lòng chờ, hệ thống đang xử lý!",
+    "ok": "Đồng ý",
+    "buy": "Mua",
+    "confirm_paid": "Tôi đã thanh toán",
+    "yes": "Xác nhận",
+    "no": "Hủy",
+    "text_describe_qr": "Vui lòng quét mã QR để thanh toán",
+    "orders": {
+      "title": "Danh sách đặt mua",
+      "show_qr": "Xem QR",
+      "cancel_order": "Hủy đặt mua",
+      "orderNo": "Mã đơn",
+      "subscription": "Tên gói",
+      "activeTime": "Thời gian hoạt động",
+      "status": "Trạng thái thanh toán",
+      "expired": "Hết hạn",
+      "createdOn": "Thời gian tạo",
+      "action": "Hành động",
+      "success": "Thành công",
+      "cancel_success": "Hủy đặt mua thành công",
+      "all": "Tất cả",
+      "pending": "Đang chờ",
+      "completed": "Hoàn thành",
+      "canceled": "Đã hủy"
+    }
+  },
   "questions": {
     "delete_all_success": "Xóa tất cả câu hỏi thành công",
     "reject_success": "Loại bỏ câu hỏi thành công",
@@ -614,7 +646,8 @@
     "subjects": "Môn học",
     "audit-logs": "Nhật ký",
     "help": "Trợ giúp",
-    "infor": "Thông tin"
+    "infor": "Thông tin",
+    "orders": "Gói đã đặt"
   },
   "bin": {
     "title": "Thùng rác",

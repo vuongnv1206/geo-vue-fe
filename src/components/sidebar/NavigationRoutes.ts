@@ -77,5 +77,13 @@ export default {
         permission: 'AuditLogs.View',
       },
     },
+    {
+      name: 'orders',
+      displayName: 'menu.orders',
+      meta: {
+        icon: 'shopping_bag',
+        permission: 'Orders.View',
+      },
+    },
   ] as INavigationRoute[],
 }
