@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import {
+  HandleJoinGroupRequest,
   JoinGroupTeacherRequestResponse,
   JoinTeacherGroupStatus,
   RequestStatus,
   SearchJoinGroupTeacherRequest,
 } from '../types'
-import { DataTableColumnSource, useToast } from 'vuestic-ui'
+import { DataTableColumnSource, useModal, useToast } from 'vuestic-ui'
 import { useJoinGroupRequestStore } from '@/stores/modules/joinGroupRequest.module'
 import { getErrorMessage, JoinGroupStatusColor, JoinGroupStatusLabel } from '@/services/utils'
 
 const joinGroupRequestStore = useJoinGroupRequestStore()
 const { init: notify } = useToast()
+const { confirm } = useModal()
+
 const joinGroupRequest = ref<SearchJoinGroupTeacherRequest>({
   status: RequestStatus.Received,
   pageNumber: 1,
   pageSize: 10,
 })
+
+const isLoading = ref(true)
 
 const joinGroupResponse = ref<JoinGroupTeacherRequestResponse>()
 
@@ -30,6 +35,7 @@ const getJoinGroupRequest = async () => {
       color: 'danger',
     })
   }
+  isLoading.value = false
 }
 
 const columnTable: DataTableColumnSource<string>[] = [
@@ -80,6 +86,63 @@ const getContentDisplay = (content: string) => {
   return content ? content : 'No Content'
 }
 
+const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus) => {
+  const messageConfirm =
+    status == JoinTeacherGroupStatus.Accepted
+      ? 'Are you sure accept this request join group'
+      : 'Are you sure reject this request join group'
+
+  confirm(messageConfirm).then(async (agreed) => {
+    if (agreed) {
+      const request: HandleJoinGroupRequest = {
+        requestId: requestId,
+      }
+
+      if (status == JoinTeacherGroupStatus.Accepted) {
+        await joinGroupRequestStore
+          .acceptRequest(request)
+          .then(async () => {
+            notify({
+              message: 'Accept successfully',
+              color: 'success',
+            })
+            joinGroupRequestStore.setRefresh(true)
+          })
+          .catch((error) => {
+            const message = getErrorMessage(error)
+            notify({
+              message: message,
+              color: 'danger',
+            })
+          })
+      } else if (status == JoinTeacherGroupStatus.Rejected) {
+        await joinGroupRequestStore
+          .rejectRequest(request)
+          .then(async () => {
+            notify({
+              message: 'Reject successfully',
+              color: 'success',
+            })
+            joinGroupRequestStore.setRefresh(true)
+          })
+          .catch((error) => {
+            const message = getErrorMessage(error)
+            notify({
+              message: message,
+              color: 'danger',
+            })
+          })
+      }
+      await getJoinGroupRequest()
+    }
+  })
+}
+
+const handlePageChange = async (newPage: number) => {
+  joinGroupRequest.value.pageNumber = newPage
+  await getJoinGroupRequest()
+}
+
 onMounted(async () => {
   await getJoinGroupRequest()
 })
@@ -91,12 +154,13 @@ onMounted(async () => {
     <VaDataTable
       :items="joinGroupResponse?.data"
       :columns="columnTable"
+      :loading="isLoading"
       sticky-header
       :disable-client-side-sorting="false"
       class="va-data-table-statistic"
     >
       <template #cell(content)="{ row }">
-        <span>{{ getContentDisplay(row.content) }}</span>
+        <span>{{ getContentDisplay(row.source.content) }}</span>
       </template>
       <template #cell(status)="{ row }">
         <span>
@@ -107,11 +171,48 @@ onMounted(async () => {
           />
         </span>
       </template>
-      <template #cell(action)="{}">
-        <div class="flex gap-2 justify-center">
-          <VaButton preset="secondary" border-color="danger" icon="close" color="danger"> Reject </VaButton>
-          <VaButton preset="secondary" border-color="success" icon="check" color="success"> Accept </VaButton>
+      <template #cell(action)="{ row }">
+        <div v-if="row.source.status === JoinTeacherGroupStatus.Pending" class="flex gap-2 justify-center">
+          <VaButton
+            preset="secondary"
+            border-color="danger"
+            icon="close"
+            color="danger"
+            @click="handlerRequest(row.source.id, JoinTeacherGroupStatus.Rejected)"
+          >
+            Reject
+          </VaButton>
+          <VaButton
+            preset="secondary"
+            border-color="success"
+            icon="check"
+            color="success"
+            @click="handlerRequest(row.source.id, JoinTeacherGroupStatus.Accepted)"
+          >
+            Accept
+          </VaButton>
         </div>
+        <div v-else-if="row.source.status === JoinTeacherGroupStatus.Cancel">
+          <span>The request has been cancelled</span>
+        </div>
+        <div v-else>
+          <span>N/a</span>
+        </div>
+      </template>
+      <template v-if="joinGroupResponse && joinGroupResponse.data.length > 0" #bodyAppend>
+        <tr>
+          <td colspan="6">
+            <div class="flex justify-center mt-4">
+              <VaPagination
+                v-model="joinGroupResponse.currentPage"
+                :pages="joinGroupResponse.totalPages"
+                :visible-pages="5"
+                buttons-preset="default"
+                @update:modelValue="handlePageChange"
+              />
+            </div>
+          </td>
+        </tr>
       </template>
     </VaDataTable>
   </VaCardContent>

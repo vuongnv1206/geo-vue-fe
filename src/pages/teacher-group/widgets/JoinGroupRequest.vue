@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { GroupTeacher, SendRequestJoinGroupRequest } from '../types'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
+const router = useRouter()
 
 const useTeacherGroup = useGroupTeacherStore()
 const { init: notify } = useToast()
@@ -46,6 +47,7 @@ const sendRequestJoin = async () => {
       message: 'Send request successfully',
       color: 'success',
     })
+    router.push({ name: 'join-request' })
   } catch (error) {
     loading.value = false
     notify({

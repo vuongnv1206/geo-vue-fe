@@ -111,6 +111,7 @@ export type JoinGroupTeacherRequestResponse = {
 }
 
 export type JoinGroupTeacherRequestDto = {
+  id: string
   groupId: string
   groupName?: string
   teacherId: string
@@ -130,4 +131,8 @@ export enum JoinTeacherGroupStatus {
   Accepted = 1,
   Rejected = 2,
   Cancel = 3,
+}
+
+export type HandleJoinGroupRequest = {
+  requestId: string
 }
