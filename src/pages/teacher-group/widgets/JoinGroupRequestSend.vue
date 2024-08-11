@@ -10,6 +10,7 @@ import {
 import { onMounted, ref } from 'vue'
 import { DataTableColumnSource, useModal, useToast } from 'vuestic-ui'
 import { getErrorMessage, JoinGroupStatusColor, JoinGroupStatusLabel } from '@/services/utils'
+import { format } from '../../../services/utils'
 
 const joinGroupRequestStore = useJoinGroupRequestStore()
 const { init: notify } = useToast()
@@ -45,13 +46,6 @@ const columnTable: DataTableColumnSource<string>[] = [
     sortable: true,
   },
   {
-    label: 'Sender',
-    key: 'email',
-    thAlign: 'center',
-    tdAlign: 'center',
-    sortable: true,
-  },
-  {
     label: 'Receiver',
     key: 'receiverEmail',
     thAlign: 'center',
@@ -64,6 +58,13 @@ const columnTable: DataTableColumnSource<string>[] = [
     thAlign: 'center',
     tdAlign: 'center',
     width: '400px',
+  },
+  {
+    label: 'approval time',
+    key: 'lastModifiedOn',
+    thAlign: 'center',
+    tdAlign: 'center',
+    width: '200px',
   },
   {
     label: 'Status',
@@ -167,6 +168,11 @@ onMounted(async () => {
         <span v-else-if="row.source.status === JoinTeacherGroupStatus.Cancel" class="va-text-secondary">
           Request has been cancelled
         </span>
+      </template>
+      <template #cell(lastModifiedOn)="{ row }">
+        <span v-if="row.source.status !== JoinTeacherGroupStatus.Pending">{{
+          format.formatDate(row.source.lastModifiedOn)
+        }}</span>
       </template>
       <template v-if="joinGroupResponse && joinGroupResponse.data.length > 0" #bodyAppend>
         <tr>

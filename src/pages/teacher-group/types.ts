@@ -119,6 +119,8 @@ export type JoinGroupTeacherRequestDto = {
   phone: string
   status: JoinTeacherGroupStatus
   content: string
+  createOn: Date
+  lastModifiedOn: Date
 }
 
 export enum RequestStatus {

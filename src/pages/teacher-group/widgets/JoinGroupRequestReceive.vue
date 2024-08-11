@@ -9,7 +9,7 @@ import {
 } from '../types'
 import { DataTableColumnSource, useModal, useToast } from 'vuestic-ui'
 import { useJoinGroupRequestStore } from '@/stores/modules/joinGroupRequest.module'
-import { getErrorMessage, JoinGroupStatusColor, JoinGroupStatusLabel } from '@/services/utils'
+import { format, getErrorMessage, JoinGroupStatusColor, JoinGroupStatusLabel } from '@/services/utils'
 
 const joinGroupRequestStore = useJoinGroupRequestStore()
 const { init: notify } = useToast()
@@ -45,6 +45,7 @@ const columnTable: DataTableColumnSource<string>[] = [
     thAlign: 'center',
     tdAlign: 'center',
     sortable: true,
+    width: '200px',
   },
   {
     label: 'Sender',
@@ -55,13 +56,6 @@ const columnTable: DataTableColumnSource<string>[] = [
     width: '250px',
   },
   {
-    label: 'Receiver',
-    key: 'receiverEmail',
-    thAlign: 'center',
-    tdAlign: 'center',
-    width: '250px',
-  },
-  {
     label: 'Content',
     key: 'content',
     thAlign: 'center',
@@ -69,10 +63,18 @@ const columnTable: DataTableColumnSource<string>[] = [
     width: '400px',
   },
   {
+    label: 'Send time',
+    key: 'createOn',
+    thAlign: 'center',
+    tdAlign: 'center',
+    width: '200px',
+  },
+  {
     label: 'Status',
     key: 'status',
     thAlign: 'center',
     tdAlign: 'center',
+    width: '100px',
   },
   {
     label: ' ',
@@ -199,6 +201,9 @@ onMounted(async () => {
         <div v-else>
           <span>N/a</span>
         </div>
+      </template>
+      <template #cell(createOn)="{ row }">
+        {{ format.formatDate(row.source.createOn) }}
       </template>
       <template v-if="joinGroupResponse && joinGroupResponse.data.length > 0" #bodyAppend>
         <tr>
