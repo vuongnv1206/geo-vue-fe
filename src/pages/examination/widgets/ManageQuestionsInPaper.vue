@@ -119,9 +119,14 @@ const deleteQuestion = async (questionId: string | null | undefined) => {
 
 <template>
   <div>
-    <VaCard>
-      <VaCardTitle>{{ paperDetail?.examName }}</VaCardTitle>
-      <VaButton class="ml-1 p-1" size="small" @click="saveManageQuestions">Save</VaButton>
+    <VaCard square outlined>
+      <div class="flex justify-between p-1">
+        <div></div>
+        <VaCardTitle>{{ paperDetail?.examName }}</VaCardTitle>
+        <div class="flex justify-end">
+          <VaButton class="ml-1 pr-3 pl-3" size="small" @click="saveManageQuestions">Save</VaButton>
+        </div>
+      </div>
     </VaCard>
     <VaCardContent>
       <div class="flex justify-between">

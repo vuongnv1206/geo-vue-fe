@@ -184,8 +184,7 @@ const getSubmittedStudents = async (classId?: string) => {
       dataFilterSubmittedStudent.value.classId === classId
     }
 
-    const res = await paperStore.getSubmittedStudentsInPaper(paperId, dataFilterSubmittedStudent.value)
-    return res
+    submittedStudents.value = await paperStore.getSubmittedStudentsInPaper(paperId, dataFilterSubmittedStudent.value)
   } catch (error) {
     notify({
       message: `Failed to get submitted students \n ${error}`,
