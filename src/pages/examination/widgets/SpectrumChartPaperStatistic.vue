@@ -47,7 +47,13 @@ const canvas = ref<HTMLCanvasElement | null>(null)
 let chartInstance: Chart | null = null // Track the Chart instance
 
 const labelScores = computed(() => {
-  return (data.value?.frequencyMarks ?? []).map(({ fromMark, toMark }) => `${fromMark}-${toMark}`)
+  return (data.value?.frequencyMarks ?? []).map(({ toMark }, index, array) => {
+    // Nếu đây là mốc cuối cùng, sử dụng '<=' thay vì '<'
+    if (index === array.length - 1) {
+      return `<=${toMark}`
+    }
+    return `<${toMark}`
+  })
 })
 
 const renderChart = () => {
@@ -92,6 +98,9 @@ const renderChart = () => {
             },
             y: {
               beginAtZero: true,
+              ticks: {
+                stepSize: 1, // Chỉ số nguyên trên trục Y
+              },
             },
           },
         },

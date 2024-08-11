@@ -58,7 +58,7 @@ onMounted(async () => {
                 colspan="2"
                 class="va-text-center border"
               >
-                {{ scoreRange.fromMark }} - {{ scoreRange.toMark }}
+                {{ index === frequencyMarkRange.length - 1 ? '<=' : '<' }}{{ scoreRange.toMark }}
               </th>
             </tr>
           </thead>
