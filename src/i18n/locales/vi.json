@@ -609,6 +609,8 @@
     "class": "Lớp",
     "group-class": "Nhóm lớp",
     "teacher-group": "Giáo viên",
+    "group-manage": "Quản lý nhóm",
+    "join-request": "Quản lý yêu cần",
     "exam": "Kỳ thi",
     "assignments": "Bài tập",
     "subjects": "Môn học",
@@ -771,7 +773,11 @@
     "reading": "Đọc",
     "readingQuestionPassage": "Đoạn câu hỏi đọc",
     "writing": "Viết",
-    "other": "Khác"
+    "other": "Khác",
+    "Pending": "Đang chờ",
+    "Accepted": "Đã chấp nhận",
+    "Rejected": "Đã từ chối",
+    "Cancel": "Đã hủy"
   },
   "languageSwitcher": {
     "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."

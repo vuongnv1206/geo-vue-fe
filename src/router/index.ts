@@ -121,7 +121,26 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
         },
-        component: () => import('../pages/teacher-group/TeacherGroup.vue'),
+        children: [
+          {
+            name: 'group-manage',
+            path: 'group-manage',
+            component: () => import('../pages/teacher-group/TeacherGroup.vue'),
+          },
+          {
+            name: 'join-request',
+            path: 'join-request',
+            component: () => import('../pages/teacher-group/JoinGroupRequestList.vue'),
+          },
+        ],
+      },
+      {
+        name: 'join-group',
+        path: 'join-group/:id',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/teacher-group/widgets/JoinGroupRequest.vue'),
       },
       {
         name: 'classrooms',

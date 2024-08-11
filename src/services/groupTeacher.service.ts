@@ -1,4 +1,5 @@
 import {
+  SendRequestJoinGroupRequest,
   SetPermissionInClassGroup,
   SetPermissionInClassTeacher,
   TeacherInGroupRequest,
@@ -152,6 +153,17 @@ class GroupTeacherService {
   async setPermissionTeacherInClass(data: SetPermissionInClassTeacher): Promise<any> {
     return apiService
       .post('v1/permissionclasses/teacher-permission-in-class', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async sendRequestJoinGroup(data: SendRequestJoinGroupRequest): Promise<any> {
+    return apiService
+      .post('v1/groupteachers/request-join-group', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })

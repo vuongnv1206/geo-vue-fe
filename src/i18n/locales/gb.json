@@ -612,6 +612,8 @@
     "class": "Class",
     "group-class": "Group class",
     "teacher-group": "Teacher",
+    "group-manage": "Group Manage",
+    "join-request": "Join Request",
     "exam": "Exam",
     "assignments": "Assignment",
     "subjects": "Subject",
@@ -773,7 +775,11 @@
     "reading": "Reading",
     "readingQuestionPassage": "Reading Question Passage",
     "writing": "Writing",
-    "other": "Other"
+    "other": "Other",
+    "Pending": "Pending",
+    "Accepted": "Accepted",
+    "Rejected": "Rejected",
+    "Cancel": "Cancel"
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"

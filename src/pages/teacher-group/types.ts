@@ -3,6 +3,9 @@ export type GroupTeacher = {
   name: string
   teacherTeams: TeacherTeam[]
   groupPermissionInClasses: GroupPermissionInClass[]
+  qrCode?: string
+  joinLink?: string
+  adminGroup?: string
   // createdBy: string
   // createdOn: string
   // lastModifiedBy: string
@@ -84,4 +87,47 @@ export type TeacherInGroupRequest = {
 export type TeacherTeamTeacherGroupCombine = {
   teacherTeam: TeacherTeam | null
   groupTeacher: GroupTeacher | null
+}
+
+export type SendRequestJoinGroupRequest = {
+  groupId: string
+  content?: string
+}
+
+export type SearchJoinGroupTeacherRequest = {
+  status: RequestStatus
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+}
+
+export type JoinGroupTeacherRequestResponse = {
+  data: JoinGroupTeacherRequestDto[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type JoinGroupTeacherRequestDto = {
+  groupId: string
+  groupName?: string
+  teacherId: string
+  email: string
+  phone: string
+  status: JoinTeacherGroupStatus
+  content: string
+}
+
+export enum RequestStatus {
+  Received = 0,
+  Sent = 1,
+}
+
+export enum JoinTeacherGroupStatus {
+  Pending = 0,
+  Accepted = 1,
+  Rejected = 2,
+  Cancel = 3,
 }
