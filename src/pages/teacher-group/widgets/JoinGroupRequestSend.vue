@@ -63,6 +63,7 @@ const columnTable: DataTableColumnSource<string>[] = [
     key: 'content',
     thAlign: 'center',
     tdAlign: 'center',
+    width: '400px',
   },
   {
     label: 'Status',
@@ -190,5 +191,7 @@ onMounted(async () => {
 .va-data-table-statistic th,
 .va-data-table-statistic td {
   text-wrap: pretty;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 </style>

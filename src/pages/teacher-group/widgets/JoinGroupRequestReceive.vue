@@ -66,6 +66,7 @@ const columnTable: DataTableColumnSource<string>[] = [
     key: 'content',
     thAlign: 'center',
     tdAlign: 'center',
+    width: '400px',
   },
   {
     label: 'Status',
@@ -160,7 +161,7 @@ onMounted(async () => {
       class="va-data-table-statistic"
     >
       <template #cell(content)="{ row }">
-        <span>{{ getContentDisplay(row.source.content) }}</span>
+        <p class="text-wrap">{{ getContentDisplay(row.source.content) }}</p>
       </template>
       <template #cell(status)="{ row }">
         <span>
@@ -218,10 +219,12 @@ onMounted(async () => {
   </VaCardContent>
 </template>
 
-<style lang="css">
+<style lang="scss">
 .va-data-table-statistic th,
 .va-data-table-statistic td {
   text-wrap: pretty;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .va-data-table-statistic tr,
