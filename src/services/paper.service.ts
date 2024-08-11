@@ -10,6 +10,7 @@ import {
   PaperDeletedResponse,
   QuestionGenerateToMatrix,
   AddQuestionsInPaperRequest,
+  UpdateQuestionsInPaperRequest,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -29,6 +30,8 @@ export interface IPapersService {
   deleteQuestionInPaper(paperId: string, questionId: string): Promise<any>
 
   addQuestionsInPaper(paperId: string, request: AddQuestionsInPaperRequest): Promise<any>
+
+  updateQuestionsInPaper(paperId: string, request: UpdateQuestionsInPaperRequest): Promise<any>
 }
 
 export class PapersService implements IPapersService {
@@ -186,6 +189,18 @@ export class PapersService implements IPapersService {
     const url = `/v1/papers/${paperId}/questions`
     return apiService
       .post(url, request)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async updateQuestionsInPaper(id: string, request: UpdateQuestionsInPaperRequest): Promise<any> {
+    const url = `/v1/papers/${id}/questions`
+    return apiService
+      .put(url, request)
       .then((res) => {
         return Promise.resolve(res.data)
       })

@@ -99,6 +99,12 @@ const routes: Array<RouteRecordRaw> = [
             path: 'admin/exam-statistic/:id',
             component: () => import('../pages/examination/PaperAdminStatistic.vue'),
           },
+          {
+            path: '/papers/:paperId/manage-questions',
+            name: 'manage-questions',
+            component: () => import('../pages/examination/widgets/ManageQuestionsInPaper.vue'),
+            props: true,
+          },
         ],
       },
       {

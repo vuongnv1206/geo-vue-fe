@@ -569,11 +569,10 @@ export type QuestionGenerateToMatrix = {
 
 export interface AddQuestionsInPaperRequest {
   paperId: string
-  questions?: CreateUpdateQuestionInPaperDto[]
+  questions?: QuestionIntoPaperRequest[]
 }
 
-export interface CreateUpdateQuestionInPaperDto {
-  questionId: string
-  mark: number
-  rawIndex?: number
+export interface UpdateQuestionsInPaperRequest {
+  paperId: string
+  questions?: QuestionIntoPaperRequest[]
 }

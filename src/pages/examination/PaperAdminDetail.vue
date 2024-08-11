@@ -204,6 +204,9 @@ const navigateToExamReview = (paperId: string, userId: string, submitPaperId: st
     },
   })
 }
+const navigateToManageQuestions = () => {
+  router.push({ name: 'manage-questions', params: { paperId: paperId } })
+}
 
 const showSelectClassModal = ref(false)
 const classInSelectedGroup = ref<Classrooms[]>([])
@@ -392,7 +395,7 @@ onMounted(async () => {
             <VaCardTitle class="flex justify-between">
               <span> Content</span>
               <div>
-                <VaButton preset="secondary" size="small">
+                <VaButton preset="secondary" size="small" @click="navigateToManageQuestions">
                   <VaIcon name="edit_square" size="small" class="material-symbols-outlined" />
                   edit
                 </VaButton>

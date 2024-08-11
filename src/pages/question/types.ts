@@ -106,6 +106,7 @@ export type Question = {
   owner?: UserDetail | null
   mark?: number | null
   questionStatus?: number | null
+  originalQuestionId?: string | null
 }
 
 export type QuestionLable = {
