@@ -68,6 +68,16 @@ export default {
         icon: 'group',
         permission: 'GroupTeachers.View',
       },
+      children: [
+        {
+          name: 'group-manage',
+          displayName: 'menu.group-manage',
+        },
+        {
+          name: 'join-request',
+          displayName: 'menu.join-request',
+        },
+      ],
     },
     {
       name: 'audit logs',
