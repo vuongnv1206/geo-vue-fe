@@ -8,6 +8,7 @@ import { useModal, useToast } from 'vuestic-ui'
 import TeacherGroupModal from './TeacherGroupModal.vue'
 import TeacherTeamModal from './TeacherTeamModal.vue'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/modules/auth.module'
 
 const { t } = useI18n()
 const dataFilter = ref({
@@ -24,6 +25,7 @@ const { init: notify } = useToast()
 const groupTeachers = ref<GroupTeacher[]>([])
 const teacherTeams = ref<TeacherTeam[]>([])
 const loading = ref(true)
+const authStore = useAuthStore()
 
 const doShowGroupEditModal = ref(false)
 const doShowTeacherEditModal = ref(false)
@@ -264,6 +266,27 @@ const confirmDeleteTeacherInTeam = async (teacherId: string, teacherName: string
       })
   }
 }
+const currentUser = authStore.user?.id
+const copyLinkInvite = () => {
+  const baseUrl = window.location.origin
+
+  const inviteLink = `${baseUrl}/invite-join-team/${currentUser}`
+
+  navigator.clipboard
+    .writeText(inviteLink)
+    .then(() => {
+      notify({
+        message: 'Copy successfully',
+        color: 'success',
+      })
+    })
+    .catch((error) => {
+      notify({
+        message: `Failed to copy. ${error}`,
+        color: 'danger',
+      })
+    })
+}
 
 onMounted(() => {
   getTeacherGroups()
@@ -279,233 +302,243 @@ const handlerSearch = (event: Event) => {
 </script>
 
 <template>
-  <VaCard>
-    <VaCardTitle>
-      <div class="flex gap-1">
-        <div class="flex-grow">
-          <VaInput class="" :placeholder="t('teacherGroups.search_name_phone_email')" @input="handlerSearch">
-            <template #appendInner>
-              <VaIcon color="secondary" class="material-icons"> search </VaIcon>
-            </template>
-          </VaInput>
+  <VaCard class="flex-wrap">
+    <div>
+      <VaCardTitle>
+        <div class="flex gap-1">
+          <div class="flex-grow">
+            <VaInput class="" :placeholder="t('teacherGroups.search_name_phone_email')" @input="handlerSearch">
+              <template #appendInner>
+                <VaIcon color="secondary" class="material-icons"> search </VaIcon>
+              </template>
+            </VaInput>
+          </div>
+          <div class="">
+            <VaDropdown placement="bottom-end">
+              <template #anchor>
+                <VaButton icon="add" />
+              </template>
+              <VaDropdownContent class="p-0">
+                <VaButton
+                  icon="add"
+                  preset="secondary"
+                  size="small"
+                  style="width: 100%"
+                  class="p-2"
+                  @click="showAddTeacherModal('Teacher')"
+                >
+                  {{ t('teacherGroups.teacher') }}
+                </VaButton>
+              </VaDropdownContent>
+              <VaDropdownContent class="p-0">
+                <VaButton
+                  icon="add"
+                  preset="secondary"
+                  size="small"
+                  style="width: 100%"
+                  class="p-2"
+                  @click="showAddGroupModal('Group')"
+                >
+                  {{ t('teacherGroups.teacher_group') }}
+                </VaButton>
+              </VaDropdownContent>
+            </VaDropdown>
+          </div>
+          <VaModal
+            v-slot="{ cancel, ok }"
+            v-model="doShowGroupEditModal"
+            size="small"
+            mobile-fullscreen
+            close-button
+            hide-default-actions
+            :before-cancel="beforeEditFormModalClose"
+          >
+            <h3 class="va-text-bold">
+              {{ modalToGroupEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}
+            </h3>
+            <TeacherGroupModal
+              ref="editFormRef"
+              :group-teacher="modalToGroupEdit"
+              :user="currentType"
+              :save-button-label="saveButtonLabel"
+              @close="cancel"
+              @save="
+                (data: GroupTeacher) => {
+                  onGroupSaved(data)
+                  ok()
+                }
+              "
+            />
+          </VaModal>
+          <VaModal
+            v-slot="{ cancel, ok }"
+            v-model="doShowTeacherEditModal"
+            size="small"
+            mobile-fullscreen
+            close-button
+            hide-default-actions
+            :before-cancel="beforeEditFormModalClose"
+          >
+            <h3 class="va-text-bold">
+              {{ modalToTeacherEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}
+            </h3>
+            <TeacherTeamModal
+              ref="editFormRef"
+              :user="currentType"
+              :teacher-team="modalToTeacherEdit"
+              :save-button-label="saveButtonLabel"
+              @close="cancel"
+              @save="
+                (data: TeacherTeam) => {
+                  onTeacherSaved(data)
+                  ok()
+                }
+              "
+            />
+          </VaModal>
         </div>
-        <div class="">
-          <VaDropdown placement="bottom-end">
-            <template #anchor>
-              <VaButton icon="add" />
-            </template>
-            <VaDropdownContent class="p-0">
-              <VaButton
-                icon="add"
-                preset="secondary"
-                size="small"
-                style="width: 100%"
-                class="p-2"
-                @click="showAddTeacherModal('Teacher')"
-              >
-                {{ t('teacherGroups.teacher') }}
-              </VaButton>
-            </VaDropdownContent>
-            <VaDropdownContent class="p-0">
-              <VaButton
-                icon="add"
-                preset="secondary"
-                size="small"
-                style="width: 100%"
-                class="p-2"
-                @click="showAddGroupModal('Group')"
-              >
-                {{ t('teacherGroups.teacher_group') }}
-              </VaButton>
-            </VaDropdownContent>
-          </VaDropdown>
-        </div>
-        <VaModal
-          v-slot="{ cancel, ok }"
-          v-model="doShowGroupEditModal"
-          size="small"
-          mobile-fullscreen
-          close-button
-          hide-default-actions
-          :before-cancel="beforeEditFormModalClose"
-        >
-          <h3 class="va-text-bold">
-            {{ modalToGroupEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}
-          </h3>
-          <TeacherGroupModal
-            ref="editFormRef"
-            :group-teacher="modalToGroupEdit"
-            :user="currentType"
-            :save-button-label="saveButtonLabel"
-            @close="cancel"
-            @save="
-              (data: GroupTeacher) => {
-                onGroupSaved(data)
-                ok()
-              }
-            "
-          />
-        </VaModal>
-        <VaModal
-          v-slot="{ cancel, ok }"
-          v-model="doShowTeacherEditModal"
-          size="small"
-          mobile-fullscreen
-          close-button
-          hide-default-actions
-          :before-cancel="beforeEditFormModalClose"
-        >
-          <h3 class="va-text-bold">
-            {{ modalToTeacherEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}
-          </h3>
-          <TeacherTeamModal
-            ref="editFormRef"
-            :user="currentType"
-            :teacher-team="modalToTeacherEdit"
-            :save-button-label="saveButtonLabel"
-            @close="cancel"
-            @save="
-              (data: TeacherTeam) => {
-                onTeacherSaved(data)
-                ok()
-              }
-            "
-          />
-        </VaModal>
-      </div>
+        <VaDivider class="m-0" />
+      </VaCardTitle>
       <VaDivider class="m-0" />
-    </VaCardTitle>
-    <VaDivider class="m-0" />
-    <VaCardContent>
-      <VaInnerLoading :loading="loading">
-        <VaScrollContainer vertical>
-          <VaList class="mb-2 max-h-[60vh]">
-            <VaListItem
-              v-for="group in groupTeachers"
-              :key="group.id"
-              class="list__item cursor-pointer"
-              @click="selectGroup(group)"
-            >
-              <VaListItemSection avatar class="justify-center">
-                <VaIcon name="group" />
-              </VaListItemSection>
+      <VaCardContent>
+        <VaInnerLoading :loading="loading">
+          <VaScrollContainer vertical>
+            <VaList class="mb-2 max-h-[60vh]">
+              <VaListItem
+                v-for="group in groupTeachers"
+                :key="group.id"
+                class="list__item cursor-pointer"
+                @click="selectGroup(group)"
+              >
+                <VaListItemSection avatar class="justify-center">
+                  <VaIcon name="group" />
+                </VaListItemSection>
 
-              <VaListItemSection>
-                <VaListItemLabel>
-                  {{
-                    group.name
-                      .split(' ')
-                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                      .join(' ')
-                  }}
-                </VaListItemLabel>
-              </VaListItemSection>
+                <VaListItemSection>
+                  <VaListItemLabel>
+                    {{
+                      group.name
+                        .split(' ')
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')
+                    }}
+                  </VaListItemLabel>
+                </VaListItemSection>
 
-              <VaListItemSection icon class="m-0">
-                <VaDropdown placement="bottom-end">
-                  <template #anchor>
-                    <VaButton preset="secondary">
-                      <VaIcon name="more_vert" />
-                    </VaButton>
-                  </template>
-                  <VaDropdownContent class="p-0">
-                    <VaButton
-                      preset="secondary"
-                      size="small"
-                      style="width: 100%"
-                      class="flex justify-between"
-                      @click="showEditGroupModal(group)"
-                    >
-                      <VaIcon name="edit_square" class="mr-1" /> {{ t('settings.edit') }}
-                    </VaButton>
-                  </VaDropdownContent>
-                  <VaDropdownContent class="p-0">
-                    <VaButton
-                      preset="secondary"
-                      size="small"
-                      style="width: 100%"
-                      class="flex justify-between"
-                      @click="confirmDeleteGroupModal(group.id, group.name)"
-                    >
-                      <VaIcon name="delete" class="mr-1" color="danger" /> {{ t('settings.delete') }}
-                    </VaButton>
-                  </VaDropdownContent>
-                </VaDropdown>
-              </VaListItemSection>
-            </VaListItem>
-            <VaListItem
-              v-for="teacher in teacherTeams"
-              :key="teacher.id"
-              class="list__item cursor-pointer pt-1 pb-1"
-              @click="detailTeacherInTeam(teacher.id)"
-            >
-              <VaListItemSection avatar class="justify-center">
-                <VaAvatar size="small">
-                  {{
-                    teacher.teacherName
-                      .split(' ')
-                      .filter((_, index, array) => index === 0 || index === array.length - 1)
-                      .map((w) => w.charAt(0).toUpperCase())
-                      .join('')
-                  }}
-                </VaAvatar>
-              </VaListItemSection>
+                <VaListItemSection icon class="m-0">
+                  <VaDropdown placement="bottom-end">
+                    <template #anchor>
+                      <VaButton preset="secondary">
+                        <VaIcon name="more_vert" />
+                      </VaButton>
+                    </template>
+                    <VaDropdownContent class="p-0">
+                      <VaButton
+                        preset="secondary"
+                        size="small"
+                        style="width: 100%"
+                        class="flex justify-between"
+                        @click="showEditGroupModal(group)"
+                      >
+                        <VaIcon name="edit_square" class="mr-1" /> {{ t('settings.edit') }}
+                      </VaButton>
+                    </VaDropdownContent>
+                    <VaDropdownContent class="p-0">
+                      <VaButton
+                        preset="secondary"
+                        size="small"
+                        style="width: 100%"
+                        class="flex justify-between"
+                        @click="confirmDeleteGroupModal(group.id, group.name)"
+                      >
+                        <VaIcon name="delete" class="mr-1" color="danger" /> {{ t('settings.delete') }}
+                      </VaButton>
+                    </VaDropdownContent>
+                  </VaDropdown>
+                </VaListItemSection>
+              </VaListItem>
+              <VaListItem
+                v-for="teacher in teacherTeams"
+                :key="teacher.id"
+                class="list__item cursor-pointer pt-1 pb-1"
+                @click="detailTeacherInTeam(teacher.id)"
+              >
+                <VaListItemSection avatar class="justify-center">
+                  <VaAvatar size="small">
+                    {{
+                      teacher.teacherName
+                        .split(' ')
+                        .filter((_, index, array) => index === 0 || index === array.length - 1)
+                        .map((w) => w.charAt(0).toUpperCase())
+                        .join('')
+                    }}
+                  </VaAvatar>
+                </VaListItemSection>
 
-              <VaListItemSection>
-                <VaListItemLabel>
-                  {{
-                    teacher.teacherName
-                      .split(' ')
-                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                      .join(' ')
-                  }}
-                  <VaIcon
-                    v-if="teacher.teacherId === '00000000-0000-0000-0000-000000000000'"
-                    class="mr-2"
-                    name="no_accounts"
-                  />
-                </VaListItemLabel>
-                <VaListItemLabel caption>
-                  {{ (teacher.email ?? '').toLowerCase() }}
-                  {{ teacher.phone }}
-                </VaListItemLabel>
-              </VaListItemSection>
+                <VaListItemSection>
+                  <VaListItemLabel>
+                    {{
+                      teacher.teacherName
+                        .split(' ')
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')
+                    }}
+                    <VaIcon
+                      v-if="teacher.teacherId === '00000000-0000-0000-0000-000000000000'"
+                      class="mr-2"
+                      name="no_accounts"
+                    />
+                  </VaListItemLabel>
+                  <VaListItemLabel caption>
+                    {{ (teacher.email ?? '').toLowerCase() }}
+                    {{ teacher.phone }}
+                  </VaListItemLabel>
+                </VaListItemSection>
 
-              <VaListItemSection icon class="m-0">
-                <VaDropdown placement="bottom-end">
-                  <template #anchor>
-                    <VaButton preset="secondary">
-                      <VaIcon name="more_vert" />
-                    </VaButton>
-                  </template>
-                  <VaDropdownContent class="p-0">
-                    <VaButton
-                      preset="secondary"
-                      size="small"
-                      style="width: 100%"
-                      class="flex justify-between"
-                      @click="showEditTeacherModal(teacher)"
-                    >
-                      <VaIcon name="edit_square" class="mr-1" /> {{ t('settings.edit') }}
-                    </VaButton>
-                  </VaDropdownContent>
-                  <VaDropdownContent class="p-0">
-                    <VaButton
-                      preset="secondary"
-                      size="small"
-                      style="width: 100%"
-                      class="flex justify-between"
-                      @click="confirmDeleteTeacherInTeam(teacher.id, teacher.teacherName)"
-                    >
-                      <VaIcon name="delete" class="mr-1" color="danger" /> {{ t('settings.delete') }}
-                    </VaButton>
-                  </VaDropdownContent>
-                </VaDropdown>
-              </VaListItemSection>
-            </VaListItem>
-          </VaList>
-        </VaScrollContainer>
-      </VaInnerLoading>
+                <VaListItemSection icon class="m-0">
+                  <VaDropdown placement="bottom-end">
+                    <template #anchor>
+                      <VaButton preset="secondary">
+                        <VaIcon name="more_vert" />
+                      </VaButton>
+                    </template>
+                    <VaDropdownContent class="p-0">
+                      <VaButton
+                        preset="secondary"
+                        size="small"
+                        style="width: 100%"
+                        class="flex justify-between"
+                        @click="showEditTeacherModal(teacher)"
+                      >
+                        <VaIcon name="edit_square" class="mr-1" /> {{ t('settings.edit') }}
+                      </VaButton>
+                    </VaDropdownContent>
+                    <VaDropdownContent class="p-0">
+                      <VaButton
+                        preset="secondary"
+                        size="small"
+                        style="width: 100%"
+                        class="flex justify-between"
+                        @click="confirmDeleteTeacherInTeam(teacher.id, teacher.teacherName)"
+                      >
+                        <VaIcon name="delete" class="mr-1" color="danger" /> {{ t('settings.delete') }}
+                      </VaButton>
+                    </VaDropdownContent>
+                  </VaDropdown>
+                </VaListItemSection>
+              </VaListItem>
+            </VaList>
+          </VaScrollContainer>
+        </VaInnerLoading>
+      </VaCardContent>
+    </div>
+
+    <VaCardContent class="flex justify-end">
+      <div>
+        <VaButton preset="secondary" border-color="primary" size="small" @click="copyLinkInvite"
+          >Copy Invite link to team</VaButton
+        >
+      </div>
     </VaCardContent>
   </VaCard>
 </template>

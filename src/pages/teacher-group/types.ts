@@ -85,3 +85,8 @@ export type TeacherTeamTeacherGroupCombine = {
   teacherTeam: TeacherTeam | null
   groupTeacher: GroupTeacher | null
 }
+
+export type SendRequestJoinTeamRequest = {
+  adminTeamId: string
+  content?: string
+}
