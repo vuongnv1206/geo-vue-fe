@@ -1,34 +1,33 @@
 <script setup lang="ts">
-import { useJoinGroupRequestStore } from '@/stores/modules/joinGroupRequest.module'
 import {
-  HandleJoinGroupRequest,
-  JoinGroupTeacherRequestResponse,
+  HandleJoinTeamRequest,
   JoinTeacherGroupStatus,
+  JoinTeacherTeamRequestResponse,
   RequestStatus,
-  SearchJoinGroupTeacherRequest,
+  SearchJoinTeacherTeamRequest,
 } from '../types'
 import { onMounted, ref } from 'vue'
 import { DataTableColumnSource, useModal, useToast } from 'vuestic-ui'
 import { getErrorMessage, JoinGroupStatusColor, JoinGroupStatusLabel } from '@/services/utils'
 import { format } from '../../../services/utils'
-import JoinTeamRequestSend from './JoinTeamRequestSend.vue'
+import { useJoinTeacherTeamStore } from '@/stores/modules/joinTeacherTeam.module'
 
-const joinGroupRequestStore = useJoinGroupRequestStore()
+const useJoinTeacherTeamRequest = useJoinTeacherTeamStore()
 const { init: notify } = useToast()
 const { confirm } = useModal()
 const isLoading = ref(true)
-const joinGroupRequest = ref<SearchJoinGroupTeacherRequest>({
+const joinTeamRequest = ref<SearchJoinTeacherTeamRequest>({
   status: RequestStatus.Sent,
   pageNumber: 1,
-  pageSize: 10,
+  pageSize: 5,
 })
 
-const joinGroupResponse = ref<JoinGroupTeacherRequestResponse>()
+const joinTeamResponse = ref<JoinTeacherTeamRequestResponse>()
 
-const getJoinGroupRequest = async () => {
+const getJoinTeamRequest = async () => {
   try {
-    const res = await joinGroupRequestStore.joinGroupRequest_search(joinGroupRequest.value)
-    joinGroupResponse.value = res
+    const res = await useJoinTeacherTeamRequest.requestJoinTeamList(joinTeamRequest.value)
+    joinTeamResponse.value = res
   } catch (error) {
     notify({
       message: getErrorMessage(error),
@@ -40,15 +39,8 @@ const getJoinGroupRequest = async () => {
 
 const columnTable: DataTableColumnSource<string>[] = [
   {
-    label: 'Group name',
-    key: 'groupName',
-    thAlign: 'center',
-    tdAlign: 'center',
-    sortable: true,
-  },
-  {
     label: 'Receiver',
-    key: 'receiverEmail',
+    key: 'AdminTeamEmail',
     thAlign: 'center',
     tdAlign: 'center',
     sortable: true,
@@ -98,19 +90,18 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
 
   confirm(messageConfirm).then(async (agreed) => {
     if (agreed) {
-      const request: HandleJoinGroupRequest = {
+      const request: HandleJoinTeamRequest = {
         requestId: requestId,
       }
 
       if (status == JoinTeacherGroupStatus.Cancel) {
-        await joinGroupRequestStore
-          .cancelRequest(request)
+        await useJoinTeacherTeamRequest
+          .cancelJoinTeamRequest(request)
           .then(async () => {
             notify({
               message: 'Cancel successfully',
               color: 'success',
             })
-            joinGroupRequestStore.setRefresh(true)
           })
           .catch((error) => {
             const message = getErrorMessage(error)
@@ -119,27 +110,27 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
               color: 'danger',
             })
           })
-        await getJoinGroupRequest()
+        await getJoinTeamRequest()
       }
     }
   })
 }
 const handlePageChange = async (newPage: number) => {
-  joinGroupRequest.value.pageNumber = newPage
-  await getJoinGroupRequest()
+  joinTeamRequest.value.pageNumber = newPage
+  await getJoinTeamRequest()
 }
 
 onMounted(async () => {
-  await getJoinGroupRequest()
+  await getJoinTeamRequest()
 })
 </script>
 
 <template>
   <VaCard>
-    <VaCardTitle>Request join group</VaCardTitle>
+    <VaCardTitle>Request join team</VaCardTitle>
     <VaCardContent>
       <VaDataTable
-        :items="joinGroupResponse?.data"
+        :items="joinTeamResponse?.data"
         :columns="columnTable"
         :loading="isLoading"
         sticky-header
@@ -183,13 +174,16 @@ onMounted(async () => {
             format.formatDate(row.source.lastModifiedOn)
           }}</span>
         </template>
-        <template v-if="joinGroupResponse && joinGroupResponse.data.length > 0" #bodyAppend>
+        <template #cell(createOn)="{ row }">
+          <span>{{ format.formatDate(row.source.createOn) }}</span>
+        </template>
+        <template v-if="joinTeamResponse && joinTeamResponse.data.length > 0" #bodyAppend>
           <tr>
             <td colspan="6">
               <div class="flex justify-center mt-4">
                 <VaPagination
-                  v-model="joinGroupResponse.currentPage"
-                  :pages="joinGroupResponse.totalPages"
+                  v-model="joinTeamResponse.currentPage"
+                  :pages="joinTeamResponse.totalPages"
                   :visible-pages="5"
                   buttons-preset="default"
                   @update:modelValue="handlePageChange"
@@ -201,7 +195,6 @@ onMounted(async () => {
       </VaDataTable>
     </VaCardContent>
   </VaCard>
-  <JoinTeamRequestSend />
 </template>
 
 <style lang="css">

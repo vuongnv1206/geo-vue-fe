@@ -1,22 +1,25 @@
+<!-- eslint-disable prettier/prettier -->
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import {
-  HandleJoinGroupRequest,
-  JoinGroupTeacherRequestResponse,
+  AcceptJoinTeamRequest,
+  HandleJoinTeamRequest,
   JoinTeacherGroupStatus,
+  JoinTeacherTeamRequestDto,
+  JoinTeacherTeamRequestResponse,
   RequestStatus,
-  SearchJoinGroupTeacherRequest,
+  SearchJoinTeacherTeamRequest,
 } from '../types'
 import { DataTableColumnSource, useModal, useToast } from 'vuestic-ui'
-import { useJoinGroupRequestStore } from '@/stores/modules/joinGroupRequest.module'
 import { format, getErrorMessage, JoinGroupStatusColor, JoinGroupStatusLabel } from '@/services/utils'
-import JoinTeamRequestReceive from './JoinTeamRequestReceive.vue'
+import { useJoinTeacherTeamStore } from '@/stores/modules/joinTeacherTeam.module'
+import AcceptRequestModal from './AcceptRequestModal.vue'
 
-const joinGroupRequestStore = useJoinGroupRequestStore()
+const useJoinTeacherTeamRequest = useJoinTeacherTeamStore()
 const { init: notify } = useToast()
 const { confirm } = useModal()
 
-const joinGroupRequest = ref<SearchJoinGroupTeacherRequest>({
+const joinTeamRequest = ref<SearchJoinTeacherTeamRequest>({
   status: RequestStatus.Received,
   pageNumber: 1,
   pageSize: 5,
@@ -24,12 +27,12 @@ const joinGroupRequest = ref<SearchJoinGroupTeacherRequest>({
 
 const isLoading = ref(true)
 
-const joinGroupResponse = ref<JoinGroupTeacherRequestResponse>()
+const joinTeamResponse = ref<JoinTeacherTeamRequestResponse>()
 
-const getJoinGroupRequest = async () => {
+const getJoinTeacherTeamRequest = async () => {
   try {
-    const res = await joinGroupRequestStore.joinGroupRequest_search(joinGroupRequest.value)
-    joinGroupResponse.value = res
+    const res = await useJoinTeacherTeamRequest.requestJoinTeamList(joinTeamRequest.value)
+    joinTeamResponse.value = res
   } catch (error) {
     notify({
       message: getErrorMessage(error),
@@ -41,8 +44,8 @@ const getJoinGroupRequest = async () => {
 
 const columnTable: DataTableColumnSource<string>[] = [
   {
-    label: 'Group name',
-    key: 'groupName',
+    label: 'Full name',
+    key: 'senderFullName',
     thAlign: 'center',
     tdAlign: 'center',
     sortable: true,
@@ -50,7 +53,7 @@ const columnTable: DataTableColumnSource<string>[] = [
   },
   {
     label: 'Sender',
-    key: 'email',
+    key: 'senderEmail',
     thAlign: 'center',
     tdAlign: 'center',
     sortable: true,
@@ -98,43 +101,21 @@ const getContentDisplay = (content: string) => {
 }
 
 const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus) => {
-  const messageConfirm =
-    status == JoinTeacherGroupStatus.Accepted
-      ? 'Are you sure accept this request join group'
-      : 'Are you sure reject this request join group'
+  const messageConfirm = 'Are you sure reject this request join team'
 
   confirm(messageConfirm).then(async (agreed) => {
     if (agreed) {
-      const request: HandleJoinGroupRequest = {
-        requestId: requestId,
-      }
-
-      if (status == JoinTeacherGroupStatus.Accepted) {
-        await joinGroupRequestStore
-          .acceptRequest(request)
-          .then(async () => {
-            notify({
-              message: 'Accept successfully',
-              color: 'success',
-            })
-            joinGroupRequestStore.setRefresh(true)
-          })
-          .catch((error) => {
-            const message = getErrorMessage(error)
-            notify({
-              message: message,
-              color: 'danger',
-            })
-          })
-      } else if (status == JoinTeacherGroupStatus.Rejected) {
-        await joinGroupRequestStore
-          .rejectRequest(request)
+      if (status == JoinTeacherGroupStatus.Rejected) {
+        const request: HandleJoinTeamRequest = {
+          requestId: requestId,
+        }
+        await useJoinTeacherTeamRequest
+          .rejectJoinTeamRequest(request)
           .then(async () => {
             notify({
               message: 'Reject successfully',
               color: 'success',
             })
-            joinGroupRequestStore.setRefresh(true)
           })
           .catch((error) => {
             const message = getErrorMessage(error)
@@ -144,27 +125,53 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
             })
           })
       }
-      await getJoinGroupRequest()
+      await getJoinTeacherTeamRequest()
     }
   })
 }
 
 const handlePageChange = async (newPage: number) => {
-  joinGroupRequest.value.pageNumber = newPage
-  await getJoinGroupRequest()
+  joinTeamRequest.value.pageNumber = newPage
+  await getJoinTeacherTeamRequest()
+}
+
+const showAcceptModal = ref(false)
+const selectedRequest = ref<JoinTeacherTeamRequestDto>()
+const showAcceptModalHandle = (request: JoinTeacherTeamRequestDto) => {
+  showAcceptModal.value = !showAcceptModal.value
+  selectedRequest.value = request
+}
+
+const handleAcceptRequest = async (data: AcceptJoinTeamRequest) => {
+  await useJoinTeacherTeamRequest
+    .acceptJoinTeamRequest(data)
+    .then(async () => {
+      notify({
+        message: 'Accept successfully',
+        color: 'success',
+      })
+    })
+    .catch((error) => {
+      const message = getErrorMessage(error)
+      notify({
+        message: message,
+        color: 'danger',
+      })
+    })
+  await getJoinTeacherTeamRequest()
 }
 
 onMounted(async () => {
-  await getJoinGroupRequest()
+  await getJoinTeacherTeamRequest()
 })
 </script>
 
 <template>
   <VaCard>
-    <VaCardTitle>Request join group</VaCardTitle>
+    <VaCardTitle>Request join team</VaCardTitle>
     <VaCardContent>
       <VaDataTable
-        :items="joinGroupResponse?.data"
+        :items="joinTeamResponse?.data"
         :columns="columnTable"
         :loading="isLoading"
         sticky-header
@@ -183,12 +190,6 @@ onMounted(async () => {
             />
           </span>
         </template>
-        <template #cell(lastModifiedOn)="{ row }">
-          <span v-if="row.source.status !== JoinTeacherGroupStatus.Pending">{{
-            format.formatDate(row.source.lastModifiedOn)
-          }}</span>
-          <span v-else> N/a </span>
-        </template>
         <template #cell(action)="{ row }">
           <div v-if="row.source.status === JoinTeacherGroupStatus.Pending" class="flex gap-2 justify-center">
             <VaButton
@@ -205,7 +206,7 @@ onMounted(async () => {
               border-color="success"
               icon="check"
               color="success"
-              @click="handlerRequest(row.source.id, JoinTeacherGroupStatus.Accepted)"
+              @click="showAcceptModalHandle(row.source as JoinTeacherTeamRequestDto)"
             >
               Accept
             </VaButton>
@@ -217,16 +218,22 @@ onMounted(async () => {
             <span>N/a</span>
           </div>
         </template>
+        <template #cell(lastModifiedOn)="{ row }">
+          <span v-if="row.source.status !== JoinTeacherGroupStatus.Pending">{{
+            format.formatDate(row.source.lastModifiedOn)
+          }}</span>
+          <span v-else> N/a </span>
+        </template>
         <template #cell(createOn)="{ row }">
           {{ format.formatDate(row.source.createOn) }}
         </template>
-        <template v-if="joinGroupResponse && joinGroupResponse.data.length > 0" #bodyAppend>
+        <template v-if="joinTeamResponse && joinTeamResponse.data.length > 0" #bodyAppend>
           <tr>
             <td colspan="6">
               <div class="flex justify-center mt-4">
                 <VaPagination
-                  v-model="joinGroupResponse.currentPage"
-                  :pages="joinGroupResponse.totalPages"
+                  v-model="joinTeamResponse.currentPage"
+                  :pages="joinTeamResponse.totalPages"
                   :visible-pages="5"
                   buttons-preset="default"
                   @update:modelValue="handlePageChange"
@@ -238,7 +245,28 @@ onMounted(async () => {
       </VaDataTable>
     </VaCardContent>
   </VaCard>
-  <JoinTeamRequestReceive />
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="showAcceptModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    hide-default-actions
+  >
+    <AcceptRequestModal
+      v-if="selectedRequest"
+      :request-join="selectedRequest"
+      :save-button-label="'Approve'"
+      @close="cancel"
+      @save="
+        (data: AcceptJoinTeamRequest) => {
+          handleAcceptRequest(data)
+          ok()
+        }
+      "
+    />
+  </VaModal>
 </template>
 
 <style lang="scss">

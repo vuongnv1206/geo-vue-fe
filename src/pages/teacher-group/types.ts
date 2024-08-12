@@ -142,3 +142,41 @@ export enum JoinTeacherGroupStatus {
 export type HandleJoinGroupRequest = {
   requestId: string
 }
+
+export type SearchJoinTeacherTeamRequest = {
+  status: RequestStatus
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+}
+
+export type JoinTeacherTeamRequestResponse = {
+  data: JoinTeacherTeamRequestDto[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type JoinTeacherTeamRequestDto = {
+  id: string
+  adminTeamId: string
+  adminTeamEmail?: string
+  status: JoinTeacherGroupStatus
+  content: string
+  createOn: Date
+  lastModifiedOn: Date
+  createBy: string
+  senderEmail?: string
+  senderFullName?: string
+}
+
+export type AcceptJoinTeamRequest = {
+  requestId: string
+  nickname: string
+}
+
+export type HandleJoinTeamRequest = {
+  requestId: string
+}

@@ -65,6 +65,7 @@ const onSave = () => {
           :label="t('teacherGroups.teacher_contact')"
           :placeholder="t('teacherGroups.enter_teacher_contact')"
           :rules="[validators.required2(t('teacherGroups.teacher_contact')), validators.maxLength(200)]"
+          disabled
         />
       </VaForm>
     </VaCardContent>
