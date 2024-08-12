@@ -314,6 +314,35 @@ const filteredGroupClasses = computed(() => {
     .filter((groupClass) => groupClass.classes.length > 0)
 })
 
+const copyJoinLink = (linkCopy: string) => {
+  if (linkCopy) {
+    navigator.clipboard
+      .writeText(linkCopy)
+      .then(() => {
+        notify({
+          message: 'Copy successfully',
+          color: 'success',
+        })
+      })
+      .catch((error) => {
+        notify({
+          message: `Failed to copy. ${error}`,
+        })
+      })
+  }
+}
+
+const downloadQRCode = (qrCode: string) => {
+  if (qrCode) {
+    const link = document.createElement('a')
+    link.href = qrCode
+    link.download = 'qr_code.png'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+}
+
 watch(searchQuery, () => {
   accordionKey.value += 1
 })
@@ -323,9 +352,32 @@ const accordionKey = ref(0)
 <template>
   <div>
     <VaCard v-if="groupDetail !== null" class="mb-2">
-      <VaCardTitle class="gap-2">
-        <span v-if="groupDetail">{{ t('teacherGroups.group_member', { name: groupDetail.name }) }}</span>
-      </VaCardTitle>
+      <VaCardContent class="flex gap-2">
+        <VaButton
+          preset="secondary"
+          border-color="primary"
+          size="small"
+          @click="copyJoinLink(groupDetail.joinLink || '')"
+          >Link invite</VaButton
+        >
+        <VaDropdown>
+          <template #anchor>
+            <VaButton icon="qr_code_2" preset="secondary" border-color="primary" size="small" />
+          </template>
+          <VaDropdownContent>
+            <div>
+              <VaImage :src="groupDetail.qrCode" />
+              <div>
+                <VaButton preset="secondary" size="small" @click="downloadQRCode(groupDetail.qrCode || '')"
+                  >download</VaButton
+                >
+              </div>
+            </div>
+          </VaDropdownContent>
+        </VaDropdown>
+      </VaCardContent>
+    </VaCard>
+    <VaCard v-if="groupDetail !== null" class="mb-2">
       <VaCardContent>
         <div class="flex gap-2">
           <div class="text-center cursor-pointer">

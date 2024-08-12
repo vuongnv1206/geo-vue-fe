@@ -38,12 +38,15 @@ const { confirm } = useModal()
 const titleModal = ref<string>()
 
 const emit = defineEmits(['select-group', 'select-teacher'])
+const selectedItemId = ref<string>('')
 
 const selectGroup = (group: GroupTeacher) => {
+  selectedItemId.value = group.id
   emit('select-group', group)
 }
 
 const detailTeacherInTeam = (teacherId: string) => {
+  selectedItemId.value = teacherId
   emit('select-teacher', teacherId)
 }
 
@@ -408,6 +411,7 @@ const handlerSearch = (event: Event) => {
                 v-for="group in groupTeachers"
                 :key="group.id"
                 class="list__item cursor-pointer"
+                :class="{ selectItem: selectedItemId === group.id }"
                 @click="selectGroup(group)"
               >
                 <VaListItemSection avatar class="justify-center">
@@ -545,6 +549,10 @@ const handlerSearch = (event: Event) => {
 
 <style lang="scss" scoped>
 .list__item:hover {
+  background-color: #f1f5f9;
+}
+
+.selectItem {
   background-color: #f1f5f9;
 }
 </style>

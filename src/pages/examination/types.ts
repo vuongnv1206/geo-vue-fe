@@ -186,9 +186,8 @@ export interface PaperAccess {
 }
 
 export enum AccessType {
-  Everyone = 0,
-  ByClass = 3,
-  ByStudent = 2,
+  ByStudent = 1,
+  ByClass = 2,
 }
 
 export interface GetLastResultExamRequest {
@@ -566,4 +565,14 @@ export type QuestionGenerateToMatrix = {
   question: Question
   mark: number
   rawIndex: number
+}
+
+export interface AddQuestionsInPaperRequest {
+  paperId: string
+  questions?: QuestionIntoPaperRequest[]
+}
+
+export interface UpdateQuestionsInPaperRequest {
+  paperId: string
+  questions?: QuestionIntoPaperRequest[]
 }

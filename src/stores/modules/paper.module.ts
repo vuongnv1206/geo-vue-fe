@@ -1,8 +1,10 @@
 import {
+  AddQuestionsInPaperRequest,
   PaperDeletedResponse,
   PaperInListDto,
   QuestionGenerateToMatrix,
   SearchSharedPaperRequest,
+  UpdateQuestionsInPaperRequest,
 } from './../../pages/examination/types'
 import papersService from '@/services/paper.service'
 import {
@@ -142,6 +144,36 @@ export const usePaperStore = defineStore('paper', {
     async getQuestionFromMatrix(matrixId: string): Promise<QuestionGenerateToMatrix[]> {
       return await papersService
         .getQuestionFromMatrix(matrixId)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async deleteQuestionInPaper(paperId: string, questionId: string): Promise<any> {
+      return await papersService
+        .deleteQuestionInPaper(paperId, questionId)
+        .then((res) => {
+          return Promise.resolve(res.data)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async addQuestionsInPaper(paperId: string, request: AddQuestionsInPaperRequest): Promise<any> {
+      return await papersService
+        .addQuestionsInPaper(paperId, request)
+        .then((res) => {
+          return Promise.resolve(res.data)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async updateQuestionsInPaper(id: string, request: UpdateQuestionsInPaperRequest): Promise<any> {
+      return await papersService
+        .updateQuestionsInPaper(id, request)
         .then((response) => {
           return Promise.resolve(response)
         })
