@@ -203,8 +203,9 @@ const saveDraffPaper = (isPublish: boolean) => {
       })
     })
     .catch((error) => {
+      const message = getErrorMessage(error)
       notify({
-        message: `Update failing \n ${error}`,
+        message: message,
         color: 'danger',
       })
     })
@@ -296,8 +297,7 @@ onMounted(() => {
           <div class="mb-2 pr-1">
             <VueDatePicker
               v-model="editPaper.startTime"
-              range
-              model-auto
+              mode="single"
               :action-row="{ showNow: true }"
               :is-24="true"
               enable-seconds
@@ -305,14 +305,13 @@ onMounted(() => {
               :text-input="dateInputFormat"
               :month-change-on-scroll="true"
               :month-change-on-arrows="true"
-              :placeholder="$t('assignments.enter_start_and_end_time')"
+              placeholder="Enter start time"
             />
           </div>
           <div class="mb-2 pr-1">
             <VueDatePicker
               v-model="editPaper.endTime"
-              range
-              model-auto
+              mode="single"
               :action-row="{ showNow: true }"
               :is-24="true"
               enable-seconds
@@ -320,7 +319,7 @@ onMounted(() => {
               :text-input="dateInputFormat"
               :month-change-on-scroll="true"
               :month-change-on-arrows="true"
-              :placeholder="$t('assignments.enter_start_and_end_time')"
+              placeholder="Enter start time"
             />
           </div>
           <div class="col-span-2 justify-end flex">

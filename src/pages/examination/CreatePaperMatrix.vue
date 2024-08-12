@@ -90,8 +90,9 @@ const saveCreatePaper = (data: CreatePaperRequest) => {
       router.push({ name: 'admin-exam-detail', params: { id: res } })
     })
     .catch((error) => {
+      const message = getErrorMessage(error)
       notify({
-        message: `Fail create paper \n ${error}`,
+        message: message,
         color: 'danger',
       })
     })

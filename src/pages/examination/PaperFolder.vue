@@ -84,10 +84,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to update paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   } else {
@@ -105,10 +106,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to create paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   }
@@ -187,10 +189,11 @@ const onDeleteSelectedItems = async () => {
         selectedItems.value = []
         getPaperFolders(currentFolderId.value)
         getPapers(currentFolderId.value)
-      } catch (err: any) {
+      } catch (error) {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete selected items\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       }
     }
