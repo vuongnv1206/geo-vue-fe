@@ -14,6 +14,7 @@ import { PermissionNameInClass } from './PermissionInClass.enum'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
+import QrcodeVue from 'qrcode.vue'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -317,7 +318,7 @@ const filteredGroupClasses = computed(() => {
 const copyJoinLink = (linkCopy: string) => {
   if (linkCopy) {
     navigator.clipboard
-      .writeText(linkCopy)
+      .writeText(`${baseUrl}/${linkCopy}`)
       .then(() => {
         notify({
           message: 'Copy successfully',
@@ -332,16 +333,35 @@ const copyJoinLink = (linkCopy: string) => {
   }
 }
 
-const downloadQRCode = (qrCode: string) => {
-  if (qrCode) {
+const downloadQRCode = () => {
+  const canvas = document.querySelector('canvas')
+  if (canvas) {
     const link = document.createElement('a')
-    link.href = qrCode
+    link.href = canvas.toDataURL('image/png')
     link.download = 'qr_code.png'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  } else {
+    notify({
+      message: 'Failed to download QR code. Canvas not found.',
+      color: 'danger',
+    })
   }
 }
+
+const qrCodeSrc = ref<string | null>(null)
+const baseUrl = window.location.origin
+watch(
+  () => groupDetail?.value?.joinLink,
+  (newLink) => {
+    if (newLink) {
+      qrCodeSrc.value = `${baseUrl}/${newLink}`
+      console.log(qrCodeSrc.value)
+    }
+  },
+  { immediate: true },
+)
 
 watch(searchQuery, () => {
   accordionKey.value += 1
@@ -366,11 +386,11 @@ const accordionKey = ref(0)
           </template>
           <VaDropdownContent>
             <div>
-              <VaImage :src="groupDetail.qrCode" />
+              <QrcodeVue v-if="qrCodeSrc" :value="qrCodeSrc" />
               <div>
-                <VaButton preset="secondary" size="small" @click="downloadQRCode(groupDetail.qrCode || '')"
-                  >download</VaButton
-                >
+                <div>
+                  <VaButton preset="secondary" size="small" @click="downloadQRCode">download</VaButton>
+                </div>
               </div>
             </div>
           </VaDropdownContent>
