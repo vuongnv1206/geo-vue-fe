@@ -19,6 +19,7 @@ import { computed } from 'vue'
 import { watchEffect } from 'vue'
 import EditPaperFolderForm from '@pages/examination/widgets/EditPaperFolderForm.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
+import { getErrorMessage } from '@/services/utils'
 
 const router = useRouter()
 const { init: notify } = useToast()
@@ -270,10 +271,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getSharedPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to create paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   }
@@ -296,10 +298,11 @@ const onFolderDelete = async (folder: PaperFolderDto) => {
       })
       getSharedPaperFolders(currentFolderId.value)
       getSharedPapers(currentFolderId.value)
-    } catch (err: any) {
+    } catch (error) {
+      const message = getErrorMessage(error)
       notify({
-        message: `Failed to delete folder\n${err.message}`,
-        color: 'error',
+        message: message,
+        color: 'danger',
       })
     }
   }
@@ -321,10 +324,11 @@ const onPaperDelete = async (paper: PaperInListDto) => {
         color: 'success',
       })
       getSharedPapers(currentFolderId.value)
-    } catch (err: any) {
+    } catch (error) {
+      const message = getErrorMessage(error)
       notify({
-        message: `Failed to delete paper\n${err.message}`,
-        color: 'error',
+        message: message,
+        color: 'danger',
       })
     }
   }
@@ -352,10 +356,11 @@ const onDeleteSelectedItems = async () => {
         selectedItems.value = []
         getSharedPaperFolders(currentFolderId.value)
         getSharedPapers(currentFolderId.value)
-      } catch (err: any) {
+      } catch (error) {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete selected items\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       }
     }
