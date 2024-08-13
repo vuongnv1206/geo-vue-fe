@@ -215,7 +215,7 @@ const filesUploaded = ref<any>()
 
 const assignmentClass = ref<AssignmentClass>({
   assignmentId: assignmentId,
-  classesdId: classId,
+  classId: classId,
 })
 
 const doShowFormModal = ref(false)
