@@ -15,6 +15,7 @@ const useJoinTeacherTeam = useJoinTeacherTeamStore()
 const { init: notify } = useToast()
 
 const adminTeamId = route.params.userId as string
+const invitationId = route.params.invitationId ? String(route.params.invitationId) : undefined
 
 const adminDetail = ref<UserDetail>()
 const loading = ref(true)
@@ -36,6 +37,7 @@ const getUserDetail = async (userId: string) => {
 const requestJoinTeamRequest = ref<SendRequestJoinTeamRequest>({
   adminTeamId: adminTeamId,
   content: '',
+  invitationId: invitationId,
 })
 
 const sendRequestJoinTeam = async () => {

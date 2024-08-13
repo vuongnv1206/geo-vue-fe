@@ -1,6 +1,8 @@
 import {
   AcceptJoinTeamRequest,
   HandleJoinTeamRequest,
+  InviteJoinTeacherTeamDto,
+  InviteTeacherJoinTeamRequest,
   JoinTeacherTeamRequestResponse,
   SearchJoinTeacherTeamRequest,
   SendRequestJoinTeamRequest,
@@ -54,6 +56,26 @@ export const useJoinTeacherTeamStore = defineStore('joinTeacherTeam', {
     async cancelJoinTeamRequest(request: HandleJoinTeamRequest): Promise<string> {
       return joinTeacherTeamService
         .cancelJoinTeamRequest(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async inviteTeacherJoinTeam(request: InviteTeacherJoinTeamRequest): Promise<string> {
+      return joinTeacherTeamService
+        .inviteTeacherJoinTeam(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getInvitationTeacherNotInTeam(request: any): Promise<InviteJoinTeacherTeamDto[]> {
+      return joinTeacherTeamService
+        .getInvitationTeacherNotInTeam(request)
         .then((response) => {
           return Promise.resolve(response)
         })

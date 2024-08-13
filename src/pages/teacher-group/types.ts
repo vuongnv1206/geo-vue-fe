@@ -92,6 +92,7 @@ export type TeacherTeamTeacherGroupCombine = {
 export type SendRequestJoinTeamRequest = {
   adminTeamId: string
   content?: string
+  invitationId?: string
 }
 export type SendRequestJoinGroupRequest = {
   groupId: string
@@ -179,4 +180,23 @@ export type AcceptJoinTeamRequest = {
 
 export type HandleJoinTeamRequest = {
   requestId: string
+}
+
+export type InviteTeacherJoinTeamRequest = {
+  contact: string
+}
+
+export type InviteJoinTeacherTeamDto = {
+  id: string
+  recipientEmail: string
+  senderEmail: string
+  isRegistered: boolean
+  status: InvitationStatus
+}
+
+export enum InvitationStatus {
+  NotRequest = 0,
+  Requested = 1,
+  BeRejected = 2,
+  BeAccepted = 3,
 }

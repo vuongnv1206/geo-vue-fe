@@ -447,6 +447,7 @@
   "teacherGroups": {
     "teacher_group": "Nhóm giáo viên",
     "teacher": "Giáo viên",
+    "invite-teacher": "Mời giáo viên",
     "select_teacher": "Chọn giáo viên",
     "group_member": "Thành viên trong nhóm {name}",
     "search_class": "Tìm kiếm lớp",
@@ -799,6 +800,7 @@
     "deleteFailed": "Xóa {message} thất bại\n",
     "unsavedChanges": "Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời khỏi?",
     "confirmDelete": "Bạn muốn xóa {message}?",
+    "inviteSuccess": "Mời {message} thành công",
     "singleChoice": "Lựa chọn đơn",
     "multipleChoice": "Lựa chọn nhiều",
     "fillBlank": "Điền vào chỗ trống",
@@ -810,7 +812,8 @@
     "Pending": "Đang chờ",
     "Accepted": "Đã chấp nhận",
     "Rejected": "Đã từ chối",
-    "Cancel": "Đã hủy"
+    "Cancel": "Đã hủy",
+    "NotRequest": "chưa yêu cầu"
   },
   "languageSwitcher": {
     "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."

@@ -1,6 +1,8 @@
 import {
   AcceptJoinTeamRequest,
   HandleJoinTeamRequest,
+  InviteJoinTeacherTeamDto,
+  InviteTeacherJoinTeamRequest,
   JoinTeacherTeamRequestResponse,
   SearchJoinTeacherTeamRequest,
   SendRequestJoinTeamRequest,
@@ -13,9 +15,33 @@ export interface IJoinTeacherTeamService {
   acceptJoinTeamRequest(request: AcceptJoinTeamRequest): Promise<string>
   rejectJoinTeamRequest(request: HandleJoinTeamRequest): Promise<string>
   cancelJoinTeamRequest(request: HandleJoinTeamRequest): Promise<string>
+  inviteTeacherJoinTeam(request: InviteTeacherJoinTeamRequest): Promise<string>
+  getInvitationTeacherNotInTeam(request: any): Promise<InviteJoinTeacherTeamDto[]>
 }
 
 export class JoinTeacherTeamService implements IJoinTeacherTeamService {
+  getInvitationTeacherNotInTeam(request: any): Promise<InviteJoinTeacherTeamDto[]> {
+    const url = '/v1/jointeacherteamrequests/get-invitations'
+    return apiService
+      .post(url, request)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+  inviteTeacherJoinTeam(request: InviteTeacherJoinTeamRequest): Promise<string> {
+    const url = '/v1/jointeacherteamrequests/invite-teacher'
+    return apiService
+      .post(url, request)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   acceptJoinTeamRequest(request: AcceptJoinTeamRequest): Promise<string> {
     const url = '/v1/jointeacherteamrequests/accept-request'
     return apiService

@@ -2,13 +2,15 @@
 // const loading = ref(true)
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { ref, onMounted, computed } from 'vue'
-import { GroupTeacher, TeacherTeam } from './types'
+import { GroupTeacher, TeacherTeam, InviteTeacherJoinTeamRequest, TeacherTeamRequest } from './types'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { useModal, useToast } from 'vuestic-ui'
 import TeacherGroupModal from './TeacherGroupModal.vue'
 import TeacherTeamModal from './TeacherTeamModal.vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/modules/auth.module'
+import { useJoinTeacherTeamStore } from '@/stores/modules/joinTeacherTeam.module'
+import InvitationsJoinTeam from './widgets/InvitationsJoinTeam.vue'
 
 const { t } = useI18n()
 const dataFilter = ref({
@@ -27,12 +29,14 @@ const teacherTeams = ref<TeacherTeam[]>([])
 const loading = ref(true)
 const authStore = useAuthStore()
 
+const useJoinTeacherTeamRequest = useJoinTeacherTeamStore()
+
 const doShowGroupEditModal = ref(false)
 const doShowTeacherEditModal = ref(false)
 
 const modalToGroupEdit = ref<GroupTeacher | null>(null)
 const modalToTeacherEdit = ref<TeacherTeam | null>(null)
-
+const isInviteTeacher = ref(false)
 const editFormRef = ref()
 const { confirm } = useModal()
 const titleModal = ref<string>()
@@ -125,7 +129,7 @@ const onGroupSaved = async (group: GroupTeacher) => {
   }
 }
 
-const onTeacherSaved = async (teacher: TeacherTeam) => {
+const onTeacherSaved = async (teacher: TeacherTeamRequest) => {
   if (modalToTeacherEdit.value) {
     await stores
       .updateTeacherInTeam(teacher.id, teacher)
@@ -144,19 +148,21 @@ const onTeacherSaved = async (teacher: TeacherTeam) => {
         })
       })
   } else {
-    await stores
-      .addTeacherIntoTeam(teacher)
+    const inviteRequest: InviteTeacherJoinTeamRequest = {
+      contact: teacher.contact,
+    }
+
+    await useJoinTeacherTeamRequest
+      .inviteTeacherJoinTeam(inviteRequest)
       .then(() => {
         notify({
-          message: notifications.createSuccessfully(teacher.teacherName),
+          message: notifications.inviteSuccess(teacher.contact),
           color: 'success',
         })
-        getTeacherGroups()
-        getTeacherTeams()
       })
       .catch((error) => {
         notify({
-          message: notifications.createFailed(teacher.teacherName) + getErrorMessage(error),
+          message: getErrorMessage(error),
           color: 'danger',
         })
       })
@@ -170,6 +176,7 @@ const showAddGroupModal = (title: string) => {
 }
 
 const showAddTeacherModal = (title: string) => {
+  isInviteTeacher.value = true
   modalToTeacherEdit.value = null
   doShowTeacherEditModal.value = true
   titleModal.value = title
@@ -210,6 +217,7 @@ const showEditGroupModal = (group: GroupTeacher) => {
 }
 
 const showEditTeacherModal = (teacher: TeacherTeam) => {
+  isInviteTeacher.value = false
   modalToTeacherEdit.value = teacher
   doShowTeacherEditModal.value = true
   titleModal.value = 'Teacher'
@@ -291,6 +299,8 @@ const copyLinkInvite = () => {
     })
 }
 
+const showInvitation = ref(false)
+
 onMounted(() => {
   getTeacherGroups()
   getTeacherTeams()
@@ -316,7 +326,7 @@ const handlerSearch = (event: Event) => {
               </template>
             </VaInput>
           </div>
-          <div class="">
+          <div>
             <VaDropdown placement="bottom-end">
               <template #anchor>
                 <VaButton icon="add" />
@@ -330,7 +340,7 @@ const handlerSearch = (event: Event) => {
                   class="p-2"
                   @click="showAddTeacherModal('Teacher')"
                 >
-                  {{ t('teacherGroups.teacher') }}
+                  {{ t('teacherGroups.invite-teacher') }}
                 </VaButton>
               </VaDropdownContent>
               <VaDropdownContent class="p-0">
@@ -347,63 +357,12 @@ const handlerSearch = (event: Event) => {
               </VaDropdownContent>
             </VaDropdown>
           </div>
-          <VaModal
-            v-slot="{ cancel, ok }"
-            v-model="doShowGroupEditModal"
-            size="small"
-            mobile-fullscreen
-            close-button
-            hide-default-actions
-            :before-cancel="beforeEditFormModalClose"
-          >
-            <h3 class="va-text-bold">
-              {{ modalToGroupEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}
-            </h3>
-            <TeacherGroupModal
-              ref="editFormRef"
-              :group-teacher="modalToGroupEdit"
-              :user="currentType"
-              :save-button-label="saveButtonLabel"
-              @close="cancel"
-              @save="
-                (data: GroupTeacher) => {
-                  onGroupSaved(data)
-                  ok()
-                }
-              "
-            />
-          </VaModal>
-          <VaModal
-            v-slot="{ cancel, ok }"
-            v-model="doShowTeacherEditModal"
-            size="small"
-            mobile-fullscreen
-            close-button
-            hide-default-actions
-            :before-cancel="beforeEditFormModalClose"
-          >
-            <h3 class="va-text-bold">
-              {{ modalToTeacherEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}
-            </h3>
-            <TeacherTeamModal
-              ref="editFormRef"
-              :user="currentType"
-              :teacher-team="modalToTeacherEdit"
-              :save-button-label="saveButtonLabel"
-              @close="cancel"
-              @save="
-                (data: TeacherTeam) => {
-                  onTeacherSaved(data)
-                  ok()
-                }
-              "
-            />
-          </VaModal>
         </div>
         <VaDivider class="m-0" />
       </VaCardTitle>
       <VaDivider class="m-0" />
-      <VaCardContent>
+      <InvitationsJoinTeam v-if="showInvitation" :search-filter="dataFilter.advancedSearch.keyword" />
+      <VaCardContent v-else>
         <VaInnerLoading :loading="loading">
           <VaScrollContainer vertical>
             <VaList class="mb-2 max-h-[60vh]">
@@ -538,13 +497,67 @@ const handlerSearch = (event: Event) => {
     </div>
 
     <VaCardContent class="flex justify-end">
-      <div>
+      <div class="flex gap-2">
+        <VaButton preset="secondary" border-color="primary" size="small" @click="showInvitation = !showInvitation"
+          >Invitation</VaButton
+        >
         <VaButton preset="secondary" border-color="primary" size="small" @click="copyLinkInvite"
           >Copy Invite link to team</VaButton
         >
       </div>
     </VaCardContent>
   </VaCard>
+
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowGroupEditModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+  >
+    <h3 class="va-text-bold">{{ modalToGroupEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}</h3>
+    <TeacherGroupModal
+      ref="editFormRef"
+      :group-teacher="modalToGroupEdit"
+      :user="currentType"
+      :save-button-label="saveButtonLabel"
+      @close="cancel"
+      @save="
+        (data: GroupTeacher) => {
+          onGroupSaved(data)
+          ok()
+        }
+      "
+    />
+  </VaModal>
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowTeacherEditModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    hide-default-actions
+    :before-cancel="beforeEditFormModalClose"
+  >
+    <h3 class="va-text-bold">{{ modalToTeacherEdit ? t('settings.edit') : $t('settings.add') }} {{ titleModal }}</h3>
+    <TeacherTeamModal
+      ref="editFormRef"
+      :user="currentType"
+      :teacher-team="modalToTeacherEdit"
+      :save-button-label="saveButtonLabel"
+      :disable-button="!isInviteTeacher"
+      :is-show-name-input="!isInviteTeacher"
+      @close="cancel"
+      @save="
+        (data: TeacherTeamRequest) => {
+          onTeacherSaved(data)
+          ok()
+        }
+      "
+    />
+  </VaModal>
 </template>
 
 <style lang="scss" scoped>

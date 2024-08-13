@@ -446,6 +446,7 @@
   "teacherGroups": {
     "teacher_group": "Teacher Group",
     "teacher": "Teacher",
+    "invite-teacher": "Invite Teacher",
     "select_teacher": "Select teacher",
     "group_member": "Member In Group {name}",
     "search_class": "Search class",
@@ -801,6 +802,7 @@
     "deleteFailed": "Failed to delete {message}\n",
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
     "confirmDelete": "Are you sure you want to delete {message}?",
+    "inviteSuccess": "Invite {message} successfully",
     "singleChoice": "Single Choice",
     "multipleChoice": "Multiple Choice",
     "fillBlank": "Fill Blank",
@@ -812,7 +814,8 @@
     "Pending": "Pending",
     "Accepted": "Accepted",
     "Rejected": "Rejected",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+    "NotRequest": "Not request"
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"

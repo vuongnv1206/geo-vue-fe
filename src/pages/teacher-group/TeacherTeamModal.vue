@@ -15,6 +15,14 @@ const props = defineProps({
     type: String,
     default: 'Save',
   },
+  disableButton: {
+    type: Boolean,
+    default: true,
+  },
+  isShowNameInput: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const defaultNewTeacherTeam: TeacherTeamRequest = {
@@ -53,6 +61,7 @@ const onSave = () => {
     <VaCardContent>
       <VaForm ref="addForm" stateful class="flex flex-col gap-2">
         <VaInput
+          v-if="isShowNameInput"
           v-model="newTeacher.teacherName"
           name="teacherName"
           :label="t('teacherGroups.teacher_name')"
@@ -64,8 +73,12 @@ const onSave = () => {
           name="contact"
           :label="t('teacherGroups.teacher_contact')"
           :placeholder="t('teacherGroups.enter_teacher_contact')"
-          :rules="[validators.required2(t('teacherGroups.teacher_contact')), validators.maxLength(200)]"
-          disabled
+          :rules="[
+            validators.required2(t('teacherGroups.teacher_contact')),
+            validators.maxLength(200),
+            validators.email,
+          ]"
+          :disabled="disableButton"
         />
       </VaForm>
     </VaCardContent>

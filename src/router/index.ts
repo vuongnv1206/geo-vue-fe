@@ -123,7 +123,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         name: 'invite-join-team',
-        path: 'invite-join-team/:userId',
+        path: 'invite-join-team/:userId/:invitationId?',
         meta: {
           requiresAuth: true,
         },
