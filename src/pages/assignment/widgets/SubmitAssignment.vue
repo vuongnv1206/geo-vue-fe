@@ -221,9 +221,14 @@ onMounted(() => {
         </VaCardContent>
         <VaCardContent class="font-semibold mr-1">
           {{ $t('assignments.comment') }}:
-          <!-- eslint-disable vue/no-v-html -->
-          <div class="text-md font-medium px-5 mb-4" v-html="assignmentSubmissions[0]?.comment"></div>
-          <!-- eslint-enable -->
+          <VaScrollContainer class="max-h-[48vh]">
+            <!-- eslint-disable vue/no-v-html -->
+            <div
+              class="text-md font-medium px-5 mb-4 max-h-48 overflow-y-auto break-words whitespace-pre-line"
+              v-html="assignmentSubmissions[0]?.comment"
+            ></div>
+            <!-- eslint-enable -->
+          </VaScrollContainer>
         </VaCardContent>
       </VaCard>
     </VaCard>
