@@ -8182,6 +8182,11 @@ q@^1.5.1:
   resolved "https://registry.npmjs.org/q/-/q-1.5.1.tgz"
   integrity sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==
 
+qrcode.vue@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.npmjs.org/qrcode.vue/-/qrcode.vue-3.4.1.tgz"
+  integrity sha512-wq/zHsifH4FJ1GXQi8/wNxD1KfQkckIpjK1KPTc/qwYU5/Bkd4me0w4xZSg6EXk6xLBkVDE0zxVagewv5EMAVA==
+
 qs@^6.10.0:
   version "6.12.1"
   resolved "https://registry.npmjs.org/qs/-/qs-6.12.1.tgz"
