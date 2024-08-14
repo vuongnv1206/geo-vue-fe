@@ -29,7 +29,7 @@
     <template #left>
       <VaCard v-if="showSidebar" class="mr-2 rounded min-w-[500px]">
         <VaCard v-if="assignment" class="min-h-[81vh]">
-          <VaCardContent class="font-bold">{{ assignment.name }}</VaCardContent>
+          <VaCardContent class="font-bold">{{ className }} - {{ assignment.name }}</VaCardContent>
           <VaCardContent>
             <div class="flex items-center mb-1">
               <VaIcon name="event" class="material-symbols-outlined mr-1" />
@@ -211,6 +211,7 @@ const students = ref<Student[] | undefined>([])
 
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
+const className = ref<string>('')
 const filesUploaded = ref<any>()
 
 const assignmentClass = ref<AssignmentClass>({
@@ -263,6 +264,7 @@ const getClassById = async () => {
     .getClassById(classId)
     .then((response) => {
       students.value = response.students
+      className.value = response.name
     })
     .catch((error) => {
       notify({
