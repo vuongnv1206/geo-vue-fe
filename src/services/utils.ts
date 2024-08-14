@@ -10,7 +10,7 @@ dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 import i18n from './../i18n'
-import { JoinTeacherGroupStatus } from '@/pages/teacher-group/types'
+import { InvitationStatus, JoinTeacherGroupStatus } from '@/pages/teacher-group/types'
 const { t } = i18n.global
 const local = i18n.global.locale.value === 'vi' ? 'vi' : 'en'
 
@@ -99,6 +99,9 @@ export const notifications = {
   unsavedChanges: t('validateUtils.unsavedChanges'),
   confirmDelete: (message: string) => {
     return t('validateUtils.confirmDelete', { message }) + '\n'
+  },
+  inviteSuccess: (message: string) => {
+    return t('validateUtils.inviteSuccess', { message }) + '\n'
   },
 }
 
@@ -242,6 +245,52 @@ export const JoinGroupStatusLabel = (type: JoinTeacherGroupStatus) => {
     {
       type: JoinTeacherGroupStatus.Cancel,
       label: t('validateUtils.Cancel'),
+    },
+  ]
+  const label = labels.find((c) => c.type === type)?.label
+  return label || ''
+}
+
+export const InvitationStatusColor = (type: InvitationStatus | undefined) => {
+  const colors = [
+    {
+      type: InvitationStatus.NotRequest,
+      color: 'warning',
+    },
+    {
+      type: InvitationStatus.Requested,
+      color: 'info',
+    },
+    {
+      type: InvitationStatus.BeRejected,
+      color: 'danger',
+    },
+    {
+      type: InvitationStatus.BeAccepted,
+      color: 'success',
+    },
+  ]
+  const color = colors.find((c) => c.type === type)?.color
+  return color || 'primary'
+}
+
+export const InvitationStatusLabel = (type: InvitationStatus) => {
+  const labels = [
+    {
+      type: InvitationStatus.NotRequest,
+      label: t('validateUtils.NotRequest'),
+    },
+    {
+      type: InvitationStatus.Requested,
+      label: t('validateUtils.Pending'),
+    },
+    {
+      type: InvitationStatus.BeRejected,
+      label: t('validateUtils.Rejected'),
+    },
+    {
+      type: InvitationStatus.BeAccepted,
+      label: t('validateUtils.Accepted'),
     },
   ]
   const label = labels.find((c) => c.type === type)?.label

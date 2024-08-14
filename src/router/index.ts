@@ -122,6 +122,14 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
+        name: 'invite-join-team',
+        path: 'invite-join-team/:userId/:invitationId?',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/teacher-group/InviteJoinTeam.vue'),
+      },
+      {
         name: 'teacher-group',
         path: 'teacher-group',
         meta: {

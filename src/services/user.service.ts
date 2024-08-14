@@ -2,6 +2,7 @@ import {
   ChangeEmailFormData,
   ChangePhoneNumberFormData,
   PasswordDetailFormData,
+  UserDetail,
   UserDetailsUpdate,
 } from '@/pages/user/types'
 import apiService from '@services/api.service'
@@ -121,6 +122,17 @@ class UserService {
       .get(`/users/resend-email-confirm`)
       .then((response) => {
         return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async getUserDetail(id: string): Promise<UserDetail> {
+    return apiService
+      .get(`/users/${id}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
       })
       .catch((error) => {
         return Promise.reject(error)

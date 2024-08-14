@@ -89,6 +89,11 @@ export type TeacherTeamTeacherGroupCombine = {
   groupTeacher: GroupTeacher | null
 }
 
+export type SendRequestJoinTeamRequest = {
+  adminTeamId: string
+  content?: string
+  invitationId?: string
+}
 export type SendRequestJoinGroupRequest = {
   groupId: string
   content?: string
@@ -137,4 +142,61 @@ export enum JoinTeacherGroupStatus {
 
 export type HandleJoinGroupRequest = {
   requestId: string
+}
+
+export type SearchJoinTeacherTeamRequest = {
+  status: RequestStatus
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+}
+
+export type JoinTeacherTeamRequestResponse = {
+  data: JoinTeacherTeamRequestDto[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type JoinTeacherTeamRequestDto = {
+  id: string
+  adminTeamId: string
+  adminTeamEmail?: string
+  status: JoinTeacherGroupStatus
+  content: string
+  createOn: Date
+  lastModifiedOn: Date
+  createBy: string
+  senderEmail?: string
+  senderFullName?: string
+}
+
+export type AcceptJoinTeamRequest = {
+  requestId: string
+  nickname: string
+}
+
+export type HandleJoinTeamRequest = {
+  requestId: string
+}
+
+export type InviteTeacherJoinTeamRequest = {
+  contact: string
+}
+
+export type InviteJoinTeacherTeamDto = {
+  id: string
+  recipientEmail: string
+  senderEmail: string
+  isRegistered: boolean
+  status: InvitationStatus
+}
+
+export enum InvitationStatus {
+  NotRequest = 0,
+  Requested = 1,
+  BeRejected = 2,
+  BeAccepted = 3,
 }
