@@ -145,7 +145,14 @@
             </VaListItemSection>
             <VaListItemSection>
               <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-              <VaListItemLabel caption> đã nộp/chưa nôp </VaListItemLabel>
+              <VaListItemLabel caption>
+                {{
+                  assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
+                  'Submmitted'
+                    ? $t('assignments.Submmitted')
+                    : $t('assignments.Doing')
+                }}
+              </VaListItemLabel>
             </VaListItemSection>
           </VaListItem>
         </VaList>
@@ -190,7 +197,14 @@ import { useBreakpoint, useModal, useToast, VaCardContent, VaIcon } from 'vuesti
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { Student } from '@/pages/classrooms/types'
-import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
+import {
+  Assignment,
+  AssignmentClass,
+  AssignmentContent,
+  EmptyAssignmentContent,
+  AssignmentAttachment,
+  AssignmentSubmission,
+} from '../types'
 
 const { t } = useI18n()
 const loading = ref(true)
@@ -208,6 +222,7 @@ const assignment = ref<Assignment | null>(null)
 const assignmentContent = ref<AssignmentContent | null>(null)
 const assignmentAttachment = ref<AssignmentAttachment | null>(null)
 const students = ref<Student[] | undefined>([])
+const assignmentSubmissions = ref<AssignmentSubmission[]>([])
 
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
@@ -269,6 +284,24 @@ const getClassById = async () => {
     .catch((error) => {
       notify({
         message: notifications.getFailed(`class with id ${classId}`) + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getAssignmentSubmissions = () => {
+  loading.value = true
+  stores
+    .getAssignmentSubmissions({ assignmentId: assignmentId, classId: classId })
+    .then((response) => {
+      assignmentSubmissions.value = response
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -390,5 +423,6 @@ watchEffect(() => {
 onMounted(() => {
   getClassById()
   getAssignment(assignmentId)
+  getAssignmentSubmissions()
 })
 </script>

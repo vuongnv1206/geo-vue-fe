@@ -35,6 +35,7 @@ const defaultAssignmentSubmit: AssignmentSubmit = {
 const newAssignmentSubmit = ref<AssignmentSubmit>({ ...defaultAssignmentSubmit })
 
 const getAssignment = () => {
+  loading.value = true
   assignmentStores
     .getAssignment(assignmentId)
     .then((response) => {
@@ -65,6 +66,7 @@ const getAssignment = () => {
 }
 
 const getAssignmentSubmissions = () => {
+  loading.value = true
   assignmentStores
     .getAssignmentSubmissions({ assignmentId: assignmentId, classId: classId })
     .then((response) => {

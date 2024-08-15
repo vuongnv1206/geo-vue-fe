@@ -308,7 +308,9 @@
     "score": "Score",
     "enter_score": "Enter score",
     "comment": "Comment",
-    "answers": "Answers"
+    "answers": "Answers",
+    "Submmitted": "Submmitted",
+    "Doing": "Doing"
   },
   "subjects": {
     "subject": "Subject",
