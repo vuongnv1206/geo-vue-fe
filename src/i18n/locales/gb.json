@@ -148,8 +148,13 @@
       "viewDetailsCol": "view Details"
     },
     "details": {
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "newData": "New Data",
       "oldData": "Old Data",
-      "newData": "New Data"
+      "data": "Data",
+      "fields": "Fields"
     }
   },
   "subscription": {
