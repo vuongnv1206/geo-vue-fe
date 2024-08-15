@@ -2,7 +2,8 @@ import apiService from '@services/api.service'
 import {
   CreatePaperFolderRequest,
   PaperFolderDto,
-  PaperFolderResponse,
+  PaperFolderTree,
+  SearchPaperFolderRequest,
   SearchSharedPaperFolderRequest,
   SharePaperFolderRequest,
   UpdatePaperFolderRequest,
@@ -11,7 +12,7 @@ import {
 export interface IPaperFoldersService {
   paperFolders_Create(request: CreatePaperFolderRequest): Promise<string>
 
-  paperFolders_Search(dataFilter: any): Promise<PaperFolderResponse>
+  paperFolders_Search(request: SearchPaperFolderRequest): Promise<PaperFolderTree>
 
   paperFolders_Delete(id: string): Promise<string>
 
@@ -21,7 +22,7 @@ export interface IPaperFoldersService {
 
   paperFolders_GetParents(id: string): Promise<PaperFolderDto[]>
 
-  paperFolders_SearchShared(request: SearchSharedPaperFolderRequest): Promise<PaperFolderDto[]>
+  paperFolders_SearchShared(request: SearchSharedPaperFolderRequest): Promise<PaperFolderTree>
 }
 
 class PaperFoldersService implements IPaperFoldersService {
@@ -41,11 +42,11 @@ class PaperFoldersService implements IPaperFoldersService {
   /**
    * Search paper folder using available filder
    */
-  async paperFolders_Search(dataFilter: any): Promise<PaperFolderResponse> {
+  async paperFolders_Search(request: SearchPaperFolderRequest): Promise<PaperFolderTree> {
     const url = '/v1/paperfolders/search'
 
     return apiService
-      .post(url, dataFilter)
+      .post(url, request)
       .catch((error: any) => {
         return Promise.reject(error)
       })
@@ -98,7 +99,7 @@ class PaperFoldersService implements IPaperFoldersService {
       })
   }
 
-  async paperFolders_SearchShared(request: SearchSharedPaperFolderRequest): Promise<PaperFolderDto[]> {
+  async paperFolders_SearchShared(request: SearchSharedPaperFolderRequest): Promise<PaperFolderTree> {
     const url = '/v1/paperfolders/shared'
 
     return apiService

@@ -4,18 +4,18 @@ import {
   UpdatePaperRequest,
   PaperStudentDto,
   CreatePaperRequest,
-  PaperResponse,
   SearchSharedPaperRequest,
   PaperInListDto,
   PaperDeletedResponse,
   QuestionGenerateToMatrix,
   AddQuestionsInPaperRequest,
   UpdateQuestionsInPaperRequest,
+  SearchPaperRequest,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
 export interface IPapersService {
-  papers_SearchPaper(dataFilter: any): Promise<PaperResponse>
+  papers_SearchPaper(request: SearchPaperRequest): Promise<PaperInListDto[]>
 
   papers_Delete(id: string): Promise<string>
 
@@ -97,11 +97,11 @@ export class PapersService implements IPapersService {
         return Promise.resolve(response.data)
       })
   }
-  async papers_SearchPaper(dataFilter: any): Promise<PaperResponse> {
+  async papers_SearchPaper(request: SearchPaperRequest): Promise<PaperInListDto[]> {
     const url = '/v1/papers/search'
 
     return apiService
-      .post(url, dataFilter)
+      .post(url, request)
       .catch((error: any) => {
         return Promise.reject(error)
       })

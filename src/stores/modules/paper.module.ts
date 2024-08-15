@@ -3,6 +3,7 @@ import {
   PaperDeletedResponse,
   PaperInListDto,
   QuestionGenerateToMatrix,
+  SearchPaperRequest,
   SearchSharedPaperRequest,
   UpdateQuestionsInPaperRequest,
 } from './../../pages/examination/types'
@@ -13,7 +14,6 @@ import {
   PaperStudentDto,
   SubmitPaperResponse,
   CreatePaperRequest,
-  PaperResponse,
 } from '@/pages/examination/types'
 
 import { defineStore } from 'pinia'
@@ -60,9 +60,9 @@ export const usePaperStore = defineStore('paper', {
           return Promise.reject(error)
         })
     },
-    async searchPapers(dataFilter: any): Promise<PaperResponse> {
+    async searchPapers(request: SearchPaperRequest): Promise<PaperInListDto[]> {
       return await papersService
-        .papers_SearchPaper(dataFilter)
+        .papers_SearchPaper(request)
 
         .then((response) => {
           return Promise.resolve(response)
