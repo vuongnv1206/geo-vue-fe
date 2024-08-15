@@ -147,8 +147,13 @@
       "viewDetailsCol": "xem chi tiết"
     },
     "details": {
-      "oldData": "Dữ Liệu Cũ",
-      "newData": "Dữ Liệu Mới"
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "delete": "Xóa",
+      "newData": "Dữ liệu mới",
+      "oldData": "Dữ liệu cũ",
+      "data": "Dữ liệu",
+      "fields": "Trường"
     }
   },
   "subscription": {
