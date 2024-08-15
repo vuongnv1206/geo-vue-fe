@@ -1,5 +1,6 @@
 import {
   HandleJoinGroupRequest,
+  InviteJoinGroupRequest,
   JoinGroupTeacherRequestResponse,
   SearchJoinGroupTeacherRequest,
 } from '@/pages/teacher-group/types'
@@ -47,6 +48,16 @@ export const useJoinGroupRequestStore = defineStore('joinGroupRequest', {
     async cancelRequest(request: HandleJoinGroupRequest): Promise<string> {
       return joinGroupRequestService
         .cancelRequest(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async inviteTeacher(request: InviteJoinGroupRequest): Promise<string> {
+      return joinGroupRequestService
+        .inviteTeacher(request)
         .then((response) => {
           return Promise.resolve(response)
         })
