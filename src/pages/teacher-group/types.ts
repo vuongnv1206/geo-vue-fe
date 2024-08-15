@@ -200,3 +200,8 @@ export enum InvitationStatus {
   BeRejected = 2,
   BeAccepted = 3,
 }
+
+export type InviteJoinGroupRequest = {
+  teacherId: string
+  groupId: string
+}
