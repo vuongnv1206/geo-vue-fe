@@ -50,6 +50,7 @@ export type ClassroomWithPosts = {
   students: Student[]
   permissions: PermissionInClass[] | null
   posts?: Post[]
+  owner: UserDetail | null
 }
 
 export type EmptyClassrooms = {
