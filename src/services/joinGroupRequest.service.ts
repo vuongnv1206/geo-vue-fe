@@ -1,5 +1,6 @@
 import {
   HandleJoinGroupRequest,
+  InviteJoinGroupRequest,
   JoinGroupTeacherRequestResponse,
   SearchJoinGroupTeacherRequest,
 } from '@/pages/teacher-group/types'
@@ -10,9 +11,22 @@ export interface IJoinGroupRequestService {
   acceptRequest(request: HandleJoinGroupRequest): Promise<string>
   rejectRequest(request: HandleJoinGroupRequest): Promise<string>
   cancelRequest(request: HandleJoinGroupRequest): Promise<string>
+  inviteTeacher(request: InviteJoinGroupRequest): Promise<string>
 }
 
 export class JoinGroupRequestService implements IJoinGroupRequestService {
+  inviteTeacher(request: InviteJoinGroupRequest): Promise<string> {
+    const url = '/v1/joingroupteacherrequests/invite-teacher'
+
+    return apiService
+      .post(url, request)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   rejectRequest(request: HandleJoinGroupRequest): Promise<string> {
     const url = '/v1/joingroupteacherrequests/reject-request'
 

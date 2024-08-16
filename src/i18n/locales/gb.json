@@ -127,7 +127,8 @@
     "share": "Share",
     "search": "Search",
     "submit": "Submit",
-    "submit_homeworks": "Submit homeworks"
+    "submit_homeworks": "Submit homeworks",
+    "close": "Close"
   },
   "auditLogs": {
     "title": "Audit Logs",
