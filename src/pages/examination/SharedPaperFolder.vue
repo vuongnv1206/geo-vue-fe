@@ -66,7 +66,7 @@ const getSharedPaperFolders = async (parentId?: string | null, name?: string | n
     .searchSharedPaperFolders(searchSharedPaperFolderRequest.value)
     .then((res) => {
       loading.value = false
-      paperFolderDtos.value = res
+      paperFolderDtos.value = res.paperFolderChildrens
     })
     .catch(() => {
       loading.value = false

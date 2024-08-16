@@ -273,14 +273,11 @@ export interface QuestionIntoPaperRequest {
   rawIndex: number | 1
 }
 
-export type PaperFolderResponse = {
-  data: PaperFolderDto[]
-  currentPage: number
-  totalPages: number
-  totalCount: number
-  pageSize: number
-  hasPreviousPage: boolean
-  hasNextPage: boolean
+export type PaperFolderTree = {
+  id: string | undefined
+  paperFolderChildrens: PaperFolderDto[]
+  paperFolderPermissions: PaperFolderPermission[]
+  totalPapers: number
 }
 
 export type PaperResponse = {
@@ -342,8 +339,17 @@ export interface SearchSharedPaperFolderRequest {
   parentId?: string | null
   name?: string | null
 }
+export interface SearchPaperFolderRequest {
+  parentId?: string | null
+  name?: string | null
+}
 
 export interface SearchSharedPaperRequest {
+  paperFolderId?: string | null | undefined
+  name?: string | null | undefined
+}
+
+export interface SearchPaperRequest {
   paperFolderId?: string | null | undefined
   name?: string | null | undefined
 }
