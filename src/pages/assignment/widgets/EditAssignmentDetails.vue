@@ -34,17 +34,18 @@
             :month-change-on-scroll="true"
             :month-change-on-arrows="true"
             :placeholder="$t('assignments.enter_start_and_end_time')"
+            :min-date="new Date(new Date().setHours(0, 0, 0, 0))"
           />
           <VaSwitch
             v-model="newAssignmentDetails.canViewResult"
             size="small"
             :label="$t('assignments.can_view_result')"
           />
-          <VaSwitch
+          <!-- <VaSwitch
             v-model="newAssignmentDetails.requireLoginToSubmit"
             size="small"
             :label="$t('assignments.require_login_to_submit')"
-          />
+          /> -->
           <VaLayout class="border rounded-xl pb-2 px-2">
             <template #left>
               <VaSidebar v-model="showSidebar" class="mt-2 rounded" :class="showSidebar ? 'border mr-1' : ''">

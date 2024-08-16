@@ -167,18 +167,18 @@
         <div v-if="(class1.assignments && class1.assignments.length > 0) || (class1.posts && class1.posts.length > 0)">
           <!-- Header Section -->
           <VaCard class="flex flex-row items-center p-4 bg-white rounded-lg shadow-sm">
-            <!-- <GeoAvatar class="mr-2" :size="48" color="warning" :image="post.owner?.imageUrl || undefined" :txt="post.owner?.firstName?.charAt(0).toUpperCase()" /> -->
-            <!-- <GeoAvatar
+            <GeoAvatar
               class="mr-2"
               :size="48"
               color="warning"
-              :image="'https://picsum.photos/1500'"
-              :txt="class1.ownerId?.charAt(0).toUpperCase()"
-            /> -->
-            <VaImage src="https://picsum.photos/1500" class="w-16 h-16 rounded-full mr-4" />
+              :image="class1.owner?.imageUrl || undefined"
+              :txt="class1.owner?.firstName.charAt(0).toUpperCase()"
+            />
             <VaCard :to="{ name: 'class-details', params: { id: class1.id } }">
-              <VaCardContent class="text-md font-semibold text-gray-800">Nguyen Duc Thang</VaCardContent>
-              <VaCardContent class="text-sm font-medium text-gray-600">{{ class1.name }}</VaCardContent>
+              <VaCardContent class="text-md font-bold text-gray-800"
+                >{{ class1.owner?.firstName }} {{ class1.owner?.lastName }}</VaCardContent
+              >
+              <VaCardContent class="text-sm font-semibold text-gray-600">{{ class1.name }}</VaCardContent>
             </VaCard>
           </VaCard>
 
@@ -258,6 +258,7 @@ import { useClassStore } from '@/stores/modules/class.module'
 import { ClassroomWithPosts } from '@/pages/classrooms/types'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { usePostsStore } from '@/stores/modules/posts.module'
+import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 
 const { t } = useI18n()
 const loading = ref(true)

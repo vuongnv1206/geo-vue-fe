@@ -11,6 +11,7 @@
                 ? { name: 'assignment-details', params: { id: assignment?.id, classId: assignment?.classId } }
                 : { name: 'assignment-submission', params: { id: assignment?.id, classId: assignment?.classId } }
             "
+            v-on="getAssignmentSubmissions({ assignmentId: assignment?.id, classId: assignment.classId })"
           >
             <VaCard class="border rounded-lg p-3 hover:scale-105 transition-transform duration-200 w-full">
               <div class="flex items-center">
@@ -29,7 +30,10 @@
                   </VaListItemLabel>
                 </VaListItemSection>
                 <VaListItemSection icon>
-                  <VaCard>0/100</VaCard>
+                  <VaCard v-if="submissionStatsMap[assignment.id]">
+                    {{ submissionStatsMap[assignment.id].totalSubmittedCount }} /
+                    {{ submissionStatsMap[assignment.id].totalStudentsCount }}
+                  </VaCard>
                 </VaListItemSection>
               </div>
             </VaCard>
@@ -63,6 +67,7 @@
                       ? { name: 'assignment-details', params: { id: assignment?.id, classId: assClass.id } }
                       : { name: 'assignment-submission', params: { id: assignment?.id, classId: assClass.id } }
                   "
+                  v-on="getAssignmentSubmissions({ assignmentId: assignment?.id, classId: assClass.id })"
                 >
                   <VaCard
                     class="flex items-center border rounded-lg p-3 w-full hover:scale-105 transition-transform duration-200"
@@ -82,7 +87,10 @@
                       >
                     </VaListItemSection>
                     <VaListItemSection icon>
-                      <VaCard>0/100</VaCard>
+                      <VaCard v-if="submissionStatsMap[assignment.id]">
+                        {{ submissionStatsMap[assignment.id].totalSubmittedCount }} /
+                        {{ submissionStatsMap[assignment.id].totalStudentsCount }}
+                      </VaCard>
                     </VaListItemSection>
                   </VaCard>
                 </VaListItem>
@@ -96,14 +104,29 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, PropType } from 'vue'
-import { format } from '@/services/utils'
+import { computed, PropType, reactive, ref } from 'vue'
+import { format, getErrorMessage, notifications } from '@/services/utils'
 import { Classrooms } from '@/pages/classrooms/types'
 import { useAuthStore } from '@/stores/modules/auth.module'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { useToast, VaCard } from 'vuestic-ui'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+const { init: notify } = useToast()
+const load = ref(true)
 
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id
 const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
+const assignmentStore = useAssignmentStore()
+
+interface SubmissionStats {
+  totalSubmittedCount: number
+  totalStudentsCount: number
+}
+
+const submissionStatsMap = reactive<{ [key: string]: SubmissionStats }>({})
 
 const props = defineProps({
   assignmentsByClass: {
@@ -115,6 +138,28 @@ const props = defineProps({
     required: true,
   },
 })
+
+const getAssignmentSubmissions = async ({ assignmentId, classId }: { assignmentId: string; classId: string }) => {
+  load.value = true
+  await assignmentStore
+    .getAssignmentSubmissions({ assignmentId, classId })
+    .then((response) => {
+      submissionStatsMap[assignmentId] = {
+        totalSubmittedCount: response.filter((submission: any) => submission.status === 'Submmitted').length,
+        totalStudentsCount: response.length,
+      }
+      console.log('submissionStatsMap:', submissionStatsMap)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      load.value = false
+    })
+}
 
 const recentAssignments = computed(() => {
   const allAssignmentsWithClassId = props.assignmentsByClass.flatMap(

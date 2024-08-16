@@ -91,7 +91,7 @@ const genderOptions = reactive([
         validators.maxLength(50),
       ]"
     />
-    <VaInput v-model="newStudent.avatarUrl" label="Avatar" placeholder="tam the da" />
+    <!-- <VaInput v-model="newStudent.avatarUrl" label="Avatar" placeholder="tam the da" /> -->
     <VaInput
       v-model="newStudent.studentCode"
       :label="t('students.code')"

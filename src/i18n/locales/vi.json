@@ -342,10 +342,12 @@
     "submit_homeworks": "Nộp bài",
     "submission_time_over": "Đã hết thời gian nộp bài tập",
     "is_not_submited": "Chưa nộp bài",
-    "score": "Score",
+    "score": "Điểm",
     "enter_score": "Nhập diểm",
     "comment": "Nhận xét",
-    "answers": "Câu trả lời"
+    "answers": "Câu trả lời",
+    "Submmitted": "Đã nộp",
+    "Doing": "Đang làm bài"
   },
   "subjects": {
     "subject": "Môn học",

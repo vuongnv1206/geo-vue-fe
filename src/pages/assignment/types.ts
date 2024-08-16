@@ -76,7 +76,7 @@ export type AssignmentResponse = {
 
 export type AssignmentClass = {
   assignmentId: string
-  classesdId: string
+  classId: string
 }
 
 export type AssignmentSub = {
