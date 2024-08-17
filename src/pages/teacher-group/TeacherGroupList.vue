@@ -11,6 +11,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { useJoinTeacherTeamStore } from '@/stores/modules/joinTeacherTeam.module'
 import InvitationsJoinTeam from './widgets/InvitationsJoinTeam.vue'
+import SharedTeacherGroupList from './SharedTeacherGroupList.vue'
 
 const { t } = useI18n()
 const dataFilter = ref({
@@ -18,8 +19,6 @@ const dataFilter = ref({
     fields: [''],
     keyword: '',
   },
-  pageNumber: 0,
-  pageSize: 100,
   orderBy: ['id'],
 })
 const stores = useGroupTeacherStore()
@@ -379,12 +378,7 @@ const handlerSearch = (event: Event) => {
 
                 <VaListItemSection>
                   <VaListItemLabel>
-                    {{
-                      group.name
-                        .split(' ')
-                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(' ')
-                    }}
+                    {{ group.name }}
                   </VaListItemLabel>
                 </VaListItemSection>
 
@@ -490,6 +484,15 @@ const handlerSearch = (event: Event) => {
                   </VaDropdown>
                 </VaListItemSection>
               </VaListItem>
+              <SharedTeacherGroupList
+                :search-filter="dataFilter.advancedSearch.keyword"
+                :selected-item-id="selectedItemId"
+                @selectedGroup="
+                  (data: GroupTeacher) => {
+                    selectGroup(data)
+                  }
+                "
+              />
             </VaList>
           </VaScrollContainer>
         </VaInnerLoading>
