@@ -18,7 +18,7 @@ const { confirm } = useModal()
 const showQuestionBankModal = ref(false)
 const questionsInPaper = ref<Question[]>([])
 const questionRequest = ref<QuestionIntoPaperRequest[]>([])
-const totalPointPaper = ref(0)
+const totalPointPaper = ref(10)
 const paperStore = usePaperStore()
 const paperId = route.params.paperId as string
 
@@ -34,7 +34,8 @@ const getPaperDetail = async () => {
         mark: question.mark || 0,
         rawIndex: question.rawIndex || 0,
       }))
-
+      console.log('questionRequest', questionRequest.value)
+      console.log('questionsInPaper', questionsInPaper.value)
       updateTotalPoint()
     }
   } catch (error) {
@@ -50,19 +51,21 @@ onMounted(() => {
 })
 
 const AddQuestionsToPaper = (questions: Question[]) => {
-  let indexQuestion = 0
   questions.forEach((question) => {
     if (!questionRequest.value.some((req) => req.questionId === question.id)) {
       questionsInPaper.value.push(question)
-      questionRequest.value.push({
-        questionId: question.id,
-        mark: 1,
-        rawIndex: indexQuestion++,
-      })
     }
-    console.log('questionRequest', questionRequest.value)
-    console.log('questionsInPaper', questionsInPaper.value)
   })
+  console.log(questions)
+  const markPerQuestion = 10 / questionsInPaper.value.length
+
+  questionRequest.value = questionsInPaper.value.map((question, index) => ({
+    questionId: question.originalQuestionId || question.id,
+    mark: parseFloat(markPerQuestion.toFixed(2)),
+    rawIndex: index,
+  }))
+  console.log('questionRequest', questionRequest.value)
+  console.log('questionsInPaper', questionsInPaper.value)
   updateTotalPoint()
 }
 
@@ -107,12 +110,31 @@ const deleteQuestion = async (questionId: string | null | undefined) => {
   })
 
   if (result) {
-    questionsInPaper.value = questionsInPaper.value.filter((ques) => ques.id !== questionId)
+    questionsInPaper.value = questionsInPaper.value.filter((ques) => ques.originalQuestionId !== questionId)
     questionRequest.value = questionRequest.value.filter((req) => req.questionId !== questionId)
-    console.log('questionRequest', questionRequest.value)
-    console.log('questionsInPaper', questionsInPaper.value)
+    // Cập nhật lại điểm sau khi xóa câu hỏi
+    const markPerQuestion = 10 / questionsInPaper.value.length
 
+    questionRequest.value.forEach((req) => {
+      req.mark = parseFloat(markPerQuestion.toFixed(2))
+    })
     updateTotalPoint()
+  }
+}
+
+const isTotalPointValid = ref(true)
+const errorMessages = ref<string[]>([])
+
+const updateQuestionMark = (index: number, mark: number) => {
+  questionRequest.value[index].mark = mark
+  updateTotalPoint()
+
+  if (totalPointPaper.value !== 10) {
+    errorMessages.value[index] = `Total points must be exactly 10. Current total is ${totalPointPaper.value}.`
+    isTotalPointValid.value = false
+  } else {
+    errorMessages.value[index] = '' // Clear error message if total is valid
+    isTotalPointValid.value = true
   }
 }
 </script>
@@ -122,9 +144,11 @@ const deleteQuestion = async (questionId: string | null | undefined) => {
     <VaCard square outlined>
       <div class="flex justify-between p-1">
         <div></div>
-        <VaCardTitle>{{ paperDetail?.examName }}</VaCardTitle>
+        <VaCardTitle>Exam name : {{ paperDetail?.examName }}</VaCardTitle>
         <div class="flex justify-end">
-          <VaButton class="ml-1 pr-3 pl-3" size="small" @click="saveManageQuestions">Save</VaButton>
+          <VaButton class="ml-1 pr-3 pl-3" size="small" :disabled="!isTotalPointValid" @click="saveManageQuestions"
+            >Save</VaButton
+          >
         </div>
       </div>
     </VaCard>
@@ -171,11 +195,17 @@ const deleteQuestion = async (questionId: string | null | undefined) => {
               :placeholder="t('papers.enter_point')"
               :label="t('papers.point')"
               :rules="[validators.required, validators.isNumber]"
-              @change="updateTotalPoint"
+              @change="updateQuestionMark(index, questionRequest[index].mark)"
             />
+            <span v-if="errorMessages[index]" class="text-red-500 text-sm">{{ errorMessages[index] }}</span>
           </div>
           <div class="flex align-bottom">
-            <VaButton preset="primary" color="danger" icon="delete" @click="deleteQuestion(testQuestion.id)" />
+            <VaButton
+              preset="primary"
+              color="danger"
+              icon="delete"
+              @click="deleteQuestion(testQuestion.originalQuestionId)"
+            />
           </div>
         </VaCardTitle>
         <VaCardContent class="p-0 pb-1">

@@ -1,9 +1,22 @@
 <script setup lang="ts">
-import { computed, PropType } from 'vue'
-import { format } from '@/services/utils'
+import { computed, PropType, reactive, ref } from 'vue'
+import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useRouter } from 'vue-router'
-import { VaAccordion, VaCollapse } from 'vuestic-ui'
+import { useToast, VaAccordion, VaCollapse } from 'vuestic-ui'
 import { useAuthStore } from '@/stores/modules/auth.module'
+import { useI18n } from 'vue-i18n'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+
+const { t } = useI18n()
+const { init: notify } = useToast()
+const load = ref(true)
+const assignmentStore = useAssignmentStore()
+
+interface SubmissionStats {
+  totalSubmittedCount: number
+  totalStudentsCount: number
+}
+const submissionStatsMap = reactive<{ [key: string]: SubmissionStats }>({})
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -17,6 +30,28 @@ const props = defineProps({
     required: true,
   },
 })
+
+const getAssignmentSubmissions = async ({ assignmentId, classId }: { assignmentId: string; classId: string }) => {
+  load.value = true
+  await assignmentStore
+    .getAssignmentSubmissions({ assignmentId, classId })
+    .then((response) => {
+      submissionStatsMap[assignmentId] = {
+        totalSubmittedCount: response.filter((submission: any) => submission.status === 'Submmitted').length,
+        totalStudentsCount: response.length,
+      }
+      console.log('submissionStatsMap:', submissionStatsMap)
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      load.value = false
+    })
+}
 </script>
 
 <template>
@@ -48,11 +83,15 @@ const props = defineProps({
                   ? { name: 'assignment-details', params: { id: assignment.id, classId: classId } }
                   : { name: 'assignment-submission', params: { id: assignment.id, classId: classId } }
               "
+              v-on="getAssignmentSubmissions({ assignmentId: assignment?.id, classId: classId })"
             >
               <VaIcon name="description" size="3rem" class="text-gray-500" />
               <div>
                 <VaCardTitle class="font-medium text-lg">{{ assignment.name }}</VaCardTitle>
-                <VaCard>{{ $t('classes.submited') }}: 0/0</VaCard>
+                <VaCard v-if="submissionStatsMap[assignment.id]">
+                  {{ $t('classes.submited') }}: {{ submissionStatsMap[assignment.id].totalSubmittedCount }} /
+                  {{ submissionStatsMap[assignment.id].totalStudentsCount }}
+                </VaCard>
               </div>
             </VaCard>
           </div>
@@ -65,7 +104,10 @@ const props = defineProps({
               <VaIcon name="article" size="3rem" class="text-gray-500" />
               <div>
                 <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>
-                <VaCard>{{ $t('classes.submited') }}: 0/0</VaCard>
+                <VaCard v-if="submissionStatsMap[paper.id]">
+                  {{ $t('classes.submited') }}: {{ submissionStatsMap[paper.id].totalSubmittedCount }} /
+                  {{ submissionStatsMap[paper.id].totalStudentsCount }}
+                </VaCard>
               </div>
             </VaCard>
           </div>

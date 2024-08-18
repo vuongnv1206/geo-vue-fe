@@ -126,7 +126,8 @@
     "see_more": "Xem thêm",
     "share": "Chia sẻ",
     "search": "Tìm kiếm",
-    "submit": "Nộp bài"
+    "submit": "Nộp bài",
+    "close": "Đóng"
   },
   "auditLogs": {
     "title": "Nhật ký",
@@ -147,8 +148,13 @@
       "viewDetailsCol": "xem chi tiết"
     },
     "details": {
-      "oldData": "Dữ Liệu Cũ",
-      "newData": "Dữ Liệu Mới"
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "delete": "Xóa",
+      "newData": "Dữ liệu mới",
+      "oldData": "Dữ liệu cũ",
+      "data": "Dữ liệu",
+      "fields": "Trường"
     }
   },
   "subscription": {
@@ -336,10 +342,12 @@
     "submit_homeworks": "Nộp bài",
     "submission_time_over": "Đã hết thời gian nộp bài tập",
     "is_not_submited": "Chưa nộp bài",
-    "score": "Score",
+    "score": "Điểm",
     "enter_score": "Nhập diểm",
     "comment": "Nhận xét",
-    "answers": "Câu trả lời"
+    "answers": "Câu trả lời",
+    "Submmitted": "Đã nộp",
+    "Doing": "Đang làm bài"
   },
   "subjects": {
     "subject": "Môn học",
@@ -555,6 +563,19 @@
     "content_0": "Bạn có thể tải lên các tệp bài tập, bài kiểm tra hoặc phiếu trả lời để chấm ngoại tuyến.",
     "details": "Chi tiết",
     "require_title": "Đề bài",
+    "start_time": "Thời gian bắt đầu",
+    "end_time": "Thời gian kết thúc",
+    "is_published": "Đã công bố",
+    "paper_label_id": "Mã nhãn bài thi",
+    "paper_label": "Nhãn bài thi",
+    "completion_status": "Trạng thái hoàn thành",
+    "score": "Điểm",
+    "show_mark": "Hiển thị điểm",
+    "started_time": "Thời gian bắt đầu làm bài",
+    "submitted_time": "Thời gian nộp bài",
+    "exam_schedule": "Lịch thi",
+    "stt": "STT",
+    "class_list": "Danh sách lớp",
     "rawIndex": "STT"
   },
   "file_upload": {

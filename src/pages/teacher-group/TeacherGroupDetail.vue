@@ -1,12 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch, computed } from 'vue'
-import {
-  GroupTeacher,
-  TeacherInGroupRequest,
-  SetPermissionInClassGroup,
-  TeacherTeam,
-  SetPermissionInClassTeacher,
-} from './types'
+import { GroupTeacher, SetPermissionInClassGroup, TeacherTeam, SetPermissionInClassTeacher } from './types'
 import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { ClassroomQueryType, GroupClass } from '../classrooms/types'
@@ -15,6 +9,7 @@ import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
 import QrcodeVue from 'qrcode.vue'
+import TeacherInTeamModal from './widgets/TeacherInTeamModal.vue'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -29,7 +24,7 @@ const props = defineProps({
 })
 
 const loading = ref(true)
-const showSelect = ref(false)
+const showTeacherInTeamModal = ref(false)
 const { init: notify } = useToast()
 
 const stores = useGroupTeacherStore()
@@ -123,63 +118,7 @@ const getGroupClasses = async () => {
 }
 
 const selectTeacherTeam = () => {
-  showSelect.value = !showSelect.value
-  getGroupDetail()
-}
-
-const updateTeacherIntoGroup = async (selectedTeacherList: string[]) => {
-  const newSelectedTeacherValue = selectedTeacherList.map((id) => ({
-    label: teacherOptions.value.find((option) => option.value === id)?.label || '',
-    value: id,
-  }))
-
-  for (const teacher of newSelectedTeacherValue) {
-    if (!currentSelectedTeacher.value.some((t) => t.value === teacher.value) && groupDetail.value) {
-      const teacherInGroupRequest: TeacherInGroupRequest = {
-        groupId: groupDetail.value.id,
-        teacherId: teacher.value,
-      }
-      await stores
-        .addTeacherIntoGroup(teacherInGroupRequest)
-        .then(() => {
-          notify({
-            message: notifications.createSuccessfully(teacher.label),
-            color: 'success',
-          })
-        })
-        .catch((error) => {
-          notify({
-            message: notifications.createFailed(teacher.label) + getErrorMessage(error),
-            color: 'danger',
-          })
-        })
-    }
-  }
-
-  for (let i = currentSelectedTeacher.value.length - 1; i >= 0; i--) {
-    const value = currentSelectedTeacher.value[i].value
-    if (!newSelectedTeacherValue.some((item) => item.value === value) && groupDetail.value) {
-      const teacherInGroupRequest: TeacherInGroupRequest = {
-        groupId: groupDetail.value.id,
-        teacherId: value,
-      }
-      await stores
-        .removeTeacherInGroup(teacherInGroupRequest)
-        .then(() => {
-          notify({
-            message: notifications.deleteSuccessfully(currentSelectedTeacher.value[i].label),
-            color: 'success',
-          })
-        })
-        .catch((error) => {
-          notify({
-            message: notifications.deleteFailed(currentSelectedTeacher.value[i].label) + getErrorMessage(error),
-            color: 'danger',
-          })
-        })
-    }
-  }
-  await getGroupDetail()
+  showTeacherInTeamModal.value = !showTeacherInTeamModal.value
 }
 
 const optionPermissionInClass = () => {
@@ -338,7 +277,7 @@ const downloadQRCode = () => {
   if (canvas) {
     const link = document.createElement('a')
     link.href = canvas.toDataURL('image/png')
-    link.download = 'qr_code.png'
+    link.download = `${groupDetail.value?.name}qr_code.png`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -357,7 +296,6 @@ watch(
   (newLink) => {
     if (newLink) {
       qrCodeSrc.value = `${baseUrl}/${newLink}`
-      console.log(qrCodeSrc.value)
     }
   },
   { immediate: true },
@@ -367,6 +305,10 @@ watch(searchQuery, () => {
   accordionKey.value += 1
 })
 const accordionKey = ref(0)
+
+const closeTeacherModal = async () => {
+  await getGroupDetail()
+}
 </script>
 
 <template>
@@ -404,27 +346,6 @@ const accordionKey = ref(0)
             <VaAvatar color="secondary" size="small" @click="selectTeacherTeam">
               <VaIcon name="add" />
             </VaAvatar>
-            <div v-if="showSelect">
-              <VaSelect
-                v-model="selectedTeacher"
-                :label="t('teacherGroups.select_teacher')"
-                :options="teacherOptions"
-                text-by="label"
-                value-by="value"
-                :max-visible-options="3"
-                autocomplete
-                multiple
-                searchable
-                highlight-matched-text
-                @update:modelValue="updateTeacherIntoGroup"
-              >
-                <template #content="{ value2 }">
-                  <VaChip v-for="chip in value2" :key="chip" size="small" class="mr-1 my-1">
-                    {{ chip.label }}
-                  </VaChip>
-                </template>
-              </VaSelect>
-            </div>
           </div>
           <div class="flex gap-2 flex-wrap">
             <div v-for="teacher in groupDetail?.teacherTeams" :key="teacher.id">
@@ -490,4 +411,23 @@ const accordionKey = ref(0)
       </VaCardContent>
     </VaCard>
   </div>
+
+  <VaModal
+    v-slot="{ cancel }"
+    v-model="showTeacherInTeamModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    hide-default-actions
+  >
+    <TeacherInTeamModal
+      :group-detail="groupDetail"
+      @close="
+        () => {
+          closeTeacherModal()
+          cancel()
+        }
+      "
+    />
+  </VaModal>
 </template>

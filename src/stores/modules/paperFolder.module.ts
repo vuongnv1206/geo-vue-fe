@@ -2,7 +2,8 @@ import PaperFoldersService from '@/services/paperFolder.service'
 import {
   CreatePaperFolderRequest,
   PaperFolderDto,
-  PaperFolderResponse,
+  PaperFolderTree,
+  SearchPaperFolderRequest,
   SearchSharedPaperFolderRequest,
   SharePaperFolderRequest,
   UpdatePaperFolderRequest,
@@ -21,8 +22,8 @@ export const usePaperFolderStore = defineStore('paperFolder', {
           return Promise.reject(error)
         })
     },
-    async searchPaperFolders(dataFilter: any): Promise<PaperFolderResponse> {
-      return await PaperFoldersService.paperFolders_Search(dataFilter)
+    async searchPaperFolders(request: SearchPaperFolderRequest): Promise<PaperFolderTree> {
+      return await PaperFoldersService.paperFolders_Search(request)
         .then((response) => {
           return Promise.resolve(response)
         })
@@ -66,7 +67,7 @@ export const usePaperFolderStore = defineStore('paperFolder', {
           return Promise.reject(error)
         })
     },
-    async searchSharedPaperFolders(request: SearchSharedPaperFolderRequest): Promise<PaperFolderDto[]> {
+    async searchSharedPaperFolders(request: SearchSharedPaperFolderRequest): Promise<PaperFolderTree> {
       return await PaperFoldersService.paperFolders_SearchShared(request)
         .then((response) => {
           return Promise.resolve(response)

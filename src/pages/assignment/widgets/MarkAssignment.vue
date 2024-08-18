@@ -141,9 +141,12 @@ onMounted(() => {
               </VaButton>
             </VaCard>
             <VaCardTitle>{{ $t('assignments.answers') }}</VaCardTitle>
-            <VaScrollContainer class="max-h-32" vertical>
+            <VaScrollContainer class="max-h-[50vh]" vertical>
               <!-- eslint-disable vue/no-v-html -->
-              <div class="text-md font-medium px-5 mb-4" v-html="ass.answerRaw"></div>
+              <div
+                class="text-md font-medium px-5 mb-4 max-h-48 overflow-y-auto break-words whitespace-pre-line"
+                v-html="ass.answerRaw"
+              ></div>
               <!-- eslint-enable -->
             </VaScrollContainer>
           </VaCard>
@@ -187,7 +190,7 @@ onMounted(() => {
             <VaCardTitle>{{ $t('assignments.comment') }}</VaCardTitle>
             <VaCard class="px-4">
               <QuillEditor
-                v-model="newMarkAssignment.comment"
+                v-model:content="newMarkAssignment.comment"
                 class="border rounded w-full mx-auto"
                 :placeholder="$t('posts.enter_content')"
                 content-type="html"

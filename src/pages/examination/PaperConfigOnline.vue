@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { VaButton, VaCard, VaCardTitle, VaIcon, useToast } from 'vuestic-ui'
+import { VaButton, VaCard, VaCardTitle, VaIcon, useForm, useToast } from 'vuestic-ui'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { PaperDto, ShowQuestionAnswer, ShowResult, StatusPaper } from '@/pages/examination/types'
 import { useRoute, useRouter } from 'vue-router'
@@ -253,224 +253,238 @@ onMounted(() => {
   getGroupClasses()
   getSubjects()
 })
+
+const form = useForm('paperConfigForm')
 </script>
 <template>
-  <div class="">
-    <div class="flex justify-center" style="align-items: center">
-      <VaCardTitle>Exam name: {{ paperDetail?.examName }}- Code: {{ paperDetail?.examCode }}</VaCardTitle>
-    </div>
-    <VaCard class="mb-3">
-      <VaCardTitle class="justify-between align-center">
-        <VaButton size="small" @click="backToPage">
-          <VaIcon name="keyboard_arrow_left" />
-        </VaButton>
-        <p>Configuration type</p>
-        <VaSwitch v-model="valueSwitch" true-inner-label="Exam" false-inner-label="Practice" />
-      </VaCardTitle>
-    </VaCard>
-    <VaCard class="mb-3">
-      <VaCardTitle> General configuration </VaCardTitle>
-      <VaDivider class="m-0" />
-      <VaCardContent>
-        <div class="grid grid-cols-2">
-          <VaInput
-            v-model="editPaper.examName"
-            :rules="[(value: any) => (value && value.length > 0) || 'Exam name is required']"
-            label="Exam name"
-            class="mb-2 col-span-2"
-          />
-          <VaSelect
-            v-model="editPaper.subjectId"
-            :options="subjects"
-            :text-by="(option: Subject) => option.name"
-            :value-by="(option: Subject) => option.id"
-            label="Subject"
-            class="mb-2 pl-1"
-          />
-          <VaCounter
-            v-model="editPaper.duration"
-            label="Test duration (minutes)"
-            :rules="[(v: any) => v >= 0 || 'Field is required']"
-            manual-input
-            class="mb-2 w-full pl-1"
-          />
-          <div class="mb-2 pr-1">
-            <VueDatePicker
-              v-model="editPaper.startTime"
-              mode="single"
-              :action-row="{ showNow: true }"
-              :is-24="true"
-              enable-seconds
-              :clearable="true"
-              :text-input="dateInputFormat"
-              :month-change-on-scroll="true"
-              :month-change-on-arrows="true"
-              placeholder="Enter start time"
+  <VaForm ref="paperConfigForm" stateful class="flex flex-col gap-2">
+    <div class="">
+      <div class="flex justify-center" style="align-items: center">
+        <VaCardTitle>Exam name: {{ paperDetail?.examName }}- Code: {{ paperDetail?.examCode }}</VaCardTitle>
+      </div>
+      <VaCard class="mb-3">
+        <VaCardTitle class="justify-between align-center">
+          <VaButton size="small" @click="backToPage">
+            <VaIcon name="keyboard_arrow_left" />
+          </VaButton>
+          <p>Configuration type</p>
+          <VaSwitch v-model="valueSwitch" true-inner-label="Exam" false-inner-label="Practice" />
+        </VaCardTitle>
+      </VaCard>
+      <VaCard class="mb-3">
+        <VaCardTitle> General configuration </VaCardTitle>
+        <VaDivider class="m-0" />
+        <VaCardContent>
+          <div class="grid grid-cols-2">
+            <VaInput
+              v-model="editPaper.examName"
+              :rules="[(value: any) => (value && value.length > 0) || 'Exam name is required']"
+              label="Exam name"
+              class="mb-2 col-span-2"
             />
-          </div>
-          <div class="mb-2 pr-1">
-            <VueDatePicker
-              v-model="editPaper.endTime"
-              mode="single"
-              :action-row="{ showNow: true }"
-              :is-24="true"
-              enable-seconds
-              :clearable="true"
-              :text-input="dateInputFormat"
-              :month-change-on-scroll="true"
-              :month-change-on-arrows="true"
-              placeholder="Enter start time"
+            <VaSelect
+              v-model="editPaper.subjectId"
+              :options="subjects"
+              :text-by="(option: Subject) => option.name"
+              :value-by="(option: Subject) => option.id"
+              label="Subject"
+              class="mb-2 pl-1"
             />
-          </div>
-          <div class="col-span-2 justify-end flex">
-            <VaButton size="small" preset="secondary" border-color="primary" @click="resetAccessTime"
-              >Reset time
-            </VaButton>
-          </div>
-          <div class="col-span-2">
-            <p class="mt-2 text-xs va-text-bold">Who is allowed to take the exam?</p>
-            <VaRadio v-model="valueOption" :options="accessOptions" class="assign-radio mb-2" value-by="value" />
-          </div>
-          <div class="col-span-2">
-            <div
-              v-if="
-                (valueOption === AccessType.ByClass || valueOption === AccessType.ByStudent) && groupClasses !== null
-              "
-              class="grid grid-cols-3 gap-2"
-            >
-              <VaCard outlined class="border-style col-span-1">
-                <VaCardTitle>
-                  <VaInput placeholder="Search group class" />
-                </VaCardTitle>
-                <VaDivider class="m-0" />
-                <VaCardContent class="p-1">
-                  <VaScrollContainer vertical class="max-h-[40vh]">
-                    <VaSidebarItem
-                      v-for="groupClass in groupClasses"
-                      :key="groupClass.id"
-                      :active="selectedGroupClass === groupClass.id"
-                    >
-                      <VaSidebarItemContent class="p-1 min-h-[30px]" @click="getClassByGroupClass(groupClass.id)">
-                        {{ groupClass.name }}
-                      </VaSidebarItemContent>
-                    </VaSidebarItem>
-                  </VaScrollContainer>
-                </VaCardContent>
-              </VaCard>
-
-              <VaCard outlined class="border-style col-span-2">
-                <VaCardTitle>
-                  <VaInput placeholder="Search class in group" />
-                </VaCardTitle>
-                <VaDivider class="m-0" />
-                <VaCardContent>
-                  <VaScrollContainer v-if="valueOption === AccessType.ByClass" class="max-h-50" vertical>
-                    <VaOptionList
-                      v-model="checkedPermissionsClassAccess"
-                      :options="classRoomsInGroup"
-                      :text-by="(op: Classrooms) => op.name"
-                      value-by="id"
-                    />
-                  </VaScrollContainer>
-                  <VaScrollContainer v-if="valueOption === AccessType.ByStudent" class="max-h-50" vertical>
-                    <div class="grid xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                      <VaButton
-                        v-for="classroom in classRoomsInGroup"
-                        :key="classroom.id"
-                        :preset="
-                          classroom.students?.some((student) => checkedPermissionsStudentAccess.includes(student.id))
-                            ? 'primary'
-                            : 'secondary'
-                        "
-                        border-color="primary"
-                        @click="getListStudentModal(classroom, classroom.students)"
-                        >{{ classroom.name }}</VaButton
+            <VaCounter
+              v-model="editPaper.duration"
+              label="Test duration (minutes)"
+              :rules="[
+                (v: any) => (v !== null && v !== undefined) || 'Field is required',
+                (v: any) => v > 0 || 'Value must be greater than 0',
+              ]"
+              manual-input
+              class="mb-2 w-full pl-1"
+            />
+            <div class="mb-2 pr-1">
+              <VueDatePicker
+                v-model="editPaper.startTime"
+                mode="single"
+                :action-row="{ showNow: true }"
+                :is-24="true"
+                enable-seconds
+                :clearable="true"
+                :text-input="dateInputFormat"
+                :month-change-on-scroll="true"
+                :month-change-on-arrows="true"
+                :min-date="new Date(new Date().setHours(0, 0, 0, 0))"
+                placeholder="Enter start time"
+              />
+            </div>
+            <div class="mb-2 pr-1">
+              <VueDatePicker
+                v-model="editPaper.endTime"
+                mode="single"
+                :action-row="{ showNow: true }"
+                :is-24="true"
+                enable-seconds
+                :clearable="true"
+                :text-input="dateInputFormat"
+                :month-change-on-scroll="true"
+                :month-change-on-arrows="true"
+                placeholder="Enter end time"
+              />
+            </div>
+            <div class="col-span-2 justify-end flex">
+              <VaButton size="small" preset="secondary" border-color="primary" @click="resetAccessTime"
+                >Reset time
+              </VaButton>
+            </div>
+            <div class="col-span-2">
+              <p class="mt-2 text-xs va-text-bold">Who is allowed to take the exam?</p>
+              <VaRadio v-model="valueOption" :options="accessOptions" class="assign-radio mb-2" value-by="value" />
+            </div>
+            <div class="col-span-2">
+              <div
+                v-if="
+                  (valueOption === AccessType.ByClass || valueOption === AccessType.ByStudent) && groupClasses !== null
+                "
+                class="grid grid-cols-3 gap-2"
+              >
+                <VaCard outlined class="border-style col-span-1">
+                  <VaCardTitle>
+                    <VaInput placeholder="Search group class" />
+                  </VaCardTitle>
+                  <VaDivider class="m-0" />
+                  <VaCardContent class="p-1">
+                    <VaScrollContainer vertical class="max-h-[40vh]">
+                      <VaSidebarItem
+                        v-for="groupClass in groupClasses"
+                        :key="groupClass.id"
+                        :active="selectedGroupClass === groupClass.id"
                       >
-                    </div>
-                  </VaScrollContainer>
-                </VaCardContent>
-              </VaCard>
+                        <VaSidebarItemContent class="p-1 min-h-[30px]" @click="getClassByGroupClass(groupClass.id)">
+                          {{ groupClass.name }}
+                        </VaSidebarItemContent>
+                      </VaSidebarItem>
+                    </VaScrollContainer>
+                  </VaCardContent>
+                </VaCard>
+
+                <VaCard outlined class="border-style col-span-2">
+                  <VaCardTitle>
+                    <VaInput placeholder="Search class in group" />
+                  </VaCardTitle>
+                  <VaDivider class="m-0" />
+                  <VaCardContent>
+                    <VaScrollContainer v-if="valueOption === AccessType.ByClass" class="max-h-50" vertical>
+                      <VaOptionList
+                        v-model="checkedPermissionsClassAccess"
+                        :options="classRoomsInGroup"
+                        :text-by="(op: Classrooms) => op.name"
+                        value-by="id"
+                      />
+                    </VaScrollContainer>
+                    <VaScrollContainer v-if="valueOption === AccessType.ByStudent" class="max-h-50" vertical>
+                      <div class="grid xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                        <VaButton
+                          v-for="classroom in classRoomsInGroup"
+                          :key="classroom.id"
+                          :preset="
+                            classroom.students?.some((student) => checkedPermissionsStudentAccess.includes(student.id))
+                              ? 'primary'
+                              : 'secondary'
+                          "
+                          border-color="primary"
+                          @click="getListStudentModal(classroom, classroom.students)"
+                          >{{ classroom.name }}</VaButton
+                        >
+                      </div>
+                    </VaScrollContainer>
+                  </VaCardContent>
+                </VaCard>
+              </div>
             </div>
           </div>
-        </div>
-      </VaCardContent>
-    </VaCard>
-    <VaCard class="mb-3">
-      <VaCardTitle>Security</VaCardTitle>
-      <VaDivider class="m-0" />
-      <VaCardContent>
-        <div class="grid grid-cols-2">
-          <VaInput
-            v-model="editPaper.password"
-            class="mb-2 pr-1"
-            label="Exam password"
-            placeholder="Enter password..."
-          />
-          <VaCounter
-            v-model="editPaper.numberAttempt"
-            :rules="[(v: any) => v > 0 || 'Field is required']"
-            label="Submitted"
-            manual-input
-            class="mb-2 w-full pl-1"
-          />
-        </div>
+        </VaCardContent>
+      </VaCard>
+      <VaCard class="mb-3">
+        <VaCardTitle>Security</VaCardTitle>
+        <VaDivider class="m-0" />
+        <VaCardContent>
+          <div class="grid grid-cols-2">
+            <VaInput
+              v-model="editPaper.password"
+              class="mb-2 pr-1"
+              label="Exam password"
+              placeholder="Enter password..."
+            />
+            <VaCounter
+              v-model="editPaper.numberAttempt"
+              :rules="[(v: any) => v > 0 || 'Field is required']"
+              label="Submitted"
+              manual-input
+              class="mb-2 w-full pl-1"
+            />
+          </div>
 
-        <div class="grid grid-cols-2">
-          <VaInput
-            v-model="editPaper.publicIpAllowed"
-            class="mb-2 pr-1"
-            label="Allowed Public Ip Address"
-            placeholder="Enter Ip Address"
-          />
-          <VaInput
-            v-model="editPaper.localIpAllowed"
-            class="mb-2 pr-1 pl-1"
-            label="Allowed local Ip Address"
-            placeholder="Enter Ip Address"
-          />
-        </div>
-      </VaCardContent>
-    </VaCard>
+          <div class="grid grid-cols-2">
+            <VaInput
+              v-model="editPaper.publicIpAllowed"
+              class="mb-2 pr-1"
+              label="Allowed Public Ip Address"
+              placeholder="Enter Ip Address"
+            />
+            <VaInput
+              v-model="editPaper.localIpAllowed"
+              class="mb-2 pr-1 pl-1"
+              label="Allowed local Ip Address"
+              placeholder="Enter Ip Address"
+            />
+          </div>
+        </VaCardContent>
+      </VaCard>
 
-    <VaCard class="mb-3">
-      <VaCardTitle> point an answers review </VaCardTitle>
-      <VaDivider class="m-0" />
-      <VaCardContent>
-        <div class="mb-2">
-          <span class="va-title">Show result</span>
-          <VaRadio
-            v-model="editPaper.showMarkResult"
-            :options="showMarkResultOptions"
-            :text-by="(op: any) => op.label"
-            :value-by="(op: any) => op.value"
-            type="radio"
-            class="assign-radio"
-            vertical
-          />
-        </div>
-        <div>
-          <span class="va-title">Show the exam and answers</span>
-          <VaRadio
-            v-model="editPaper.showQuestionAnswer"
-            :options="showQuestionAnswerOptions"
-            :text-by="(op: any) => op.label"
-            :value-by="(op: any) => op.value"
-            type="radio"
-            class="assign-radio"
-            vertical
-          />
-        </div>
-      </VaCardContent>
-    </VaCard>
+      <VaCard class="mb-3">
+        <VaCardTitle> point an answers review </VaCardTitle>
+        <VaDivider class="m-0" />
+        <VaCardContent>
+          <div class="mb-2">
+            <span class="va-title">Show result</span>
+            <VaRadio
+              v-model="editPaper.showMarkResult"
+              :options="showMarkResultOptions"
+              :text-by="(op: any) => op.label"
+              :value-by="(op: any) => op.value"
+              type="radio"
+              class="assign-radio"
+              vertical
+            />
+          </div>
+          <div>
+            <span class="va-title">Show the exam and answers</span>
+            <VaRadio
+              v-model="editPaper.showQuestionAnswer"
+              :options="showQuestionAnswerOptions"
+              :text-by="(op: any) => op.label"
+              :value-by="(op: any) => op.value"
+              type="radio"
+              class="assign-radio"
+              vertical
+            />
+          </div>
+        </VaCardContent>
+      </VaCard>
 
-    <div class="flex justify-end">
-      <VaButton color="warning" size="small" class="p-1 pr-2 pl-2 mr-1" @click="saveDraffPaper(false)"
-        >Save draft
-      </VaButton>
-      <VaButton size="small" class="p-1 pr-2 pl-2 ml-1" @click="saveDraffPaper(true)">Publish</VaButton>
+      <div class="flex justify-end">
+        <VaButton
+          color="warning"
+          size="small"
+          class="p-1 pr-2 pl-2 mr-1"
+          :disabled="!form.validate()"
+          @click="saveDraffPaper(false)"
+          >Save draft
+        </VaButton>
+        <VaButton size="small" class="p-1 pr-2 pl-2 ml-1" :disabled="!form.validate()" @click="saveDraffPaper(true)"
+          >Publish</VaButton
+        >
+      </div>
     </div>
-  </div>
-
+  </VaForm>
   <VaModal v-slot="{ ok }" v-model="showListStudentModal" hide-default-actions>
     <StudentListInClassModal
       :students="studentList"

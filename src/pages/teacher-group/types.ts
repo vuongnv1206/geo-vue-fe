@@ -6,7 +6,7 @@ export type GroupTeacher = {
   qrCode?: string
   joinLink?: string
   adminGroup?: string
-  // createdBy: string
+  createdBy?: string
   // createdOn: string
   // lastModifiedBy: string
   // lastModifiedOn: string | null
@@ -16,7 +16,16 @@ export type GroupPermissionInClass = {
   id: string
   groupTeacherId: string
   classId: string
+  className?: string
   permissionType: string
+}
+
+export type AssignedClassroomInGroup = {
+  id: string
+  groupTeacherId: string
+  classId: string
+  className?: string
+  permissionType: string[]
 }
 
 export type SetPermissionInClassGroup = {
@@ -199,4 +208,9 @@ export enum InvitationStatus {
   Requested = 1,
   BeRejected = 2,
   BeAccepted = 3,
+}
+
+export type InviteJoinGroupRequest = {
+  teacherId: string
+  groupId: string
 }

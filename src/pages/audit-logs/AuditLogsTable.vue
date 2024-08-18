@@ -36,7 +36,13 @@
           </div>
         </template>
         <template #cell(viewDetails)="{ row }">
-          <VaButton preset="secondary" class="w-fit text-xs md:text-sm" size="small" @click="handleShowDetails(row)">
+          <VaButton
+            v-if="row?.rowData?.action?.toLowerCase() !== ActionEnum.Delete.Action"
+            preset="secondary"
+            class="w-fit text-xs md:text-sm"
+            size="small"
+            @click="handleShowDetails(row)"
+          >
             {{ t('auditLogs.table.buttonDetails') }}
           </VaButton>
         </template>
@@ -91,7 +97,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { AuditLogsTypes, PaginationType } from './types'
 import AuditLogsDetails from './AuditLogsDetails.vue'
-import { pageSizeOptions } from './audit-logs.enum'
+import { ActionEnum, pageSizeOptions } from './audit-logs.enum'
 import { VaAvatar, useToast } from 'vuestic-ui/web-components'
 import { watch } from 'vue'
 import { useAuditLogsStore } from '@/stores/modules/auditLogs.module'
