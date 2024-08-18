@@ -311,7 +311,7 @@ const form = useForm('paperConfigForm')
                 :text-input="dateInputFormat"
                 :month-change-on-scroll="true"
                 :month-change-on-arrows="true"
-                :min-date="new Date(new Date().setHours(0, 0, 0, 0))"
+                :min-date="new Date(new Date())"
                 placeholder="Enter start time"
               />
             </div>
@@ -327,6 +327,7 @@ const form = useForm('paperConfigForm')
                 :month-change-on-scroll="true"
                 :month-change-on-arrows="true"
                 placeholder="Enter end time"
+                :min-date="new Date(editPaper.startTime ?? new Date())"
               />
             </div>
             <div class="col-span-2 justify-end flex">
