@@ -43,21 +43,28 @@ const getGroupClasses = async () => {
   try {
     const res = await groupClassStores.getGroupClasses(groupClassFilter)
     if (paperDetail.value?.paperAccesses) {
-      paperDetail.value.paperAccesses
-        .filter((element) => element.classId !== null || element.userId !== null)
-        .forEach((element) => {
-          res.data.forEach((groupClass) => {
-            if (
-              groupClass.classes.some((x) => x.id === element.classId) ||
-              groupClass.classes.some((x) => x.students.some((s) => s.id === element.userId))
-            ) {
-              if (!groupClasses.value.some((existingGroupClass) => existingGroupClass.id === groupClass.id)) {
-                groupClasses.value.push(groupClass)
-              }
-            }
-          })
+      const validPaperAccesses = paperDetail.value.paperAccesses.filter(
+        (element) => element.classId !== null || element.userId !== null,
+      )
+
+      validPaperAccesses.forEach((access) => {
+        res.data.forEach((groupClass) => {
+          const classExists = Array.isArray(groupClass.classes) && groupClass.classes.length > 0
+          const isClassMatch =
+            classExists &&
+            groupClass.classes.some(
+              (cls) =>
+                cls.id === access.classId ||
+                (Array.isArray(cls.students) && cls.students.some((student) => student.id === access.userId)),
+            )
+          if (isClassMatch && !groupClasses.value.some((existingClass) => existingClass.id === groupClass.id)) {
+            groupClasses.value.push(groupClass)
+          }
         })
-      await selectClassInGroup(groupClasses.value[0].classes[0].id)
+      })
+      if (groupClasses.value.length > 0) {
+        await selectClassInGroup(groupClasses.value[0].classes[0].id)
+      }
     }
   } catch (error) {
     console.error(error)

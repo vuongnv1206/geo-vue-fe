@@ -562,7 +562,8 @@
     "content_0": "You can upload Exercise Files, Exam Papers, or Answer Sheets for offline grading.",
     "details": "Details",
     "require_title": "Requirement",
-    "rawIndex": "No"
+    "rawIndex": "No",
+    "excel_export_button": "Export Excel file"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",

@@ -563,7 +563,8 @@
     "content_0": "Bạn có thể tải lên các tệp bài tập, bài kiểm tra hoặc phiếu trả lời để chấm ngoại tuyến.",
     "details": "Chi tiết",
     "require_title": "Đề bài",
-    "rawIndex": "STT"
+    "rawIndex": "STT",
+    "excel_export_button": "Xuất tập Excel"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",
