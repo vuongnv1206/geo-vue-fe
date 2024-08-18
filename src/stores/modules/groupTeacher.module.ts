@@ -161,5 +161,15 @@ export const useGroupTeacherStore = defineStore('groupTeacher', {
           return Promise.reject(error)
         })
     },
+    async shareTeacherGroups(data: any): Promise<GroupTeacherResponse> {
+      return groupTeacherService
+        .shareTeacherGroups(data)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })

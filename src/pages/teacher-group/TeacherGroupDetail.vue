@@ -296,7 +296,6 @@ watch(
   (newLink) => {
     if (newLink) {
       qrCodeSrc.value = `${baseUrl}/${newLink}`
-      console.log(qrCodeSrc.value)
     }
   },
   { immediate: true },
