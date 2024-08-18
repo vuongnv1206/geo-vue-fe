@@ -214,7 +214,7 @@ onMounted(() => {
       <VaCard v-if="!assignment.canViewResult">
         <VaCardContent class="flex flex-col items-center">
           <VaIcon name="done" size="large" class="material-symbols-outlined mb-2" />
-          <p>{{ $t('assignments.submitted') }}</p>
+          <p>{{ $t('assignments.Submmitted') }}</p>
         </VaCardContent>
       </VaCard>
       <VaCard v-else>
