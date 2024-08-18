@@ -19,7 +19,9 @@
                   <VaIcon name="description" size="3rem" />
                 </VaListItemSection>
                 <VaListItemSection>
-                  <VaListItemLabel class="font-semibold mb-1">{{ assignment?.name }}</VaListItemLabel>
+                  <VaListItemLabel class="font-semibold mb-1"
+                    >{{ assignment?.className }} - {{ assignment?.name }}</VaListItemLabel
+                  >
                   <VaListItemLabel caption>
                     <VaPopover placement="right" color="#FFFFFF" :message="format.formatDate(assignment?.createdOn)">
                       {{ $t('assignments.create_at') }} {{ format.formatDateFromNow(assignment?.createdOn) }}
