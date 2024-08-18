@@ -523,7 +523,20 @@
     "supported_format": "Định dạng hỗ trợ: .pdf, .docx, .xlsx.",
     "content_0": "Bạn có thể tải lên các tệp bài tập, bài kiểm tra hoặc phiếu trả lời để chấm ngoại tuyến.",
     "details": "Chi tiết",
-    "require_title": "Đề bài"
+    "require_title": "Đề bài",
+    "start_time": "Thời gian bắt đầu",
+    "end_time": "Thời gian kết thúc",
+    "is_published": "Đã công bố",
+    "paper_label_id": "Mã nhãn bài thi",
+    "paper_label": "Nhãn bài thi",
+    "completion_status": "Trạng thái hoàn thành",
+    "score": "Điểm",
+    "show_mark": "Hiển thị điểm",
+    "started_time": "Thời gian bắt đầu làm bài",
+    "submitted_time": "Thời gian nộp bài",
+    "exam_schedule": "Lịch thi",
+    "stt": "STT",
+    "class_list": "Danh sách lớp"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",

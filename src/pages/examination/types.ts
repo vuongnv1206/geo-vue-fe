@@ -511,3 +511,52 @@ export type InfoAttendeeTranscript = {
   startedTest: Date
   finishedTest?: Date
 }
+
+export type PaperStudents = {
+  id: string
+  examName: string
+  startTime: Date
+  endTime: Date
+  duration: number
+  isPublish: boolean
+  description: string
+  paperLabelId: string
+  paperLabelName: string
+  subjectId: string
+  subjectName: string
+  completionStatus: number
+}
+
+export type PaperStudentsResponse = {
+  data: PaperStudents[]
+  // currentPage: number
+  // totalPages: number
+  // totalCount: number
+  // pageSize: number
+  // hasPreviousPage: boolean
+  // hasNextPage: boolean
+}
+
+export type PaperStudentsHistory = {
+  id: string
+  examName: string
+  duration: number
+  paperLabelId: string
+  paperLabelName: string
+  subjectId: string
+  subjectName: string
+  startedTime: Date
+  submittedTime: Date
+  score: number
+  completionStatus: number
+  showMarkResult: boolean
+}
+export type PaperStudentsHistoryResponse = {
+  data: PaperStudentsHistory[]
+  // currentPage: number
+  // totalPages: number
+  // totalCount: number
+  // pageSize: number
+  // hasPreviousPage: boolean
+  // hasNextPage: boolean
+}
