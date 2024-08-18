@@ -13,6 +13,10 @@ const createPaperUseQuestionBank = () => {
   router.push({ name: 'create-paper-question-bank', params: { folderId: folderId.value } })
 }
 
+const createPaperUseMatrix = () => {
+  router.push({ name: 'create-paper-matrix', params: { folderId: folderId.value } })
+}
+
 onMounted(() => {})
 </script>
 
@@ -63,7 +67,7 @@ onMounted(() => {})
             <a href="#">Learn more</a>
           </p>
 
-          <VaButton block outline color="primary" style="margin-bottom: 10px">
+          <VaButton block outline color="primary" style="margin-bottom: 10px" @click="createPaperUseMatrix">
             <VaIcon name="business" style="margin-right: 10px" /> {{ t('papers.create_test_from_matrix') }}
           </VaButton>
           <p style="margin-left: 40px; color: gray">
@@ -71,13 +75,13 @@ onMounted(() => {})
             <a href="#">Learn more</a>
           </p>
 
-          <VaButton block outline color="primary" style="margin-bottom: 10px">
+          <!-- <VaButton block outline color="primary" style="margin-bottom: 10px">
             <VaIcon name="thumb_up" style="margin-right: 10px" /> {{ t('papers.create_offline_test_manually') }}
           </VaButton>
 
           <VaButton block outline color="primary">
             <VaIcon name="article" style="margin-right: 10px" /> {{ t('papers.create_offline_test_with_text') }}
-          </VaButton>
+          </VaButton> -->
         </VaCardContent>
       </VaCard>
     </div>

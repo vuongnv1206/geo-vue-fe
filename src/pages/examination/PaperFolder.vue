@@ -8,9 +8,8 @@ import {
   CreatePaperFolderRequest,
   PaperInListDto,
   CombinedData,
-  DataFilterFolder,
-  DataFilterPaper,
-  PaperFolderResponse,
+  SearchPaperFolderRequest,
+  SearchPaperRequest,
 } from './types'
 import { useMenu, useModal, useToast } from 'vuestic-ui'
 import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
@@ -30,22 +29,8 @@ const paperStore = usePaperStore()
 const loading = ref(true)
 const isMyDocument = ref(true)
 
-const dataFilterFolder = ref<DataFilterFolder>({
-  keyword: '',
-  pageNumber: 1,
-  pageSize: 20,
-  orderBy: ['id'],
-  parentId: null,
-})
-
-const dataFilterPaper = ref<DataFilterPaper>({
-  keyword: '',
-  pageNumber: 1,
-  pageSize: 20,
-  orderBy: ['id'],
-  paperFolderId: null,
-})
-
+const searchPaperFolderRequest = ref<SearchPaperFolderRequest>({})
+const searchPaperRequest = ref<SearchPaperRequest>({})
 const pagination = ref({
   pageNumber: 1,
   pageSize: 10,
@@ -84,10 +69,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to update paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   } else {
@@ -105,10 +91,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to create paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   }
@@ -187,10 +174,11 @@ const onDeleteSelectedItems = async () => {
         selectedItems.value = []
         getPaperFolders(currentFolderId.value)
         getPapers(currentFolderId.value)
-      } catch (err: any) {
+      } catch (error) {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete selected items\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       }
     }
@@ -204,13 +192,12 @@ onMounted(() => {
 
 const getPaperFolders = async (parentId?: string | null, name?: string | null) => {
   loading.value = true
-  dataFilterFolder.value.parentId = parentId
-  dataFilterFolder.value.keyword = name ?? ''
+  searchPaperFolderRequest.value = { parentId, name }
   paperFolderStore
-    .searchPaperFolders(dataFilterFolder.value)
-    .then((res: PaperFolderResponse) => {
+    .searchPaperFolders(searchPaperFolderRequest.value)
+    .then((res) => {
       loading.value = false
-      paperFolderDtos.value = res.data
+      paperFolderDtos.value = res.paperFolderChildrens
     })
     .catch(() => {
       loading.value = false
@@ -218,16 +205,15 @@ const getPaperFolders = async (parentId?: string | null, name?: string | null) =
     })
 }
 
-const getPapers = async (folderId?: string | null, name?: string | null) => {
+const getPapers = async (paperFolderId?: string | null, name?: string | null) => {
   papers.value = []
   loading.value = true
-  dataFilterPaper.value.paperFolderId = folderId
-  dataFilterPaper.value.keyword = name ?? ''
+  searchPaperRequest.value = { paperFolderId, name }
   paperStore
-    .searchPapers(dataFilterPaper.value)
+    .searchPapers(searchPaperRequest.value)
     .then((res) => {
       loading.value = false
-      papers.value = res.data
+      papers.value = res
     })
     .catch(() => {
       loading.value = false

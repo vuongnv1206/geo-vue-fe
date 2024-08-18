@@ -127,7 +127,8 @@
     "share": "Share",
     "search": "Search",
     "submit": "Submit",
-    "submit_homeworks": "Submit homeworks"
+    "submit_homeworks": "Submit homeworks",
+    "close": "Close"
   },
   "auditLogs": {
     "title": "Audit Logs",
@@ -148,8 +149,45 @@
       "viewDetailsCol": "view Details"
     },
     "details": {
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "newData": "New Data",
       "oldData": "Old Data",
-      "newData": "New Data"
+      "data": "Data",
+      "fields": "Fields"
+    }
+  },
+  "subscription": {
+    "btn_subscribe": "Register a subscription",
+    "choose_subscription": "Choose your subscription",
+    "confirmation_title": "Subscription confirmation",
+    "confirmation_text": "Are you sure want to register this subscription ?",
+    "alert_title": "DONE",
+    "alert_text": "Please wait a moment, the system is processing!",
+    "ok": "OK",
+    "buy": "Buy",
+    "confirm_paid": "I have already paid",
+    "yes": "Confirm",
+    "no": "Cancel",
+    "text_describe_qr": "Scan this QR to pay your subscription",
+    "orders": {
+      "title": "Orders List",
+      "show_qr": "Show Payment QR",
+      "cancel_order": "Cancel Order",
+      "orderNo": "Order No",
+      "subscription": "Subscription",
+      "activeTime": "Active Time",
+      "status": "Payment Status",
+      "expired": "Expired",
+      "createdOn": "Created On",
+      "action": "Action",
+      "success": "Success",
+      "cancel_success": "Cancel order successfully!",
+      "all": "All",
+      "pending": "Pending",
+      "completed": "Completed",
+      "canceled": "Canceled"
     }
   },
   "questions": {
@@ -416,6 +454,7 @@
   "teacherGroups": {
     "teacher_group": "Teacher Group",
     "teacher": "Teacher",
+    "invite-teacher": "Invite Teacher",
     "select_teacher": "Select teacher",
     "group_member": "Member In Group {name}",
     "search_class": "Search class",
@@ -535,7 +574,8 @@
     "submitted_time": "Submitted Time",
     "exam_schedule": "Exam Schedule",
     "stt": "No.",
-    "class_list": "Class List"
+    "class_list": "Class List",
+    "rawIndex": "No"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",
@@ -626,11 +666,14 @@
     "class": "Class",
     "group-class": "Group class",
     "teacher-group": "Teacher",
+    "group-manage": "Group Manage",
+    "join-request": "Join Request",
     "exam": "Exam",
     "assignments": "Assignment",
     "subjects": "Subject",
     "help": "Help",
-    "infor": "Information"
+    "infor": "Information",
+    "orders": "Orders"
   },
   "bin": {
     "title": "Trash",
@@ -780,6 +823,7 @@
     "deleteFailed": "Failed to delete {message}\n",
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
     "confirmDelete": "Are you sure you want to delete {message}?",
+    "inviteSuccess": "Invite {message} successfully",
     "singleChoice": "Single Choice",
     "multipleChoice": "Multiple Choice",
     "fillBlank": "Fill Blank",
@@ -787,7 +831,12 @@
     "reading": "Reading",
     "readingQuestionPassage": "Reading Question Passage",
     "writing": "Writing",
-    "other": "Other"
+    "other": "Other",
+    "Pending": "Pending",
+    "Accepted": "Accepted",
+    "Rejected": "Rejected",
+    "Cancel": "Cancel",
+    "NotRequest": "Not request"
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"

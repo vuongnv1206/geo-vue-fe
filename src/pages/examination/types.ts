@@ -146,7 +146,7 @@ export interface PaperStudentDto {
 export interface UpdatePaperRequest {
   id: string
   examName: string
-  status?: number
+  status?: number | null
   startTime?: string
   endTime?: string
   paperLabelId?: string
@@ -186,9 +186,8 @@ export interface PaperAccess {
 }
 
 export enum AccessType {
-  Everyone = 0,
-  ByClass = 3,
-  ByStudent = 2,
+  ByStudent = 1,
+  ByClass = 2,
 }
 
 export interface GetLastResultExamRequest {
@@ -274,14 +273,11 @@ export interface QuestionIntoPaperRequest {
   rawIndex: number | 1
 }
 
-export type PaperFolderResponse = {
-  data: PaperFolderDto[]
-  currentPage: number
-  totalPages: number
-  totalCount: number
-  pageSize: number
-  hasPreviousPage: boolean
-  hasNextPage: boolean
+export type PaperFolderTree = {
+  id: string | undefined
+  paperFolderChildrens: PaperFolderDto[]
+  paperFolderPermissions: PaperFolderPermission[]
+  totalPapers: number
 }
 
 export type PaperResponse = {
@@ -343,8 +339,17 @@ export interface SearchSharedPaperFolderRequest {
   parentId?: string | null
   name?: string | null
 }
+export interface SearchPaperFolderRequest {
+  parentId?: string | null
+  name?: string | null
+}
 
 export interface SearchSharedPaperRequest {
+  paperFolderId?: string | null | undefined
+  name?: string | null | undefined
+}
+
+export interface SearchPaperRequest {
   paperFolderId?: string | null | undefined
   name?: string | null | undefined
 }
@@ -380,6 +385,47 @@ export type MarkAnswerRequest = {
   mark?: number
 }
 
+export type CreateMatrixRequest = {
+  name: string
+  content: string
+  totalPoint: number
+}
+
+export type UpdateMatrixRequest = {
+  id: string
+  name: string
+  content: string
+  totalPoint: number
+}
+
+export type ContentMatrixRequest = {
+  questionFolderId: string
+  criteriaQuestions: CriteriaQuestion[]
+  totalPoint: number
+}
+
+export type CriteriaQuestion = {
+  questionLabelId: string | null
+  questionType?: number
+  numberOfQuestion?: number
+  rawIndex?: string
+}
+
+export type PaperMatrixTemplate = {
+  id: string
+  name: string
+  content: string
+  contentItems: ContentMatrixItem[]
+  totalPoint: number
+}
+
+export type ContentMatrixItem = {
+  questionFolderId: string
+  questionFolderName?: string
+  criteriaQuestions: CriteriaQuestion[]
+  totalPoint: number
+}
+
 export type BasicStatisticPaperRequest = {
   paperId: string
   classId?: string
@@ -399,6 +445,10 @@ export type BasicStatisticPaperResponse = {
   averageMark: number
   totalPopular: number
   markPopular: number
+  totalHighestMark: number
+  totalLowestMark: number
+  highestMark: number
+  lowestMark: number
   classrooms: BasicStatisticPaperInClass[]
 }
 
@@ -559,4 +609,25 @@ export type PaperStudentsHistoryResponse = {
   // pageSize: number
   // hasPreviousPage: boolean
   // hasNextPage: boolean
+}
+
+export enum StatusPaper {
+  publish = 1,
+  unpublish = 2,
+}
+
+export type QuestionGenerateToMatrix = {
+  question: Question
+  mark: number
+  rawIndex: number
+}
+
+export interface AddQuestionsInPaperRequest {
+  paperId: string
+  questions?: QuestionIntoPaperRequest[]
+}
+
+export interface UpdateQuestionsInPaperRequest {
+  paperId: string
+  questions?: QuestionIntoPaperRequest[]
 }

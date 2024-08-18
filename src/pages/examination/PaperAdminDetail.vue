@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import { useRoute, useRouter } from 'vue-router'
+import AssignPaperModal from './widgets/AssignPaperModal.vue'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto, AccessType, PaperAccess, UpdatePaperRequest, SubmitPaperResponse } from './types'
+import { PaperDto, AccessType, PaperAccess, UpdatePaperRequest, SubmitPaperResponse, StatusPaper } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
 import { Classrooms, GroupClass } from '@/pages/classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useClassStore } from '../../stores/modules/class.module'
 import { format } from '@/services/utils'
+import { onMounted, ref } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,9 +27,6 @@ const getPaperDetail = async () => {
     paperDetail.value = res
     if (paperDetail.value.shareType === AccessType.ByClass || paperDetail.value.shareType === AccessType.ByStudent) {
       await getGroupClasses()
-    } else if (paperDetail.value.shareType === AccessType.Everyone) {
-      const allSubmit = (await getSubmittedStudents()) || null
-      submittedStudents.value = allSubmit
     }
   } catch (error) {
     notify({
@@ -112,7 +109,7 @@ const examMonitorAction = () => {
 const editPaper = ref<UpdatePaperRequest>({
   id: '',
   examName: '',
-  status: 0,
+  status: StatusPaper.unpublish,
   startTime: undefined,
   endTime: undefined,
   paperLabelId: undefined,
@@ -136,7 +133,7 @@ const handleSaveAssigned = async (shareType: AccessType, accessPaperList: PaperA
     editPaper.value = {
       id: paperDetail.value.id,
       examName: paperDetail.value.examName,
-      status: 0,
+      status: paperDetail.value.status === 'Publish' ? StatusPaper.publish : StatusPaper.unpublish,
       startTime: paperDetail.value.startTime ?? undefined,
       endTime: paperDetail.value.endTime ?? undefined,
       paperLabelId: paperDetail.value.paperLabelId ?? undefined,
@@ -187,8 +184,7 @@ const getSubmittedStudents = async (classId?: string) => {
       dataFilterSubmittedStudent.value.classId === classId
     }
 
-    const res = await paperStore.getSubmittedStudentsInPaper(paperId, dataFilterSubmittedStudent.value)
-    return res
+    submittedStudents.value = await paperStore.getSubmittedStudentsInPaper(paperId, dataFilterSubmittedStudent.value)
   } catch (error) {
     notify({
       message: `Failed to get submitted students \n ${error}`,
@@ -206,6 +202,9 @@ const navigateToExamReview = (paperId: string, userId: string, submitPaperId: st
       submitPaperId,
     },
   })
+}
+const navigateToManageQuestions = () => {
+  router.push({ name: 'manage-questions', params: { paperId: paperId } })
 }
 
 const showSelectClassModal = ref(false)
@@ -295,7 +294,7 @@ onMounted(async () => {
                 <VaMenuItem @click="paperConfigAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Setting
                 </VaMenuItem>
-                <VaMenuItem> <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem>
+                <!-- <VaMenuItem> <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem> -->
                 <VaMenuItem @click="statisticExam">
                   <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics
                 </VaMenuItem>
@@ -333,17 +332,6 @@ onMounted(async () => {
               />
             </VaModal>
             <VaCardContent class="p-0">
-              <VaButton
-                v-if="paperDetail?.shareType == AccessType.Everyone"
-                preset="secondary"
-                border-color="none"
-                size="small"
-                text-color="secondary"
-                class="w-full"
-                @click="showAssignPaperModal = !showAssignPaperModal"
-              >
-                Everyone
-              </VaButton>
               <div
                 v-if="paperDetail?.shareType === AccessType.ByClass || paperDetail?.shareType === AccessType.ByStudent"
               >
@@ -406,7 +394,7 @@ onMounted(async () => {
             <VaCardTitle class="flex justify-between">
               <span> Content</span>
               <div>
-                <VaButton preset="secondary" size="small">
+                <VaButton preset="secondary" size="small" @click="navigateToManageQuestions">
                   <VaIcon name="edit_square" size="small" class="material-symbols-outlined" />
                   edit
                 </VaButton>

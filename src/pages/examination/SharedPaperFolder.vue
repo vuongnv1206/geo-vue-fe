@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {
   PaperFolderDto,
+  PaperFolderPermission,
   PaperInListDto,
   SearchSharedPaperFolderRequest,
   SearchSharedPaperRequest,
@@ -17,6 +18,8 @@ import { CreatePaperFolderRequest } from './types'
 import { computed } from 'vue'
 import { watchEffect } from 'vue'
 import EditPaperFolderForm from '@pages/examination/widgets/EditPaperFolderForm.vue'
+import { useAuthStore } from '@/stores/modules/auth.module'
+import { getErrorMessage } from '@/services/utils'
 
 const router = useRouter()
 const { init: notify } = useToast()
@@ -53,6 +56,9 @@ const pagination = ref({
   totalItems: 0,
 })
 
+const authStore = useAuthStore()
+const currentUserId = authStore.user?.id
+
 const getSharedPaperFolders = async (parentId?: string | null, name?: string | null) => {
   loading.value = true
   searchSharedPaperFolderRequest.value = { parentId, name }
@@ -60,7 +66,7 @@ const getSharedPaperFolders = async (parentId?: string | null, name?: string | n
     .searchSharedPaperFolders(searchSharedPaperFolderRequest.value)
     .then((res) => {
       loading.value = false
-      paperFolderDtos.value = res
+      paperFolderDtos.value = res.paperFolderChildrens
     })
     .catch(() => {
       loading.value = false
@@ -89,10 +95,12 @@ onMounted(() => {
   getSharedPapers()
 })
 
+const currentFolder = ref<PaperFolderDto>()
 const handleFolderDoubleClick = async (event: any) => {
   const item = event.item
   if (item.type === 'folder') {
     const folderId = item.id
+    currentFolder.value = item
     if (currentFolderId.value !== folderId) {
       currentFolderId.value = folderId
       const folder = paperFolderDtos.value.find((folder) => folder.id === folderId)
@@ -189,7 +197,6 @@ const showEditPaperFolderModal = (folder: PaperFolderDto) => {
 }
 
 const showCreatePaper = () => {
-  console.log(currentFolderId.value)
   router.push({ name: 'create-paper', params: { folderId: currentFolderId.value } })
 }
 
@@ -217,7 +224,7 @@ const contextmenu = (event: any) => {
       event: event.event,
       options: [
         { text: 'Rename', icon: 'edit' },
-        { text: 'Share', icon: 'share' },
+        // { text: 'Share', icon: 'share' },
         { text: 'Delete', icon: 'delete' },
       ],
       onSelected(option) {
@@ -264,10 +271,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getSharedPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to create paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   }
@@ -290,10 +298,11 @@ const onFolderDelete = async (folder: PaperFolderDto) => {
       })
       getSharedPaperFolders(currentFolderId.value)
       getSharedPapers(currentFolderId.value)
-    } catch (err: any) {
+    } catch (error) {
+      const message = getErrorMessage(error)
       notify({
-        message: `Failed to delete folder\n${err.message}`,
-        color: 'error',
+        message: message,
+        color: 'danger',
       })
     }
   }
@@ -315,10 +324,11 @@ const onPaperDelete = async (paper: PaperInListDto) => {
         color: 'success',
       })
       getSharedPapers(currentFolderId.value)
-    } catch (err: any) {
+    } catch (error) {
+      const message = getErrorMessage(error)
       notify({
-        message: `Failed to delete paper\n${err.message}`,
-        color: 'error',
+        message: message,
+        color: 'danger',
       })
     }
   }
@@ -346,10 +356,11 @@ const onDeleteSelectedItems = async () => {
         selectedItems.value = []
         getSharedPaperFolders(currentFolderId.value)
         getSharedPapers(currentFolderId.value)
-      } catch (err: any) {
+      } catch (error) {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete selected items\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       }
     }
@@ -422,6 +433,18 @@ const switchToMyDocuments = () => {
   router.push({ name: 'paper-folder' })
 }
 
+const canEdit = (permissions: PaperFolderPermission[]) => {
+  return permissions.some((item) => item.userId === currentUserId && item.canUpdate)
+}
+
+const canDelete = (permissions: PaperFolderPermission[]) => {
+  return permissions.some((item) => item.userId === currentUserId && item.canDelete)
+}
+
+const canAdd = () => {
+  return currentFolder.value?.paperFolderPermissions?.some((item) => item.userId === currentUserId && item.canAdd)
+}
+
 // Computed property để lấy ra dữ liệu cho trang hiện tại
 const currentItems = computed(() => {
   const startIndex = (pagination.value.pageNumber - 1) * pagination.value.pageSize
@@ -454,8 +477,10 @@ const handlePageChange = async (page: number) => {
           <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems"
             >Delete
           </VaButton>
-          <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
-          <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
+          <template v-if="canAdd()">
+            <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
+            <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
+          </template>
           <VaDropdown placement="bottom-end">
             <template #anchor>
               <VaButton icon="filter_alt" />
@@ -499,6 +524,7 @@ const handlePageChange = async (page: number) => {
       </VaCardTitle>
       <VaCardContent>
         <VaDataTable
+          class="min-h-[73vh]"
           :items="currentItems"
           :columns="tableColumns"
           :loading="loading"
@@ -556,6 +582,7 @@ const handlePageChange = async (page: number) => {
           <template #cell(actions)="{ rowData }">
             <div v-if="rowData.type === 'folder'" class="flex gap-2 justify-end">
               <VaButton
+                v-if="canEdit(rowData.paperFolderPermissions)"
                 preset="primary"
                 size="small"
                 color="primary"
@@ -564,6 +591,7 @@ const handlePageChange = async (page: number) => {
                 @click="showEditPaperFolderModal(rowData as PaperFolderDto)"
               />
               <VaButton
+                v-if="canDelete(rowData.paperFolderPermissions)"
                 preset="primary"
                 size="small"
                 icon="mso-delete"

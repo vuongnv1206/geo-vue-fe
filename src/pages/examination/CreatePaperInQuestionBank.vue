@@ -20,7 +20,7 @@ const { confirm } = useModal()
 const showQuestionBankModal = ref(false)
 const questionsInPaper = ref<Question[]>([])
 const questionRequest = ref<QuestionIntoPaperRequest[]>([])
-const totalPointPaper = ref(0)
+const totalPointPaper = ref(10)
 const storePaper = usePaperStore()
 
 const paperRequest = ref<CreatePaperRequest>({
@@ -35,22 +35,39 @@ const paperRequest = ref<CreatePaperRequest>({
 })
 
 const AddQuestionsToPaper = (questions: Question[]) => {
-  let indexQuestion = 0
   questions.forEach((question) => {
     if (!questionRequest.value.some((req) => req.questionId === question.id)) {
       questionsInPaper.value.push(question)
-      questionRequest.value.push({
-        questionId: question.id,
-        mark: 1,
-        rawIndex: indexQuestion++,
-      })
     }
   })
+
+  const markPerQuestion = 10 / questionsInPaper.value.length
+
+  questionRequest.value = questionsInPaper.value.map((question, index) => ({
+    questionId: question.id,
+    mark: parseFloat(markPerQuestion.toFixed(2)),
+    rawIndex: index,
+  }))
+
   updateTotalPoint()
 }
 
 const updateTotalPoint = () => {
   totalPointPaper.value = questionRequest.value.reduce((sum, question) => sum + question.mark, 0)
+}
+const errorMessages = ref<string[]>([])
+
+const updateQuestionMark = (index: number, mark: number) => {
+  questionRequest.value[index].mark = mark
+  updateTotalPoint()
+
+  if (totalPointPaper.value !== 10) {
+    errorMessages.value[index] = `Total points must be exactly 10. Current total is ${totalPointPaper.value}.`
+    isTotalPointValid.value = false
+  } else {
+    errorMessages.value[index] = '' // Clear error message if total is valid
+    isTotalPointValid.value = true
+  }
 }
 
 const showUpdatePaperPurpose = ref(false)
@@ -112,6 +129,7 @@ const saveCreatePaper = (data: CreatePaperRequest) => {
 const cancelUpdatePaper = () => {
   showUpdatePaperPurpose.value = !showUpdatePaperPurpose.value
 }
+const isTotalPointValid = ref(true)
 </script>
 
 <template>
@@ -120,13 +138,15 @@ const cancelUpdatePaper = () => {
       <VaCardTitle>
         <VaInput v-model="paperRequest.examName" placeholder="Enter name..." />
         <VaButton preset="primary" class="mr-1 ml-2 p-1" size="small" @click="cancelCreatePaper">Cancel</VaButton>
-        <VaButton class="ml-1 p-1" size="small" @click="continueCreatePaper">Continue</VaButton>
+        <VaButton class="ml-1 p-1" size="small" :disabled="!isTotalPointValid" @click="continueCreatePaper"
+          >Continue</VaButton
+        >
       </VaCardTitle>
     </VaCard>
     <VaCardContent>
       <div class="flex justify-between">
         <p>
-          <b>{{ questionsInPaper.length }} question(s)</b> ({{ totalPointPaper }} point)
+          <b>{{ questionsInPaper.length }} question(s)</b> ({{ totalPointPaper }} {{ t('papers.point') }})
         </p>
         <VaButton
           border-color="primary"
@@ -166,8 +186,9 @@ const cancelUpdatePaper = () => {
               :placeholder="t('papers.enter_point')"
               :label="t('papers.point')"
               :rules="[validators.required, validators.isNumber]"
-              @change="updateTotalPoint"
+              @change="updateQuestionMark(index, questionRequest[index].mark)"
             />
+            <span v-if="errorMessages[index]" class="text-red-500 text-sm">{{ errorMessages[index] }}</span>
           </div>
           <div class="flex align-bottom">
             <VaButton preset="primary" color="danger" icon="delete" @click="deleteQuestion(testQuestion.id)" />
