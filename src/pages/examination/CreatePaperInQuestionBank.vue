@@ -45,8 +45,8 @@ const AddQuestionsToPaper = (questions: Question[]) => {
 
   questionRequest.value = questionsInPaper.value.map((question, index) => ({
     questionId: question.id,
-    mark: parseFloat(markPerQuestion.toFixed(2)),
-    rawIndex: index,
+    mark: markPerQuestion,
+    rawIndex: index + 1,
   }))
 
   updateTotalPoint()
@@ -68,6 +68,10 @@ const updateQuestionMark = (index: number, mark: number) => {
     errorMessages.value[index] = '' // Clear error message if total is valid
     isTotalPointValid.value = true
   }
+  // Đảm bảo rawIndex luôn liên tục
+  questionRequest.value.forEach((req, idx) => {
+    req.rawIndex = idx + 1
+  })
 }
 
 const showUpdatePaperPurpose = ref(false)
@@ -93,6 +97,14 @@ const deleteQuestion = async (questionId: string | null | undefined) => {
   if (result) {
     questionsInPaper.value = questionsInPaper.value.filter((ques) => ques.id !== questionId)
     questionRequest.value = questionRequest.value.filter((req) => req.questionId !== questionId)
+
+    // Cập nhật lại điểm sau khi xóa câu hỏi
+    const markPerQuestion = 10 / questionsInPaper.value.length
+
+    questionRequest.value.forEach((req, index) => {
+      req.rawIndex = index + 1 // Bắt đầu từ 1
+      req.mark = markPerQuestion
+    })
     updateTotalPoint()
   }
 }

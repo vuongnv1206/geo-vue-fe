@@ -61,8 +61,8 @@ const AddQuestionsToPaper = (questions: Question[]) => {
 
   questionRequest.value = questionsInPaper.value.map((question, index) => ({
     questionId: question.originalQuestionId || question.id,
-    mark: parseFloat(markPerQuestion.toFixed(2)),
-    rawIndex: index,
+    mark: markPerQuestion,
+    rawIndex: index + 1,
   }))
   console.log('questionRequest', questionRequest.value)
   console.log('questionsInPaper', questionsInPaper.value)
@@ -115,9 +115,13 @@ const deleteQuestion = async (questionId: string | null | undefined) => {
     // Cập nhật lại điểm sau khi xóa câu hỏi
     const markPerQuestion = 10 / questionsInPaper.value.length
 
-    questionRequest.value.forEach((req) => {
-      req.mark = parseFloat(markPerQuestion.toFixed(2))
+    questionRequest.value.forEach((req, index) => {
+      req.rawIndex = index + 1 // Bắt đầu từ 1
+      req.mark = markPerQuestion
     })
+    console.log('questionRequest', questionRequest.value)
+    console.log('questionsInPaper', questionsInPaper.value)
+
     updateTotalPoint()
   }
 }
@@ -136,6 +140,10 @@ const updateQuestionMark = (index: number, mark: number) => {
     errorMessages.value[index] = '' // Clear error message if total is valid
     isTotalPointValid.value = true
   }
+  // Đảm bảo rawIndex luôn liên tục
+  questionRequest.value.forEach((req, idx) => {
+    req.rawIndex = idx + 1
+  })
 }
 </script>
 
@@ -204,7 +212,7 @@ const updateQuestionMark = (index: number, mark: number) => {
               preset="primary"
               color="danger"
               icon="delete"
-              @click="deleteQuestion(testQuestion.originalQuestionId)"
+              @click="deleteQuestion(testQuestion.originalQuestionId ?? testQuestion.id)"
             />
           </div>
         </VaCardTitle>
