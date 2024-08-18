@@ -575,7 +575,8 @@
     "exam_schedule": "Exam Schedule",
     "stt": "No.",
     "class_list": "Class List",
-    "rawIndex": "No"
+    "rawIndex": "No",
+    "unlimited_time": "Unlimited Time"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",

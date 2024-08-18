@@ -5,7 +5,9 @@ import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/vi'
 import 'dayjs/locale/en'
+import duration from 'dayjs/plugin/duration'
 
+dayjs.extend(duration)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -71,6 +73,17 @@ export const format = {
     } else {
       return dateTime.fromNow()
     }
+  },
+  formatDuration: (minutes: number) => {
+    const totalMilliseconds = minutes * 60 * 1000
+    const durationObj = dayjs.duration(totalMilliseconds)
+    const minutesPart = durationObj.minutes()
+      ? `${durationObj.minutes()} minute${durationObj.minutes() > 1 ? 's' : ''}`
+      : ''
+    const secondsPart = durationObj.seconds()
+      ? `${durationObj.seconds()} second${durationObj.seconds() > 1 ? 's' : ''}`
+      : ''
+    return [minutesPart, secondsPart].filter(Boolean).join(' ')
   },
 }
 
