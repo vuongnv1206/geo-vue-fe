@@ -31,7 +31,7 @@
                   </VaListItemLabel>
                 </VaListItemSection>
                 <VaListItemSection icon>
-                  <VaCard>
+                  <VaCard v-if="isTeacher">
                     {{ assignment.submissionsStats?.totalSubmitted }} /
                     {{ assignment.submissionsStats?.totalStudents }}
                   </VaCard>
@@ -87,7 +87,7 @@
                       >
                     </VaListItemSection>
                     <VaListItemSection icon>
-                      <VaCard>
+                      <VaCard v-if="isTeacher">
                         {{ assignment.submissionsStats?.totalSubmitted }} /
                         {{ assignment.submissionsStats?.totalStudents }}
                       </VaCard>
