@@ -99,6 +99,7 @@ const fileUpload = async () => {
     .uploadFile(filesUploaded.value)
     .then((response) => {
       newAssignmentSubmit.value.attachmentPath = JSON.stringify(response)
+      getAssignmentSubmissions()
     })
     .catch((error) => {
       notify({
