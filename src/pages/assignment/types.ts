@@ -101,3 +101,21 @@ export type MarkAssignment = {
   score: number
   comment: string
 }
+export type SubmissionStats = {
+  totalSubmitted: number
+  totalStudents: number
+}
+
+export type AssignmentStats = {
+  id: string
+  name: string
+  startTime: Date
+  endTime: Date
+  content: string
+  canViewResult: boolean
+  requireLoginToSubmit: boolean
+  subjectId: string
+  attachment: string
+  createdOn: Date
+  submissionsStats: SubmissionStats
+}

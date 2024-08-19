@@ -179,6 +179,11 @@ const canStudentManage = computed(() => {
         @selectionChange="handleSelectionChange($event.currentSelectedItems)"
         @delete="deleteStudentWithConfirm"
       >
+        <template #cell(gender)="{ rowData }">
+          <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+            <div>{{ rowData.gender ? t('students.male') : t('students.female') }}</div>
+          </div>
+        </template>
         <template #cell(dateOfBirth)="{ rowData }">
           <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
             <div>{{ format.formatDate(rowData.dateOfBirth) }}</div>
