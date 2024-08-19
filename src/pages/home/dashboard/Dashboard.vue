@@ -372,11 +372,12 @@ const calculatePaperStudent = () => {
       ...student,
     })),
     ...paperStudentsHistory.value.map((history: any, index: number) => ({
-      stt: index + 1,
+      stt: paperStudents.value.length + index + 1,
       ...history,
     })),
   ]
 }
+
 const dataFilter = ref({
   advancedSearch: {
     fields: [''],
