@@ -577,7 +577,8 @@
     "exam_schedule": "Lịch thi",
     "stt": "STT",
     "class_list": "Danh sách lớp",
-    "rawIndex": "STT"
+    "rawIndex": "STT",
+    "unlimited_time": "Không giới hạn thời gian"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",

@@ -165,7 +165,7 @@
     <div v-if="isStudent" class="flex flex-col gap-4 pt-4">
       <div class="col-span-1 lg:col-span-1 xl:col-span-1 mb-3">
         <VaCardTitle>{{ t('papers.exam_schedule') }}</VaCardTitle>
-        <VaDataTable hoverable :columns="columns" :items="paperStudent">
+        <VaDataTable hoverable :disable-client-side-sorting="false" :columns="columns" :items="paperStudent">
           <template #cell(startTime)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
@@ -176,7 +176,18 @@
           <template #cell(endTime)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
-                <span> {{ format.formatDate(rowData.endTime) }}</span>
+                <span>
+                  {{ rowData.endTime !== null ? format.formatDate(rowData.endTime) : t('papers.unlimited_time') }}
+                </span>
+              </div>
+            </div>
+          </template>
+          <template #cell(duration)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span>
+                  {{ format.formatDuration(rowData.duration) }}
+                </span>
               </div>
             </div>
           </template>
@@ -199,10 +210,12 @@
       <VaDivider />
       <VaCardTitle>{{ t('papers.class_list') }}</VaCardTitle>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        <VaCard v-for="class1 in classes" :key="class1.id" class="p-4 shadow-lg rounded-lg border border-gray-200">
-          <div
-            v-if="(class1.assignments && class1.assignments.length > 0) || (class1.posts && class1.posts.length > 0)"
-          >
+        <VaCard
+          v-for="class1 in classes.filter((class1) => class1.assignments.length > 0)"
+          :key="class1.id"
+          class="p-4 shadow-lg rounded-lg border border-gray-200"
+        >
+          <div>
             <!-- Header Section -->
             <VaCard class="flex flex-row items-center p-4 bg-white rounded-lg shadow-sm">
               <GeoAvatar
@@ -213,9 +226,9 @@
                 :txt="class1.owner?.firstName.charAt(0).toUpperCase()"
               />
               <VaCard :to="{ name: 'class-details', params: { id: class1.id } }">
-                <VaCardContent class="text-md font-bold text-gray-800"
-                  >{{ class1.owner?.firstName }} {{ class1.owner?.lastName }}</VaCardContent
-                >
+                <VaCardContent class="text-md font-bold text-gray-800">
+                  {{ class1.owner?.firstName }} {{ class1.owner?.lastName }}
+                </VaCardContent>
                 <VaCardContent class="text-sm font-semibold text-gray-600">{{ class1.name }}</VaCardContent>
               </VaCard>
             </VaCard>
@@ -259,9 +272,9 @@
             <VaCard class="flex flex-col px-4 bg-white rounded-lg">
               <div class="flex items-center mb-2">
                 <VaIcon name="newspaper" class="text-primary" size="large" />
-                <VaCardContent class="text-sm font-semibold text-gray-800 ml-2">{{
-                  $t('posts.news_board')
-                }}</VaCardContent>
+                <VaCardContent class="text-sm font-semibold text-gray-800 ml-2">
+                  {{ $t('posts.news_board') }}
+                </VaCardContent>
               </div>
               <div
                 v-for="posts1 in class1.posts?.slice(0, 2)"
@@ -271,7 +284,7 @@
                 <VaCardContent class="text-md font-bold text-gray-800">
                   <!-- eslint-disable vue/no-v-html -->
                   <div class="text-base text-gray-700" v-html="posts1.content" />
-                  <!--eslint-enable-->
+                  <!-- eslint-enable-->
                 </VaCardContent>
               </div>
               <div v-if="(class1.posts?.length || 0) > 2" class="flex justify-center items-center">
@@ -284,7 +297,7 @@
         </VaCard>
       </div>
     </div>
-    <div>
+    <div v-if="isTeacher">
       <RouterLink :to="{ name: 'subscription' }">
         <VaButton color="#ee943a" text-color="#ffffff" class="my-4">{{ t('subscription.btn_subscribe') }}</VaButton>
       </RouterLink>
@@ -304,7 +317,12 @@ import { usePostsStore } from '@/stores/modules/posts.module'
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import { PaperStudents, PaperStudentsHistory } from '@/pages/examination/types'
 import { usePaperStudentsStore } from '@/stores/modules/paperStudents.module'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
+dayjs.extend(duration)
+dayjs.extend(relativeTime)
 const { t } = useI18n()
 const loading = ref(true)
 const { init: notify } = useToast()
@@ -335,15 +353,27 @@ const columns = defineVaDataTableColumns([
 
 const paperStudent = ref<any[]>([])
 
+// const calculatePaperStudent = () => {
+//   paperStudent.value = paperStudents.value.map((student: any, index: number) => {
+//     const history = paperStudentsHistory.value.find((history: any) => history.id === student.id)
+//     return {
+//       stt: index + 1,
+//       ...student,
+//       score: history?.score || null,
+//       startedTime: history?.startedTime || null,
+//       submittedTime: history?.submittedTime || null,
+//     }
+//   })
+// }
 const calculatePaperStudent = () => {
   paperStudent.value = paperStudents.value.map((student: any, index: number) => {
-    const history = paperStudentsHistory.value.find((history: any) => history.id === student.id)
+    const history = paperStudentsHistory.value[index] || {}
     return {
       stt: index + 1,
       ...student,
-      score: history?.score || null,
-      startedTime: history?.startedTime || null,
-      submittedTime: history?.submittedTime || null,
+      score: history.score || null,
+      startedTime: history.startedTime || null,
+      submittedTime: history.submittedTime || null,
     }
   })
 }
