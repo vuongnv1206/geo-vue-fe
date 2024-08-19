@@ -239,7 +239,8 @@
     "delete": "Delete",
     "read_more": "Read more",
     "correct_answer": "Correct Answer",
-    "question_passages": "Question Passages"
+    "question_passages": "Question Passages",
+    "bin_question": "Question Bin"
   },
   "questionFolder": {
     "pending": "Approval Queue ({total})",

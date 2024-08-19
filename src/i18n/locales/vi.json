@@ -238,7 +238,8 @@
     "delete": "Xóa",
     "read_more": "Đọc thêm",
     "correct_answer": "Đáp án đúng",
-    "question_passages": "Câu hỏi đoạn văn"
+    "question_passages": "Câu hỏi đoạn văn",
+    "bin_question": "Câu hỏi đã xóa"
   },
   "questionFolder": {
     "pending": "Câu hỏi chưa duyệt ({total})",

@@ -15,7 +15,9 @@
                 <p class="font-bold text-lg my-4">{{ item?.name || '' }}</p>
               </div>
               <div class="border-t-2 border-solid border-slate-200 my-5 py-2 w-full">
-                <p>{{ item?.description || '' }}</p>
+                <!-- eslint-disable vue/no-v-html -->
+                <p v-html="item?.description || ''"></p>
+                <!--eslint-enable-->
               </div>
             </div>
             <div class="flex flex-col items-center w-full">
