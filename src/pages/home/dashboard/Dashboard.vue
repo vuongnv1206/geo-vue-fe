@@ -366,16 +366,16 @@ const paperStudent = ref<any[]>([])
 //   })
 // }
 const calculatePaperStudent = () => {
-  paperStudent.value = paperStudents.value.map((student: any, index: number) => {
-    const history = paperStudentsHistory.value[index] || {}
-    return {
+  paperStudent.value = [
+    ...paperStudents.value.map((student: any, index: number) => ({
       stt: index + 1,
       ...student,
-      score: history.score || null,
-      startedTime: history.startedTime || null,
-      submittedTime: history.submittedTime || null,
-    }
-  })
+    })),
+    ...paperStudentsHistory.value.map((history: any, index: number) => ({
+      stt: paperStudents.value.length + index + 1,
+      ...history,
+    })),
+  ]
 }
 
 const dataFilter = ref({

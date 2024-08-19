@@ -97,9 +97,17 @@ const getAssignmentSubmissions = async ({ assignmentId, classId }: { assignmentI
           </div>
           <!-- Loop through papers -->
           <div v-for="(paper, index3) in group.papers" :key="index3">
-            <VaCard
+            <!-- <VaCard
               class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
               :to="{ name: 'admin-exam-detail', params: { id: paper.id } }"
+            > -->
+            <VaCard
+              class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
+              :to="
+                isTeacher
+                  ? { name: 'admin-exam-detail', params: { id: paper.id } }
+                  : { name: '', params: { id: paper.id, classId: classId } }
+              "
             >
               <VaIcon name="article" size="3rem" class="text-gray-500" />
               <div>
