@@ -139,7 +139,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const getSrcAvatar = (rowData: any) => {
-  const img = rowData?.author?.imageUrl
+  const img = rowData?.student?.imageUrl
   const url = import.meta.env.VITE_APP_BASE_URL as string
   const url_without_api = url.slice(0, -3)
   if (img) return `${url_without_api}${img}`
