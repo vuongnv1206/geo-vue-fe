@@ -132,8 +132,6 @@ watch(
   { immediate: true },
 )
 
-const valueSwitch = ref(true)
-
 const accessOptions = [
   { value: AccessType.ByClass, text: 'By Class' },
   { value: AccessType.ByStudent, text: 'By Student' },
@@ -260,7 +258,9 @@ const form = useForm('paperConfigForm')
   <VaForm ref="paperConfigForm" stateful class="flex flex-col gap-2">
     <div class="">
       <div class="flex justify-center" style="align-items: center">
-        <VaCardTitle>Exam name: {{ paperDetail?.examName }}- Code: {{ paperDetail?.examCode }}</VaCardTitle>
+        <VaCardTitle class="flex gap-2"
+          ><span>Exam name:</span><span class="va-h5 va-text-bold">{{ paperDetail?.examName }}</span></VaCardTitle
+        >
       </div>
       <VaCard class="mb-3">
         <VaCardTitle class="justify-between align-center">
@@ -268,7 +268,8 @@ const form = useForm('paperConfigForm')
             <VaIcon name="keyboard_arrow_left" />
           </VaButton>
           <p>Configuration type</p>
-          <VaSwitch v-model="valueSwitch" true-inner-label="Exam" false-inner-label="Practice" />
+          <div></div>
+          <!-- <VaSwitch v-model="valueSwitch" true-inner-label="Exam" false-inner-label="Practice" /> -->
         </VaCardTitle>
       </VaCard>
       <VaCard class="mb-3">
@@ -334,6 +335,9 @@ const form = useForm('paperConfigForm')
               <VaButton size="small" preset="secondary" border-color="primary" @click="resetAccessTime"
                 >Reset time
               </VaButton>
+            </div>
+            <div class="col-span-2">
+              <VaTextarea v-model="editPaper.description" label="description" class="min-w-[100%]" />
             </div>
             <div class="col-span-2">
               <p class="mt-2 text-xs va-text-bold">Who is allowed to take the exam?</p>

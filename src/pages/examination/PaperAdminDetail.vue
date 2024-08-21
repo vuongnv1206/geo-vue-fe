@@ -271,9 +271,9 @@ onMounted(async () => {
       <VaCard v-if="showSidebar" class="mt-2" style="min-width: 20rem; max-width: 30rem">
         <VaCardTitle class="flex justify-between">
           <span> {{ paperDetail?.examName }}</span>
-          <div>
+          <!-- <div>
             <VaButton preset="secondary" border-color="primary" size="small"> Copy link </VaButton>
-          </div>
+          </div> -->
         </VaCardTitle>
         <VaCardContent>
           <VaList class="va-text-secondary text-xs mb-2">

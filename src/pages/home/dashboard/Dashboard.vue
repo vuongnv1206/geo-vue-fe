@@ -102,7 +102,7 @@
         </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'teacher-group' }">
+        <RouterLink :to="{ name: 'group-manage' }">
           <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg

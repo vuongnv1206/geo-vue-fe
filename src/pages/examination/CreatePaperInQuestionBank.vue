@@ -25,7 +25,7 @@ const storePaper = usePaperStore()
 
 const paperRequest = ref<CreatePaperRequest>({
   examName: '',
-  status: 1,
+  status: 2,
   password: '',
   type: 0,
   paperFolderId: folderId,
