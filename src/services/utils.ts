@@ -85,6 +85,15 @@ export const format = {
       : ''
     return [minutesPart, secondsPart].filter(Boolean).join(' ')
   },
+  // sub 2 time and return duration in minute and seconds like 2m 30s
+  formatDurationToSeconds: (date1: Date, date2: Date) => {
+    const start = dayjs(date1).tz(currentTimezone)
+    const end = dayjs(date2).tz(currentTimezone)
+    const duration = dayjs.duration(end.diff(start))
+    const minutes = duration.minutes()
+    const seconds = duration.seconds()
+    return `${minutes}m ${seconds}s`
+  },
 }
 
 export const notifications = {

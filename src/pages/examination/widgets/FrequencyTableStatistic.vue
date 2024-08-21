@@ -77,7 +77,7 @@ onMounted(async () => {
                 <td class="border">{{ item.className }}</td>
                 <td class="border">{{ item.totalRegister }}</td>
                 <td class="border">{{ item.totalAttendee }}</td>
-                <template v-for="(scoreRange, index) in item.frequencyMarks" :key="index">
+                <template v-for="(scoreRange, index2) in item.frequencyMarks" :key="index2">
                   <td class="border">{{ scoreRange.total }}</td>
                   <td class="border">{{ scoreRange.rate }}</td>
                 </template>
