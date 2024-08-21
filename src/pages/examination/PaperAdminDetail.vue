@@ -270,7 +270,7 @@ onMounted(async () => {
     <template #left>
       <VaCard v-if="showSidebar" class="mt-2" style="min-width: 20rem; max-width: 30rem">
         <VaCardTitle class="flex justify-between">
-          <span> {{ paperDetail?.examName }}</span>
+          <span style="font-size: 1rem"> {{ paperDetail?.examName }}</span>
           <!-- <div>
             <VaButton preset="secondary" border-color="primary" size="small"> Copy link </VaButton>
           </div> -->
@@ -278,13 +278,24 @@ onMounted(async () => {
         <VaCardContent>
           <VaList class="va-text-secondary text-xs mb-2">
             <VaListItem>
+              <VaIcon name="person" class="mr-1 material-symbols-outlined" /> Creator: {{ paperDetail?.creatorName }}
+            </VaListItem>
+            <VaListItem>
               <VaIcon name="event" class="mr-1 material-symbols-outlined" /> Created at:
               {{ format.formatDate(new Date(paperDetail?.createdOn || '')) }}
             </VaListItem>
             <VaListItem>
-              <VaIcon name="person" class="mr-1 material-symbols-outlined" /> Creator: {{ paperDetail?.creatorName }}
+              <VaIcon name="pending_actions" class="mr-1 material-symbols-outlined" /> Access time:
+              {{ paperDetail?.startTime ? format.formatDateNoTime(new Date(paperDetail?.startTime)) : 'N/a' }} -
+              {{ paperDetail?.endTime ? format.formatDateNoTime(new Date(paperDetail?.endTime)) : 'N/a' }}
             </VaListItem>
-            <VaListItem> <VaIcon name="task" class="mr-1 material-symbols-outlined" /> Submitted: 0 </VaListItem>
+            <VaListItem>
+              <VaIcon name="timer" class="mr-1 material-symbols-outlined" /> Duration:
+              {{ format.formatDurationMinute(paperDetail?.duration) }}
+            </VaListItem>
+            <VaListItem>
+              <VaIcon name="task" class="mr-1 material-symbols-outlined" /> Submitted: {{ paperDetail?.totalAttended }}
+            </VaListItem>
           </VaList>
 
           <VaCard outlined class="mb-2">

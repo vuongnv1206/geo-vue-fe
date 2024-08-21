@@ -103,6 +103,7 @@ export interface PaperDto {
   publicIpAllowed?: string
   localIpAllowed?: string
   numberAttempt?: number
+  totalAttended?: number
 }
 
 export interface PaperLabelDto {
