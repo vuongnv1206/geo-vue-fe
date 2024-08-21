@@ -41,10 +41,11 @@ export const validators = {
   isDecimalNumber: (fieldName: string) => (v: string) =>
     /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || t('validateUtils.isDecimalNumber', { fieldName }),
   isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || t('validateUtils.isNumber', { fieldName }),
+  isAlphanumeric: (fieldName: string) => (v: string) =>
+    /^[a-zA-Z0-9]+$/.test(v) || t('validateUtils.isAlphanumeric', { fieldName }),
   email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
-  phone: (v: string) =>
-    /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/.test(v) ||
-    t('validateUtils.phone'),
+  phone: (fieldName: string, v: string) =>
+    /([+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/.test(v) || t('validateUtils.phone', { fieldName }),
 }
 
 export const format = {

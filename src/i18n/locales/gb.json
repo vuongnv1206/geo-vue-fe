@@ -813,6 +813,7 @@
     "isCharacter": "{fieldName} must be valid characters",
     "isDecimalNumber": "{fieldName} must be valid decimal number",
     "isNumber": "{fieldName} must be valid number",
+    "isAlphanumeric": "{fieldName} must be valid alphanumeric",
     "email": "Please enter a valid email address",
     "phone": "Please enter a valid phone number",
     "updatedSuccessfully": "{message} updated successfully",
