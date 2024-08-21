@@ -14,6 +14,7 @@ import { Subject } from '../subject/types'
 import { getErrorMessage, notifications } from '@/services/utils'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import WhoAssignedPaperDetailModal from './widgets/WhoAssignedPaperDetailModal.vue'
 const paperDetail = ref<PaperDto | null>(null)
 const route = useRoute()
 const paperStore = usePaperStore()
@@ -246,6 +247,8 @@ const backToPage = () => {
   router.push({ name: 'paper-config', params: { id: paperId } })
 }
 
+const showWhoAssignedDetail = ref(false)
+
 onMounted(() => {
   getPaperDetail()
   getGroupClasses()
@@ -341,6 +344,14 @@ const form = useForm('paperConfigForm')
             </div>
             <div class="col-span-2">
               <p class="mt-2 text-xs va-text-bold">Who is allowed to take the exam?</p>
+              <VaButton
+                preset="secondary"
+                class="mr-6 mb-2"
+                size="small"
+                @click="showWhoAssignedDetail = !showWhoAssignedDetail"
+              >
+                show who assigned list
+              </VaButton>
               <VaRadio v-model="valueOption" :options="accessOptions" class="assign-radio mb-2" value-by="value" />
             </div>
             <div class="col-span-2">
@@ -501,6 +512,13 @@ const form = useForm('paperConfigForm')
           ok()
         }
       "
+    />
+  </VaModal>
+
+  <VaModal v-model="showWhoAssignedDetail" close-button hide-default-actions>
+    <WhoAssignedPaperDetailModal
+      :paper-access-list="paperDetail?.paperAccesses || []"
+      :access-type="paperDetail?.shareType as AccessType"
     />
   </VaModal>
 </template>

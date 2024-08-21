@@ -632,3 +632,36 @@ export interface UpdateQuestionsInPaperRequest {
   paperId: string
   questions?: QuestionIntoPaperRequest[]
 }
+
+export type GroupClassAccessPaper = {
+  id: string
+  name: string
+  classes: ClassAccessPaper[]
+}
+
+export type ClassAccessPaper = {
+  id: string
+  name: string
+  userClasses: StudentAccessPaper[]
+}
+
+export type StudentAccessPaper = {
+  studentId: string
+  student: Student
+}
+
+export type GetAccessPaperRequest = {
+  keyword?: string
+  pageNumber?: number
+  pageSize?: number
+  orderBy?: string[]
+  paperId: string
+}
+
+export type GetAccessPaperResponse = {
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  data: GroupClassAccessPaper[]
+}
