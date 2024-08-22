@@ -35,6 +35,10 @@
             :month-change-on-arrows="true"
             :placeholder="$t('assignments.enter_start_and_end_time')"
             :min-date="new Date(new Date().setHours(0, 0, 0, 0))"
+            :min-time="{
+              hours: new Date().getHours(),
+              minutes: new Date().getMinutes(),
+            }"
           />
           <VaFileUpload
             v-model="filesUploaded"
@@ -271,7 +275,7 @@ const defaultNewAssignment: EmptyAssignment = {
   requireLoginToSubmit: false,
   subjectId: '',
   attachment: '',
-  classIds: [] as string[],
+  classesId: [] as string[],
 }
 const newAssignment = ref({ ...defaultNewAssignment })
 
@@ -427,7 +431,7 @@ const handleClickSave = async () => {
   if (validate()) {
     handleDatePicker()
     try {
-      newAssignment.value.classIds = selectedClasses.value
+      newAssignment.value.classesId = selectedClasses.value
       await assignmentStore.createAssignment(newAssignment.value as EmptyAssignment)
       notify({ message: notifications.createSuccessfully(newAssignment.value.name), color: 'success' })
       router.push({ name: 'assignments' })
