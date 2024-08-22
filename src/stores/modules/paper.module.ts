@@ -1,5 +1,7 @@
 import {
   AddQuestionsInPaperRequest,
+  GetAccessPaperRequest,
+  GetAccessPaperResponse,
   PaperDeletedResponse,
   PaperInListDto,
   QuestionGenerateToMatrix,
@@ -174,6 +176,16 @@ export const usePaperStore = defineStore('paper', {
     async updateQuestionsInPaper(id: string, request: UpdateQuestionsInPaperRequest): Promise<any> {
       return await papersService
         .updateQuestionsInPaper(id, request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse> {
+      return await papersService
+        .getGroupClassesAccessPaper(request)
         .then((response) => {
           return Promise.resolve(response)
         })
