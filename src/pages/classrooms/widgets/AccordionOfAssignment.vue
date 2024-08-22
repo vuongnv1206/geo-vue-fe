@@ -8,18 +8,15 @@ import { useI18n } from 'vue-i18n'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { AssignmentClass, SubmissionStats } from '@/pages/assignment/types'
 
-const { t } = useI18n()
-const { init: notify } = useToast()
 const load = ref(true)
-const assignmentStore = useAssignmentStore()
-
-const submissionStatsMap = reactive<{ [key: string]: SubmissionStats }>({})
-
+const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
-
+const { init: notify } = useToast()
+const assignmentStore = useAssignmentStore()
 const classId = router.currentRoute.value.params.id.toString()
 const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
+const submissionStatsMap = reactive<{ [key: string]: SubmissionStats }>({})
 
 const props = defineProps({
   filteredGroupedData: {
@@ -59,65 +56,101 @@ const getAssignmentSubmissions = async (assignmentClass: AssignmentClass) => {
       :key="index"
       :header="format.formatDate(group.createOn)"
       solid
-      class="py-1 font-bold"
+      class="py-2 font-semibold"
     >
       <template #header="{ value, attrs, iconAttrs, text }">
-        <VaCard v-bind="attrs" class="w-full flex border-2 p-2 items-center">
-          <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" />
-          <VaCard class="flex justify-between items-center w-full">
+        <VaCard
+          v-bind="attrs"
+          class="w-full flex border-2 p-1 items-center rounded-lg hover:shadow-md transition-shadow duration-200"
+        >
+          <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" size="1.5rem" />
+          <VaCard class="flex justify-between items-center w-full ml-2">
             <VaCard>{{ text }}</VaCard>
           </VaCard>
         </VaCard>
       </template>
       <template #body>
-        <!-- List assignments and papers for this date in rows -->
-        <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
-          <!-- Loop through assignments -->
-          <div v-for="(assignment, index2) in group.assignments" :key="index2">
+        <VaList>
+          <VaListItem
+            v-for="(assignment, index2) in group.assignments"
+            :key="index2"
+            :to="
+              isTeacher
+                ? { name: 'assignment-details', params: { id: assignment.id, classId: classId } }
+                : { name: 'assignment-submission', params: { id: assignment.id, classId: classId } }
+            "
+            v-on="getAssignmentSubmissions({ assignmentId: assignment?.id, classId: classId })"
+          >
             <VaCard
-              class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
-              :to="
-                isTeacher
-                  ? { name: 'assignment-details', params: { id: assignment.id, classId: classId } }
-                  : { name: 'assignment-submission', params: { id: assignment.id, classId: classId } }
-              "
-              v-on="getAssignmentSubmissions({ assignmentId: assignment?.id, classId: classId })"
+              class="mt-1 border border-gray-200 rounded-lg overflow-hidden p-4 flex space-x-4 hover:bg-gray-50 transition-colors duration-200 w-full"
             >
-              <VaIcon name="description" size="3rem" class="text-gray-500" />
-              <div>
-                <VaCardTitle class="font-medium text-lg">{{ assignment.name }}</VaCardTitle>
-                <VaCard v-if="submissionStatsMap[assignment.id]">
-                  {{ $t('classes.submited') }}: {{ submissionStatsMap[assignment.id].totalSubmitted }} /
-                  {{ submissionStatsMap[assignment.id].totalStudents }}
-                </VaCard>
-              </div>
+              <VaListItemSection avatar>
+                <VaIcon name="description" size="2.5rem" class="text-gray-500" />
+              </VaListItemSection>
+              <VaListItemSection class="flex-1">
+                <VaListItemLabel class="font-large text-bold">{{ assignment.name }}</VaListItemLabel>
+                <VaListItemLabel caption>
+                  {{ $t('assignments.end_time') }} {{ format.formatDate(assignment.endTime) }}
+                </VaListItemLabel>
+              </VaListItemSection>
+
+              <VaListItemSection class="ml-auto text-right">
+                <div v-if="submissionStatsMap[assignment.id]" class="flex flex-col">
+                  <div v-if="isTeacher">
+                    <VaListItemLabel caption>
+                      {{ submissionStatsMap[assignment.id].totalMarked }} /
+                      {{
+                        submissionStatsMap[assignment.id].totalSubmitted + submissionStatsMap[assignment.id].totalMarked
+                      }}
+                      {{ $t('assignments.marked') }}
+                    </VaListItemLabel>
+                    <VaListItemLabel caption>
+                      {{
+                        submissionStatsMap[assignment.id].totalSubmitted + submissionStatsMap[assignment.id].totalMarked
+                      }}
+                      /
+                      {{ submissionStatsMap[assignment.id].totalStudents }}
+                      {{ $t('assignments.submitted') }}
+                    </VaListItemLabel>
+                  </div>
+                  <div v-else>
+                    <VaListItemLabel caption>
+                      {{
+                        submissionStatsMap[assignment.id].totalSubmitted
+                          ? submissionStatsMap[assignment.id].totalSubmitted
+                          : submissionStatsMap[assignment.id].totalMarked
+                      }}
+                      /
+                      {{ submissionStatsMap[assignment.id].totalStudents }}
+                      {{ $t('assignments.submitted') }}
+                    </VaListItemLabel>
+                  </div>
+                </div>
+              </VaListItemSection>
             </VaCard>
-          </div>
-          <!-- Loop through papers -->
-          <div v-for="(paper, index3) in group.papers" :key="index3">
-            <!-- <VaCard
-              class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
-              :to="{ name: 'admin-exam-detail', params: { id: paper.id } }"
-            > -->
+          </VaListItem>
+
+          <VaListItem
+            v-for="(paper, index3) in group.papers"
+            :key="index3"
+            :to="
+              isTeacher
+                ? { name: 'admin-exam-detail', params: { id: paper.id } }
+                : { name: '', params: { id: paper.id, classId: classId } }
+            "
+          >
             <VaCard
-              class="border border-gray-200 rounded-lg overflow-hidden p-4 mt-2 flex space-x-4"
-              :to="
-                isTeacher
-                  ? { name: 'admin-exam-detail', params: { id: paper.id } }
-                  : { name: '', params: { id: paper.id, classId: classId } }
-              "
+              class="mt-1 border border-gray-200 rounded-lg overflow-hidden p-4 flex space-x-4 hover:bg-gray-50 transition-colors duration-200 w-full"
             >
-              <VaIcon name="article" size="3rem" class="text-gray-500" />
-              <div>
-                <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>
-                <VaCard v-if="submissionStatsMap[paper.id]">
-                  {{ $t('classes.submited') }}: {{ submissionStatsMap[paper.id].totalSubmitted }} /
-                  {{ submissionStatsMap[paper.id].totalStudents }}
-                </VaCard>
-              </div>
+              <VaListItemSection avatar>
+                <VaIcon name="article" size="2.5rem" class="text-gray-500" />
+              </VaListItemSection>
+              <VaListItemSection>
+                <VaListItemLabel class="font-medium text-lg">{{ paper.examName }}</VaListItemLabel>
+              </VaListItemSection>
             </VaCard>
-          </div>
-        </div>
+          </VaListItem>
+        </VaList>
       </template>
     </VaCollapse>
   </VaAccordion>

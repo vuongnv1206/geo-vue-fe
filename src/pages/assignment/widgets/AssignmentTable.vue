@@ -26,14 +26,22 @@
                       {{ $t('assignments.create_at') }} {{ format.formatDateFromNow(assignment?.createdOn) }}
                     </VaPopover>
                   </VaListItemLabel>
-                  <VaListItemLabel caption
-                    >{{ $t('assignments.end_time') }} {{ format.formatDate(assignment?.endTime) }}
+                  <VaListItemLabel caption>
+                    {{ $t('assignments.end_time') }} {{ format.formatDate(assignment?.endTime) }}
                   </VaListItemLabel>
                 </VaListItemSection>
                 <VaListItemSection icon>
-                  <VaCard v-if="isTeacher">
-                    {{ assignment.submissionsStats?.totalSubmitted }} /
-                    {{ assignment.submissionsStats?.totalStudents }} {{ $t('assignments.submitted') }}
+                  <VaCard v-if="isTeacher" class="flex flex-col">
+                    <VaListItemLabel caption>
+                      {{ assignment.submissionsStats?.totalMarked }} /
+                      {{ assignment.submissionsStats?.totalSubmitted + assignment.submissionsStats?.totalMarked }}
+                      {{ $t('assignments.marked') }}
+                    </VaListItemLabel>
+
+                    <VaListItemLabel caption>
+                      {{ assignment.submissionsStats?.totalSubmitted + assignment.submissionsStats?.totalMarked }} /
+                      {{ assignment.submissionsStats?.totalStudents }} {{ $t('assignments.submitted') }}
+                    </VaListItemLabel>
                   </VaCard>
                 </VaListItemSection>
               </div>
@@ -88,14 +96,16 @@
                     </VaListItemSection>
                     <VaListItemSection icon>
                       <VaCard v-if="isTeacher" class="flex flex-col">
-                        <div>
+                        <VaListItemLabel caption>
                           {{ assignment.submissionsStats?.totalMarked }} /
-                          {{ assignment.submissionsStats?.totalSubmitted }} {{ $t('assignments.marked') }}
-                        </div>
-                        <div>
-                          {{ assignment.submissionsStats?.totalSubmitted }} /
+                          {{ assignment.submissionsStats?.totalSubmitted + assignment.submissionsStats?.totalMarked }}
+                          {{ $t('assignments.marked') }}
+                        </VaListItemLabel>
+
+                        <VaListItemLabel caption>
+                          {{ assignment.submissionsStats?.totalSubmitted + assignment.submissionsStats?.totalMarked }} /
                           {{ assignment.submissionsStats?.totalStudents }} {{ $t('assignments.submitted') }}
-                        </div>
+                        </VaListItemLabel>
                       </VaCard>
                     </VaListItemSection>
                   </VaCard>
