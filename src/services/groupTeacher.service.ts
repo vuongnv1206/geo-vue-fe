@@ -129,6 +129,17 @@ class GroupTeacherService {
       })
   }
 
+  async getGuestGroupDetail(id: string): Promise<any> {
+    return apiService
+      .get(`v1/groupteachers/guest/${id}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
   async setPermissionGroupInClass(data: SetPermissionInClassGroup): Promise<any> {
     return apiService
       .post('v1/permissionclasses/group-permission-in-class', data)
