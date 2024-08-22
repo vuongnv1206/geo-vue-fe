@@ -26,7 +26,7 @@ const requestJoin = ref<SendRequestJoinGroupRequest>({
 
 const getTeacherGroupDetail = async (id: string) => {
   try {
-    const response = await useTeacherGroup.getGroupDetail(id)
+    const response = await useTeacherGroup.getGuestGroupDetail(id)
     groupDetail.value = response
     loading.value = false
   } catch (error) {
