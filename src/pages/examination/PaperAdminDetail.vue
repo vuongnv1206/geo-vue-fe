@@ -19,6 +19,11 @@ import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useClassStore } from '../../stores/modules/class.module'
 import { format } from '@/services/utils'
 import { onMounted, ref } from 'vue'
+import { useAuthStore } from '@/stores/modules/auth.module'
+import WhoAssignedPaperDetailModal from './widgets/WhoAssignedPaperDetailModal.vue'
+
+const authStore = useAuthStore()
+const currentUserId = authStore.user?.id
 
 const route = useRoute()
 const router = useRouter()
@@ -45,13 +50,13 @@ const getPaperDetail = async () => {
     })
   }
 }
-const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
+const groupClassFilter = ref({ keyword: '', orderBy: ['id'], queryType: 1 })
 
 const groupClasses = ref<GroupClass[]>([])
 const groupClassStores = useGroupClassStore()
 const getGroupClasses = async (): Promise<void> => {
   try {
-    const { data: groupClassesData } = await groupClassStores.getGroupClasses(groupClassFilter)
+    const { data: groupClassesData } = await groupClassStores.getGroupClasses(groupClassFilter.value)
 
     if (!paperDetail.value?.paperAccesses) return
 
@@ -292,6 +297,8 @@ const getAccessPaperGroups = async () => {
   }
 }
 
+const showWhoAssignedDetail = ref(false)
+
 onMounted(async () => {
   await getPaperDetail()
   if (groupClasses.value.length > 0 && groupClasses.value[0].classes) {
@@ -370,9 +377,22 @@ onMounted(async () => {
 
           <VaCard>
             <VaCardTitle class="flex justify-between">
-              <span> Assigned to</span>
+              <VaButton
+                preset="plain"
+                class="mr-6 mb-2"
+                size="small"
+                color="textPrimary"
+                @click="showWhoAssignedDetail = !showWhoAssignedDetail"
+              >
+                Assigned to
+              </VaButton>
               <div>
-                <VaButton preset="secondary" size="small" @click="showAssignPaperModal = !showAssignPaperModal">
+                <VaButton
+                  v-if="currentUserId === paperDetail?.createdBy"
+                  preset="secondary"
+                  size="small"
+                  @click="showAssignPaperModal = !showAssignPaperModal"
+                >
                   <VaIcon name="edit_square" size="small" class="material-symbols-outlined" />
                   edit
                 </VaButton>
@@ -422,7 +442,12 @@ onMounted(async () => {
             <VaCardTitle class="flex justify-between">
               <span> Content</span>
               <div>
-                <VaButton preset="secondary" size="small" @click="navigateToManageQuestions">
+                <VaButton
+                  v-if="currentUserId === paperDetail?.createdBy"
+                  preset="secondary"
+                  size="small"
+                  @click="navigateToManageQuestions"
+                >
                   <VaIcon name="edit_square" size="small" class="material-symbols-outlined" />
                   edit
                 </VaButton>
@@ -602,6 +627,13 @@ onMounted(async () => {
       </VaCard>
     </template>
   </VaLayout>
+  <VaModal v-model="showWhoAssignedDetail" close-button hide-default-actions>
+    <WhoAssignedPaperDetailModal
+      :paper-detail="paperDetail"
+      :group-access-paper="accessPaperGroups"
+      :access-type="paperDetail?.shareType as AccessType"
+    />
+  </VaModal>
 </template>
 
 <style scoped>

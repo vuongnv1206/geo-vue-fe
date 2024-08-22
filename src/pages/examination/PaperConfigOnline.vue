@@ -2,7 +2,14 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { VaButton, VaCard, VaCardTitle, VaIcon, useForm, useToast } from 'vuestic-ui'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { PaperDto, ShowQuestionAnswer, ShowResult, StatusPaper } from '@/pages/examination/types'
+import {
+  GetAccessPaperRequest,
+  GroupClassAccessPaper,
+  PaperDto,
+  ShowQuestionAnswer,
+  ShowResult,
+  StatusPaper,
+} from '@/pages/examination/types'
 import { useRoute, useRouter } from 'vue-router'
 import { Classrooms, GroupClass, Student } from '@/pages/classrooms/types'
 import { useClassStore } from '@/stores/modules/class.module'
@@ -25,11 +32,12 @@ const { init: notify } = useToast()
 
 const paperId = route.params.id
 
-const getPaperDetail = () => {
-  paperStore
+const getPaperDetail = async () => {
+  await paperStore
     .paperDetail(paperId.toString())
     .then((res) => {
       paperDetail.value = res
+      getGroupAccessPaper()
     })
     .catch((error) => {
       notify({
@@ -160,11 +168,11 @@ const getClassByGroupClass = async (groupId: string) => {
 }
 
 const groupClassStores = useGroupClassStore()
-const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
+const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'], queryType: 1 })
 
 const getGroupClasses = async () => {
   try {
-    const res = await groupClassStores.getGroupClasses(groupClassFilter)
+    const res = await groupClassStores.getGroupClasses(groupClassFilter.value)
     groupClasses.value = res.data
   } catch (error) {
     console.error(error)
@@ -180,9 +188,19 @@ const saveDraffPaper = (isPublish: boolean) => {
 
   if (valueOption.value === AccessType.ByClass) {
     accessPaperSet.value = checkedPermissionsClassAccess.value.map((classId) => ({ classId: classId }))
+    // lấy lại những accesspaper cho học sinh ở trước đó không cập nhật
+    const accessOldUser = editPaper.value.paperAccesses?.filter((access) => access.userId !== null)
+    if (accessOldUser) {
+      accessPaperSet.value.push(...accessOldUser)
+    }
   }
   if (valueOption.value === AccessType.ByStudent) {
     accessPaperSet.value = checkedPermissionsStudentAccess.value.map((userId) => ({ userId: userId }))
+
+    const accessOldUser = editPaper.value.paperAccesses?.filter((access) => access.classId !== null)
+    if (accessOldUser) {
+      accessPaperSet.value.push(...accessOldUser)
+    }
   }
 
   const payload = {
@@ -249,8 +267,33 @@ const backToPage = () => {
 
 const showWhoAssignedDetail = ref(false)
 
-onMounted(() => {
-  getPaperDetail()
+const getAccessPaperRequest = ref<GetAccessPaperRequest>({
+  paperId: paperId.toString(),
+})
+
+const groupAccessPaper = ref<GroupClassAccessPaper[]>([])
+
+const getGroupAccessPaper = async () => {
+  try {
+    const res = await paperStore.getGroupClassesAccessPaper(getAccessPaperRequest.value)
+    groupAccessPaper.value = res.data
+  } catch (error) {
+    notify({
+      message: `Get fail access group ${error}`,
+      color: 'danger',
+    })
+  }
+}
+
+const checkClassHasSelectedStudent = (students?: Student[]) => {
+  if (students) {
+    return students.some((student) => checkedPermissionsStudentAccess.value.includes(student.id))
+  }
+  return false
+}
+
+onMounted(async () => {
+  await getPaperDetail()
   getGroupClasses()
   getSubjects()
 })
@@ -355,15 +398,14 @@ const form = useForm('paperConfigForm')
               <VaRadio v-model="valueOption" :options="accessOptions" class="assign-radio mb-2" value-by="value" />
             </div>
             <div class="col-span-2">
-              <div
-                v-if="
-                  (valueOption === AccessType.ByClass || valueOption === AccessType.ByStudent) && groupClasses !== null
-                "
-                class="grid grid-cols-3 gap-2"
-              >
+              <div v-if="groupClasses !== null" class="grid grid-cols-3 gap-2">
                 <VaCard outlined class="border-style col-span-1">
                   <VaCardTitle>
-                    <VaInput placeholder="Search group class" />
+                    <VaInput
+                      v-model="groupClassFilter.keyword"
+                      placeholder="Search group class"
+                      @input="getGroupClasses()"
+                    />
                   </VaCardTitle>
                   <VaDivider class="m-0" />
                   <VaCardContent class="p-1">
@@ -383,7 +425,11 @@ const form = useForm('paperConfigForm')
 
                 <VaCard outlined class="border-style col-span-2">
                   <VaCardTitle>
-                    <VaInput placeholder="Search class in group" />
+                    <VaInput
+                      v-model="classFilter.keyword"
+                      placeholder="Search class in group"
+                      @input="getClassByGroupClass(selectedGroupClass)"
+                    />
                   </VaCardTitle>
                   <VaDivider class="m-0" />
                   <VaCardContent>
@@ -400,12 +446,9 @@ const form = useForm('paperConfigForm')
                         <VaButton
                           v-for="classroom in classRoomsInGroup"
                           :key="classroom.id"
-                          :preset="
-                            classroom.students?.some((student) => checkedPermissionsStudentAccess.includes(student.id))
-                              ? 'primary'
-                              : 'secondary'
-                          "
-                          border-color="primary"
+                          :preset="checkClassHasSelectedStudent(classroom.students) ? 'primary' : 'secondary'"
+                          :color="checkClassHasSelectedStudent(classroom.students) ? 'success' : 'secondary'"
+                          :border-color="checkClassHasSelectedStudent(classroom.students) ? 'success' : 'primary'"
                           @click="getListStudentModal(classroom, classroom.students)"
                           >{{ classroom.name }}</VaButton
                         >
@@ -517,7 +560,8 @@ const form = useForm('paperConfigForm')
 
   <VaModal v-model="showWhoAssignedDetail" close-button hide-default-actions>
     <WhoAssignedPaperDetailModal
-      :paper-access-list="paperDetail?.paperAccesses || []"
+      :paper-detail="paperDetail"
+      :group-access-paper="groupAccessPaper"
       :access-type="paperDetail?.shareType as AccessType"
     />
   </VaModal>

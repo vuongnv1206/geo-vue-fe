@@ -85,6 +85,7 @@ export type Student = {
   studentCode: string
   gender: boolean
   classesId: string
+  stId?: string
 }
 
 export type EmptyStudent = {

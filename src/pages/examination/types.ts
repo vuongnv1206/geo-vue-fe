@@ -643,11 +643,14 @@ export type ClassAccessPaper = {
   id: string
   name: string
   userClasses: StudentAccessPaper[]
+  groupName?: string
 }
 
 export type StudentAccessPaper = {
   studentId: string
   student: Student
+  groupName?: string
+  className?: string
 }
 
 export type GetAccessPaperRequest = {
