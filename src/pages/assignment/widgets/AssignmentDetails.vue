@@ -145,7 +145,16 @@
             </VaListItemSection>
             <VaListItemSection>
               <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-              <VaListItemLabel caption>
+              <VaListItemLabel
+                caption
+                :class="{
+                  'text-green-500':
+                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
+                    'Submmitted',
+                  'text-yellow-500':
+                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status === 'Doing',
+                }"
+              >
                 {{
                   assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
                   'Submmitted'

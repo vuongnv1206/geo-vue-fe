@@ -35,21 +35,12 @@
             :month-change-on-arrows="true"
             :placeholder="$t('assignments.enter_start_and_end_time')"
             :min-date="new Date(new Date().setHours(0, 0, 0, 0))"
-            :min-time="{
-              hours: new Date().getHours(),
-              minutes: new Date().getMinutes(),
-            }"
           />
           <VaSwitch
             v-model="newAssignmentDetails.canViewResult"
             size="small"
             :label="$t('assignments.can_view_result')"
           />
-          <!-- <VaSwitch
-            v-model="newAssignmentDetails.requireLoginToSubmit"
-            size="small"
-            :label="$t('assignments.require_login_to_submit')"
-          /> -->
           <VaLayout class="border rounded-xl pb-2 px-2">
             <template #left>
               <VaSidebar v-model="showSidebar" class="mt-2 rounded" :class="showSidebar ? 'border mr-1' : ''">
@@ -401,6 +392,14 @@ const handleClickUpdate = async () => {
     }
   }
 }
+watch(date, (newValue) => {
+  if (newValue[0] && newValue[0] < new Date()) {
+    notify({
+      message: 'Thời gian bắt đầu phải lớn hơn thời gian hiện tại',
+      color: 'error',
+    })
+  }
+})
 
 onMounted(() => {
   getGroupClass()
