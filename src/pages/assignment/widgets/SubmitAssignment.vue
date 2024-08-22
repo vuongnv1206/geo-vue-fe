@@ -103,7 +103,7 @@ const fileUpload = async () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.createFailed('') + getErrorMessage(error),
+        message: notifications.uploadFailed + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -220,14 +220,15 @@ onMounted(() => {
       </VaCard>
       <VaCard v-else>
         <VaCardContent class="font-semibold mr-1">
-          {{ $t('assignments.score') }}: {{ assignmentSubmissions[0]?.score }}
+          {{ $t('assignments.score') }}:
+          <span class="text-red-500">{{ assignmentSubmissions[0]?.score }}</span>
         </VaCardContent>
         <VaCardContent class="font-semibold mr-1">
           {{ $t('assignments.comment') }}:
           <VaScrollContainer class="max-h-[48vh]">
             <!-- eslint-disable vue/no-v-html -->
             <div
-              class="text-md font-medium px-5 mb-4 max-h-48 overflow-y-auto break-words whitespace-pre-line"
+              class="text-md font-medium px-5 mt-2 mb-4 max-h-48 overflow-y-auto break-words whitespace-pre-line"
               v-html="assignmentSubmissions[0]?.comment"
             ></div>
             <!-- eslint-enable -->
