@@ -109,6 +109,21 @@ export const format = {
     const seconds = duration.seconds()
     return `${minutes}m ${seconds}s`
   },
+  formatTimeDifference: (fromTime: Date, toTime: Date) => {
+    // Tính toán sự khác biệt về thời gian tính bằng milliseconds
+    const timeDifference = toTime.getTime() - fromTime.getTime()
+
+    // Chuyển đổi từ milliseconds sang phút và giây
+    const minutesDifference = timeDifference / 60000
+    const secondsDifference = timeDifference / 1000
+
+    if (minutesDifference >= 1) {
+      return `${Math.floor(minutesDifference)} minute(s)`
+    } else {
+      // Ngược lại hiển thị số giây
+      return `${Math.floor(secondsDifference)} seconds`
+    }
+  },
 }
 
 export const notifications = {
