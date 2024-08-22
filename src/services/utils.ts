@@ -44,8 +44,7 @@ export const validators = {
   isAlphanumeric: (fieldName: string) => (v: string) =>
     /^[a-zA-Z0-9]+$/.test(v) || t('validateUtils.isAlphanumeric', { fieldName }),
   email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
-  phone: (fieldName: string, v: string) =>
-    /([+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/.test(v) || t('validateUtils.phone', { fieldName }),
+  phone: (v: string) => /([+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/.test(v) || t('validateUtils.phone'),
 }
 
 export const format = {

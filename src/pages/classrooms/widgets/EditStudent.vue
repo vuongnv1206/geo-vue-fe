@@ -104,11 +104,6 @@ const genderOptions = reactive([
         validators.maxLength(50),
       ]"
     />
-    <!-- <VaDateInput
-      v-model="newStudent.dateOfBirth"
-      :label="t('students.date_of_birth')"
-      :placeholder="t('students.enter_date_of_birth')"
-    /> -->
     <label
       id="input-label-510"
       aria-hidden="true"
@@ -135,7 +130,7 @@ const genderOptions = reactive([
       v-model="newStudent.phoneNumber"
       :label="t('students.phone_number')"
       :placeholder="t('students.enter_phone_number')"
-      :rules="[validators.phone(t('students.phone_number'), newStudent.phoneNumber)]"
+      :rules="[validators.phone]"
     />
     <VaInput
       v-model="newStudent.email"
