@@ -184,7 +184,7 @@ export enum ClassroomQueryType {
   SharedClass = 2,
 }
 
-export type ClassroomWithSubmissionStats = {
+export type ClassroomWithStats = {
   id: string
   name: string
   schoolYear: string

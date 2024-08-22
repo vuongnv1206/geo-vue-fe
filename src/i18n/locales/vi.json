@@ -346,10 +346,10 @@
     "enter_score": "Nhập diểm",
     "comment": "Nhận xét",
     "answers": "Câu trả lời",
-    "Submitted": "Đã nộp",
-    "Doing": "Đang làm bài",
-    "marked":"Đã chấm",
-    "not_submitted":"Không nộp"
+    "submitted": "Đã nộp",
+    "doing": "Đang làm bài",
+    "marked": "Đã chấm",
+    "not_submitted": "Không nộp"
   },
   "subjects": {
     "subject": "Môn học",

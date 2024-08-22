@@ -33,7 +33,7 @@
                 <VaListItemSection icon>
                   <VaCard v-if="isTeacher">
                     {{ assignment.submissionsStats?.totalSubmitted }} /
-                    {{ assignment.submissionsStats?.totalStudents }}
+                    {{ assignment.submissionsStats?.totalStudents }} {{ $t('assignments.submitted') }}
                   </VaCard>
                 </VaListItemSection>
               </div>
@@ -87,9 +87,15 @@
                       >
                     </VaListItemSection>
                     <VaListItemSection icon>
-                      <VaCard v-if="isTeacher">
-                        {{ assignment.submissionsStats?.totalSubmitted }} /
-                        {{ assignment.submissionsStats?.totalStudents }}
+                      <VaCard v-if="isTeacher" class="flex flex-col">
+                        <div>
+                          {{ assignment.submissionsStats?.totalMarked }} /
+                          {{ assignment.submissionsStats?.totalSubmitted }} {{ $t('assignments.marked') }}
+                        </div>
+                        <div>
+                          {{ assignment.submissionsStats?.totalSubmitted }} /
+                          {{ assignment.submissionsStats?.totalStudents }} {{ $t('assignments.submitted') }}
+                        </div>
                       </VaCard>
                     </VaListItemSection>
                   </VaCard>
@@ -106,7 +112,7 @@
 <script lang="ts" setup>
 import { computed, PropType } from 'vue'
 import { format } from '@/services/utils'
-import { ClassroomWithSubmissionStats } from '@/pages/classrooms/types'
+import { ClassroomWithStats } from '@/pages/classrooms/types'
 import { useAuthStore } from '@/stores/modules/auth.module'
 
 const authStore = useAuthStore()
@@ -115,13 +121,9 @@ const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 
 const props = defineProps({
   mergeAssignmentByClass: {
-    type: Array as PropType<ClassroomWithSubmissionStats[]>,
+    type: Array as PropType<ClassroomWithStats[]>,
     required: true,
   },
-  // assignmentsByClass: {
-  //   type: Array as PropType<Classrooms[]>,
-  //   required: true,
-  // },
   loading: {
     type: Boolean,
     required: true,

@@ -442,9 +442,9 @@ const getStatusText = (status: string | undefined) => {
   } else if (status === 'NotSubmitted') {
     return t('assignments.not_submitted')
   } else if (status === 'Submitted') {
-    return t('assignments.Submitted')
+    return t('assignments.submitted')
   } else if (status === 'Doing') {
-    return t('assignments.Doing')
+    return t('assignments.doing')
   } else {
     return ''
   }
