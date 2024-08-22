@@ -347,7 +347,7 @@
     "enter_score": "Nhập diểm",
     "comment": "Nhận xét",
     "answers": "Câu trả lời",
-    "Submmitted": "Đã nộp",
+    "Submitted": "Đã nộp",
     "Doing": "Đang làm bài"
   },
   "subjects": {
@@ -812,6 +812,7 @@
     "isCharacter": "{fieldName} phải là ký tự hợp lệ",
     "isDecimalNumber": "{fieldName} phải là số thập phân hợp lệ",
     "isNumber": "{fieldName} phải là số hợp lệ",
+    "isAlphanumeric": "{fieldName} phải là chữ số hoặc chữ cái",
     "email": "Vui lòng nhập địa chỉ email hợp lệ",
     "phone": "Vui lòng nhập số điện thoại hợp lệ",
     "updatedSuccessfully": "{message} cập nhật thành công",
@@ -836,7 +837,10 @@
     "Accepted": "Đã chấp nhận",
     "Rejected": "Đã từ chối",
     "Cancel": "Đã hủy",
-    "NotRequest": "chưa yêu cầu"
+    "NotRequest": "chưa yêu cầu",
+    "uploadFileSuccess": "Tải lên tệp thành công",
+    "uploadFileFailed": "Tải lên tệp thất bại",
+    "greaterThanDate": "Thời gian bắt đầu phải lớn hơn thời gian hiện tại"
   },
   "languageSwitcher": {
     "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."

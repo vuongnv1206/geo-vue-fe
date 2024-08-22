@@ -103,6 +103,7 @@ export interface PaperDto {
   publicIpAllowed?: string
   localIpAllowed?: string
   numberAttempt?: number
+  totalAttended?: number
 }
 
 export interface PaperLabelDto {
@@ -632,6 +633,41 @@ export interface UpdateQuestionsInPaperRequest {
   questions?: QuestionIntoPaperRequest[]
 }
 
+export type GroupClassAccessPaper = {
+  id: string
+  name: string
+  classes: ClassAccessPaper[]
+}
+
+export type ClassAccessPaper = {
+  id: string
+  name: string
+  userClasses: StudentAccessPaper[]
+  groupName?: string
+}
+
+export type StudentAccessPaper = {
+  studentId: string
+  student: Student
+  groupName?: string
+  className?: string
+}
+
+export type GetAccessPaperRequest = {
+  keyword?: string
+  pageNumber?: number
+  pageSize?: number
+  orderBy?: string[]
+  paperId: string
+}
+
+export type GetAccessPaperResponse = {
+  data: GroupClassAccessPaper[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
 // {
 //   "studentId": "8a44732e-b0f9-4531-83d4-9d21a5e8fb8d",
 //   "student": {

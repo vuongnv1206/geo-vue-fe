@@ -145,11 +145,20 @@
             </VaListItemSection>
             <VaListItemSection>
               <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-              <VaListItemLabel caption>
+              <VaListItemLabel
+                caption
+                :class="{
+                  'text-green-500':
+                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
+                    'Submitted',
+                  'text-yellow-500':
+                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status === 'Doing',
+                }"
+              >
                 {{
                   assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
-                  'Submmitted'
-                    ? $t('assignments.Submmitted')
+                  'Submitted'
+                    ? $t('assignments.Submitted')
                     : $t('assignments.Doing')
                 }}
               </VaListItemLabel>
@@ -283,7 +292,7 @@ const getClassById = async () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed(`class with id ${classId}`) + getErrorMessage(error),
+        message: notifications.getFailed(t('classes.class')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -410,7 +419,7 @@ const fileUpload = async () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.createFailed('') + getErrorMessage(error),
+        message: notifications.uploadFailed + getErrorMessage(error),
         color: 'error',
       })
     })

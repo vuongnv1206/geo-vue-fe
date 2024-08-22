@@ -41,10 +41,11 @@ export const validators = {
   isDecimalNumber: (fieldName: string) => (v: string) =>
     /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || t('validateUtils.isDecimalNumber', { fieldName }),
   isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || t('validateUtils.isNumber', { fieldName }),
+  isAlphanumeric: (fieldName: string) => (v: string) =>
+    /^[a-zA-Z0-9]+$/.test(v) || t('validateUtils.isAlphanumeric', { fieldName }),
   email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
-  phone: (v: string) =>
-    /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/.test(v) ||
-    t('validateUtils.phone'),
+  phone: (v: string) => /([+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/.test(v) || t('validateUtils.phone'),
+  greaterThanDate: (v: Date) => v >= new Date() || t('validateUtils.greaterThanDate'),
 }
 
 export const format = {
@@ -84,6 +85,21 @@ export const format = {
       ? `${durationObj.seconds()} second${durationObj.seconds() > 1 ? 's' : ''}`
       : ''
     return [minutesPart, secondsPart].filter(Boolean).join(' ')
+  },
+  // 1.5 = 1 minute 30s
+  formatDurationMinute: (minutes?: number | null) => {
+    if (!minutes || minutes < 0 || minutes === null) {
+      return '0 minute'
+    }
+
+    const wholeMinutes = Math.floor(minutes)
+    const remainingSeconds = Math.round((minutes - wholeMinutes) * 60)
+
+    const minutesPart = wholeMinutes > 0 ? `${wholeMinutes} minute${wholeMinutes !== 1 ? 's' : ''}` : ''
+
+    const secondsPart = remainingSeconds > 0 ? `${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}` : ''
+
+    return [minutesPart, secondsPart].filter(Boolean).join(' ') || '0 seconds'
   },
   // sub 2 time and return duration in minute and seconds like 2m 30s
   formatDurationToSeconds: (date1: Date, date2: Date) => {
@@ -125,6 +141,8 @@ export const notifications = {
   inviteSuccess: (message: string) => {
     return t('validateUtils.inviteSuccess', { message }) + '\n'
   },
+  uploadSuccess: () => t('validateUtils.uploadSuccess'),
+  uploadFailed: () => t('validateUtils.uploadFailed'),
 }
 
 export const getErrorMessage = (error: any) => {

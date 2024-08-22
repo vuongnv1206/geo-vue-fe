@@ -102,7 +102,7 @@
         </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'teacher-group' }">
+        <RouterLink :to="{ name: 'group-manage' }">
           <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
@@ -163,8 +163,8 @@
       </VaCard>
     </div>
     <div v-if="isStudent" class="flex flex-col gap-4 pt-4">
-      <div class="col-span-1 lg:col-span-1 xl:col-span-1 mb-3">
-        <VaCardTitle>{{ t('papers.exam_schedule') }}</VaCardTitle>
+      <VaCardTitle>{{ t('papers.exam_schedule') }}</VaCardTitle>
+      <VaCard class="col-span-1 lg:col-span-1 xl:col-span-1 mb-3">
         <VaDataTable hoverable :disable-client-side-sorting="false" :columns="columns" :items="paperStudent">
           <template #cell(startTime)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
@@ -206,8 +206,7 @@
             </div>
           </template>
         </VaDataTable>
-      </div>
-      <VaDivider />
+      </VaCard>
       <VaCardTitle>{{ t('papers.class_list') }}</VaCardTitle>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
         <VaCard
@@ -309,7 +308,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@modules/auth.module'
 import { useI18n } from 'vue-i18n'
-import { defineVaDataTableColumns, useToast, VaCardTitle, VaDivider } from 'vuestic-ui'
+import { defineVaDataTableColumns, useToast, VaCardTitle } from 'vuestic-ui'
 import { useClassStore } from '@/stores/modules/class.module'
 import { ClassroomWithPosts } from '@/pages/classrooms/types'
 import { format, getErrorMessage, notifications } from '@/services/utils'
@@ -353,18 +352,6 @@ const columns = defineVaDataTableColumns([
 
 const paperStudent = ref<any[]>([])
 
-// const calculatePaperStudent = () => {
-//   paperStudent.value = paperStudents.value.map((student: any, index: number) => {
-//     const history = paperStudentsHistory.value.find((history: any) => history.id === student.id)
-//     return {
-//       stt: index + 1,
-//       ...student,
-//       score: history?.score || null,
-//       startedTime: history?.startedTime || null,
-//       submittedTime: history?.submittedTime || null,
-//     }
-//   })
-// }
 const calculatePaperStudent = () => {
   paperStudent.value = [
     ...paperStudents.value.map((student: any, index: number) => ({
@@ -405,7 +392,7 @@ const getClasses = async () => {
     )
   } catch (error) {
     notify({
-      message: notifications.getFailed('class') + getErrorMessage(error),
+      message: notifications.getFailed(t('classes.class')) + getErrorMessage(error),
       color: 'error',
     })
   } finally {
@@ -423,7 +410,7 @@ const getPosts = async (classId: any) => {
     return response.data
   } catch (error) {
     notify({
-      message: notifications.getFailed('post') + getErrorMessage(error),
+      message: notifications.getFailed(t('posts.posts')) + getErrorMessage(error),
       color: 'error',
     })
   } finally {
@@ -439,7 +426,7 @@ const getPaperStudents = async () => {
     // console.log('paperStudents', paperStudents.value)
   } catch (error) {
     notify({
-      message: notifications.getFailed('paper student') + getErrorMessage(error),
+      message: notifications.getFailed(t('papers.paper')) + getErrorMessage(error),
       color: 'error',
     })
   } finally {
@@ -455,7 +442,7 @@ const getPaperStudentsHistory = async () => {
     // console.log('paperStudentsHistory', paperStudentsHistory.value)
   } catch (error) {
     notify({
-      message: notifications.getFailed('paper student') + getErrorMessage(error),
+      message: notifications.getFailed(t('papers.paper')) + getErrorMessage(error),
       color: 'error',
     })
   } finally {

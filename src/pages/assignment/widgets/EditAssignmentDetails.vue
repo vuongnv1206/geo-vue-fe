@@ -41,11 +41,6 @@
             size="small"
             :label="$t('assignments.can_view_result')"
           />
-          <!-- <VaSwitch
-            v-model="newAssignmentDetails.requireLoginToSubmit"
-            size="small"
-            :label="$t('assignments.require_login_to_submit')"
-          /> -->
           <VaLayout class="border rounded-xl pb-2 px-2">
             <template #left>
               <VaSidebar v-model="showSidebar" class="mt-2 rounded" :class="showSidebar ? 'border mr-1' : ''">
@@ -226,7 +221,7 @@ const defaultNewAssignmentDetails: AssignmentDetails = {
   endTime: new Date(),
   canViewResult: false,
   requireLoginToSubmit: false,
-  classIds: [],
+  classesId: [],
 }
 
 const newAssignmentDetails = ref({ ...defaultNewAssignmentDetails })
@@ -253,7 +248,16 @@ const getAssignment = (id: string) => {
         endTime: response.endTime,
         canViewResult: response.canViewResult,
         requireLoginToSubmit: response.requireLoginToSubmit,
-        classIds: response.classIds,
+        classesId: response.classesId,
+      }
+      selectedClasses.value = response.classesId
+      updateSelectAllClassesState()
+      console.log('Selected classes: ', selectedClasses.value)
+      if (newAssignmentDetails.value.startTime) {
+        date.value[0] = new Date(newAssignmentDetails.value.startTime)
+      }
+      if (newAssignmentDetails.value.endTime) {
+        date.value[1] = new Date(newAssignmentDetails.value.endTime)
       }
     })
     .catch((error) => {
@@ -282,25 +286,19 @@ const showAllClassesForAllDepartments = () => {
   selectedDepartment.value = null
 }
 
-// Select all classes in a department
 const selectAllClasses = (department: GroupClass) => {
   const selectedClassIds = selectedClasses.value
 
-  // Kiểm tra xem tất cả các lớp trong phòng ban đã được chọn chưa
   const allClassesSelected = department.classes.every((cls) => selectedClassIds.includes(cls.id))
 
   if (allClassesSelected) {
-    // Nếu tất cả các lớp đã được chọn, hãy bỏ chọn chúng
     selectedClasses.value = selectedClassIds.filter((id) => !department.classes.some((cls) => cls.id === id))
     selectedClassesByDepartmentState.value[department.id] = false
   } else {
-    // Nếu không, hãy thêm tất cả các lớp vào danh sách chọn
     const newClassIds = department.classes.map((cls) => cls.id)
     selectedClasses.value = [...new Set([...selectedClassIds, ...newClassIds])]
     selectedClassesByDepartmentState.value[department.id] = true
   }
-
-  // Cập nhật trạng thái tổng thể nếu tất cả các department đều được chọn
   updateSelectAllClassesState()
 }
 
@@ -310,20 +308,17 @@ const updateSelectAllClassesState = () => {
     selectedClassesByDepartmentState.value[department.id] = allClassesSelected
   })
 
-  // Cập nhật trạng thái tổng thể nếu tất cả các department đều được chọn
   selectAllClassesState.value = groupClasses.value.every((department) =>
     department.classes.every((cls) => selectedClasses.value.includes(cls.id)),
   )
 }
 
-// Gọi phương thức theo dõi khi chọn tay từng class
 watch(selectedClasses, updateSelectAllClassesState, { deep: true })
 
 const showDepartmentClasses = (groupClass: GroupClass) => {
   selectedDepartment.value = groupClass
 }
 
-// Select all classes across all departments
 const selectAllClassesForAllDepartments = () => {
   if (selectAllClassesState.value) {
     selectedClasses.value = []
@@ -388,7 +383,7 @@ const handleClickUpdate = async () => {
     newAssignmentDetails.value.startTime = date.value[0]
     newAssignmentDetails.value.endTime = date.value[1]
     try {
-      newAssignmentDetails.value.classIds = selectedClasses.value
+      newAssignmentDetails.value.classesId = selectedClasses.value
       await stores.updateAssignment(assignmentId, newAssignmentDetails.value as EmptyAssignmentDetails)
       notify({ message: notifications.updatedSuccessfully(newAssignmentDetails.value.name), color: 'success' })
       router.push({ name: 'assignment-details', params: { id: assignmentId } })
@@ -397,6 +392,14 @@ const handleClickUpdate = async () => {
     }
   }
 }
+watch(date, (newValue) => {
+  if (newValue[0] && newValue[0] < new Date()) {
+    notify({
+      message: t('validateUtils.greaterThanDate'),
+      color: 'error',
+    })
+  }
+})
 
 onMounted(() => {
   getGroupClass()

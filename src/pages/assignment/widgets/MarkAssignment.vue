@@ -127,7 +127,7 @@ onMounted(() => {
     <template #left>
       <div class="w-[55vw] bg-gray-200 p-4 mr-2 rounded-md h-full">
         <div v-for="ass in assignmentSubmission" :key="ass.assignmentId" class="h-full">
-          <VaCard v-if="ass.status === 'Submmitted'" class="h-full">
+          <VaCard v-if="ass.status === 'Submitted'" class="h-full">
             <VaCardTitle>{{ $t('assignments.attachments') }}</VaCardTitle>
             <VaCard v-for="(attachmentPath, index) in attachmentPaths" :key="index">
               <VaButton
@@ -181,7 +181,7 @@ onMounted(() => {
                 :placeholder="$t('assignments.enter_score')"
                 :rules="[
                   validators.required2($t('assignments.score')),
-                  validators.isNumber($t('assignments.score')),
+                  validators.isDecimalNumber($t('assignments.score')),
                   validators.minValue(0),
                   validators.maxValue(10),
                 ]"
