@@ -662,9 +662,55 @@ export type GetAccessPaperRequest = {
 }
 
 export type GetAccessPaperResponse = {
+  data: GroupClassAccessPaper[]
   currentPage: number
   totalPages: number
   totalCount: number
   pageSize: number
-  data: GroupClassAccessPaper[]
+}
+// {
+//   "studentId": "8a44732e-b0f9-4531-83d4-9d21a5e8fb8d",
+//   "student": {
+//     "id": "8a44732e-b0f9-4531-83d4-9d21a5e8fb8d",
+//     "userName": "root.student",
+//     "firstName": "root",
+//     "lastName": "Student",
+//     "gender": null,
+//     "birthDate": null,
+//     "email": "basic@root.com",
+//     "isActive": true,
+//     "emailConfirmed": true,
+//     "phoneNumber": null,
+//     "phoneNumberConfirmed": true,
+//     "imageUrl": null
+//   },
+//   "paperId": "a2e664b3-763f-4507-9bbc-1ce365870afb",
+//   "paper": null,
+//   "submitPaperId": "8733c6ed-0dea-4278-9e77-43e340339604",
+//   "submitPaper": null,
+//   "completionStatus": 0,
+//   "isSuspicious": false,
+//   "submitPaperLogs": null,
+//   "classId": "5502aa20-2a71-4945-b320-fc6d3ffc7b44"
+// },
+
+export interface StudentMonitor {
+  studentId: string
+  student: Student
+  submitPaperId: string
+  submitPaper: SubmitPaperDto
+  completionStatus: number
+  isSuspicious: boolean
+  submitPaperLogs: any
+  classId: string
+}
+
+export type StudentMonitorResponse = {
+  data: StudentMonitor[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
 }

@@ -248,6 +248,7 @@ const formatContent = (content: string) => {
                 </VaButton>
               </template>
 
+              <!-- eslint-disable-next-line vue/no-template-shadow -->
               <template #expandableRow="{ rowData }">
                 <div class="p-4">
                   <p style="width: 50%; text-wrap: wrap">
