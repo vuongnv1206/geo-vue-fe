@@ -58,6 +58,9 @@ export const format = {
   formatDateStr: (date: string) => {
     return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
   },
+  formatDateStrSec: (date: string) => {
+    return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm:ss')
+  },
   formatDateFromNow: (date: Date) => {
     return dayjs(date).tz(currentTimezone).fromNow()
   },
