@@ -64,7 +64,9 @@
           </template>
 
           <template #cell(submitPaper.totalMark)="{ rowData }">
-            <div v-if="rowData.completionStatus === 2">{{ rowData.submitPaper.totalMark }}</div>
+            <div v-if="rowData.completionStatus === 2">
+              {{ rowData.submitPaper.totalMark / rowData.paper.totalMark }}
+            </div>
             <div v-else>-</div>
           </template>
 
