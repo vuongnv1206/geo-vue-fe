@@ -72,8 +72,8 @@
                 @click="togglePostLike(post)"
                 >{{ post.numberLikeInThePost }}
               </VaButton>
-              <VaButton class="mr-4" preset="plain" icon="comment" @click="toggleComments(post.id)"
-                >{{ post.comments.length }}
+              <VaButton class="mr-4" preset="plain" icon="comment" @click="toggleComments(post.id)">
+                {{ post.comments.length }}
               </VaButton>
             </VaCard>
           </div>
@@ -134,12 +134,20 @@
                     >
                       {{ comment.numberLikeInComment }}
                     </VaButton>
-                    <VaButton preset="plain" size="small" icon="reply" @click="toggleReplies(comment.id)">
+
+                    <VaButton
+                      :disabled="post.isLockComment && isStudent"
+                      preset="plain"
+                      size="small"
+                      icon="reply"
+                      @click="toggleReplies(comment.id)"
+                    >
                       {{ t('comments.reply') }}</VaButton
                     >
                   </div>
                   <div v-if="selectedCommentIds.includes(comment.id)">
                     <Comments
+                      v-if="!post.isLockComment || !isStudent"
                       :post-id="post.id"
                       :parent-id="comment.id"
                       @save="(comment: EmptyComment) => OnCommentSaved(comment)"
@@ -149,6 +157,7 @@
               </template>
             </VaTreeView>
             <Comments
+              v-if="!post.isLockComment || !isStudent"
               :post-id="post.id"
               :parent-id="commentId"
               @save="(comment: EmptyComment) => OnCommentSaved(comment)"
@@ -220,7 +229,7 @@
 
 <script setup lang="ts">
 import { format, getErrorMessage, notifications } from '@/services/utils'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useModal, useToast, VaModal } from 'vuestic-ui'
 import EditPosts from './EditPosts.vue'
 import EditComment from './EditComment.vue'
@@ -243,7 +252,8 @@ const postsStore = usePostsStore()
 const commentStore = useCommentStore()
 
 const editFormRef = ref()
-
+// const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
+const isStudent = computed(() => authStore?.musHaveRole('Student'))
 const postId = ref<string | null>(null)
 const commentId = ref<string>('')
 const userId = authStore.user?.id ?? ''

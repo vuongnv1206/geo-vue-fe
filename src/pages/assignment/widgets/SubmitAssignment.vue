@@ -81,7 +81,6 @@ const getAssignmentSubmissions = () => {
           url: `${url}${path}`,
         }
       })
-      console.log('filesUploaded', filesUploaded.value)
     })
     .catch((error) => {
       notify({
