@@ -837,7 +837,10 @@
     "Accepted": "Đã chấp nhận",
     "Rejected": "Đã từ chối",
     "Cancel": "Đã hủy",
-    "NotRequest": "chưa yêu cầu"
+    "NotRequest": "chưa yêu cầu",
+    "uploadFileSuccess": "Tải lên tệp thành công",
+    "uploadFileFailed": "Tải lên tệp thất bại",
+    "greaterThanDate": "Thời gian bắt đầu phải lớn hơn thời gian hiện tại"
   },
   "languageSwitcher": {
     "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."
