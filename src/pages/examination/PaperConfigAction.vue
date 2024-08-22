@@ -39,7 +39,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="flex justify-center">
-    <div style="max-width: 70%">
+    <div class="min-w-[50%]">
       <VaCard class="flex mb-3">
         <VaCardTitle class="flex gap-2">
           <VaButton size="small" @click="backToPage">
@@ -52,12 +52,6 @@ onMounted(() => {
       <VaCard>
         <VaCardTitle>Online</VaCardTitle>
         <VaCardContent>
-          <p class="va-text-secondary text-xs mb-2">
-            <VaIcon name="info" class="material-symbols-outlined" />
-            Copy the link and send it to students. Students access the link to do and submit assignments online. Support
-            both multiple choice and essay
-          </p>
-
           <VaButton preset="secondary" border-color="primary" icon="settings" @click="configOnline"
             >Config Online Testing</VaButton
           >
@@ -67,12 +61,7 @@ onMounted(() => {
       <VaCard class="mt-3">
         <VaCardTitle>Offline</VaCardTitle>
         <VaCardContent>
-          <p class="va-text-secondary text-xs mb-2">
-            <VaIcon name="info" class="material-symbols-outlined" />
-            Print questions for students to do on paper.
-          </p>
-
-          <VaButton preset="secondary" border-color="primary" icon="prints">Print Test</VaButton>
+          <VaButton preset="secondary" border-color="primary" icon="text_snippet">Export exam to Word</VaButton>
         </VaCardContent>
       </VaCard>
     </div>

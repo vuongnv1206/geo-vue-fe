@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
 import { CreatePaperRequest } from '../types'
-import { computed, ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { validators } from '@services/utils'
 import { useSubjectStore } from '../../../stores/modules/subject.module'
 import { Subject } from '@/pages/subject/types'
@@ -23,7 +23,7 @@ const emit = defineEmits(['cancel', 'save'])
 
 const paper = ref<CreatePaperRequest>({
   examName: '',
-  status: 1,
+  status: 2,
   password: '' || undefined,
   type: 0,
   paperFolderId: '' || undefined,
@@ -32,14 +32,14 @@ const paper = ref<CreatePaperRequest>({
   subjectId: '' || undefined,
 })
 
-const isPublished = computed({
-  get() {
-    return paper.value.status === 1
-  },
-  set(value) {
-    paper.value.status = value ? 1 : 2
-  },
-})
+// const isPublished = computed({
+//   get() {
+//     return paper.value.status === 1
+//   },
+//   set(value) {
+//     paper.value.status = value ? 1 : 2
+//   },
+// })
 
 watch(
   () => props.paperRequest,
@@ -120,7 +120,7 @@ onMounted(() => {
           :label="t('papers.description')"
           class="col-span-2"
         />
-        <VaSwitch v-model="isPublished" :label="t('papers.publish')" size="small" class="col-span-2 justify-self-end" />
+        <!-- <VaSwitch v-model="isPublished" :label="t('papers.publish')" size="small" class="col-span-2 justify-self-end" /> -->
       </VaCardContent>
     </VaForm>
   </VaCard>

@@ -11,6 +11,8 @@ import {
   AddQuestionsInPaperRequest,
   UpdateQuestionsInPaperRequest,
   SearchPaperRequest,
+  GetAccessPaperRequest,
+  GetAccessPaperResponse,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -32,9 +34,22 @@ export interface IPapersService {
   addQuestionsInPaper(paperId: string, request: AddQuestionsInPaperRequest): Promise<any>
 
   updateQuestionsInPaper(paperId: string, request: UpdateQuestionsInPaperRequest): Promise<any>
+
+  getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse>
 }
 
 export class PapersService implements IPapersService {
+  getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse> {
+    const url = '/v1/papers/get-access-paper'
+    return apiService
+      .post(url, request)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   getQuestionFromMatrix(matrixId: string): Promise<QuestionGenerateToMatrix[]> {
     const url = '/v1/papers/get-questions-from-matrix'
     const request = {

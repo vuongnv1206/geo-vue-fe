@@ -85,6 +85,21 @@ export const format = {
       : ''
     return [minutesPart, secondsPart].filter(Boolean).join(' ')
   },
+  // 1.5 = 1 minute 30s
+  formatDurationMinute: (minutes?: number | null) => {
+    if (!minutes || minutes < 0 || minutes === null) {
+      return '0 minute'
+    }
+
+    const wholeMinutes = Math.floor(minutes)
+    const remainingSeconds = Math.round((minutes - wholeMinutes) * 60)
+
+    const minutesPart = wholeMinutes > 0 ? `${wholeMinutes} minute${wholeMinutes !== 1 ? 's' : ''}` : ''
+
+    const secondsPart = remainingSeconds > 0 ? `${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}` : ''
+
+    return [minutesPart, secondsPart].filter(Boolean).join(' ') || '0 seconds'
+  },
   // sub 2 time and return duration in minute and seconds like 2m 30s
   formatDurationToSeconds: (date1: Date, date2: Date) => {
     const start = dayjs(date1).tz(currentTimezone)
