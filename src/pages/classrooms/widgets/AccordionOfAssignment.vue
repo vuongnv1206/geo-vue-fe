@@ -37,7 +37,7 @@ const getAssignmentSubmissions = async ({ assignmentId, classId }: { assignmentI
     .getAssignmentSubmissions({ assignmentId, classId })
     .then((response) => {
       submissionStatsMap[assignmentId] = {
-        totalSubmittedCount: response.filter((submission: any) => submission.status === 'Submmitted').length,
+        totalSubmittedCount: response.filter((submission: any) => submission.status === 'Submitted').length,
         totalStudentsCount: response.length,
       }
       console.log('submissionStatsMap:', submissionStatsMap)

@@ -59,7 +59,7 @@ const getAssignmentByClass = () => {
             .getAssignmentSubmissions({ assignmentId: assignment.id, classId: class1.id })
             .then((response) => {
               const submissionStats: SubmissionStats = {
-                totalSubmitted: response.filter((submission: any) => submission.status === 'Submmitted').length,
+                totalSubmitted: response.filter((submission: any) => submission.status === 'Submitted').length,
                 totalStudents: response.length,
               }
 
