@@ -6,16 +6,13 @@ import { useToast, VaAccordion, VaCollapse } from 'vuestic-ui'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { useI18n } from 'vue-i18n'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { AssignmentClass, SubmissionStats } from '@/pages/assignment/types'
 
 const { t } = useI18n()
 const { init: notify } = useToast()
 const load = ref(true)
 const assignmentStore = useAssignmentStore()
 
-interface SubmissionStats {
-  totalSubmittedCount: number
-  totalStudentsCount: number
-}
 const submissionStatsMap = reactive<{ [key: string]: SubmissionStats }>({})
 
 const router = useRouter()
@@ -31,16 +28,17 @@ const props = defineProps({
   },
 })
 
-const getAssignmentSubmissions = async ({ assignmentId, classId }: { assignmentId: string; classId: string }) => {
+const getAssignmentSubmissions = async (assignmentClass: AssignmentClass) => {
   load.value = true
   await assignmentStore
-    .getAssignmentSubmissions({ assignmentId, classId })
+    .getAssignmentSubmissions(assignmentClass)
     .then((response) => {
-      submissionStatsMap[assignmentId] = {
-        totalSubmittedCount: response.filter((submission: any) => submission.status === 'Submitted').length,
-        totalStudentsCount: response.length,
+      submissionStatsMap[assignmentClass.assignmentId] = {
+        totalSubmitted: response.filter((submission: any) => submission.status === 'Submitted').length,
+        totalMarked: response.filter((submission: any) => submission.status === 'Marked').length,
+        totalStudents: response.length,
       }
-      console.log('submissionStatsMap:', submissionStatsMap)
+      console.log('submissionStatsMap:', submissionStatsMap.value)
     })
     .catch((error) => {
       notify({
@@ -89,8 +87,8 @@ const getAssignmentSubmissions = async ({ assignmentId, classId }: { assignmentI
               <div>
                 <VaCardTitle class="font-medium text-lg">{{ assignment.name }}</VaCardTitle>
                 <VaCard v-if="submissionStatsMap[assignment.id]">
-                  {{ $t('classes.submited') }}: {{ submissionStatsMap[assignment.id].totalSubmittedCount }} /
-                  {{ submissionStatsMap[assignment.id].totalStudentsCount }}
+                  {{ $t('classes.submited') }}: {{ submissionStatsMap[assignment.id].totalSubmitted }} /
+                  {{ submissionStatsMap[assignment.id].totalStudents }}
                 </VaCard>
               </div>
             </VaCard>
@@ -113,8 +111,8 @@ const getAssignmentSubmissions = async ({ assignmentId, classId }: { assignmentI
               <div>
                 <VaCardTitle class="font-medium text-lg">{{ paper.examName }}</VaCardTitle>
                 <VaCard v-if="submissionStatsMap[paper.id]">
-                  {{ $t('classes.submited') }}: {{ submissionStatsMap[paper.id].totalSubmittedCount }} /
-                  {{ submissionStatsMap[paper.id].totalStudentsCount }}
+                  {{ $t('classes.submited') }}: {{ submissionStatsMap[paper.id].totalSubmitted }} /
+                  {{ submissionStatsMap[paper.id].totalStudents }}
                 </VaCard>
               </div>
             </VaCard>
