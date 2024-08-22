@@ -121,6 +121,16 @@ export const useGroupTeacherStore = defineStore('groupTeacher', {
           return Promise.reject(error)
         })
     },
+    async getGuestGroupDetail(id: string): Promise<any> {
+      return groupTeacherService
+        .getGuestGroupDetail(id)
+        .then((res) => {
+          return Promise.resolve(res)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
     async setPermissionGroupInClass(data: SetPermissionInClassGroup): Promise<any> {
       return groupTeacherService
         .setPermissionGroupInClass(data)
