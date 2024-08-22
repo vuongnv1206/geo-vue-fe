@@ -59,7 +59,8 @@
           <template #cell(completionStatus)="{ rowData }">
             <VaBadge v-if="rowData.completionStatus === 2" color="success" text="Completed" />
             <VaBadge v-else-if="rowData.completionStatus === 1" color="warning" text="Doing" />
-            <VaBadge v-else-if="rowData.completionStatus === 0" color="danger" text="Not started" />
+            <VaBadge v-else-if="rowData.completionStatus === 0" color="secondary" text="Not started" />
+            <VaBadge v-else-if="rowData.completionStatus === 3" color="danger" text="Supended" />
           </template>
 
           <template #cell(submitPaper.totalMark)="{ rowData }">

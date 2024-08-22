@@ -129,14 +129,18 @@ export const notifications = {
 
 export const getErrorMessage = (error: any) => {
   console.log(error)
-  if (error.response) {
-    if (error.response.data.messages.length > 0) {
-      return error.response.data.messages.join(', ')
+  try {
+    if (error.response) {
+      if (error.response.data.messages.length > 0) {
+        return error.response.data.messages.join(', ')
+      } else {
+        return error.response.data.exception
+      }
     } else {
-      return error.response.data.exception
+      return error.message
     }
-  } else {
-    return error.message
+  } catch {
+    return "Can't get error message"
   }
 }
 

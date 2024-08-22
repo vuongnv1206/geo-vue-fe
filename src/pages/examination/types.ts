@@ -678,3 +678,17 @@ export type StudentMonitorResponse = {
   hasPreviousPage: boolean
   hasNextPage: boolean
 }
+
+export type ReassignExamRequest = {
+  paperId: string
+  userId?: string
+  studentEmail?: string
+  reason: string
+}
+
+export type SupendStudentExamRequest = {
+  paperId: string
+  userId?: string
+  studentEmail?: string
+  reason: string
+}
