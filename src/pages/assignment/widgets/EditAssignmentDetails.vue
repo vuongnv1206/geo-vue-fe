@@ -395,7 +395,7 @@ const handleClickUpdate = async () => {
 watch(date, (newValue) => {
   if (newValue[0] && newValue[0] < new Date()) {
     notify({
-      message: 'Thời gian bắt đầu phải lớn hơn thời gian hiện tại',
+      message: t('validateUtils.greaterThanDate'),
       color: 'error',
     })
   }

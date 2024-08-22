@@ -325,7 +325,7 @@ const fileUpload = async () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.createFailed('') + getErrorMessage(error),
+        message: notifications.uploadFailed + getErrorMessage(error),
         color: 'error',
       })
     })

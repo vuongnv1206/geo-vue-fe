@@ -45,7 +45,7 @@ export const validators = {
     /^[a-zA-Z0-9]+$/.test(v) || t('validateUtils.isAlphanumeric', { fieldName }),
   email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
   phone: (v: string) => /([+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/.test(v) || t('validateUtils.phone'),
-  greaterThanDate: (v: Date) => v >= new Date() || 'Thời gian bắt đầu phải lớn hơn thời gian hiện tại',
+  greaterThanDate: (v: Date) => v >= new Date() || t('validateUtils.greaterThanDate'),
 }
 
 export const format = {
@@ -117,6 +117,8 @@ export const notifications = {
   inviteSuccess: (message: string) => {
     return t('validateUtils.inviteSuccess', { message }) + '\n'
   },
+  uploadSuccess: () => t('validateUtils.uploadSuccess'),
+  uploadFailed: () => t('validateUtils.uploadFailed'),
 }
 
 export const getErrorMessage = (error: any) => {
