@@ -181,7 +181,7 @@ onMounted(() => {
                 :placeholder="$t('assignments.enter_score')"
                 :rules="[
                   validators.required2($t('assignments.score')),
-                  validators.isNumber($t('assignments.score')),
+                  validators.isDecimalNumber($t('assignments.score')),
                   validators.minValue(0),
                   validators.maxValue(10),
                 ]"

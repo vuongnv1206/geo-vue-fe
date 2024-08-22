@@ -812,6 +812,7 @@
     "isCharacter": "{fieldName} phải là ký tự hợp lệ",
     "isDecimalNumber": "{fieldName} phải là số thập phân hợp lệ",
     "isNumber": "{fieldName} phải là số hợp lệ",
+    "isAlphanumeric": "{fieldName} phải là chữ số hoặc chữ cái",
     "email": "Vui lòng nhập địa chỉ email hợp lệ",
     "phone": "Vui lòng nhập số điện thoại hợp lệ",
     "updatedSuccessfully": "{message} cập nhật thành công",

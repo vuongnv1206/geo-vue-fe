@@ -22,7 +22,7 @@ export type EmptyAssignment = {
   requireLoginToSubmit: boolean
   subjectId: string
   attachment: string | null
-  classIds: string[]
+  classesId: string[]
 }
 
 export type AssignmentDetails = {
@@ -32,7 +32,7 @@ export type AssignmentDetails = {
   endTime: Date | null
   canViewResult: boolean
   requireLoginToSubmit: boolean
-  classIds: string[]
+  classesId: string[]
 }
 
 export type EmptyAssignmentDetails = {
@@ -41,7 +41,7 @@ export type EmptyAssignmentDetails = {
   endTime: Date | null
   canViewResult: boolean
   requireLoginToSubmit: boolean
-  classIds: string[]
+  classesId: string[]
 }
 
 export type AssignmentContent = {

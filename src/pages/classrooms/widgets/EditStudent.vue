@@ -4,6 +4,8 @@ import { computed, reactive, ref, watch } from 'vue'
 import { EmptyStudent, Student } from '../types'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -23,7 +25,7 @@ const defaultNewStudent: EmptyStudent = {
   firstName: '',
   lastName: '',
   avatarUrl: '',
-  dateOfBirth: new Date(),
+  dateOfBirth: new Date(new Date().setFullYear(new Date().getFullYear() - 12)),
   email: '',
   phoneNumber: '',
   studentCode: '',
@@ -70,7 +72,7 @@ const genderOptions = reactive([
 </script>
 
 <template>
-  <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
+  <VaForm v-slot="{ validate }" class="flex flex-col gap-2 min-h-[60vh] pt-6">
     <VaInput
       v-model="newStudent.firstName"
       :label="t('students.first_name')"
@@ -96,19 +98,39 @@ const genderOptions = reactive([
       v-model="newStudent.studentCode"
       :label="t('students.code')"
       :placeholder="t('students.enter_code')"
-      :rules="[validators.required2(t('students.code')), validators.maxLength(50)]"
+      :rules="[
+        validators.required2(t('students.code')),
+        validators.isAlphanumeric(t('students.code')),
+        validators.maxLength(50),
+      ]"
     />
-    <VaDateInput
+    <label
+      id="input-label-510"
+      aria-hidden="true"
+      class="va-input-label va-input-wrapper__label va-input-wrapper__label--outer"
+      style="color: var(--va-primary)"
+    >
+      {{ $t('students.date_of_birth') }}
+    </label>
+    <VueDatePicker
       v-model="newStudent.dateOfBirth"
-      :label="t('students.date_of_birth')"
-      :placeholder="t('students.enter_date_of_birth')"
+      auto-apply
+      partial-flow
+      :clearable="true"
+      :flow="['year', 'month', 'calendar']"
+      :month-change-on-scroll="true"
+      :month-change-on-arrows="true"
+      :enable-time-picker="false"
+      :placeholder="$t('students.enter_date_of_birth')"
+      :min-date="new Date(new Date(new Date().setFullYear(new Date().getFullYear() - 100)).setHours(0, 0, 0, 0))"
+      :max-date="new Date(new Date(new Date().setFullYear(new Date().getFullYear() - 12)).setHours(23, 59, 59, 999))"
     />
     <VaRadio v-model="newStudent.gender" :options="genderOptions" value-by="value" />
     <VaInput
       v-model="newStudent.phoneNumber"
       :label="t('students.phone_number')"
       :placeholder="t('students.enter_phone_number')"
-      :rules="[validators.isNumber(t('students.phone_number')), validators.phone]"
+      :rules="[validators.phone]"
     />
     <VaInput
       v-model="newStudent.email"
@@ -116,7 +138,7 @@ const genderOptions = reactive([
       :placeholder="t('students.enter_email')"
       :rules="[validators.required2(t('students.email')), validators.email]"
     />
-    <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
+    <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2 pt-2">
       <VaButton preset="secondary" color="secondary" @click="$emit('close')">{{ t('settings.cancel') }}</VaButton>
       <VaButton @click="validate() && $emit('save', newStudent as Student)">{{ saveButtonLabel }} </VaButton>
     </VaCard>
