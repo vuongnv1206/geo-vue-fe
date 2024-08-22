@@ -81,7 +81,6 @@ const getAssignmentSubmissions = () => {
           url: `${url}${path}`,
         }
       })
-      console.log('filesUploaded', filesUploaded.value)
     })
     .catch((error) => {
       notify({
@@ -215,7 +214,7 @@ onMounted(() => {
       <VaCard v-if="!assignment.canViewResult">
         <VaCardContent class="flex flex-col items-center">
           <VaIcon name="done" size="large" class="material-symbols-outlined mb-2" />
-          <p>{{ $t('assignments.Submmitted') }}</p>
+          <p>{{ $t('assignments.Submitted') }}</p>
         </VaCardContent>
       </VaCard>
       <VaCard v-else>

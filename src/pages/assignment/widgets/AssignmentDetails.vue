@@ -150,15 +150,15 @@
                 :class="{
                   'text-green-500':
                     assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
-                    'Submmitted',
+                    'Submitted',
                   'text-yellow-500':
                     assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status === 'Doing',
                 }"
               >
                 {{
                   assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
-                  'Submmitted'
-                    ? $t('assignments.Submmitted')
+                  'Submitted'
+                    ? $t('assignments.Submitted')
                     : $t('assignments.Doing')
                 }}
               </VaListItemLabel>
