@@ -104,10 +104,12 @@ const checkDoExam = (studentId: string) => {
         <VaAccordion multiple>
           <VaCollapse v-for="(group, index) in groupAccessPaper" :key="index" :header="group.name">
             <template #content>
-              <div v-for="classroom in group.classes" :key="classroom.id" class="grid md:grid-cols-5">
-                <VaChip square color="success">
-                  {{ classroom.name }}
-                </VaChip>
+              <div class="grid md:grid-cols-6 xs:grid-cols-4">
+                <div v-for="classroom in group.classes" :key="classroom.id">
+                  <VaChip square color="success">
+                    {{ classroom.name }}
+                  </VaChip>
+                </div>
               </div>
             </template>
           </VaCollapse>

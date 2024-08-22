@@ -147,19 +147,14 @@
               <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
               <VaListItemLabel
                 caption
-                :class="{
-                  'text-green-500':
-                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
-                    'Submitted',
-                  'text-yellow-500':
-                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status === 'Doing',
-                }"
+                :class="
+                  getStatusColorClass(
+                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
+                  )
+                "
               >
                 {{
-                  assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
-                  'Submitted'
-                    ? $t('assignments.Submitted')
-                    : $t('assignments.Doing')
+                  getStatusText(assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status)
                 }}
               </VaListItemLabel>
             </VaListItemSection>
@@ -423,6 +418,36 @@ const fileUpload = async () => {
         color: 'error',
       })
     })
+}
+
+// Function to get the color class based on status
+const getStatusColorClass = (status: string | undefined) => {
+  if (status === 'Marked') {
+    return 'text-green-500'
+  } else if (status === 'NotSubmitted') {
+    return 'text-red-500'
+  } else if (status === 'Submitted') {
+    return 'text-blue-500'
+  } else if (status === 'Doing') {
+    return 'text-yellow-500'
+  } else {
+    return ''
+  }
+}
+
+// Function to get the display text based on status
+const getStatusText = (status: string | undefined) => {
+  if (status === 'Marked') {
+    return t('assignments.marked')
+  } else if (status === 'NotSubmitted') {
+    return t('assignments.not_submitted')
+  } else if (status === 'Submitted') {
+    return t('assignments.Submitted')
+  } else if (status === 'Doing') {
+    return t('assignments.Doing')
+  } else {
+    return ''
+  }
 }
 
 watchEffect(() => {

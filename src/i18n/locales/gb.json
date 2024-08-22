@@ -349,7 +349,9 @@
     "comment": "Comment",
     "answers": "Answers",
     "Submitted": "Submitted",
-    "Doing": "Doing"
+    "Doing": "Doing",
+    "marked":"Marked",
+    "not_submitted":"Not Submitted"
   },
   "subjects": {
     "subject": "Subject",
