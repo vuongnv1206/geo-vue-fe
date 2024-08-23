@@ -15,6 +15,7 @@ import {
   GetAccessPaperResponse,
   GetGetAssigneesInPaperRequest,
   GetGetAssigneesInPaperResponse,
+  SharePaperRequest,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -40,6 +41,8 @@ export interface IPapersService {
   getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse>
 
   getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse>
+
+  papers_Share(id: string, request: SharePaperRequest): Promise<string>
 }
 
 export class PapersService implements IPapersService {
@@ -236,6 +239,17 @@ export class PapersService implements IPapersService {
       })
       .catch((error) => {
         return Promise.reject(error)
+      })
+  }
+
+  async papers_Share(id: string, request: SharePaperRequest): Promise<string> {
+    return apiService
+      .post(`/v1/papers/${id}/share-paper`, request)
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
       })
   }
 }

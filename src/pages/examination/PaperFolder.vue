@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { usePaperFolderStore } from '@/stores/modules/paperFolder.module'
 import { usePaperStore } from '@/stores/modules/paper.module'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import {
   PaperFolderDto,
   UpdatePaperFolderRequest,
@@ -567,6 +567,10 @@ const getNameUserGroup = (option: PaperFolderPermission | null) => {
   }
 }
 
+const allPermissionFalse = (permission: PaperFolderPermission) => {
+  return !permission.canView && !permission.canAdd && !permission.canUpdate && !permission.canDelete
+}
+
 const editPermission = (permission: PaperFolderPermission) => {
   editPermissionValue.value = { ...permission }
 
@@ -578,6 +582,58 @@ const editPermission = (permission: PaperFolderPermission) => {
     canShare: permission.canShare,
   }
   doShowPaperFolderPermissionFormModal.value = true
+}
+
+const canEdit = ref(false)
+watch(
+  () => permissionEdit.value,
+  (value) => {
+    if (!value.canView) {
+      canEdit.value = false
+    }
+  },
+  { deep: true },
+)
+
+watch(
+  () => canEdit.value,
+  (value) => {
+    if (!value) {
+      permissionEdit.value = {
+        canView: false,
+        canAdd: false,
+        canUpdate: false,
+        canDelete: false,
+        canShare: false,
+      }
+    } else {
+      permissionEdit.value.canView = true
+      permissionEdit.value.canAdd = true
+      permissionEdit.value.canUpdate = true
+      permissionEdit.value.canDelete = true
+    }
+  },
+)
+
+watch(
+  () => permissionEdit.value.canShare,
+  (value) => {
+    if (value) {
+      canEdit.value = true
+    }
+  },
+  { deep: true },
+)
+
+const handleDeletePermission = () => {
+  permissionEdit.value = {
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+  }
+  onSharePaperFolderPermission()
 }
 
 const onSharePaperFolderPermission = () => {
@@ -606,7 +662,7 @@ const onSharePaperFolderPermission = () => {
         color: 'success',
       })
       doShowSharePaperFolderModal.value = false
-      getPaperFolders()
+      getPaperFolders(currentFolderId.value)
     })
     .catch((error) => {
       const message = getErrorMessage(error)
@@ -903,8 +959,33 @@ const onSharePaperFolderPermission = () => {
               </VaListItemLabel>
             </VaListItemSection>
 
-            <VaListItemSection icon>
+            <!-- <VaListItemSection icon>
               <VaButton
+                 v-if="folderToEdit?.createdBy && folderToEdit?.createdBy == permission.user?.id"
+                size="small"
+                disabled
+                preset="secondary"
+                border-color="primary"
+                class="mr-6 mb-2"
+                @click="editPermission(permission)"
+              >
+                Edit Permissions
+              </VaButton>
+            </VaListItemSection> -->
+
+            <VaListItemSection v-if="!allPermissionFalse(permission as PaperFolderPermission)" icon>
+              <VaButton
+                v-if="folderToEdit?.createdBy && folderToEdit.createdBy == permission.user?.id"
+                size="small"
+                disabled
+                preset="secondary"
+                border-color="primary"
+                class="mr-6 mb-2"
+              >
+                Owner
+              </VaButton>
+              <VaButton
+                v-else
                 size="small"
                 preset="secondary"
                 border-color="primary"
@@ -970,9 +1051,8 @@ const onSharePaperFolderPermission = () => {
       </div>
       <div class="flex flex-col gap-4 p-10">
         <VaCheckbox v-model="permissionEdit.canView" label="View" />
-        <VaCheckbox v-model="permissionEdit.canAdd" label="Create" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" label="Update" />
-        <VaCheckbox v-model="permissionEdit.canDelete" label="Delete" />
+        <VaCheckbox v-model="canEdit" label="Edit" />
+        <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
       </div>
     </VaForm>
   </VaModal>
@@ -1014,7 +1094,7 @@ const onSharePaperFolderPermission = () => {
                 color="danger"
                 @click="
                   () => {
-                    console.log('delete')
+                    handleDeletePermission()
                   }
                 "
               >
@@ -1026,9 +1106,7 @@ const onSharePaperFolderPermission = () => {
       </div>
       <div class="flex flex-col gap-4 p-10">
         <VaCheckbox v-model="permissionEdit.canView" label="View" />
-        <VaCheckbox v-model="permissionEdit.canAdd" label="Create" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" label="Update" />
-        <VaCheckbox v-model="permissionEdit.canDelete" label="Delete" />
+        <VaCheckbox v-model="canEdit" label="Edit" />
         <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
       </div>
     </VaForm>

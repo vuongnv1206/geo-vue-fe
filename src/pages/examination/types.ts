@@ -44,6 +44,18 @@ export interface SharePaperFolderRequest {
   canDelete: boolean
   canShare: boolean
 }
+
+export interface SharePaperRequest {
+  userId?: string | null
+  paperId: string
+  groupId?: string | null
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+}
+
 export interface PaperInListDto {
   id: string
   examName: string
@@ -104,6 +116,7 @@ export interface PaperDto {
   localIpAllowed?: string
   numberAttempt?: number
   totalAttended?: number
+  paperPermissions?: PaperPermission[]
 }
 
 export interface PaperLabelDto {
@@ -316,6 +329,24 @@ export type PaperFolderPermission = {
   groupTeacherId: string
   groupTeacher: GroupTeacher | null
   folderId: string
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+  createdBy: string
+  createdOn: string
+  lastModifiedBy: string
+  lastModifiedOn: string | null
+}
+
+export type PaperPermission = {
+  id: string
+  userId: string
+  user: UserDetail | null
+  groupTeacherId: string
+  groupTeacher: GroupTeacher | null
+  paperId: string
   canView: boolean
   canAdd: boolean
   canUpdate: boolean
