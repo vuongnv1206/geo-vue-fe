@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { VaButton, VaCard, VaCardTitle, VaIcon, useForm, useToast } from 'vuestic-ui'
+import { VaButton, VaCard, VaCardTitle, VaIcon, useForm, useModal, useToast } from 'vuestic-ui'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import {
   GetAccessPaperRequest,
@@ -29,7 +29,7 @@ const classStores = useClassStore()
 const subjectStores = useSubjectStore()
 const router = useRouter()
 const { init: notify } = useToast()
-
+const { confirm } = useModal()
 const paperId = route.params.id
 
 const getPaperDetail = async () => {
@@ -179,8 +179,24 @@ const getGroupClasses = async () => {
   }
 }
 
+const confirmPublish = async () => {
+  const confirmed = await confirm({
+    title: 'Confirm Publish',
+    message: `Are you sure you want to publish this exam? Once published, you will only be able to edit the start time, end time, and duration. 
+              Note: You can only make these changes up to 30 minutes before the exam starts.`,
+    okText: 'Publish',
+    cancelText: 'Cancel',
+    size: 'small',
+  })
+
+  if (confirmed) {
+    saveDraffPaper(StatusPaper.publish)
+  }
+}
+
 const saveDraffPaper = (status: StatusPaper) => {
   editPaper.value.status = status
+
   const accessPaperSet = ref<PaperAccess[] | null>(null)
 
   if (valueOption.value === AccessType.ByClass) {
@@ -250,12 +266,12 @@ const updateSelectedStudent = (selectedStudents: string[]) => {
 const showMarkResultOptions = computed(() => [
   { label: 'No', value: ShowResult.No },
   { label: 'When submitted', value: ShowResult.WhenSubmitted },
-  { label: 'When all students submitted', value: ShowResult.WhenAllStudentSubmitted },
+  //{ label: 'When all students submitted', value: ShowResult.WhenAllStudentSubmitted },
 ])
 const showQuestionAnswerOptions = computed(() => [
   { label: 'No', value: ShowQuestionAnswer.No },
   { label: 'When submitted', value: ShowQuestionAnswer.WhenSubmitted },
-  { label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
+  //{ label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
 ])
 
 const backToPage = () => {
@@ -535,11 +551,7 @@ const form = useForm('paperConfigForm')
           @click="saveDraffPaper(StatusPaper.unpublish)"
           >Save draft
         </VaButton>
-        <VaButton
-          size="small"
-          class="p-1 pr-2 pl-2 ml-1"
-          :disabled="!form.validate()"
-          @click="saveDraffPaper(StatusPaper.publish)"
+        <VaButton size="small" class="p-1 pr-2 pl-2 ml-1" :disabled="!form.validate()" @click="confirmPublish"
           >Publish</VaButton
         >
       </div>
