@@ -643,7 +643,7 @@ export type ClassAccessPaper = {
   id: string
   name: string
   userClasses: StudentAccessPaper[]
-  groupName?: string
+  groupClassName?: string
 }
 
 export type StudentAccessPaper = {
@@ -727,4 +727,22 @@ export type SupendStudentExamRequest = {
   userId?: string
   studentEmail?: string
   reason: string
+}
+
+export type GetGetAssigneesInPaperRequest = {
+  keyword?: string
+  pageNumber?: number
+  pageSize?: number
+  orderBy?: string[]
+  paperId: string
+  groupClassId?: string
+  classId?: string
+}
+
+export type GetGetAssigneesInPaperResponse = {
+  data: ClassAccessPaper[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
 }

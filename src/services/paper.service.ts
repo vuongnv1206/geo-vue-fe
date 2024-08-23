@@ -13,6 +13,8 @@ import {
   SearchPaperRequest,
   GetAccessPaperRequest,
   GetAccessPaperResponse,
+  GetGetAssigneesInPaperRequest,
+  GetGetAssigneesInPaperResponse,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -36,9 +38,22 @@ export interface IPapersService {
   updateQuestionsInPaper(paperId: string, request: UpdateQuestionsInPaperRequest): Promise<any>
 
   getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse>
+
+  getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse>
 }
 
 export class PapersService implements IPapersService {
+  getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse> {
+    const url = '/v1/papers/get-assignees-paper'
+    return apiService
+      .post(url, request)
+      .then((res) => {
+        return Promise.resolve(res.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse> {
     const url = '/v1/papers/get-access-paper'
     return apiService
