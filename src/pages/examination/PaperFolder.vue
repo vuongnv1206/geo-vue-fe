@@ -367,25 +367,7 @@ const contextmenu = (event: any) => {
         }
       },
     })
-  } else {
-    event.event.preventDefault()
-    show({
-      event: event.event,
-      options: [{ text: 'Share', icon: 'share' }],
-      onSelected(option) {
-        if (option.text === 'Share') {
-          onPaperShare(item)
-        }
-      },
-    })
   }
-}
-
-const onPaperShare = (paper: PaperInListDto) => {
-  // Thực hiện các bước chia sẻ paper tương tự như chia sẻ folder
-  // Ví dụ: Hiển thị modal để chọn người dùng hoặc nhóm để chia sẻ
-  console.log(`Sharing paper: ${paper.examName}`)
-  // Gọi các hàm cần thiết để chia sẻ paper
 }
 
 const tableColumns = computed(() => {
@@ -642,6 +624,17 @@ watch(
   },
   { deep: true },
 )
+
+const handleDeletePermission = () => {
+  permissionEdit.value = {
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+  }
+  onSharePaperFolderPermission()
+}
 
 const onSharePaperFolderPermission = () => {
   const sharePermission = ref<SharePaperFolderRequest>({
@@ -1058,9 +1051,7 @@ const onSharePaperFolderPermission = () => {
       </div>
       <div class="flex flex-col gap-4 p-10">
         <VaCheckbox v-model="permissionEdit.canView" label="View" />
-        <VaCheckbox v-model="permissionEdit.canAdd" label="Create" />
-        <VaCheckbox v-model="permissionEdit.canUpdate" label="Update" />
-        <VaCheckbox v-model="permissionEdit.canDelete" label="Delete" />
+        <VaCheckbox v-model="canEdit" label="Edit" />
         <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
       </div>
     </VaForm>
@@ -1103,7 +1094,7 @@ const onSharePaperFolderPermission = () => {
                 color="danger"
                 @click="
                   () => {
-                    console.log('delete')
+                    handleDeletePermission()
                   }
                 "
               >

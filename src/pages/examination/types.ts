@@ -44,6 +44,18 @@ export interface SharePaperFolderRequest {
   canDelete: boolean
   canShare: boolean
 }
+
+export interface SharePaperRequest {
+  userId?: string | null
+  paperId: string
+  groupId?: string | null
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+}
+
 export interface PaperInListDto {
   id: string
   examName: string
@@ -104,6 +116,7 @@ export interface PaperDto {
   localIpAllowed?: string
   numberAttempt?: number
   totalAttended?: number
+  paperPermissions?: PaperPermission[]
 }
 
 export interface PaperLabelDto {
