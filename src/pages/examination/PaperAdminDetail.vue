@@ -249,13 +249,13 @@ const onTabChange = async (classId: string) => {
   await getSubmittedStudents(classId)
 }
 
-const statusSubmitOptions: any = [
-  { label: 'done', value: 1 },
-  { label: 'not yet', value: 2 },
-  { label: 'miss', value: 3 },
-]
+// const statusSubmitOptions: any = [
+//   { label: 'done', value: 1 },
+//   { label: 'not yet', value: 2 },
+//   { label: 'miss', value: 3 },
+// ]
 
-const statusSubmitValue = ref(1)
+// const statusSubmitValue = ref(1)
 
 onMounted(async () => {
   await getPaperDetail()
@@ -444,13 +444,6 @@ onMounted(async () => {
             <VaButton size="small" @click="showSelectClassModal = !showSelectClassModal"
               >Select class group: {{ selectedGroupClassName }}
             </VaButton>
-            <VaSelect
-              v-model="statusSubmitValue"
-              :options="statusSubmitOptions"
-              text-by="label"
-              value-by="value"
-              class="max-w-[120px]"
-            />
           </VaCardTitle>
           <VaModal v-model="showSelectClassModal" size="large" hide-default-actions>
             <VaCard outlined>
