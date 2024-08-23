@@ -325,6 +325,24 @@ export type PaperFolderPermission = {
   lastModifiedOn: string | null
 }
 
+export type PaperPermission = {
+  id: string
+  userId: string
+  user: UserDetail | null
+  groupTeacherId: string
+  groupTeacher: GroupTeacher | null
+  paperId: string
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+  createdBy: string
+  createdOn: string
+  lastModifiedBy: string
+  lastModifiedOn: string | null
+}
+
 export type SharePermission = {
   folderId: string
   userIds: string[]
