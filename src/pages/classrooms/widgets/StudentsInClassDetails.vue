@@ -158,6 +158,7 @@ const getFormatFileImportStudent = () => {
         message: notifications.downloadSuccess(),
         color: 'success',
       })
+      emit('load')
     })
     .catch((error) => {
       notify({
@@ -172,11 +173,12 @@ const uploadStudentFile = () => {
   studentStore
     .uploadStudentFile(filesUploaded.value[0], props.classroom.id)
     .then(() => {
-      console.log('upload success', filesUploaded.value[0])
+      // console.log('upload success', filesUploaded.value[0])
       notify({
         message: notifications.uploadSuccess(),
         color: 'success',
       })
+      emit('load')
     })
     .catch((error) => {
       notify({
