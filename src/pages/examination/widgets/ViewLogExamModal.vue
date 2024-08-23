@@ -1,12 +1,46 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { StudentMonitor } from '../types'
+import { StudentMonitor, MonitorRequest, MonitorDetailResponse } from '../types'
+import { useExamMonitorStore } from '@/stores/modules/examMonitor.module'
+import ViewLogExamModalInfo from './ViewLogExamModalInfo.vue'
+import ViewLogExamModalProcess from './ViewLogExamModalProcess.vue'
+import ViewLogExamModalKeyboard from './ViewLogExamModalKeyboard.vue'
+import ViewLogExamModalMouse from './ViewLogExamModalMouse.vue'
+import ViewLogExamModalNet from './ViewLogExamModalNet.vue'
+import ViewLogExamModalCommon from './ViewLogExamModalCommon.vue'
+const store = useExamMonitorStore()
+
 const props = defineProps<{
   studentMonitor: StudentMonitor | null
   paperId: string
 }>()
 
-console.log(props.studentMonitor)
+const details = ref<MonitorDetailResponse | null>(null)
+
+const getMonitorDetail = () => {
+  if (props.studentMonitor) {
+    // request
+    const request: MonitorRequest = {
+      submitPaperId: props.studentMonitor.submitPaperId,
+    }
+    store
+      .getExamMonitorDetail(request)
+      .then((response) => {
+        details.value = response
+        console.log(details.value)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+}
+
+getMonitorDetail()
+
+// auto refresh every 3s
+setInterval(() => {
+  getMonitorDetail()
+}, 10000)
 
 const emit = defineEmits<{
   (event: 'showReassign', studentMonitor: StudentMonitor): void
@@ -61,7 +95,12 @@ const currentTab = computed(() => {
             {{ currentTab?.title }}
           </VaCardTitle>
           <VaCardContent>
-            {{ currentTab?.content }}
+            <ViewLogExamModalInfo v-if="currentTab?.title === 'Information'" :monitor-details="details" />
+            <ViewLogExamModalProcess v-if="currentTab?.title === 'Process'" :monitor-details="details" />
+            <ViewLogExamModalKeyboard v-if="currentTab?.title === 'Keyboard'" :monitor-details="details" />
+            <ViewLogExamModalMouse v-if="currentTab?.title === 'Mouse'" :monitor-details="details" />
+            <ViewLogExamModalNet v-if="currentTab?.title === 'Network'" :monitor-details="details" />
+            <ViewLogExamModalCommon v-if="currentTab?.title === 'Common'" :monitor-details="details" />
           </VaCardContent>
         </VaCard>
       </div>

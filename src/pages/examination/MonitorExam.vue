@@ -108,7 +108,7 @@ getPaperDetail()
 // auto refresh every 3s
 setInterval(() => {
   getStudentMonitor()
-}, 3000)
+}, 6000)
 
 const dblclick = (studentMonitor: any) => {
   console.log('dblclick', studentMonitor)
@@ -161,14 +161,6 @@ const doShowSupendStudentModal = ref(false)
 const dataModalSupend = ref<StudentMonitor | null>(null)
 
 const showSupendStudentModal = (studentMonitor: StudentMonitor | null) => {
-  // if status is doing, can reassign else not
-  if (studentMonitor?.completionStatus !== 1 && studentMonitor !== null) {
-    notify({
-      message: `Student is not doing exam, can not suspend`,
-      color: 'warning',
-    })
-    return
-  }
   dataModalSupend.value = studentMonitor
   doShowSupendStudentModal.value = true
 }

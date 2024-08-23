@@ -33,6 +33,17 @@ class ExamMonitorService {
         return Promise.reject(error)
       })
   }
+
+  // /api/v1/submitpapers/monitor-detail
+  async getExamMonitorDetail(data: any): Promise<any> {
+    return ApiService.post('/v1/submitpapers/monitor-detail', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new ExamMonitorService()
