@@ -6,7 +6,7 @@ import {
   GetAccessPaperRequest,
   GroupClassAccessPaper,
   PaperDto,
-  ShowQuestionAnswer,
+  // ShowQuestionAnswer,
   ShowResult,
   StatusPaper,
 } from '@/pages/examination/types'
@@ -266,13 +266,13 @@ const updateSelectedStudent = (selectedStudents: string[]) => {
 const showMarkResultOptions = computed(() => [
   { label: 'No', value: ShowResult.No },
   { label: 'When submitted', value: ShowResult.WhenSubmitted },
-  //{ label: 'When all students submitted', value: ShowResult.WhenAllStudentSubmitted },
+  { label: 'When all students submitted or exam runs out', value: ShowResult.WhenAllStudentSubmitted },
 ])
-const showQuestionAnswerOptions = computed(() => [
-  { label: 'No', value: ShowQuestionAnswer.No },
-  { label: 'When submitted', value: ShowQuestionAnswer.WhenSubmitted },
-  //{ label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
-])
+// const showQuestionAnswerOptions = computed(() => [
+//   { label: 'No', value: ShowQuestionAnswer.No },
+//   { label: 'When submitted', value: ShowQuestionAnswer.WhenSubmitted },
+//   //{ label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
+// ])
 
 const backToPage = () => {
   router.push({ name: 'paper-config', params: { id: paperId } })
@@ -399,14 +399,14 @@ const form = useForm('paperConfigForm')
               <VaTextarea v-model="editPaper.description" label="description" class="min-w-[100%]" />
             </div>
             <div class="col-span-2">
-              <p class="mt-2 text-xs va-text-bold">Who is allowed to take the exam?</p>
+              <p class="mt-2 text-xs va-text-bold">Student is allowed to take the exam?</p>
               <VaButton
                 preset="secondary"
                 class="mr-6 mb-2"
                 size="small"
                 @click="showWhoAssignedDetail = !showWhoAssignedDetail"
               >
-                show who assigned list
+                Show assigned student list
               </VaButton>
               <VaRadio v-model="valueOption" :options="accessOptions" class="assign-radio mb-2" value-by="value" />
             </div>
@@ -485,13 +485,13 @@ const form = useForm('paperConfigForm')
               label="Exam password"
               placeholder="Enter password..."
             />
-            <VaCounter
+            <!-- <VaCounter
               v-model="editPaper.numberAttempt"
               :rules="[(v: any) => v > 0 || 'Field is required']"
               label="Submitted"
               manual-input
               class="mb-2 w-full pl-1"
-            />
+            /> -->
           </div>
 
           <div class="grid grid-cols-2">
@@ -512,11 +512,11 @@ const form = useForm('paperConfigForm')
       </VaCard>
 
       <VaCard class="mb-3">
-        <VaCardTitle> point an answers review </VaCardTitle>
+        <!-- <VaCardTitle> point an answers review </VaCardTitle> -->
         <VaDivider class="m-0" />
         <VaCardContent>
           <div class="mb-2">
-            <span class="va-title">Show result</span>
+            <span class="va-title">Show score</span>
             <VaRadio
               v-model="editPaper.showMarkResult"
               :options="showMarkResultOptions"
@@ -527,7 +527,7 @@ const form = useForm('paperConfigForm')
               vertical
             />
           </div>
-          <div>
+          <!-- <div>
             <span class="va-title">Show the exam and answers</span>
             <VaRadio
               v-model="editPaper.showQuestionAnswer"
@@ -538,7 +538,7 @@ const form = useForm('paperConfigForm')
               class="assign-radio"
               vertical
             />
-          </div>
+          </div> -->
         </VaCardContent>
       </VaCard>
 
