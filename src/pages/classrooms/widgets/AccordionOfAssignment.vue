@@ -87,14 +87,14 @@ const getAssignmentSubmissions = async (assignmentClass: AssignmentClass) => {
               <VaListItemSection avatar>
                 <VaIcon name="description" size="2.5rem" class="text-gray-500" />
               </VaListItemSection>
-              <VaListItemSection class="flex-1">
+              <VaListItemSection class="flex-1 justify-center">
                 <VaListItemLabel class="font-large text-bold">{{ assignment.name }}</VaListItemLabel>
                 <VaListItemLabel caption>
                   {{ $t('assignments.end_time') }} {{ format.formatDate(assignment.endTime) }}
                 </VaListItemLabel>
               </VaListItemSection>
 
-              <VaListItemSection class="ml-auto text-right">
+              <VaListItemSection class="ml-auto text-right justify-center">
                 <div v-if="submissionStatsMap[assignment.id]" class="flex flex-col">
                   <div v-if="isTeacher">
                     <VaListItemLabel caption>
@@ -145,8 +145,8 @@ const getAssignmentSubmissions = async (assignmentClass: AssignmentClass) => {
               <VaListItemSection avatar>
                 <VaIcon name="article" size="2.5rem" class="text-gray-500" />
               </VaListItemSection>
-              <VaListItemSection>
-                <VaListItemLabel class="font-medium text-lg">{{ paper.examName }}</VaListItemLabel>
+              <VaListItemSection class="justify-center">
+                <VaListItemLabel class="font-large text-bold">{{ paper.examName }}</VaListItemLabel>
               </VaListItemSection>
             </VaCard>
           </VaListItem>

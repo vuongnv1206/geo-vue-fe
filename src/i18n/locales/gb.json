@@ -401,6 +401,7 @@
     "search_assignment_paper": "Search assignment or paper"
   },
   "students": {
+    "get_template": "Get template", 
     "student": "Student",
     "student_2": "student",
     "first_name": "First Name",
@@ -579,7 +580,12 @@
     "stt": "No.",
     "class_list": "Class List",
     "rawIndex": "No",
-    "unlimited_time": "Unlimited Time"
+    "unlimited_time": "Unlimited Time",
+    "not_started": "Not Started",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "suspended": "Suspended",
+    "status": "Status"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",
@@ -844,7 +850,9 @@
     "NotRequest": "Not request",
     "uploadFileSuccess": "Upload file successfully",
     "uploadFileFailed": "Upload file failed",
-    "greaterThanDate": "Start time must be greater than current time"
+    "greaterThanDate": "Start time must be greater than current time",
+    "downloadFailed": "Download file failed",
+    "downloadSuccess": "Download file successfully"
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"

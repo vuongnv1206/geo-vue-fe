@@ -159,8 +159,10 @@ export const notifications = {
   inviteSuccess: (message: string) => {
     return t('validateUtils.inviteSuccess', { message }) + '\n'
   },
-  uploadSuccess: () => t('validateUtils.uploadSuccess'),
-  uploadFailed: () => t('validateUtils.uploadFailed'),
+  uploadSuccess: () => t('validateUtils.uploadFileSuccess') + '\n',
+  uploadFailed: () => t('validateUtils.uploadFileFailed') + '\n',
+  downloadSuccess: () => t('validateUtils.downloadSuccess') + '\n',
+  downloadFailed: () => t('validateUtils.downloadFailed') + '\n',
 }
 
 export const getErrorMessage = (error: any) => {

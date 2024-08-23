@@ -402,6 +402,7 @@
     "search_assignment_paper": "Tìm kiếm bài tập hoặc bài thi"
   },
   "students": {
+    "get_template": "tải mẫu",
     "student": "Học sinh",
     "student_2": "học sinh",
     "first_name": "Tên",
@@ -580,7 +581,12 @@
     "stt": "STT",
     "class_list": "Danh sách lớp",
     "rawIndex": "STT",
-    "unlimited_time": "Không giới hạn thời gian"
+    "unlimited_time": "Không giới hạn thời gian",
+    "not_started": "Chưa bắt đầu",
+    "in_progress": "Đang làm bài",
+    "completed": "Đã hoàn thành",
+    "suspended": "Đã đình chỉ",
+    "status": "Trạng thái"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",
@@ -842,7 +848,9 @@
     "NotRequest": "chưa yêu cầu",
     "uploadFileSuccess": "Tải lên tệp thành công",
     "uploadFileFailed": "Tải lên tệp thất bại",
-    "greaterThanDate": "Thời gian bắt đầu phải lớn hơn thời gian hiện tại"
+    "greaterThanDate": "Thời gian bắt đầu phải lớn hơn thời gian hiện tại",
+    "downloadSuccess": "Tải xuống tệp thành công",
+    "downloadFailed": "Tải xuống tệp thất bại"
   },
   "languageSwitcher": {
     "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."

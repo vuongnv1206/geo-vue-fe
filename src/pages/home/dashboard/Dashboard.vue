@@ -166,10 +166,21 @@
       <VaCardTitle>{{ t('papers.exam_schedule') }}</VaCardTitle>
       <VaCard class="col-span-1 lg:col-span-1 xl:col-span-1 mb-3">
         <VaDataTable hoverable :disable-client-side-sorting="false" :columns="columns" :items="paperStudent">
+          <template #cell(completionStatus)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span :class="getStatusClass(rowData.completionStatus)">
+                  {{ getStatusText(rowData.completionStatus) }}
+                </span>
+              </div>
+            </div>
+          </template>
           <template #cell(startTime)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
-                <span> {{ format.formatDate(rowData.startTime) }}</span>
+                <span>
+                  {{ format.formatDate(rowData.startTime) }}
+                </span>
               </div>
             </div>
           </template>
@@ -188,6 +199,13 @@
                 <span>
                   {{ format.formatDuration(rowData.duration) }}
                 </span>
+              </div>
+            </div>
+          </template>
+          <template #cell(description)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <VaTextarea v-model="rowData.description" :readonly="true" />
               </div>
             </div>
           </template>
@@ -340,6 +358,7 @@ const columns = defineVaDataTableColumns([
   { label: t('papers.stt'), key: 'stt', sortable: false },
   { label: t('subjects.subject'), key: 'subjectName', sortable: true },
   { label: t('papers.name'), key: 'examName', sortable: true },
+  { label: t('papers.status'), key: 'completionStatus', sortable: true },
   { label: t('papers.start_time'), key: 'startTime', sortable: true },
   { label: t('papers.end_time'), key: 'endTime', sortable: true },
   { label: t('papers.duration'), key: 'duration', sortable: true },
@@ -449,6 +468,35 @@ const getPaperStudentsHistory = async () => {
     loading.value = false
   }
 }
+
+const getStatusText = (status: number) => {
+  if (status === 0) {
+    return t('papers.not_started')
+  } else if (status === 1) {
+    return t('papers.in_progress')
+  } else if (status === 2) {
+    return t('papers.completed')
+  } else if (status === 3) {
+    return t('papers.suspended')
+  } else {
+    return ''
+  }
+}
+
+const getStatusClass = (status: number) => {
+  if (status === 0) {
+    return 'text-yellow-500' // Not Started
+  } else if (status === 1) {
+    return 'text-blue-500' // In Progress
+  } else if (status === 2) {
+    return 'text-green-500' // Completed
+  } else if (status === 3) {
+    return 'text-red-500' // Suspended
+  } else {
+    return ''
+  }
+}
+
 onMounted(() => {
   const loadData = async () => {
     await getClasses()
