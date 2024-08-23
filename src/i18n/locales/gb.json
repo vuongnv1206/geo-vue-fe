@@ -849,7 +849,9 @@
     "NotRequest": "Not request",
     "uploadFileSuccess": "Upload file successfully",
     "uploadFileFailed": "Upload file failed",
-    "greaterThanDate": "Start time must be greater than current time"
+    "greaterThanDate": "Start time must be greater than current time",
+    "downloadFailed": "Download file failed",
+    "downloadSuccess": "Download file successfully"
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"

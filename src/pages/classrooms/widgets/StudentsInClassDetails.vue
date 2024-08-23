@@ -149,6 +149,43 @@ const onStudentSaved = async (student: Student) => {
   }
 }
 
+const getFormatFileImportStudent = () => {
+  studentStore
+    .getFormatFileImportStudent()
+    .then((response) => {
+      console.log('aaaa', response)
+      notify({
+        message: notifications.downloadSuccess(),
+        color: 'success',
+      })
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.downloadFailed() + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+}
+const filesUploaded = ref<any>()
+
+const uploadStudentFile = () => {
+  studentStore
+    .uploadStudentFile(filesUploaded.value[0], props.classroom.id)
+    .then(() => {
+      console.log('upload success', filesUploaded.value[0])
+      notify({
+        message: notifications.uploadSuccess(),
+        color: 'success',
+      })
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.uploadFailed() + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+}
+
 const canStudentManage = computed(() => {
   if (props.classroom.permissions === null || props.classroom.permissions === undefined) {
     return true
@@ -162,11 +199,16 @@ const canStudentManage = computed(() => {
     <VaCardContent>
       <div class="flex flex-col md:flex-row gap-2 justify-end">
         <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedStudent()">
-          {{ t('settings.delete') }}</VaButton
-        >
-        <VaButton :disabled="!canStudentManage" icon="add" @click="createNewStudent()">{{
-          t('students.student')
-        }}</VaButton>
+          {{ t('settings.delete') }}
+        </VaButton>
+        <VaButton :disabled="!canStudentManage" icon="add" @click="createNewStudent()">
+          {{ t('students.student') }}
+        </VaButton>
+        <VaFileUpload v-model="filesUploaded" hide-file-list file-types=".xlsx,.xls" @fileAdded="uploadStudentFile" />
+
+        <VaButton icon="download" @click="getFormatFileImportStudent()">
+          {{ t('students.student') }}
+        </VaButton>
       </div>
       <VaDataTable
         hoverable

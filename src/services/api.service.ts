@@ -113,6 +113,10 @@ class ApiService {
   async request(config: AxiosRequestConfig) {
     return this.axios_instance.request(config)
   }
+
+  async getFile(path: string, config: AxiosRequestConfig = {}): Promise<any> {
+    return this.axios_instance.get(path, config)
+  }
 }
 
 export default new ApiService()

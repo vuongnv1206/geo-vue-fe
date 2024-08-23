@@ -847,7 +847,9 @@
     "NotRequest": "chưa yêu cầu",
     "uploadFileSuccess": "Tải lên tệp thành công",
     "uploadFileFailed": "Tải lên tệp thất bại",
-    "greaterThanDate": "Thời gian bắt đầu phải lớn hơn thời gian hiện tại"
+    "greaterThanDate": "Thời gian bắt đầu phải lớn hơn thời gian hiện tại",
+    "downloadSuccess": "Tải xuống tệp thành công",
+    "downloadFailed": "Tải xuống tệp thất bại"
   },
   "languageSwitcher": {
     "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."

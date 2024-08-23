@@ -57,6 +57,34 @@ class StudentService {
         return Promise.reject(error)
       })
   }
+  async getFormatFileImportStudent(): Promise<any> {
+    return ApiService.getFile('/v1/student/format-import-student-excel', { responseType: 'blob' })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'student-import-template.xlsx')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async uploadStudentFile(file: File, classId: string): Promise<void> {
+    const formData = new FormData()
+    formData.append('formFile', file)
+    return ApiService.post(`/v1/student/import-student-excel?classId=${classId}`, formData)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new StudentService()
