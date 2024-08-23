@@ -64,7 +64,7 @@ const getAssignmentByClass = () => {
                 totalStudents: response.length,
               }
               mergeData(class1, assignment, submissionStats)
-              // console.log('merge: ', mergeAssignmentByClass.value)
+              console.log('merge: ', mergeAssignmentByClass.value)
             })
             .catch((error) => {
               notify({

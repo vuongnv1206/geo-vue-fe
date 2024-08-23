@@ -579,7 +579,12 @@
     "stt": "No.",
     "class_list": "Class List",
     "rawIndex": "No",
-    "unlimited_time": "Unlimited Time"
+    "unlimited_time": "Unlimited Time",
+    "not_started": "Not Started",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "suspended": "Suspended",
+    "status": "Status"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",

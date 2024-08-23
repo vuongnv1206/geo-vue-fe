@@ -580,7 +580,12 @@
     "stt": "STT",
     "class_list": "Danh sách lớp",
     "rawIndex": "STT",
-    "unlimited_time": "Không giới hạn thời gian"
+    "unlimited_time": "Không giới hạn thời gian",
+    "not_started": "Chưa bắt đầu",
+    "in_progress": "Đang làm bài",
+    "completed": "Đã hoàn thành",
+    "suspended": "Đã đình chỉ",
+    "status": "Trạng thái"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",
