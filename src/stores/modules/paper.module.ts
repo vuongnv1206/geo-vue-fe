@@ -2,6 +2,8 @@ import {
   AddQuestionsInPaperRequest,
   GetAccessPaperRequest,
   GetAccessPaperResponse,
+  GetGetAssigneesInPaperRequest,
+  GetGetAssigneesInPaperResponse,
   PaperDeletedResponse,
   PaperInListDto,
   QuestionGenerateToMatrix,
@@ -186,6 +188,16 @@ export const usePaperStore = defineStore('paper', {
     async getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse> {
       return await papersService
         .getGroupClassesAccessPaper(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse> {
+      return await papersService
+        .getAssigneesInPaper(request)
         .then((response) => {
           return Promise.resolve(response)
         })
