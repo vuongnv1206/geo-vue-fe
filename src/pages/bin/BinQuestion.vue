@@ -254,7 +254,7 @@ const DeleteAllFromBin = () => {
         <template #left>
           <div style="font-size: smaller" class="text-secondary font-bold uppercase ml-2 flex items-center">
             <span class="inline-block align-middle">
-              <VaIcon name="folder" class="ml-2" /> <b>{{ t('questionFolder.pending_title') }}</b>
+              <VaIcon name="folder" class="ml-2" /> <b>{{ t('questions.bin_question') }}</b>
             </span>
           </div>
         </template>

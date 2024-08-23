@@ -5,11 +5,14 @@ import timezone from 'dayjs/plugin/timezone'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/vi'
 import 'dayjs/locale/en'
+import duration from 'dayjs/plugin/duration'
 
+dayjs.extend(duration)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 import i18n from './../i18n'
+import { InvitationStatus, JoinTeacherGroupStatus } from '@/pages/teacher-group/types'
 const { t } = i18n.global
 const local = i18n.global.locale.value === 'vi' ? 'vi' : 'en'
 
@@ -38,18 +41,25 @@ export const validators = {
   isDecimalNumber: (fieldName: string) => (v: string) =>
     /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(v) || t('validateUtils.isDecimalNumber', { fieldName }),
   isNumber: (fieldName: string) => (v: string) => /^\d+$/.test(v) || t('validateUtils.isNumber', { fieldName }),
+  isAlphanumeric: (fieldName: string) => (v: string) =>
+    /^[a-zA-Z0-9]+$/.test(v) || t('validateUtils.isAlphanumeric', { fieldName }),
   email: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t('validateUtils.email'),
-  phone: (v: string) =>
-    /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/.test(v) ||
-    t('validateUtils.phone'),
+  phone: (v: string) => /([+84|84|0]+(3|5|7|8|9|1[2|6|8|9]))+([0-9]{8})\b/.test(v) || t('validateUtils.phone'),
+  greaterThanDate: (v: Date) => v >= new Date() || t('validateUtils.greaterThanDate'),
 }
 
 export const format = {
+  formatDateNoTime: (date: Date) => {
+    return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY')
+  },
   formatDate: (date: Date) => {
     return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
   },
   formatDateStr: (date: string) => {
     return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
+  },
+  formatDateStrSec: (date: string) => {
+    return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm:ss')
   },
   formatDateFromNow: (date: Date) => {
     return dayjs(date).tz(currentTimezone).fromNow()
@@ -66,6 +76,56 @@ export const format = {
       return dateTime.format('DD/MM/YYYY - HH:mm')
     } else {
       return dateTime.fromNow()
+    }
+  },
+  formatDuration: (minutes: number) => {
+    const totalMilliseconds = minutes * 60 * 1000
+    const durationObj = dayjs.duration(totalMilliseconds)
+    const minutesPart = durationObj.minutes()
+      ? `${durationObj.minutes()} minute${durationObj.minutes() > 1 ? 's' : ''}`
+      : ''
+    const secondsPart = durationObj.seconds()
+      ? `${durationObj.seconds()} second${durationObj.seconds() > 1 ? 's' : ''}`
+      : ''
+    return [minutesPart, secondsPart].filter(Boolean).join(' ')
+  },
+  // 1.5 = 1 minute 30s
+  formatDurationMinute: (minutes?: number | null) => {
+    if (!minutes || minutes < 0 || minutes === null) {
+      return '0 minute'
+    }
+
+    const wholeMinutes = Math.floor(minutes)
+    const remainingSeconds = Math.round((minutes - wholeMinutes) * 60)
+
+    const minutesPart = wholeMinutes > 0 ? `${wholeMinutes} minute${wholeMinutes !== 1 ? 's' : ''}` : ''
+
+    const secondsPart = remainingSeconds > 0 ? `${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}` : ''
+
+    return [minutesPart, secondsPart].filter(Boolean).join(' ') || '0 seconds'
+  },
+  // sub 2 time and return duration in minute and seconds like 2m 30s
+  formatDurationToSeconds: (date1: Date, date2: Date) => {
+    const start = dayjs(date1).tz(currentTimezone)
+    const end = dayjs(date2).tz(currentTimezone)
+    const duration = dayjs.duration(end.diff(start))
+    const minutes = duration.minutes()
+    const seconds = duration.seconds()
+    return `${minutes}m ${seconds}s`
+  },
+  formatTimeDifference: (fromTime: Date, toTime: Date) => {
+    // Tính toán sự khác biệt về thời gian tính bằng milliseconds
+    const timeDifference = toTime.getTime() - fromTime.getTime()
+
+    // Chuyển đổi từ milliseconds sang phút và giây
+    const minutesDifference = timeDifference / 60000
+    const secondsDifference = timeDifference / 1000
+
+    if (minutesDifference >= 1) {
+      return `${Math.floor(minutesDifference)} minute(s)`
+    } else {
+      // Ngược lại hiển thị số giây
+      return `${Math.floor(secondsDifference)} seconds`
     }
   },
 }
@@ -96,18 +156,29 @@ export const notifications = {
   confirmDelete: (message: string) => {
     return t('validateUtils.confirmDelete', { message }) + '\n'
   },
+  inviteSuccess: (message: string) => {
+    return t('validateUtils.inviteSuccess', { message }) + '\n'
+  },
+  uploadSuccess: () => t('validateUtils.uploadFileSuccess') + '\n',
+  uploadFailed: () => t('validateUtils.uploadFileFailed') + '\n',
+  downloadSuccess: () => t('validateUtils.downloadSuccess') + '\n',
+  downloadFailed: () => t('validateUtils.downloadFailed') + '\n',
 }
 
 export const getErrorMessage = (error: any) => {
   console.log(error)
-  if (error.response) {
-    if (error.response.data.messages.length > 0) {
-      return error.response.data.messages.join(', ')
+  try {
+    if (error.response) {
+      if (error.response.data.messages.length > 0) {
+        return error.response.data.messages.join(', ')
+      } else {
+        return error.response.data.exception
+      }
     } else {
-      return error.response.data.exception
+      return error.message
     }
-  } else {
-    return error.message
+  } catch {
+    return "Can't get error message"
   }
 }
 
@@ -192,6 +263,98 @@ export const QuestionTypeLabel = (type: QuestionType | undefined) => {
     {
       type: QuestionType.Other,
       label: t('validateUtils.other'),
+    },
+  ]
+  const label = labels.find((c) => c.type === type)?.label
+  return label || ''
+}
+
+export const JoinGroupStatusColor = (type: JoinTeacherGroupStatus | undefined) => {
+  const colors = [
+    {
+      type: JoinTeacherGroupStatus.Pending,
+      color: 'info',
+    },
+    {
+      type: JoinTeacherGroupStatus.Accepted,
+      color: 'success',
+    },
+    {
+      type: JoinTeacherGroupStatus.Rejected,
+      color: 'danger',
+    },
+    {
+      type: JoinTeacherGroupStatus.Cancel,
+      color: 'secondary',
+    },
+  ]
+  const color = colors.find((c) => c.type === type)?.color
+  return color || 'primary'
+}
+
+export const JoinGroupStatusLabel = (type: JoinTeacherGroupStatus) => {
+  const labels = [
+    {
+      type: JoinTeacherGroupStatus.Pending,
+      label: t('validateUtils.Pending'),
+    },
+    {
+      type: JoinTeacherGroupStatus.Accepted,
+      label: t('validateUtils.Accepted'),
+    },
+    {
+      type: JoinTeacherGroupStatus.Rejected,
+      label: t('validateUtils.Rejected'),
+    },
+    {
+      type: JoinTeacherGroupStatus.Cancel,
+      label: t('validateUtils.Cancel'),
+    },
+  ]
+  const label = labels.find((c) => c.type === type)?.label
+  return label || ''
+}
+
+export const InvitationStatusColor = (type: InvitationStatus | undefined) => {
+  const colors = [
+    {
+      type: InvitationStatus.NotRequest,
+      color: 'warning',
+    },
+    {
+      type: InvitationStatus.Requested,
+      color: 'info',
+    },
+    {
+      type: InvitationStatus.BeRejected,
+      color: 'danger',
+    },
+    {
+      type: InvitationStatus.BeAccepted,
+      color: 'success',
+    },
+  ]
+  const color = colors.find((c) => c.type === type)?.color
+  return color || 'primary'
+}
+
+export const InvitationStatusLabel = (type: InvitationStatus) => {
+  const labels = [
+    {
+      type: InvitationStatus.NotRequest,
+      label: t('validateUtils.NotRequest'),
+    },
+    {
+      type: InvitationStatus.Requested,
+      label: t('validateUtils.Pending'),
+    },
+    {
+      type: InvitationStatus.BeRejected,
+      label: t('validateUtils.Rejected'),
+    },
+    {
+      type: InvitationStatus.BeAccepted,
+      label: t('validateUtils.Accepted'),
     },
   ]
   const label = labels.find((c) => c.type === type)?.label

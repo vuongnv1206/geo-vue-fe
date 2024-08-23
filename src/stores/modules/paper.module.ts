@@ -1,4 +1,16 @@
-import { PaperDeletedResponse, PaperInListDto, SearchSharedPaperRequest } from './../../pages/examination/types'
+import {
+  AddQuestionsInPaperRequest,
+  GetAccessPaperRequest,
+  GetAccessPaperResponse,
+  GetGetAssigneesInPaperRequest,
+  GetGetAssigneesInPaperResponse,
+  PaperDeletedResponse,
+  PaperInListDto,
+  QuestionGenerateToMatrix,
+  SearchPaperRequest,
+  SearchSharedPaperRequest,
+  UpdateQuestionsInPaperRequest,
+} from './../../pages/examination/types'
 import papersService from '@/services/paper.service'
 import {
   PaperDto,
@@ -6,7 +18,6 @@ import {
   PaperStudentDto,
   SubmitPaperResponse,
   CreatePaperRequest,
-  PaperResponse,
 } from '@/pages/examination/types'
 
 import { defineStore } from 'pinia'
@@ -53,9 +64,9 @@ export const usePaperStore = defineStore('paper', {
           return Promise.reject(error)
         })
     },
-    async searchPapers(dataFilter: any): Promise<PaperResponse> {
+    async searchPapers(request: SearchPaperRequest): Promise<PaperInListDto[]> {
       return await papersService
-        .papers_SearchPaper(dataFilter)
+        .papers_SearchPaper(request)
 
         .then((response) => {
           return Promise.resolve(response)
@@ -127,6 +138,66 @@ export const usePaperStore = defineStore('paper', {
     async searchSharedPapers(request: SearchSharedPaperRequest): Promise<PaperInListDto[]> {
       return await papersService
         .papers_SearchSharedPaper(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getQuestionFromMatrix(matrixId: string): Promise<QuestionGenerateToMatrix[]> {
+      return await papersService
+        .getQuestionFromMatrix(matrixId)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async deleteQuestionInPaper(paperId: string, questionId: string): Promise<any> {
+      return await papersService
+        .deleteQuestionInPaper(paperId, questionId)
+        .then((res) => {
+          return Promise.resolve(res.data)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async addQuestionsInPaper(paperId: string, request: AddQuestionsInPaperRequest): Promise<any> {
+      return await papersService
+        .addQuestionsInPaper(paperId, request)
+        .then((res) => {
+          return Promise.resolve(res.data)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async updateQuestionsInPaper(id: string, request: UpdateQuestionsInPaperRequest): Promise<any> {
+      return await papersService
+        .updateQuestionsInPaper(id, request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse> {
+      return await papersService
+        .getGroupClassesAccessPaper(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse> {
+      return await papersService
+        .getAssigneesInPaper(request)
         .then((response) => {
           return Promise.resolve(response)
         })

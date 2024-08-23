@@ -7,18 +7,22 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const folderId = ref(route.params.folderId ?? null)
-const basic = ref([])
+// const basic = ref([])
 
 const createPaperUseQuestionBank = () => {
   router.push({ name: 'create-paper-question-bank', params: { folderId: folderId.value } })
+}
+
+const createPaperUseMatrix = () => {
+  router.push({ name: 'create-paper-matrix', params: { folderId: folderId.value } })
 }
 
 onMounted(() => {})
 </script>
 
 <template>
-  <div style="display: flex; flex-direction: row; width: 100%">
-    <div style="flex: 2; margin-right: 20px">
+  <div style="display: flex; flex-direction: row" class="justify-center">
+    <!-- <div style="flex: 2; margin-right: 20px">
       <VaCard>
         <VaCardContent>
           <h1>{{ t('papers.create_test') }}</h1>
@@ -51,8 +55,8 @@ onMounted(() => {})
           </div>
         </VaCardContent>
       </VaCard>
-    </div>
-    <div style="flex: 1">
+    </div> -->
+    <div style="width: 50%">
       <VaCard>
         <VaCardContent>
           <VaButton block outline color="primary" style="margin-bottom: 10px" @click="createPaperUseQuestionBank">
@@ -63,7 +67,7 @@ onMounted(() => {})
             <a href="#">Learn more</a>
           </p>
 
-          <VaButton block outline color="primary" style="margin-bottom: 10px">
+          <VaButton block outline color="primary" style="margin-bottom: 10px" @click="createPaperUseMatrix">
             <VaIcon name="business" style="margin-right: 10px" /> {{ t('papers.create_test_from_matrix') }}
           </VaButton>
           <p style="margin-left: 40px; color: gray">
@@ -71,13 +75,13 @@ onMounted(() => {})
             <a href="#">Learn more</a>
           </p>
 
-          <VaButton block outline color="primary" style="margin-bottom: 10px">
+          <!-- <VaButton block outline color="primary" style="margin-bottom: 10px">
             <VaIcon name="thumb_up" style="margin-right: 10px" /> {{ t('papers.create_offline_test_manually') }}
           </VaButton>
 
           <VaButton block outline color="primary">
             <VaIcon name="article" style="margin-right: 10px" /> {{ t('papers.create_offline_test_with_text') }}
-          </VaButton>
+          </VaButton> -->
         </VaCardContent>
       </VaCard>
     </div>

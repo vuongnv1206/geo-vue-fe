@@ -3,18 +3,18 @@ import { optionsActionType } from './types'
 export const ActionEnum = {
   Create: {
     Action: 'create',
-    Color: 'text-success',
+    Color: '#28a745',
   },
   Update: {
     Action: 'update',
-    Color: 'text-warning',
+    Color: '#007bff',
   },
   Delete: {
     Action: 'delete',
-    Color: 'text-danger',
+    Color: '#dc3545',
   },
   Default: {
-    Color: 'text-black',
+    Color: '#6c757d',
   },
 }
 

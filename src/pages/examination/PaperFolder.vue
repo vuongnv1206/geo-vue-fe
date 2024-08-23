@@ -8,9 +8,8 @@ import {
   CreatePaperFolderRequest,
   PaperInListDto,
   CombinedData,
-  DataFilterFolder,
-  DataFilterPaper,
-  PaperFolderResponse,
+  SearchPaperFolderRequest,
+  SearchPaperRequest,
 } from './types'
 import { useMenu, useModal, useToast } from 'vuestic-ui'
 import EditPaperFolderForm from './widgets/EditPaperFolderForm.vue'
@@ -30,22 +29,8 @@ const paperStore = usePaperStore()
 const loading = ref(true)
 const isMyDocument = ref(true)
 
-const dataFilterFolder = ref<DataFilterFolder>({
-  keyword: '',
-  pageNumber: 1,
-  pageSize: 20,
-  orderBy: ['id'],
-  parentId: null,
-})
-
-const dataFilterPaper = ref<DataFilterPaper>({
-  keyword: '',
-  pageNumber: 1,
-  pageSize: 20,
-  orderBy: ['id'],
-  paperFolderId: null,
-})
-
+const searchPaperFolderRequest = ref<SearchPaperFolderRequest>({})
+const searchPaperRequest = ref<SearchPaperRequest>({})
 const pagination = ref({
   pageNumber: 1,
   pageSize: 10,
@@ -84,10 +69,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to update paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   } else {
@@ -105,10 +91,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to create paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   }
@@ -187,10 +174,11 @@ const onDeleteSelectedItems = async () => {
         selectedItems.value = []
         getPaperFolders(currentFolderId.value)
         getPapers(currentFolderId.value)
-      } catch (err: any) {
+      } catch (error) {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete selected items\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       }
     }
@@ -204,13 +192,12 @@ onMounted(() => {
 
 const getPaperFolders = async (parentId?: string | null, name?: string | null) => {
   loading.value = true
-  dataFilterFolder.value.parentId = parentId
-  dataFilterFolder.value.keyword = name ?? ''
+  searchPaperFolderRequest.value = { parentId, name }
   paperFolderStore
-    .searchPaperFolders(dataFilterFolder.value)
-    .then((res: PaperFolderResponse) => {
+    .searchPaperFolders(searchPaperFolderRequest.value)
+    .then((res) => {
       loading.value = false
-      paperFolderDtos.value = res.data
+      paperFolderDtos.value = res.paperFolderChildrens
     })
     .catch(() => {
       loading.value = false
@@ -218,16 +205,15 @@ const getPaperFolders = async (parentId?: string | null, name?: string | null) =
     })
 }
 
-const getPapers = async (folderId?: string | null, name?: string | null) => {
+const getPapers = async (paperFolderId?: string | null, name?: string | null) => {
   papers.value = []
   loading.value = true
-  dataFilterPaper.value.paperFolderId = folderId
-  dataFilterPaper.value.keyword = name ?? ''
+  searchPaperRequest.value = { paperFolderId, name }
   paperStore
-    .searchPapers(dataFilterPaper.value)
+    .searchPapers(searchPaperRequest.value)
     .then((res) => {
       loading.value = false
-      papers.value = res.data
+      papers.value = res
     })
     .catch(() => {
       loading.value = false
@@ -387,6 +373,7 @@ const contextmenu = (event: any) => {
 const tableColumns = computed(() => {
   const columns = [
     { label: 'Name', key: 'name', sortable: true },
+    { label: 'Creator', key: 'creatorName', sortable: true },
     { label: 'Status', key: 'status', sortable: true },
     { label: 'Created On', key: 'createdOn', sortable: true },
     { label: 'Last Modified On', key: 'lastModifiedOn', sortable: true },
@@ -398,14 +385,11 @@ const tableColumns = computed(() => {
   return columns
 })
 
-const onSelectedItemsChange = (items: CombinedData[]) => {
-  selectedItems.value = items
-}
-
 const combinedData = computed(() => {
   const resolvedFolders = paperFolderDtos.value.map((folder) => ({
     ...folder,
     name: folder.name,
+    creatorName: folder.creatorName || '',
     status: '',
     createdOn: folder.createdOn || '',
     lastModifiedOn: folder.lastModifiedOn || '',
@@ -420,6 +404,7 @@ const combinedData = computed(() => {
   const resolvedPapers = papers.value.map((paper) => ({
     ...paper,
     name: paper.examName,
+    creatorName: paper.creatorName || '',
     status: paper.status,
     createdOn: paper.createdOn || '',
     lastModifiedOn: paper.lastModifiedOn || '',
@@ -653,9 +638,10 @@ const onSharePaperFolderPermission = () => {
 
     <VaCard class="flex justify-end items-center">
       <VaCard class="flex gap-2">
-        <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems"
-          >Delete
+        <VaButton v-if="selectedItems.length > 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
+          Delete
         </VaButton>
+
         <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
         <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
         <VaDropdown placement="bottom-end">
@@ -706,13 +692,10 @@ const onSharePaperFolderPermission = () => {
         :columns="tableColumns"
         :loading="loading"
         hoverable
-        selectable
         clickable
-        select-mode="multiple"
         :disable-client-side-sorting="false"
         @row:contextmenu="contextmenu($event)"
         @row:dblclick="handleFolderDoubleClick($event)"
-        @selectionChange="onSelectedItemsChange($event.currentSelectedItems)"
       >
         <template #cell(name)="{ rowData }">
           <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
@@ -747,7 +730,7 @@ const onSharePaperFolderPermission = () => {
         </template>
 
         <template #cell(path)="{ rowData }">
-          <div v-if="rowData.paths" class="flex items-center gap-2 ellipsis max-w-[230px]">
+          <div v-if="rowData.paths" class="flex items-center gap-2 ellipsis max-w-[500px]">
             <VaBreadcrumbs separator="/">
               <VaBreadcrumbsItem v-for="(segment, index) in rowData.paths" :key="index">
                 <a href="#" @click.prevent="navigateToPath(segment.id)">

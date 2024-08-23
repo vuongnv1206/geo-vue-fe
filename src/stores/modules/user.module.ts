@@ -127,5 +127,15 @@ export const useUserProfileStore = defineStore('userProfile', {
         return await Promise.reject(error)
       }
     },
+    async getUserDetail(id: string): Promise<UserDetail> {
+      return await userService
+        .getUserDetail(id)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })

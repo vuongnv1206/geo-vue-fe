@@ -215,6 +215,7 @@ const handleUploadEvent = () => {
 
 const addTemplateSingleChoice = () => {
   const question: Question = {
+    rawIndex: listQuestions.value.length + 1,
     content: 'Which continent is the largest by land area?',
     image: null,
     audio: null,
@@ -250,6 +251,7 @@ const addTemplateSingleChoice = () => {
 
 const addTemplateMultipleChoice = () => {
   const question: Question = {
+    rawIndex: listQuestions.value.length + 1,
     content: 'Who formulated the theory of relativity?',
     image: null,
     audio: null,
@@ -285,6 +287,7 @@ const addTemplateMultipleChoice = () => {
 
 const addTemplateFillBlank = () => {
   const question: Question = {
+    rawIndex: listQuestions.value.length + 1,
     content:
       "The $_fillblank[1] Ocean is the largest ocean on Earth, covering about $_fillblank[2] of the Earth's surface.",
     image: null,
@@ -313,6 +316,7 @@ const addTemplateFillBlank = () => {
 
 const addTemplateMatching = () => {
   const question: Question = {
+    rawIndex: listQuestions.value.length + 1,
     content:
       '{ "Question": "Match the scientists with their discoveries:", "ColumnA": { "1": "Isaac Newton", "2": "Albert Einstein", "3": "Marie Curie", "4": "Charles Darwin" }, "ColumnB": { "1": "Theory of Evolution", "2": "Theory of Relativity", "3": "Law of Gravity", "4": "Radioactivity" } }',
     image: null,
@@ -342,6 +346,7 @@ const addTemplateMatching = () => {
 
 const addTemplateReading = () => {
   const question: Question = {
+    rawIndex: listQuestions.value.length + 1,
     content: 'This is a reading passage template',
     image: null,
     audio: null,
@@ -403,6 +408,7 @@ const addTemplateReading = () => {
 
 const addTemplateWriting = () => {
   const question: Question = {
+    rawIndex: listQuestions.value.length + 1,
     content: 'This is a writing template',
     image: null,
     audio: null,

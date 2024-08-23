@@ -1,3 +1,5 @@
+import { Student } from '../classrooms/types'
+
 export type Assignment = {
   id: string
   name: string
@@ -20,7 +22,7 @@ export type EmptyAssignment = {
   requireLoginToSubmit: boolean
   subjectId: string
   attachment: string | null
-  classIds: string[]
+  classesId: string[]
 }
 
 export type AssignmentDetails = {
@@ -30,7 +32,7 @@ export type AssignmentDetails = {
   endTime: Date | null
   canViewResult: boolean
   requireLoginToSubmit: boolean
-  classIds: string[]
+  classesId: string[]
 }
 
 export type EmptyAssignmentDetails = {
@@ -39,7 +41,7 @@ export type EmptyAssignmentDetails = {
   endTime: Date | null
   canViewResult: boolean
   requireLoginToSubmit: boolean
-  classIds: string[]
+  classesId: string[]
 }
 
 export type AssignmentContent = {
@@ -56,6 +58,12 @@ export type AssignmentAttachment = {
   attachment: string
 }
 
+export type AssignmentSubmit = {
+  assignmentId: string
+  answerRaw: string
+  attachmentPath: string
+}
+
 export type AssignmentResponse = {
   data: Assignment[]
   currentPage: number
@@ -68,5 +76,47 @@ export type AssignmentResponse = {
 
 export type AssignmentClass = {
   assignmentId: string
-  classesdId: string
+  classId: string
+}
+
+export type AssignmentSub = {
+  assignmentId: string
+  classId: string
+}
+
+export type AssignmentSubmission = {
+  assignmentId: string
+  studentId: string
+  status: string
+  answerRaw: string
+  attachmentPath: string
+  score: number
+  comment: string
+  student: Student
+}
+
+export type MarkAssignment = {
+  assignmentId: string
+  studentId: string
+  score: number
+  comment: string
+}
+export type SubmissionStats = {
+  totalSubmitted: number
+  totalMarked: number
+  totalStudents: number
+}
+
+export type AssignmentStats = {
+  id: string
+  name: string
+  startTime: Date
+  endTime: Date
+  content: string
+  canViewResult: boolean
+  requireLoginToSubmit: boolean
+  subjectId: string
+  attachment: string
+  createdOn: Date
+  submissionsStats: SubmissionStats
 }

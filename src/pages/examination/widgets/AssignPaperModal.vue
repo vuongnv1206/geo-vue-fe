@@ -26,11 +26,11 @@ const valueOption = ref<AccessType>(props.paper?.shareType as AccessType)
 const emit = defineEmits(['close', 'save'])
 
 const groupClasses = ref<GroupClass[] | null>(null)
-const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'] })
+const groupClassFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'], queryType: 1 })
 
 const getGroupClasses = async () => {
   try {
-    const res = await groupClassStores.getGroupClasses(groupClassFilter)
+    const res = await groupClassStores.getGroupClasses(groupClassFilter.value)
     groupClasses.value = res.data
   } catch (error) {
     console.error(error)
@@ -71,7 +71,6 @@ const onSave = () => {
 }
 
 const accessOptions = [
-  { value: AccessType.Everyone, text: t('papers.everyone') },
   { value: AccessType.ByClass, text: t('papers.by_class') },
   { value: AccessType.ByStudent, text: t('papers.by_student') },
 ]

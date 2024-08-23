@@ -1,4 +1,6 @@
 import {
+  GroupTeacherResponse,
+  SendRequestJoinGroupRequest,
   SetPermissionInClassGroup,
   SetPermissionInClassTeacher,
   TeacherInGroupRequest,
@@ -105,7 +107,7 @@ class GroupTeacherService {
       })
   }
 
-  async removeTeacherInGroup(data: TeacherInGroupRequest): Promise<any> {
+  async removeTeacherInGroup(data: any): Promise<any> {
     return apiService
       .post(`v1/groupteachers/remove-teacher-into-group`, data)
       .then((response) => {
@@ -119,6 +121,17 @@ class GroupTeacherService {
   async getGroupDetail(id: string): Promise<any> {
     return apiService
       .get(`v1/groupteachers/${id}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async getGuestGroupDetail(id: string): Promise<any> {
+    return apiService
+      .get(`v1/groupteachers/guest/${id}`)
       .then((response) => {
         return Promise.resolve(response.data)
       })
@@ -152,6 +165,28 @@ class GroupTeacherService {
   async setPermissionTeacherInClass(data: SetPermissionInClassTeacher): Promise<any> {
     return apiService
       .post('v1/permissionclasses/teacher-permission-in-class', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async sendRequestJoinGroup(data: SendRequestJoinGroupRequest): Promise<any> {
+    return apiService
+      .post('v1/groupteachers/request-join-group', data)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async shareTeacherGroups(data: any): Promise<GroupTeacherResponse> {
+    return apiService
+      .post('v1/groupteachers/shared-group', data)
       .then((response) => {
         return Promise.resolve(response.data)
       })

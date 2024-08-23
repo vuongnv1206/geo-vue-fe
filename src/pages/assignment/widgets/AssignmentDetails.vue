@@ -29,7 +29,7 @@
     <template #left>
       <VaCard v-if="showSidebar" class="mr-2 rounded min-w-[500px]">
         <VaCard v-if="assignment" class="min-h-[81vh]">
-          <VaCardContent class="font-bold">{{ assignment.name }}</VaCardContent>
+          <VaCardContent class="font-bold">{{ className }} - {{ assignment.name }}</VaCardContent>
           <VaCardContent>
             <div class="flex items-center mb-1">
               <VaIcon name="event" class="material-symbols-outlined mr-1" />
@@ -125,7 +125,15 @@
     <template #content>
       <VaCard class="mt-2 p-2 min-h-[75vh]">
         <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <VaListItem v-for="student in students" :key="student.id" class="border rounded p-4">
+          <VaListItem
+            v-for="student in sortedStudents"
+            :key="student.id"
+            class="border rounded p-4"
+            :to="{
+              name: 'assignment-marking',
+              params: { id: assignment?.id, classId: classId, studentId: student.id },
+            }"
+          >
             <VaListItemSection avatar>
               <GeoAvatar
                 class="mr-2"
@@ -137,7 +145,18 @@
             </VaListItemSection>
             <VaListItemSection>
               <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-              <VaListItemLabel caption> đã nộp/chưa nôp </VaListItemLabel>
+              <VaListItemLabel
+                caption
+                :class="
+                  getStatusColorClass(
+                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
+                  )
+                "
+              >
+                {{
+                  getStatusText(assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status)
+                }}
+              </VaListItemLabel>
             </VaListItemSection>
           </VaListItem>
         </VaList>
@@ -173,7 +192,7 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { onMounted, ref, watchEffect } from 'vue'
+import { computed, onMounted, ref, watchEffect } from 'vue'
 import { useFileStore } from '@/stores/modules/file.module'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
@@ -182,7 +201,14 @@ import { useBreakpoint, useModal, useToast, VaCardContent, VaIcon } from 'vuesti
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { Student } from '@/pages/classrooms/types'
-import { Assignment, AssignmentClass, AssignmentContent, EmptyAssignmentContent, AssignmentAttachment } from '../types'
+import {
+  Assignment,
+  AssignmentClass,
+  AssignmentContent,
+  EmptyAssignmentContent,
+  AssignmentAttachment,
+  AssignmentSubmission,
+} from '../types'
 
 const { t } = useI18n()
 const loading = ref(true)
@@ -199,15 +225,17 @@ const showSidebar = ref(breakpoints.smUp)
 const assignment = ref<Assignment | null>(null)
 const assignmentContent = ref<AssignmentContent | null>(null)
 const assignmentAttachment = ref<AssignmentAttachment | null>(null)
-const students = ref<Student[] | undefined>([])
+const students = ref<Student[]>([])
+const assignmentSubmissions = ref<AssignmentSubmission[]>([])
 
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
+const className = ref<string>('')
 const filesUploaded = ref<any>()
 
 const assignmentClass = ref<AssignmentClass>({
   assignmentId: assignmentId,
-  classesdId: classId,
+  classId: classId,
 })
 
 const doShowFormModal = ref(false)
@@ -255,11 +283,29 @@ const getClassById = async () => {
     .getClassById(classId)
     .then((response) => {
       students.value = response.students
-      // console.log('Students:', students.value)
+      className.value = response.name
     })
     .catch((error) => {
       notify({
-        message: notifications.getFailed(`class with id ${classId}`) + getErrorMessage(error),
+        message: notifications.getFailed(t('classes.class')) + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getAssignmentSubmissions = () => {
+  loading.value = true
+  stores
+    .getAssignmentSubmissions({ assignmentId: assignmentId, classId: classId })
+    .then((response) => {
+      assignmentSubmissions.value = response
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -368,11 +414,61 @@ const fileUpload = async () => {
     })
     .catch((error) => {
       notify({
-        message: notifications.createFailed('') + getErrorMessage(error),
+        message: notifications.uploadFailed + getErrorMessage(error),
         color: 'error',
       })
     })
 }
+
+// Function to get the color class based on status
+const getStatusColorClass = (status: string | undefined) => {
+  if (status === 'Marked') {
+    return 'text-green-500'
+  } else if (status === 'NotSubmitted') {
+    return 'text-red-500'
+  } else if (status === 'Submitted') {
+    return 'text-blue-500'
+  } else if (status === 'Doing') {
+    return 'text-yellow-500'
+  } else {
+    return ''
+  }
+}
+
+// Function to get the display text based on status
+const getStatusText = (status: string | undefined) => {
+  if (status === 'Marked') {
+    return t('assignments.marked')
+  } else if (status === 'NotSubmitted') {
+    return t('assignments.not_submitted')
+  } else if (status === 'Submitted') {
+    return t('assignments.submitted')
+  } else if (status === 'Doing') {
+    return t('assignments.doing')
+  } else {
+    return ''
+  }
+}
+
+const statusOrder = {
+  Submitted: 1,
+  Doing: 2,
+  Marked: 3,
+  NotSubmitted: 4,
+}
+
+const sortedStudents = computed(() => {
+  return students.value.slice().sort((a, b) => {
+    const statusA =
+      (assignmentSubmissions.value.find((submission) => submission.studentId === a.id)
+        ?.status as keyof typeof statusOrder) || 'NotSubmitted'
+    const statusB =
+      (assignmentSubmissions.value.find((submission) => submission.studentId === b.id)
+        ?.status as keyof typeof statusOrder) || 'NotSubmitted'
+
+    return statusOrder[statusA] - statusOrder[statusB]
+  })
+})
 
 watchEffect(() => {
   showSidebar.value = breakpoints.smUp
@@ -381,5 +477,6 @@ watchEffect(() => {
 onMounted(() => {
   getClassById()
   getAssignment(assignmentId)
+  getAssignmentSubmissions()
 })
 </script>

@@ -16,8 +16,9 @@
           <span class="flex gap-2">
             <VaAvatar
               :src="getSrcAvatar(row)"
-              class="w-14 h-14 bg-warning font-bold"
+              class="w-14 h-14 font-bold"
               :fallback-text="row.rowData?.author?.name?.charAt(0)?.toUpperCase()"
+              :color="avatarColor(row.rowData?.author?.name)"
             />
             <div>
               <p class="text-sm">{{ row.rowData?.author?.name }}</p>
@@ -26,7 +27,7 @@
           </span>
         </template>
         <template #cell(action)="{ value }">
-          <span :class="getActionColor(value)">{{ value }}</span>
+          <VaBadge :color="getActionColor(value)" :text="value"></VaBadge>
         </template>
         <template #cell(createdAt)="{ value }">
           <div class="flex items-center gap-2 ellipsis max-w-[230px]">
@@ -36,7 +37,13 @@
           </div>
         </template>
         <template #cell(viewDetails)="{ row }">
-          <VaButton preset="secondary" class="w-fit text-xs md:text-sm" size="small" @click="handleShowDetails(row)">
+          <VaButton
+            v-if="row?.rowData?.action?.toLowerCase() !== ActionEnum.Delete.Action"
+            preset="secondary"
+            class="w-fit text-xs md:text-sm"
+            size="small"
+            @click="handleShowDetails(row)"
+          >
             {{ t('auditLogs.table.buttonDetails') }}
           </VaButton>
         </template>
@@ -91,13 +98,14 @@
 import { computed, onMounted, ref } from 'vue'
 import { AuditLogsTypes, PaginationType } from './types'
 import AuditLogsDetails from './AuditLogsDetails.vue'
-import { pageSizeOptions } from './audit-logs.enum'
+import { ActionEnum, pageSizeOptions } from './audit-logs.enum'
 import { VaAvatar, useToast } from 'vuestic-ui/web-components'
 import { watch } from 'vue'
 import { useAuditLogsStore } from '@/stores/modules/auditLogs.module'
 import { getActionColor, getSrcAvatar } from './helper'
 import { getErrorMessage, format } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
+import { avatarColor } from '@/services/utils'
 
 const { t } = useI18n()
 const { init: notify } = useToast()
