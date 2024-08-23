@@ -42,6 +42,7 @@ const getPointAchieve = (questionId: string | undefined) => {
 }
 
 const markQuestion = ref(0)
+const emit = defineEmits(['markSuccess'])
 const manualMarkForQuestion = async () => {
   const markRequest = ref<MarkAnswerRequest>({
     submitPaperId: props.submitPaperId,
@@ -57,6 +58,8 @@ const manualMarkForQuestion = async () => {
         color: 'success',
       })
       getPointAchieve(props.question.id)
+
+      emit('markSuccess', props.question.id)
     })
     .catch((error) => {
       notify({
@@ -84,7 +87,7 @@ onMounted(() => {
           <!--eslint-enable-->
           ...
           <button href="#" class="text-primary" @click="readMoreActivated = !readMoreActivated">
-            {{ t('settings.read_more') }}
+            {{ t('cards.button.readMore') }}
           </button>
         </span>
         <span v-else>
@@ -101,7 +104,7 @@ onMounted(() => {
           class="text-primary"
           @click="readMoreAnswerActivated = !readMoreAnswerActivated"
         >
-          {{ t('papers.read') }}
+          {{ t('cards.button.readMore') }}
         </button>
       </span>
       <div class="pl-2 pr-2">
@@ -118,13 +121,13 @@ onMounted(() => {
         </button>
       </div>
     </div>
-    <div class="flex">
+    <div class="flex gap-2">
       <VaInput
         v-model="markQuestion"
         :rules="[validators.maxValue(props.question.mark ?? 0), validators.minValue(0), validators.isNumber]"
-        class="max-w-[5rem] mr-2"
-        style="padding: 0px"
+        class="p-0 max-w-[300px]"
         placeholder="point"
+        input-class="va-text-right"
       >
         <template #appendInner>
           <span>/{{ props.question.mark }}</span>
