@@ -1,4 +1,5 @@
-import { Assignment } from '../assignment/types'
+import { Assignment, AssignmentStats } from '../assignment/types'
+import { PaperInListDto } from '../examination/types'
 import { PermissionInClass } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
 
@@ -32,8 +33,24 @@ export type Classrooms = {
   groupClassName: string
   numberUserOfClass: number
   assignments: Assignment[]
+  papers: PaperInListDto[]
   students: Student[]
   permissions: PermissionInClass[] | null
+}
+
+export type ClassroomWithPosts = {
+  id: string
+  name: string
+  schoolYear: string
+  ownerId: string
+  groupClassId: string
+  groupClassName: string
+  numberUserOfClass: number
+  assignments: Assignment[]
+  students: Student[]
+  permissions: PermissionInClass[] | null
+  posts?: Post[]
+  owner: UserDetail | null
 }
 
 export type EmptyClassrooms = {
@@ -68,6 +85,7 @@ export type Student = {
   studentCode: string
   gender: boolean
   classesId: string
+  stId?: string
 }
 
 export type EmptyStudent = {
@@ -165,4 +183,39 @@ export enum ClassroomQueryType {
   All = 0,
   MyClass = 1,
   SharedClass = 2,
+}
+
+export type ClassroomWithStats = {
+  id: string
+  name: string
+  schoolYear: string
+  ownerId: string
+  groupClassId: string
+  groupClassName: string
+  numberUserOfClass: number
+  assignments: AssignmentStats[]
+  papers: PaperInListDto[]
+  students: Student[]
+  permissions: PermissionInClass[] | null
+}
+
+export type FailedStudentImport = {
+  failedStudents: FailedStudent[]
+}
+
+export type FailedStudent = {
+  studentRequest: StudentFailDetail
+  errorMessage: string
+}
+
+export type StudentFailDetail = {
+  firstName: string
+  lastName: string
+  avatarUrl: string
+  dateOfBirth: string // Sử dụng string để đại diện cho ngày tháng, có thể đổi thành Date nếu cần
+  email: string
+  phoneNumber: string
+  studentCode: string
+  gender: boolean
+  classesId: string // UUID dạng string
 }

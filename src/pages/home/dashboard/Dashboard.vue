@@ -102,7 +102,7 @@
         </RouterLink>
       </VaCard>
       <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
-        <RouterLink :to="{ name: 'teacher-group' }">
+        <RouterLink :to="{ name: 'group-manage' }">
           <div class="box p-8 zoom-in h-full">
             <span class="block w-12 h-12 text-primary mx-auto">
               <svg
@@ -141,95 +141,372 @@
           </div>
         </RouterLink>
       </VaCard>
-    </div>
-    <div v-if="isStudent" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 pt-4">
-      <VaCard class="p-4">
-        <VaCard class="flex flex-row items-center">
-          <!-- <GeoAvatar class="mr-2" :size="48" color="warning" :image="'abc' || undefined" :txt="thangdeptrai" /> -->
-          <VaImage src="https://picsum.photos/1500" class="w-16 h-16 rounded-full" />
-          <div>
-            <!-- <p class="text-lg font-semibold">Nguyen Duc Thang</p>
-            <p class="text-sm font-medium ">Class ABC</p> -->
-            <VaCardContent class="text-lg font-semibold">Nguyen Duc Thang</VaCardContent>
-            <VaCardContent class="text-sm font-medium">Class ABC</VaCardContent>
+      <VaCard class="shadow-lg rounded-lg p-6 col-span-6 md:col-span-3 intro-y h-full hover:shadow-xl hover-scale">
+        <RouterLink :to="{ name: 'orders' }">
+          <div class="box p-8 zoom-in h-full">
+            <span class="block w-12 h-12 text-primary mx-auto">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="48px"
+                viewBox="0 -960 960 960"
+                width="48px"
+                fill="#154ec1"
+              >
+                <path
+                  d="M240-80q-33 0-56.5-23.5T160-160v-480q0-33 23.5-56.5T240-720h80q0-66 47-113t113-47q66 0 113 47t47 113h80q33 0 56.5 23.5T800-640v480q0 33-23.5 56.5T720-80H240Zm0-80h480v-480h-80v80q0 17-11.5 28.5T600-520q-17 0-28.5-11.5T560-560v-80H400v80q0 17-11.5 28.5T360-520q-17 0-28.5-11.5T320-560v-80h-80v480Zm160-560h160q0-33-23.5-56.5T480-800q-33 0-56.5 23.5T400-720ZM240-160v-480 480Z"
+                />
+              </svg>
+            </span>
+            <div class="font-bold text-center text-base mt-3">{{ t('menu.orders') }}</div>
           </div>
-        </VaCard>
-        <VaCard class="flex flex-col">
-          <div class="flex flex-row items-center">
-            <VaIcon name="event_available" class="text-primary" size="large" />
-            <VaCardContent class="text-sm font-semibold">Unattempted exercises, exams</VaCardContent>
-          </div>
-          <div class="bg-blue-500 p-2 rounded-lg">
-            <VaCardContent class="text-md font-semibold">Assignment</VaCardContent>
-            <VaCardContent class="text-xs font-medium">Submit At: 11/11/2024</VaCardContent>
-            <VaCardContent class="text-xs font-medium">End Time: 11/11/2024</VaCardContent>
-          </div>
-        </VaCard>
-        <VaCard class="flex flex-col">
-          <div class="flex items-center">
-            <VaIcon name="newspaper" class="text-primary" size="large" />
-            <VaCardContent class="text-sm font-semibold">News board</VaCardContent>
-          </div>
-          <div class="bg-blue-500 p-2 rounded-lg">
-            <VaCardContent class="text-md font-bold">News Content</VaCardContent>
-          </div>
-        </VaCard>
+        </RouterLink>
       </VaCard>
+    </div>
+    <div v-if="isStudent" class="flex flex-col gap-4 pt-4">
+      <VaCardTitle>{{ t('papers.exam_schedule') }}</VaCardTitle>
+      <VaCard class="col-span-1 lg:col-span-1 xl:col-span-1 mb-3">
+        <VaDataTable hoverable :disable-client-side-sorting="false" :columns="columns" :items="paperStudent">
+          <template #cell(completionStatus)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span :class="getStatusClass(rowData.completionStatus)">
+                  {{ getStatusText(rowData.completionStatus) }}
+                </span>
+              </div>
+            </div>
+          </template>
+          <template #cell(startTime)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span>
+                  {{ format.formatDate(rowData.startTime) }}
+                </span>
+              </div>
+            </div>
+          </template>
+          <template #cell(endTime)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span>
+                  {{ rowData.endTime !== null ? format.formatDate(rowData.endTime) : t('papers.unlimited_time') }}
+                </span>
+              </div>
+            </div>
+          </template>
+          <template #cell(duration)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span>
+                  {{ format.formatDuration(rowData.duration) }}
+                </span>
+              </div>
+            </div>
+          </template>
+          <template #cell(description)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <VaTextarea v-model="rowData.description" :readonly="true" />
+              </div>
+            </div>
+          </template>
+          <template #cell(startedTime)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span v-if="rowData.startedTime != null"> {{ format.formatDate(rowData.startedTime) }}</span>
+              </div>
+            </div>
+          </template>
+          <template #cell(submittedTime)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span v-if="rowData.submittedTime != null"> {{ format.formatDate(rowData.submittedTime) }}</span>
+              </div>
+            </div>
+          </template>
+        </VaDataTable>
+      </VaCard>
+      <VaCardTitle>{{ t('papers.class_list') }}</VaCardTitle>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+        <VaCard
+          v-for="class1 in classes.filter((class1) => class1.assignments.length > 0)"
+          :key="class1.id"
+          class="p-4 shadow-lg rounded-lg border border-gray-200"
+        >
+          <div>
+            <!-- Header Section -->
+            <VaCard class="flex flex-row items-center p-4 bg-white rounded-lg shadow-sm">
+              <GeoAvatar
+                class="mr-2"
+                :size="48"
+                color="warning"
+                :image="class1.owner?.imageUrl || undefined"
+                :txt="class1.owner?.firstName.charAt(0).toUpperCase()"
+              />
+              <VaCard :to="{ name: 'class-details', params: { id: class1.id } }">
+                <VaCardContent class="text-md font-bold text-gray-800">
+                  {{ class1.owner?.firstName }} {{ class1.owner?.lastName }}
+                </VaCardContent>
+                <VaCardContent class="text-sm font-semibold text-gray-600">{{ class1.name }}</VaCardContent>
+              </VaCard>
+            </VaCard>
+
+            <!-- Assignments Section -->
+            <VaCard class="flex flex-col mb-2 px-4 bg-white rounded-lg">
+              <div class="flex flex-row items-center mb-2">
+                <VaIcon name="event_available" class="text-primary" size="large" />
+                <VaCardContent class="text-sm font-semibold text-gray-800 ml-2">
+                  {{ $t('assignments.unattemped_ass_exam') }}
+                </VaCardContent>
+              </div>
+              <div v-for="ass in class1.assignments.slice(0, 2)" :key="ass.id" class="bg-blue-100 px-4 rounded-lg mb-2">
+                <RouterLink :to="{ name: 'assignment-submission', params: { id: ass.id, classId: class1.id } }">
+                  <VaCardContent class="text-md font-semibold text-gray-800">
+                    {{ ass.name }}
+                  </VaCardContent>
+
+                  <VaCardContent class="text-xs font-medium text-gray-600">
+                    <div class="flex items-center mb-1">
+                      <VaIcon name="event" class="material-symbols-outlined mr-1" />
+                      <span class="font-semibold mr-1">{{ $t('assignments.start_time') }} </span>
+                      {{ format.formatDate(ass.startTime) }}
+                    </div>
+                    <div class="flex items-center">
+                      <VaIcon name="event" class="material-symbols-outlined mr-1" />
+                      <span class="font-semibold mr-1">{{ $t('assignments.end_time') }}</span>
+                      {{ format.formatDate(ass.endTime) }}
+                    </div>
+                  </VaCardContent>
+                </RouterLink>
+              </div>
+              <div v-if="class1.assignments.length > 2" class="flex justify-center items-center">
+                <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: class1.id } }">
+                  {{ $t('settings.see_more') }}
+                </VaButton>
+              </div>
+            </VaCard>
+
+            <!-- News Section -->
+            <VaCard class="flex flex-col px-4 bg-white rounded-lg">
+              <div class="flex items-center mb-2">
+                <VaIcon name="newspaper" class="text-primary" size="large" />
+                <VaCardContent class="text-sm font-semibold text-gray-800 ml-2">
+                  {{ $t('posts.news_board') }}
+                </VaCardContent>
+              </div>
+              <div
+                v-for="posts1 in class1.posts?.slice(0, 2)"
+                :key="posts1.id"
+                class="bg-blue-100 px-4 rounded-lg mb-2"
+              >
+                <VaCardContent class="text-md font-bold text-gray-800">
+                  <!-- eslint-disable vue/no-v-html -->
+                  <div class="text-base text-gray-700" v-html="posts1.content" />
+                  <!-- eslint-enable-->
+                </VaCardContent>
+              </div>
+              <div v-if="(class1.posts?.length || 0) > 2" class="flex justify-center items-center">
+                <VaButton preset="plain" size="small" :to="{ name: 'class-details', params: { id: class1.id } }">
+                  {{ $t('settings.see_more') }}
+                </VaButton>
+              </div>
+            </VaCard>
+          </div>
+        </VaCard>
+      </div>
+    </div>
+    <div v-if="isTeacher">
+      <RouterLink :to="{ name: 'subscription' }">
+        <VaButton color="#ee943a" text-color="#ffffff" class="my-4">{{ t('subscription.btn_subscribe') }}</VaButton>
+      </RouterLink>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@modules/auth.module'
 import { useI18n } from 'vue-i18n'
+import { defineVaDataTableColumns, useToast, VaCardTitle } from 'vuestic-ui'
+import { useClassStore } from '@/stores/modules/class.module'
+import { ClassroomWithPosts } from '@/pages/classrooms/types'
+import { format, getErrorMessage, notifications } from '@/services/utils'
+import { usePostsStore } from '@/stores/modules/posts.module'
+import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
+import { PaperStudents, PaperStudentsHistory } from '@/pages/examination/types'
+import { usePaperStudentsStore } from '@/stores/modules/paperStudents.module'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
+dayjs.extend(duration)
+dayjs.extend(relativeTime)
 const { t } = useI18n()
-// const loading = ref(true)
-// const { confirm } = useModal()
-// const { init: notify } = useToast()
+const loading = ref(true)
+const { init: notify } = useToast()
 const authStore = useAuthStore()
-// const groupClassStores = useGroupClassStore()
-// const classStores = useClassStore()
-
-// const classes = ref<Classrooms[]>([])
-// const groupClasses = ref<GroupClass[]>([])
+const classStores = useClassStore()
+const postStores = usePostsStore()
+const paperStudentsStores = usePaperStudentsStore()
+const classes = ref<ClassroomWithPosts[]>([])
+const paperStudents = ref<PaperStudents[]>([])
+const paperStudentsHistory = ref<PaperStudentsHistory[]>([])
 
 const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
 const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for testing
 
-// const dataFilter = ref({
-//   advancedSearch: {
-//     fields: [''],
-//     keyword: '',
-//   },
-//   pageNumber: 1,
-//   totalPages: 1,
-//   totalCount: 1,
-//   pageSize: 10,
-//   orderBy: [''],
-// })
+const columns = defineVaDataTableColumns([
+  { label: t('papers.stt'), key: 'stt', sortable: false },
+  { label: t('subjects.subject'), key: 'subjectName', sortable: true },
+  { label: t('papers.name'), key: 'examName', sortable: true },
+  { label: t('papers.status'), key: 'completionStatus', sortable: true },
+  { label: t('papers.start_time'), key: 'startTime', sortable: true },
+  { label: t('papers.end_time'), key: 'endTime', sortable: true },
+  { label: t('papers.duration'), key: 'duration', sortable: true },
+  { label: t('papers.description'), key: 'description', sortable: true },
+  // { label: t('papers.paper_label'), key: 'paperLabelName', sortable: true },
+  { label: t('papers.started_time'), key: 'startedTime', sortable: true },
+  { label: t('papers.submitted_time'), key: 'submittedTime', sortable: true },
+  { label: t('papers.score'), key: 'score', sortable: true },
+])
 
-// const getGroupClasses = () => {
-//   loading.value = true
-//   groupClassStores.getGroupClasses(dataFilter).
-//     then((response) => {
-//       groupClasses.value = response.data
-//     })
-//     .catch((error) => {
-//       notify({
-//         message: notifications.getFailed('group class') + getErrorMessage(error),
-//         color: 'error',
-//       })
-//     })
-//     .finally(() => {
-//       loading.value = false
-//     })
-// }
+const paperStudent = ref<any[]>([])
 
-// onMounted(() => {
-//   getGroupClasses()
-// })
+const calculatePaperStudent = () => {
+  paperStudent.value = [
+    ...paperStudents.value.map((student: any, index: number) => ({
+      stt: index + 1,
+      ...student,
+    })),
+    ...paperStudentsHistory.value.map((history: any, index: number) => ({
+      stt: paperStudents.value.length + index + 1,
+      ...history,
+    })),
+  ]
+}
+
+const dataFilter = ref({
+  advancedSearch: {
+    fields: [''],
+    keyword: '',
+  },
+  pageNumber: 1,
+  totalPages: 1,
+  totalCount: 1,
+  pageSize: 10,
+  orderBy: [''],
+})
+
+const getClasses = async () => {
+  loading.value = true
+  try {
+    const response = await classStores.getClasses(dataFilter)
+    classes.value = await Promise.all(
+      response.data.map(async (item: any) => {
+        const posts = (await getPosts(item.id)) || []
+        return {
+          ...item,
+          posts,
+        }
+      }),
+    )
+  } catch (error) {
+    notify({
+      message: notifications.getFailed(t('classes.class')) + getErrorMessage(error),
+      color: 'error',
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+const getPosts = async (classId: any) => {
+  loading.value = true
+  const request = {
+    classId: classId,
+  }
+  try {
+    const response = await postStores.getPosts(request)
+    return response.data
+  } catch (error) {
+    notify({
+      message: notifications.getFailed(t('posts.posts')) + getErrorMessage(error),
+      color: 'error',
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+const getPaperStudents = async () => {
+  loading.value = true
+  try {
+    const response = await paperStudentsStores.getPaperStudents(dataFilter)
+    paperStudents.value = response.data
+    // console.log('paperStudents', paperStudents.value)
+  } catch (error) {
+    notify({
+      message: notifications.getFailed(t('papers.paper')) + getErrorMessage(error),
+      color: 'error',
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+const getPaperStudentsHistory = async () => {
+  loading.value = true
+  try {
+    const response = await paperStudentsStores.getPaperStudentsHistory(dataFilter)
+    paperStudentsHistory.value = response.data
+    // console.log('paperStudentsHistory', paperStudentsHistory.value)
+  } catch (error) {
+    notify({
+      message: notifications.getFailed(t('papers.paper')) + getErrorMessage(error),
+      color: 'error',
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+const getStatusText = (status: number) => {
+  if (status === 0) {
+    return t('papers.not_started')
+  } else if (status === 1) {
+    return t('papers.in_progress')
+  } else if (status === 2) {
+    return t('papers.completed')
+  } else if (status === 3) {
+    return t('papers.suspended')
+  } else {
+    return ''
+  }
+}
+
+const getStatusClass = (status: number) => {
+  if (status === 0) {
+    return 'text-yellow-500' // Not Started
+  } else if (status === 1) {
+    return 'text-blue-500' // In Progress
+  } else if (status === 2) {
+    return 'text-green-500' // Completed
+  } else if (status === 3) {
+    return 'text-red-500' // Suspended
+  } else {
+    return ''
+  }
+}
+
+onMounted(() => {
+  const loadData = async () => {
+    await getClasses()
+    await getPaperStudents()
+    await getPaperStudentsHistory()
+    calculatePaperStudent()
+  }
+
+  loadData()
+})
 </script>
 
 <style>

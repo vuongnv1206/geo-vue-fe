@@ -26,10 +26,20 @@
     </template>
     <template #content>
       <TeacherGroupDetail
+        v-if="selectedGroupTeacher?.createdBy == currentUserId || selectedTeacher"
         class="max-h-[calc(100vh-64px)] overflow-y-auto"
         :group="selectedGroupTeacher"
         :teacher-id="selectedTeacher"
       />
+      <SharedTeacherGroupDetail
+        v-else-if="selectedGroupTeacher && selectedGroupTeacher.createdBy != currentUserId"
+        :group-detail="selectedGroupTeacher"
+      />
+      <VaCard v-else>
+        <VaCardContent class="min-h-[60vh] flex justify-center va-text-bold text-secondary">
+          Select a item
+        </VaCardContent>
+      </VaCard>
     </template>
   </VaLayout>
 </template>
@@ -41,6 +51,11 @@ import { ref, watchEffect } from 'vue'
 import { GroupTeacher } from './types'
 import { useBreakpoint } from 'vuestic-ui'
 
+import { useAuthStore } from '@/stores/modules/auth.module'
+import SharedTeacherGroupDetail from './SharedTeacherGroupDetail.vue'
+
+const authStore = useAuthStore()
+const currentUserId = authStore.user?.id
 const breakpoints = useBreakpoint()
 
 const isSidebarVisibleChild = ref(breakpoints.smUp)

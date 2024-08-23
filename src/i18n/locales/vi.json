@@ -122,7 +122,12 @@
     "show": "Hiển thị",
     "read_more": "Đọc thêm",
     "read": "Đọc",
-    "send": "Gửi"
+    "send": "Gửi",
+    "see_more": "Xem thêm",
+    "share": "Chia sẻ",
+    "search": "Tìm kiếm",
+    "submit": "Nộp bài",
+    "close": "Đóng"
   },
   "auditLogs": {
     "title": "Nhật ký",
@@ -143,8 +148,45 @@
       "viewDetailsCol": "xem chi tiết"
     },
     "details": {
-      "oldData": "Dữ Liệu Cũ",
-      "newData": "Dữ Liệu Mới"
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "delete": "Xóa",
+      "newData": "Dữ liệu mới",
+      "oldData": "Dữ liệu cũ",
+      "data": "Dữ liệu",
+      "fields": "Trường"
+    }
+  },
+  "subscription": {
+    "btn_subscribe": "Đăng ký gói",
+    "choose_subscription": "Chọn gói đăng ký",
+    "confirmation_title": "Xác nhận đăng ký",
+    "confirmation_text": "Bạn có chắc chắn muốn đăng ký gói này không ?",
+    "alert_title": "XONG",
+    "alert_text": "Vui lòng chờ, hệ thống đang xử lý!",
+    "ok": "Đồng ý",
+    "buy": "Mua",
+    "confirm_paid": "Tôi đã thanh toán",
+    "yes": "Xác nhận",
+    "no": "Hủy",
+    "text_describe_qr": "Vui lòng quét mã QR để thanh toán",
+    "orders": {
+      "title": "Danh sách đặt mua",
+      "show_qr": "Xem QR",
+      "cancel_order": "Hủy đặt mua",
+      "orderNo": "Mã đơn",
+      "subscription": "Tên gói",
+      "activeTime": "Thời gian hoạt động",
+      "status": "Trạng thái thanh toán",
+      "expired": "Hết hạn",
+      "createdOn": "Thời gian tạo",
+      "action": "Hành động",
+      "success": "Thành công",
+      "cancel_success": "Hủy đặt mua thành công",
+      "all": "Tất cả",
+      "pending": "Đang chờ",
+      "completed": "Hoàn thành",
+      "canceled": "Đã hủy"
     }
   },
   "questions": {
@@ -196,7 +238,8 @@
     "delete": "Xóa",
     "read_more": "Đọc thêm",
     "correct_answer": "Đáp án đúng",
-    "question_passages": "Câu hỏi đoạn văn"
+    "question_passages": "Câu hỏi đoạn văn",
+    "bin_question": "Câu hỏi đã xóa"
   },
   "questionFolder": {
     "pending": "Câu hỏi chưa duyệt ({total})",
@@ -277,6 +320,7 @@
     "enter_end_time": "Nhập thời gian kết thúc",
     "enter_content": "Nhập nội dung",
     "empty_content": "Nội dung trống",
+    "empty_file": "Tệp đính kèm trống",
     "enter_start_and_end_time": "Bắt đầu chọn hoặc nhập ngày và giờ",
     "settings": "Cài đặt",
     "global_settings": "Cài Đặt Chung",
@@ -293,7 +337,20 @@
     "upload": "Tải lên",
     "select_all": "Chọn tất cả",
     "deselect_all": "Bỏ chọn tất cả",
-    "share": "Chia sẻ"
+    "share": "Chia sẻ",
+    "unattemped_ass_exam": "Bài tập, bài kiểm tra chưa làm",
+    "submit": "Nộp",
+    "submit_homeworks": "Nộp bài",
+    "submission_time_over": "Đã hết thời gian nộp bài tập",
+    "is_not_submited": "Chưa nộp bài",
+    "score": "Điểm",
+    "enter_score": "Nhập diểm",
+    "comment": "Nhận xét",
+    "answers": "Câu trả lời",
+    "submitted": "Đã nộp",
+    "doing": "Đang làm bài",
+    "marked": "Đã chấm",
+    "not_submitted": "Không nộp"
   },
   "subjects": {
     "subject": "Môn học",
@@ -318,7 +375,8 @@
     "delete_group_class": "Xóa nhóm lớp",
     "edit_group_class": "Chỉnh sửa nhóm lớp",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
-    "select_group_class": "Chọn một nhóm lớp"
+    "select_group_class": "Chọn một nhóm lớp",
+    "search_group_class_name": "Tìm kiếm tên nhóm lớp"
   },
   "classes": {
     "class": "Lớp",
@@ -340,9 +398,11 @@
     "submited": "Đã nộp",
     "students_list": "Danh sách học sinh",
     "assignment_and_exam": "Bài tập & bài thi",
-    "news_board": "Bảng tin"
+    "news_board": "Bảng tin",
+    "search_assignment_paper": "Tìm kiếm bài tập hoặc bài thi"
   },
   "students": {
+    "get_template": "tải mẫu",
     "student": "Học sinh",
     "student_2": "học sinh",
     "first_name": "Tên",
@@ -388,7 +448,8 @@
     "edit_post": "Chỉnh sửa bài viết",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
     "no_post": "Không có bài viết nào",
-    "please_enter_content": "Vui lòng nhập nội dung"
+    "please_enter_content": "Vui lòng nhập nội dung",
+    "news_board": "Bảng tin"
   },
   "class_permission": {
     "assign_assignment": "Giao bài tập",
@@ -398,6 +459,7 @@
   "teacherGroups": {
     "teacher_group": "Nhóm giáo viên",
     "teacher": "Giáo viên",
+    "invite-teacher": "Mời giáo viên",
     "select_teacher": "Chọn giáo viên",
     "group_member": "Thành viên trong nhóm {name}",
     "search_class": "Tìm kiếm lớp",
@@ -504,7 +566,27 @@
     "supported_format": "Định dạng hỗ trợ: .pdf, .docx, .xlsx.",
     "content_0": "Bạn có thể tải lên các tệp bài tập, bài kiểm tra hoặc phiếu trả lời để chấm ngoại tuyến.",
     "details": "Chi tiết",
-    "require_title": "Đề bài"
+    "require_title": "Đề bài",
+    "start_time": "Thời gian bắt đầu",
+    "end_time": "Thời gian kết thúc",
+    "is_published": "Đã công bố",
+    "paper_label_id": "Mã nhãn bài thi",
+    "paper_label": "Nhãn bài thi",
+    "completion_status": "Trạng thái hoàn thành",
+    "score": "Điểm",
+    "show_mark": "Hiển thị điểm",
+    "started_time": "Thời gian bắt đầu làm bài",
+    "submitted_time": "Thời gian nộp bài",
+    "exam_schedule": "Lịch thi",
+    "stt": "STT",
+    "class_list": "Danh sách lớp",
+    "rawIndex": "STT",
+    "unlimited_time": "Không giới hạn thời gian",
+    "not_started": "Chưa bắt đầu",
+    "in_progress": "Đang làm bài",
+    "completed": "Đã hoàn thành",
+    "suspended": "Đã đình chỉ",
+    "status": "Trạng thái"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",
@@ -591,12 +673,15 @@
     "class": "Lớp",
     "group-class": "Nhóm lớp",
     "teacher-group": "Giáo viên",
+    "group-manage": "Quản lý nhóm",
+    "join-request": "Quản lý yêu cần",
     "exam": "Kỳ thi",
     "assignments": "Bài tập",
     "subjects": "Môn học",
     "audit-logs": "Nhật ký",
     "help": "Trợ giúp",
-    "infor": "Thông tin"
+    "infor": "Thông tin",
+    "orders": "Gói đã đặt"
   },
   "bin": {
     "title": "Thùng rác",
@@ -735,6 +820,7 @@
     "isCharacter": "{fieldName} phải là ký tự hợp lệ",
     "isDecimalNumber": "{fieldName} phải là số thập phân hợp lệ",
     "isNumber": "{fieldName} phải là số hợp lệ",
+    "isAlphanumeric": "{fieldName} phải là chữ số hoặc chữ cái",
     "email": "Vui lòng nhập địa chỉ email hợp lệ",
     "phone": "Vui lòng nhập số điện thoại hợp lệ",
     "updatedSuccessfully": "{message} cập nhật thành công",
@@ -746,6 +832,7 @@
     "deleteFailed": "Xóa {message} thất bại\n",
     "unsavedChanges": "Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời khỏi?",
     "confirmDelete": "Bạn muốn xóa {message}?",
+    "inviteSuccess": "Mời {message} thành công",
     "singleChoice": "Lựa chọn đơn",
     "multipleChoice": "Lựa chọn nhiều",
     "fillBlank": "Điền vào chỗ trống",
@@ -753,7 +840,17 @@
     "reading": "Đọc",
     "readingQuestionPassage": "Đoạn câu hỏi đọc",
     "writing": "Viết",
-    "other": "Khác"
+    "other": "Khác",
+    "Pending": "Đang chờ",
+    "Accepted": "Đã chấp nhận",
+    "Rejected": "Đã từ chối",
+    "Cancel": "Đã hủy",
+    "NotRequest": "chưa yêu cầu",
+    "uploadFileSuccess": "Tải lên tệp thành công",
+    "uploadFileFailed": "Tải lên tệp thất bại",
+    "greaterThanDate": "Thời gian bắt đầu phải lớn hơn thời gian hiện tại",
+    "downloadSuccess": "Tải xuống tệp thành công",
+    "downloadFailed": "Tải xuống tệp thất bại"
   },
   "languageSwitcher": {
     "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."

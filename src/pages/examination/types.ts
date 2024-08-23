@@ -1,3 +1,4 @@
+import { Classrooms, Student } from '../classrooms/types'
 import { Question } from '../question/types'
 import { GroupTeacher } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
@@ -102,6 +103,7 @@ export interface PaperDto {
   publicIpAllowed?: string
   localIpAllowed?: string
   numberAttempt?: number
+  totalAttended?: number
 }
 
 export interface PaperLabelDto {
@@ -115,6 +117,7 @@ export interface CombinedData {
   id: string
   name: string
   status?: string | null
+  creatorName?: string | null
   createdBy: string
   createdOn: string
   lastModifiedBy: string | null
@@ -144,7 +147,7 @@ export interface PaperStudentDto {
 export interface UpdatePaperRequest {
   id: string
   examName: string
-  status?: number
+  status?: number | null
   startTime?: string
   endTime?: string
   paperLabelId?: string
@@ -179,13 +182,13 @@ export enum ShowQuestionAnswer {
 
 export interface PaperAccess {
   classId?: string
+  className?: string
   userId?: string
 }
 
 export enum AccessType {
-  Everyone = 0,
-  ByClass = 3,
-  ByStudent = 2,
+  ByStudent = 1,
+  ByClass = 2,
 }
 
 export interface GetLastResultExamRequest {
@@ -271,14 +274,11 @@ export interface QuestionIntoPaperRequest {
   rawIndex: number | 1
 }
 
-export type PaperFolderResponse = {
-  data: PaperFolderDto[]
-  currentPage: number
-  totalPages: number
-  totalCount: number
-  pageSize: number
-  hasPreviousPage: boolean
-  hasNextPage: boolean
+export type PaperFolderTree = {
+  id: string | undefined
+  paperFolderChildrens: PaperFolderDto[]
+  paperFolderPermissions: PaperFolderPermission[]
+  totalPapers: number
 }
 
 export type PaperResponse = {
@@ -340,8 +340,17 @@ export interface SearchSharedPaperFolderRequest {
   parentId?: string | null
   name?: string | null
 }
+export interface SearchPaperFolderRequest {
+  parentId?: string | null
+  name?: string | null
+}
 
 export interface SearchSharedPaperRequest {
+  paperFolderId?: string | null | undefined
+  name?: string | null | undefined
+}
+
+export interface SearchPaperRequest {
   paperFolderId?: string | null | undefined
   name?: string | null | undefined
 }
@@ -375,4 +384,404 @@ export type MarkAnswerRequest = {
   submitPaperId?: string
   questionId?: string
   mark?: number
+}
+
+export type CreateMatrixRequest = {
+  name: string
+  content: string
+  totalPoint: number
+}
+
+export type UpdateMatrixRequest = {
+  id: string
+  name: string
+  content: string
+  totalPoint: number
+}
+
+export type ContentMatrixRequest = {
+  questionFolderId: string
+  criteriaQuestions: CriteriaQuestion[]
+  totalPoint: number
+}
+
+export type CriteriaQuestion = {
+  questionLabelId: string | null
+  questionType?: number
+  numberOfQuestion?: number
+  rawIndex?: string
+}
+
+export type PaperMatrixTemplate = {
+  id: string
+  name: string
+  content: string
+  contentItems: ContentMatrixItem[]
+  totalPoint: number
+}
+
+export type ContentMatrixItem = {
+  questionFolderId: string
+  questionFolderName?: string
+  criteriaQuestions: CriteriaQuestion[]
+  totalPoint: number
+}
+
+export type BasicStatisticPaperRequest = {
+  paperId: string
+  classId?: string
+}
+
+export type BasicStatisticPaperResponse = {
+  id: string
+  examName: string
+  paperLabelId: string
+  paperLabelName: string
+  subjectId: string
+  subjectName: string
+  totalRegister: number
+  totalNotComplete: number
+  totalDoing: number
+  totalAttendee: number
+  averageMark: number
+  totalPopular: number
+  markPopular: number
+  totalHighestMark: number
+  totalLowestMark: number
+  highestMark: number
+  lowestMark: number
+  classrooms: BasicStatisticPaperInClass[]
+}
+
+export type BasicStatisticPaperInClass = {
+  id: string
+  name: string
+  groupClassId: string
+  groupClassName: string
+  totalRegister: number
+  totalTested: number
+}
+
+export type ClassroomFrequencyMarkRequest = {
+  paperId: string
+  classroomId?: string
+}
+
+export type ClassroomFrequencyMarkResponse = {
+  totalRegister: number
+  totalAttendee: number
+  frequencyMarks: FrequencyMark[]
+  className?: string
+}
+
+export type FrequencyMark = {
+  fromMark: number
+  toMark: number
+  total: number
+  rate: number
+}
+
+export type ListQuestionStatisticRequest = {
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+  paperId: string
+  classId?: string
+}
+
+export type ListQuestionStatisticResponse = {
+  data: QuestionStatistic[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type QuestionStatistic = {
+  id: string
+  paperId: string
+  content: string
+  image?: string
+  audio?: string
+  questionFolderId?: string
+  questionFolderName?: string
+  questionType?: number
+  questionLabelId?: string
+  questionLabelName?: string
+  questionParentId?: string
+  questionPassages?: QuestionStatistic
+  answers?: AnswerStatistic[]
+  rawIndex: number
+  totalTest: number
+  totalAnswered: number
+  totalNotAnswered: number
+  totalCorrect: number
+  totalWrong: number
+  wrongStudents?: WrongStudentInfo[]
+}
+
+export type AnswerStatistic = {
+  id: string
+  content?: string
+  questionId: string
+  isCorrect: boolean
+}
+
+export type WrongStudentInfo = {
+  id: string
+  studentId?: string
+  firstName: string
+  lastName: string
+  classId?: string
+  className?: string
+}
+
+export type TranscriptStatisticRequest = {
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+  paperId: string
+  classId?: string
+}
+
+export type TranscriptStatisticResponse = {
+  data: InfoAttendeeTranscript[]
+  averageMark: number
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+
+export type InfoAttendeeTranscript = {
+  attendee: Student
+  classrooms?: Classrooms[]
+  mark: number
+  startedTest: Date
+  finishedTest?: Date
+}
+
+export type PaperStudents = {
+  id: string
+  examName: string
+  startTime: Date
+  endTime: Date
+  duration: number
+  isPublish: boolean
+  description: string
+  paperLabelId: string
+  paperLabelName: string
+  subjectId: string
+  subjectName: string
+  completionStatus: number
+}
+
+export type PaperStudentsResponse = {
+  data: PaperStudents[]
+  // currentPage: number
+  // totalPages: number
+  // totalCount: number
+  // pageSize: number
+  // hasPreviousPage: boolean
+  // hasNextPage: boolean
+}
+
+export type PaperStudentsHistory = {
+  id: string
+  examName: string
+  duration: number
+  paperLabelId: string
+  paperLabelName: string
+  subjectId: string
+  subjectName: string
+  startedTime: Date
+  submittedTime: Date
+  score: number
+  completionStatus: number
+  showMarkResult: boolean
+}
+export type PaperStudentsHistoryResponse = {
+  data: PaperStudentsHistory[]
+  // currentPage: number
+  // totalPages: number
+  // totalCount: number
+  // pageSize: number
+  // hasPreviousPage: boolean
+  // hasNextPage: boolean
+}
+
+export enum StatusPaper {
+  publish = 1,
+  unpublish = 2,
+}
+
+export type QuestionGenerateToMatrix = {
+  question: Question
+  mark: number
+  rawIndex: number
+}
+
+export interface AddQuestionsInPaperRequest {
+  paperId: string
+  questions?: QuestionIntoPaperRequest[]
+}
+
+export interface UpdateQuestionsInPaperRequest {
+  paperId: string
+  questions?: QuestionIntoPaperRequest[]
+}
+
+export type GroupClassAccessPaper = {
+  id: string
+  name: string
+  classes: ClassAccessPaper[]
+}
+
+export type ClassAccessPaper = {
+  id: string
+  name: string
+  userClasses: StudentAccessPaper[]
+  groupClassName?: string
+}
+
+export type StudentAccessPaper = {
+  studentId: string
+  student: Student
+  groupName?: string
+  className?: string
+}
+
+export type GetAccessPaperRequest = {
+  keyword?: string
+  pageNumber?: number
+  pageSize?: number
+  orderBy?: string[]
+  paperId: string
+}
+
+export type GetAccessPaperResponse = {
+  data: GroupClassAccessPaper[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+}
+// {
+//   "studentId": "8a44732e-b0f9-4531-83d4-9d21a5e8fb8d",
+//   "student": {
+//     "id": "8a44732e-b0f9-4531-83d4-9d21a5e8fb8d",
+//     "userName": "root.student",
+//     "firstName": "root",
+//     "lastName": "Student",
+//     "gender": null,
+//     "birthDate": null,
+//     "email": "basic@root.com",
+//     "isActive": true,
+//     "emailConfirmed": true,
+//     "phoneNumber": null,
+//     "phoneNumberConfirmed": true,
+//     "imageUrl": null
+//   },
+//   "paperId": "a2e664b3-763f-4507-9bbc-1ce365870afb",
+//   "paper": null,
+//   "submitPaperId": "8733c6ed-0dea-4278-9e77-43e340339604",
+//   "submitPaper": null,
+//   "completionStatus": 0,
+//   "isSuspicious": false,
+//   "submitPaperLogs": null,
+//   "classId": "5502aa20-2a71-4945-b320-fc6d3ffc7b44"
+// },
+
+export interface StudentMonitor {
+  studentId: string
+  student: Student
+  submitPaperId: string
+  submitPaper: SubmitPaperDto
+  completionStatus: number
+  isSuspicious: boolean
+  submitPaperLogs: any
+  classId: string
+}
+
+export type StudentMonitorResponse = {
+  data: StudentMonitor[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type ReassignExamRequest = {
+  paperId: string
+  userId?: string
+  studentEmail?: string
+  reason: string
+}
+
+export type SupendStudentExamRequest = {
+  paperId: string
+  userId?: string
+  studentEmail?: string
+  reason: string
+}
+
+export type GetGetAssigneesInPaperRequest = {
+  keyword?: string
+  pageNumber?: number
+  pageSize?: number
+  orderBy?: string[]
+  paperId: string
+  groupClassId?: string
+  classId?: string
+}
+
+export type GetGetAssigneesInPaperResponse = {
+  data: ClassAccessPaper[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+export type MonitorDetail = {
+  submitPaperId?: string
+  deviceId?: string
+  deviceName?: string
+  deviceType?: string
+  publicIp?: string
+  localIp?: string
+  processLog?: string
+  mouseLog?: string
+  keyboardLog?: string
+  networkLog?: string
+  reassignLog?: string
+  commonLog?: string
+  isSuspicious?: boolean
+  suspiciousReason?: string
+  createdBy?: string
+  createdOn?: string
+  lastModifiedBy?: string
+  lastModifiedOn?: string
+  deletedOn?: string
+  deletedBy?: string
+  id?: string
+}
+
+export type MonitorDetailResponse = {
+  data: MonitorDetail[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type MonitorRequest = {
+  submitPaperId: string
 }

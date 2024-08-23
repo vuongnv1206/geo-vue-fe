@@ -68,6 +68,16 @@ export default {
         icon: 'group',
         permission: 'GroupTeachers.View',
       },
+      children: [
+        {
+          name: 'group-manage',
+          displayName: 'menu.group-manage',
+        },
+        {
+          name: 'join-request',
+          displayName: 'menu.join-request',
+        },
+      ],
     },
     {
       name: 'audit logs',
@@ -75,6 +85,14 @@ export default {
       meta: {
         icon: 'list_alt',
         permission: 'AuditLogs.View',
+      },
+    },
+    {
+      name: 'orders',
+      displayName: 'menu.orders',
+      meta: {
+        icon: 'shopping_bag',
+        permission: 'Orders.View',
       },
     },
   ] as INavigationRoute[],

@@ -54,11 +54,20 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/examination/CreatePaper.vue'),
           },
           {
+            name: 'create-paper-matrix',
+            path: 'create-paper/:folderId?/matrix-template',
+            component: () => import('../pages/examination/CreateMatrixTemplate.vue'),
+          },
+          {
+            name: 'generate-paper-matrix',
+            path: 'create-paper/:folderId?/paper-matrix/:matrixId',
+            component: () => import('../pages/examination/CreatePaperMatrix.vue'),
+          },
+          {
             name: 'create-paper-question-bank',
             path: 'create-paper/:folderId?/question-bank',
             component: () => import('../pages/examination/CreatePaperInQuestionBank.vue'),
           },
-
           {
             name: 'admin-exam-detail',
             path: 'admin/exam-detail/:id',
@@ -80,6 +89,22 @@ const routes: Array<RouteRecordRaw> = [
             path: 'admin/paper-config-online/:id',
             component: () => import('../pages/examination/PaperConfigOnline.vue'),
           },
+          {
+            name: 'monitor-exam',
+            path: 'admin/monitor-exam/:id',
+            component: () => import('../pages/examination/MonitorExam.vue'),
+          },
+          {
+            name: 'admin-exam-statistic',
+            path: 'admin/exam-statistic/:id',
+            component: () => import('../pages/examination/PaperAdminStatistic.vue'),
+          },
+          {
+            path: '/papers/:paperId/manage-questions',
+            name: 'manage-questions',
+            component: () => import('../pages/examination/widgets/ManageQuestionsInPaper.vue'),
+            props: true,
+          },
         ],
       },
       {
@@ -97,12 +122,39 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
+        name: 'invite-join-team',
+        path: 'invite-join-team/:userId/:invitationId?',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/teacher-group/InviteJoinTeam.vue'),
+      },
+      {
         name: 'teacher-group',
         path: 'teacher-group',
         meta: {
           requiresAuth: true,
         },
-        component: () => import('../pages/teacher-group/TeacherGroup.vue'),
+        children: [
+          {
+            name: 'group-manage',
+            path: 'group-manage',
+            component: () => import('../pages/teacher-group/TeacherGroup.vue'),
+          },
+          {
+            name: 'join-request',
+            path: 'join-request',
+            component: () => import('../pages/teacher-group/JoinGroupRequestList.vue'),
+          },
+        ],
+      },
+      {
+        name: 'join-group',
+        path: 'join-group/:id',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/teacher-group/widgets/JoinGroupRequest.vue'),
       },
       {
         name: 'classrooms',
@@ -150,6 +202,16 @@ const routes: Array<RouteRecordRaw> = [
             path: '/assignments/create',
             component: () => import('../pages/assignment/widgets/EditAssignment.vue'),
           },
+          {
+            name: 'assignment-submission',
+            path: '/assignments/submission/:id/:classId',
+            component: () => import('../pages/assignment/widgets/SubmitAssignment.vue'),
+          },
+          {
+            name: 'assignment-marking',
+            path: '/assignments/marking/:id/:classId/:studentId',
+            component: () => import('../pages/assignment/widgets/MarkAssignment.vue'),
+          },
         ],
       },
       {
@@ -191,6 +253,22 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: () => import('../pages/bin/Bin.vue'),
+      },
+      {
+        name: 'subscription',
+        path: 'subscription',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/subscription/Subscription.vue'),
+      },
+      {
+        name: 'orders',
+        path: 'orders',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/orders/Orders.vue'),
       },
     ],
   },

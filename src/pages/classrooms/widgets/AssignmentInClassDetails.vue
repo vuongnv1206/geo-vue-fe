@@ -2,13 +2,13 @@
   <VaCardContent>
     <VaCard class="flex flex-col md:flex-row gap-2 mb-4">
       <VaCard class="flex-grow justify-start items-center">
-        <VaInput v-model="searchQuery" placeholder="Search assignment or paper name">
+        <VaInput v-model="searchQuery" :placeholder="$t('classes.search_assignment_paper')">
           <template #appendInner>
             <VaIcon color="secondary" class="material-icons">search</VaIcon>
           </template>
         </VaInput>
       </VaCard>
-      <VaMenu class="justify-end" :options="options" @selected="selectedOption">
+      <VaMenu v-if="isTeacher" class="justify-end" :options="options" @selected="selectedOption">
         <template #anchor>
           <VaButton :disabled="!canAssignmentManage">
             <VaIcon name="add" />
@@ -30,6 +30,7 @@ import { Classrooms } from '../types'
 import AccordionOfAssignment from './AccordionOfAssignment.vue'
 import router from '@/router'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/modules/auth.module'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -38,7 +39,9 @@ const props = defineProps({
     required: true,
   },
 })
+const authStore = useAuthStore()
 
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 const canAssignmentManage = computed(() => {
   if (props.classDetails.permissions === null || props.classDetails.permissions === undefined) {
     return true
@@ -67,15 +70,6 @@ const selectedOption = (v: { text: string; value: string }) => {
 
 const searchQuery = ref('')
 
-// Papers data
-const papers = ref([
-  { id: '1', examName: 'Paper 1', createOn: '2024-06-30T11:21:35.721019+00:00' },
-  { id: '2', examName: 'Paper 2', createOn: '2024-06-30T11:21:35.721019+00:00' },
-  { id: '3', examName: 'Paper 3', createOn: '2024-06-30T11:21:35.721019+00:00' },
-  { id: '4', examName: 'Paper 4', createOn: '2024-06-30T11:21:35.721019+00:00' },
-  { id: '5', examName: 'Paper 5', createOn: '2024-06-30T11:21:35.721019+00:00' },
-])
-
 const groupedData = computed(() => {
   const groups: { [key: string]: any } = {}
   props.classDetails.assignments?.forEach((assignment) => {
@@ -90,11 +84,11 @@ const groupedData = computed(() => {
     groups[createOn].assignments.push(assignment)
   })
 
-  papers.value.forEach((paper) => {
-    const createOn = format.formatDate(new Date(paper.createOn))
+  props.classDetails.papers?.forEach((paper) => {
+    const createOn = format.formatDate(new Date(paper.createdOn))
     if (!groups[createOn]) {
       groups[createOn] = {
-        createOn: paper.createOn,
+        createOn: new Date(paper.createdOn),
         assignments: [],
         papers: [],
       }

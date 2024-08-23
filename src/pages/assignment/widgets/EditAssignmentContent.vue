@@ -3,9 +3,10 @@
     <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
       <QuillEditor
         v-model:content="newAssignmentContent.content"
-        class="h-15 border rounded"
+        class="border rounded"
         :placeholder="$t('assignments.enter_content')"
         content-type="html"
+        style="height: 200px"
       />
       <div class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
         <VaButton preset="secondary" color="secondary" @click="emit('close')">{{ $t('settings.cancel') }}</VaButton>

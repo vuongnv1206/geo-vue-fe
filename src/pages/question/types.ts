@@ -106,6 +106,7 @@ export type Question = {
   owner?: UserDetail | null
   mark?: number | null
   questionStatus?: number | null
+  originalQuestionId?: string | null
 }
 
 export type QuestionLable = {
@@ -176,4 +177,15 @@ export type SearchMyQuestion = {
   questionType?: number | null | undefined
   content?: string | null | undefined
   questionStatus?: number | null | undefined
+}
+
+export type QuestionLabelRequest = {
+  keyword?: string
+  pageNumber?: number | 0
+  pageSize?: number | 0
+  orderBy?: string[]
+}
+
+export type QuestionLabelResponse = {
+  data: QuestionLable[]
 }
