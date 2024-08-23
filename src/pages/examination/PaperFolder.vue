@@ -385,10 +385,6 @@ const tableColumns = computed(() => {
   return columns
 })
 
-const onSelectedItemsChange = (items: CombinedData[]) => {
-  selectedItems.value = items
-}
-
 const combinedData = computed(() => {
   const resolvedFolders = paperFolderDtos.value.map((folder) => ({
     ...folder,
@@ -642,9 +638,10 @@ const onSharePaperFolderPermission = () => {
 
     <VaCard class="flex justify-end items-center">
       <VaCard class="flex gap-2">
-        <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems"
-          >Delete
+        <VaButton v-if="selectedItems.length > 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
+          Delete
         </VaButton>
+
         <VaButton icon="add" @click="showCreatePaper()">Paper</VaButton>
         <VaButton icon="add" @click="showAddPaperFolderModal()">Folder</VaButton>
         <VaDropdown placement="bottom-end">
@@ -695,13 +692,10 @@ const onSharePaperFolderPermission = () => {
         :columns="tableColumns"
         :loading="loading"
         hoverable
-        selectable
         clickable
-        select-mode="multiple"
         :disable-client-side-sorting="false"
         @row:contextmenu="contextmenu($event)"
         @row:dblclick="handleFolderDoubleClick($event)"
-        @selectionChange="onSelectedItemsChange($event.currentSelectedItems)"
       >
         <template #cell(name)="{ rowData }">
           <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
@@ -736,7 +730,7 @@ const onSharePaperFolderPermission = () => {
         </template>
 
         <template #cell(path)="{ rowData }">
-          <div v-if="rowData.paths" class="flex items-center gap-2 ellipsis max-w-[230px]">
+          <div v-if="rowData.paths" class="flex items-center gap-2 ellipsis max-w-[500px]">
             <VaBreadcrumbs separator="/">
               <VaBreadcrumbsItem v-for="(segment, index) in rowData.paths" :key="index">
                 <a href="#" @click.prevent="navigateToPath(segment.id)">
