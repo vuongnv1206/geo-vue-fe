@@ -198,3 +198,24 @@ export type ClassroomWithStats = {
   students: Student[]
   permissions: PermissionInClass[] | null
 }
+
+export type FailedStudentImport = {
+  failedStudents: FailedStudent[]
+}
+
+export type FailedStudent = {
+  studentRequest: StudentFailDetail
+  errorMessage: string
+}
+
+export type StudentFailDetail = {
+  firstName: string
+  lastName: string
+  avatarUrl: string
+  dateOfBirth: string // Sử dụng string để đại diện cho ngày tháng, có thể đổi thành Date nếu cần
+  email: string
+  phoneNumber: string
+  studentCode: string
+  gender: boolean
+  classesId: string // UUID dạng string
+}

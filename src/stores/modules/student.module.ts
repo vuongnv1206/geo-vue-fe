@@ -55,5 +55,35 @@ export const useStudentStore = defineStore('student', {
           return Promise.reject(error)
         })
     },
+    getFormatFileImportStudent(): Promise<any> {
+      return studentService
+        .getFormatFileImportStudent()
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getFailedFileImportStudent(data: any): Promise<any> {
+      return studentService
+        .getFailedFileImportStudent(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    uploadStudentFile(file: File, classId: string): Promise<any> {
+      return studentService
+        .uploadStudentFile(file, classId)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })
