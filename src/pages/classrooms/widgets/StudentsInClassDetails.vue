@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, PropType, ref } from 'vue'
 import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
-import { Classrooms, EmptyStudent, Student } from '../types'
+import { Classrooms, EmptyStudent, FailedStudentImport, Student } from '../types'
 import { notifications, getErrorMessage, format } from '@/services/utils'
 import { useStudentStore } from '@/stores/modules/student.module'
 import EditStudent from './EditStudent.vue'
@@ -154,10 +154,24 @@ const getFormatFileImportStudent = () => {
     .getFormatFileImportStudent()
     .then((response) => {
       console.log('aaaa', response)
+      // notify({
+      //   message: notifications.downloadSuccess(),
+      //   color: 'success',
+      // })
+      emit('load')
+    })
+    .catch((error) => {
       notify({
-        message: notifications.downloadSuccess(),
-        color: 'success',
+        message: notifications.downloadFailed() + getErrorMessage(error),
+        color: 'error',
       })
+    })
+}
+
+const getFailedFileImportStudent = (data: any) => {
+  studentStore
+    .getFailedFileImportStudent(data)
+    .then(() => {
       emit('load')
     })
     .catch((error) => {
@@ -172,13 +186,38 @@ const filesUploaded = ref<any>()
 const uploadStudentFile = () => {
   studentStore
     .uploadStudentFile(filesUploaded.value[0], props.classroom.id)
-    .then(() => {
+    .then((response) => {
       // console.log('upload success', filesUploaded.value[0])
-      notify({
-        message: notifications.uploadSuccess(),
-        color: 'success',
-      })
-      emit('load')
+      console.log(response)
+      if (response.length > 0) {
+        notify({
+          message: 'Some students encountered errors during import.',
+          color: 'warning',
+        })
+        const requestFail: FailedStudentImport = {
+          failedStudents: response.map((item: any) => ({
+            studentRequest: {
+              firstName: item.studentRequest.firstName,
+              lastName: item.studentRequest.lastName,
+              avatarUrl: item.studentRequest.avatarUrl,
+              dateOfBirth: item.studentRequest.dateOfBirth,
+              email: item.studentRequest.email,
+              phoneNumber: item.studentRequest.phoneNumber,
+              studentCode: item.studentRequest.studentCode,
+              gender: item.studentRequest.gender,
+              classesId: item.studentRequest.classesId,
+            },
+            errorMessage: item.errorMessage,
+          })),
+        }
+        getFailedFileImportStudent(requestFail)
+      } else {
+        notify({
+          message: notifications.uploadSuccess(),
+          color: 'success',
+        })
+        emit('load')
+      }
     })
     .catch((error) => {
       notify({
@@ -198,20 +237,20 @@ const canStudentManage = computed(() => {
 
 <template>
   <VaCard>
-    <VaCardContent>
-      <div class="flex flex-col md:flex-row gap-2 justify-end">
-        <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedStudent()">
-          {{ t('settings.delete') }}
-        </VaButton>
-        <VaButton :disabled="!canStudentManage" icon="add" @click="createNewStudent()">
-          {{ t('students.student') }}
-        </VaButton>
-        <VaFileUpload v-model="filesUploaded" hide-file-list file-types=".xlsx,.xls" @fileAdded="uploadStudentFile" />
+    <VaCardTitle class="flex flex-col md:flex-row gap-2 justify-end">
+      <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedStudent()">
+        {{ t('settings.delete') }}
+      </VaButton>
+      <VaButton :disabled="!canStudentManage" icon="add" @click="createNewStudent()">
+        {{ t('students.student') }}
+      </VaButton>
+      <VaFileUpload v-model="filesUploaded" hide-file-list file-types=".xlsx,.xls" @fileAdded="uploadStudentFile" />
 
-        <VaButton icon="download" @click="getFormatFileImportStudent()">
-          {{ t('students.student') }}
-        </VaButton>
-      </div>
+      <VaButton icon="download" @click="getFormatFileImportStudent()">
+        {{ t('students.get_template') }}
+      </VaButton>
+    </VaCardTitle>
+    <VaCardContent>
       <VaDataTable
         hoverable
         clickable

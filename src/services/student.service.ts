@@ -73,7 +73,22 @@ class StudentService {
         return Promise.reject(error)
       })
   }
-
+  async getFailedFileImportStudent(data: any): Promise<any> {
+    return ApiService.postFileData('/v1/student/failed-import-student-excel', data, { responseType: 'blob' })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'failed-student-import.xlsx')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   async uploadStudentFile(file: File, classId: string): Promise<void> {
     const formData = new FormData()
     formData.append('formFile', file)

@@ -402,6 +402,7 @@
     "search_assignment_paper": "Tìm kiếm bài tập hoặc bài thi"
   },
   "students": {
+    "get_template": "tải mẫu",
     "student": "Học sinh",
     "student_2": "học sinh",
     "first_name": "Tên",

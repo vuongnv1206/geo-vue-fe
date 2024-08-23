@@ -401,6 +401,7 @@
     "search_assignment_paper": "Search assignment or paper"
   },
   "students": {
+    "get_template": "Get template", 
     "student": "Student",
     "student_2": "student",
     "first_name": "First Name",
