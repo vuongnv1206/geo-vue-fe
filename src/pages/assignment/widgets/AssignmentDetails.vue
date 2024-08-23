@@ -126,7 +126,7 @@
       <VaCard class="mt-2 p-2 min-h-[75vh]">
         <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
           <VaListItem
-            v-for="student in students"
+            v-for="student in sortedStudents"
             :key="student.id"
             class="border rounded p-4"
             :to="{
@@ -147,19 +147,14 @@
               <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
               <VaListItemLabel
                 caption
-                :class="{
-                  'text-green-500':
-                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
-                    'Submitted',
-                  'text-yellow-500':
-                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status === 'Doing',
-                }"
+                :class="
+                  getStatusColorClass(
+                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
+                  )
+                "
               >
                 {{
-                  assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status ===
-                  'Submitted'
-                    ? $t('assignments.Submitted')
-                    : $t('assignments.Doing')
+                  getStatusText(assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status)
                 }}
               </VaListItemLabel>
             </VaListItemSection>
@@ -197,7 +192,7 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { onMounted, ref, watchEffect } from 'vue'
+import { computed, onMounted, ref, watchEffect } from 'vue'
 import { useFileStore } from '@/stores/modules/file.module'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
@@ -230,7 +225,7 @@ const showSidebar = ref(breakpoints.smUp)
 const assignment = ref<Assignment | null>(null)
 const assignmentContent = ref<AssignmentContent | null>(null)
 const assignmentAttachment = ref<AssignmentAttachment | null>(null)
-const students = ref<Student[] | undefined>([])
+const students = ref<Student[]>([])
 const assignmentSubmissions = ref<AssignmentSubmission[]>([])
 
 const assignmentId = router.currentRoute.value.params.id.toString()
@@ -424,6 +419,56 @@ const fileUpload = async () => {
       })
     })
 }
+
+// Function to get the color class based on status
+const getStatusColorClass = (status: string | undefined) => {
+  if (status === 'Marked') {
+    return 'text-green-500'
+  } else if (status === 'NotSubmitted') {
+    return 'text-red-500'
+  } else if (status === 'Submitted') {
+    return 'text-blue-500'
+  } else if (status === 'Doing') {
+    return 'text-yellow-500'
+  } else {
+    return ''
+  }
+}
+
+// Function to get the display text based on status
+const getStatusText = (status: string | undefined) => {
+  if (status === 'Marked') {
+    return t('assignments.marked')
+  } else if (status === 'NotSubmitted') {
+    return t('assignments.not_submitted')
+  } else if (status === 'Submitted') {
+    return t('assignments.submitted')
+  } else if (status === 'Doing') {
+    return t('assignments.doing')
+  } else {
+    return ''
+  }
+}
+
+const statusOrder = {
+  Submitted: 1,
+  Doing: 2,
+  Marked: 3,
+  NotSubmitted: 4,
+}
+
+const sortedStudents = computed(() => {
+  return students.value.slice().sort((a, b) => {
+    const statusA =
+      (assignmentSubmissions.value.find((submission) => submission.studentId === a.id)
+        ?.status as keyof typeof statusOrder) || 'NotSubmitted'
+    const statusB =
+      (assignmentSubmissions.value.find((submission) => submission.studentId === b.id)
+        ?.status as keyof typeof statusOrder) || 'NotSubmitted'
+
+    return statusOrder[statusA] - statusOrder[statusB]
+  })
+})
 
 watchEffect(() => {
   showSidebar.value = breakpoints.smUp

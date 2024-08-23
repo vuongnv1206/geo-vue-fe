@@ -348,8 +348,10 @@
     "enter_score": "Enter score",
     "comment": "Comment",
     "answers": "Answers",
-    "Submitted": "Submitted",
-    "Doing": "Doing"
+    "submitted": "Submitted",
+    "doing": "Doing",
+    "marked": "Marked",
+    "not_submitted": "Not Submitted"
   },
   "subjects": {
     "subject": "Subject",

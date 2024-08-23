@@ -103,6 +103,7 @@ export type MarkAssignment = {
 }
 export type SubmissionStats = {
   totalSubmitted: number
+  totalMarked: number
   totalStudents: number
 }
 

@@ -714,3 +714,55 @@ export type StudentMonitorResponse = {
   hasPreviousPage: boolean
   hasNextPage: boolean
 }
+
+export type ReassignExamRequest = {
+  paperId: string
+  userId?: string
+  studentEmail?: string
+  reason: string
+}
+
+export type SupendStudentExamRequest = {
+  paperId: string
+  userId?: string
+  studentEmail?: string
+  reason: string
+}
+
+export type MonitorDetail = {
+  submitPaperId?: string
+  deviceId?: string
+  deviceName?: string
+  deviceType?: string
+  publicIp?: string
+  localIp?: string
+  processLog?: string
+  mouseLog?: string
+  keyboardLog?: string
+  networkLog?: string
+  reassignLog?: string
+  commonLog?: string
+  isSuspicious?: boolean
+  suspiciousReason?: string
+  createdBy?: string
+  createdOn?: string
+  lastModifiedBy?: string
+  lastModifiedOn?: string
+  deletedOn?: string
+  deletedBy?: string
+  id?: string
+}
+
+export type MonitorDetailResponse = {
+  data: MonitorDetail[]
+  currentPage: number
+  totalPages: number
+  totalCount: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+export type MonitorRequest = {
+  submitPaperId: string
+}

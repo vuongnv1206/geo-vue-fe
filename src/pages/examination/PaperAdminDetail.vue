@@ -14,13 +14,11 @@ import {
 } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
-import { Classrooms, GroupClass } from '@/pages/classrooms/types'
-import { useGroupClassStore } from '@/stores/modules/groupclass.module'
-import { useClassStore } from '../../stores/modules/class.module'
 import { format } from '@/services/utils'
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import WhoAssignedPaperDetailModal from './widgets/WhoAssignedPaperDetailModal.vue'
+import { getErrorMessage } from '@/services/utils'
 
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id
@@ -32,70 +30,16 @@ const { init: notify } = useToast()
 const { confirm } = useModal()
 const paperDetail = ref<PaperDto | null>(null)
 
-const valueClassInGroupTap = ref<string>('')
-
 const paperId = route.params.id as string
 const getPaperDetail = async () => {
   try {
     const res = await paperStore.paperDetail(paperId)
     paperDetail.value = res
-    if (paperDetail.value.shareType === AccessType.ByClass || paperDetail.value.shareType === AccessType.ByStudent) {
-      await getGroupClasses()
-    }
-    await getAccessPaperGroups()
   } catch (error) {
     notify({
       message: `Not Found ${error}`,
       color: 'danger',
     })
-  }
-}
-const groupClassFilter = ref({ keyword: '', orderBy: ['id'], queryType: 1 })
-
-const groupClasses = ref<GroupClass[]>([])
-const groupClassStores = useGroupClassStore()
-const getGroupClasses = async (): Promise<void> => {
-  try {
-    const { data: groupClassesData } = await groupClassStores.getGroupClasses(groupClassFilter.value)
-
-    if (!paperDetail.value?.paperAccesses) return
-
-    // Filter paperAccesses for non-null classId or userId
-    const filteredAccesses = paperDetail.value.paperAccesses.filter(
-      (element) => element.classId !== null || element.userId !== null,
-    )
-
-    // Initialize a Set to track unique group class IDs
-    const existingGroupClassIds = new Set(groupClasses.value.map((g) => g.id))
-
-    // Process each paper access
-    filteredAccesses.forEach((access) => {
-      groupClassesData.forEach((groupClass) => {
-        // Ensure groupClass.classes is defined
-        const hasMatchingClass = groupClass.classes?.some((cls) => cls.id === access.classId)
-
-        // Ensure groupClass.classes and cls.students are defined
-        const hasMatchingStudent = groupClass.classes?.some((cls) =>
-          cls.students?.some((student) => student.id === access.userId),
-        )
-
-        if (hasMatchingClass || hasMatchingStudent) {
-          // Add groupClass if it's not already in the groupClasses
-          if (!existingGroupClassIds.has(groupClass.id)) {
-            groupClasses.value.push(groupClass)
-            existingGroupClassIds.add(groupClass.id)
-          }
-        }
-      })
-    })
-
-    // Ensure there's at least one group class and its classes array is defined
-    const firstGroupClass = groupClasses.value[0]
-    if (firstGroupClass?.classes?.length > 0) {
-      await selectClassInGroup(firstGroupClass.classes[0].id)
-    }
-  } catch (error) {
-    console.error('Error fetching group classes:', error)
   }
 }
 
@@ -197,7 +141,7 @@ const handleSaveAssigned = async (shareType: AccessType, accessPaperList: PaperA
       })
       .catch((error) => {
         notify({
-          message: `Update failing \n ${error}`,
+          message: getErrorMessage(error),
           color: 'danger',
         })
       })
@@ -209,14 +153,19 @@ const dataFilterSubmittedStudent = ref({
   keyword: '',
   pageNumber: 0,
   pageSize: 10,
-  orderBy: ['id'],
+  orderBy: [],
   paperId: paperId,
-  classId: null,
+  classId: '',
 })
+
+const valueClassInGroupTap = ref('')
+
 const getSubmittedStudents = async (classId?: string) => {
   try {
-    if (paperDetail.value?.shareType === AccessType.ByClass) {
-      dataFilterSubmittedStudent.value.classId === classId
+    dataFilterSubmittedStudent.value.classId = valueClassInGroupTap.value
+
+    if (classId) {
+      dataFilterSubmittedStudent.value.classId = classId
     }
 
     submittedStudents.value = await paperStore.getSubmittedStudentsInPaper(paperId, dataFilterSubmittedStudent.value)
@@ -243,26 +192,22 @@ const navigateToManageQuestions = () => {
 }
 
 const showSelectClassModal = ref(false)
-const classInSelectedGroup = ref<Classrooms[]>([])
 const selectedGroupClassName = ref('')
-const classStore = useClassStore()
-const classFilter = ref({ keyword: '', pageNumber: 0, pageSize: 100, orderBy: ['id'], groupClassId: '' })
+
+const selectedGroupClass = ref<GroupClassAccessPaper>()
+
 const selectClassInGroup = async (classId: string) => {
   try {
-    const classDetail = await classStore.getClassById(classId)
-    classFilter.value.groupClassId = classDetail.groupClassId
-    const res = await classStore.getClasses(classFilter.value)
-    if (paperDetail.value?.shareType === AccessType.ByClass) {
-      classInSelectedGroup.value = res.data.filter((classroom: Classrooms) =>
-        paperDetail.value?.paperAccesses?.some((x: PaperAccess) => x.classId == classroom.id),
-      )
-    } else if (paperDetail.value?.shareType === AccessType.ByStudent) {
-      classInSelectedGroup.value = res.data.filter((classroom: Classrooms) =>
-        classroom.students.some((s) => paperDetail.value?.paperAccesses?.some((x: PaperAccess) => x.userId == s.id)),
-      )
-    }
-    selectedGroupClassName.value = classDetail.groupClassName
+    // lấy ra group có class được chọn
+    selectedGroupClass.value = accessPaperGroups.value.find((group) =>
+      group.classes.some((classroom) => classroom.id == classId),
+    )
+
+    selectedGroupClassName.value = selectedGroupClass.value?.name || ''
+    // Update the v-model value for VaTabs
     showSelectClassModal.value = false
+
+    await onTabChange(classId)
 
     await getSubmittedStudents(classId)
   } catch (error) {
@@ -299,11 +244,22 @@ const getAccessPaperGroups = async () => {
 
 const showWhoAssignedDetail = ref(false)
 
+const onTabChange = async (classId: string) => {
+  valueClassInGroupTap.value = classId
+  await getSubmittedStudents(classId)
+}
+
+const statusSubmitOptions: any = [
+  { label: 'done', value: 1 },
+  { label: 'not yet', value: 2 },
+  { label: 'miss', value: 3 },
+]
+
+const statusSubmitValue = ref(1)
+
 onMounted(async () => {
   await getPaperDetail()
-  if (groupClasses.value.length > 0 && groupClasses.value[0].classes) {
-    valueClassInGroupTap.value = groupClasses.value[0].classes[0].name
-  }
+  await getAccessPaperGroups()
 })
 </script>
 
@@ -326,9 +282,6 @@ onMounted(async () => {
       <VaCard v-if="showSidebar" class="mt-2" style="min-width: 20rem; max-width: 30rem">
         <VaCardTitle class="flex justify-between">
           <span style="font-size: 1rem"> {{ paperDetail?.examName }}</span>
-          <!-- <div>
-            <VaButton preset="secondary" border-color="primary" size="small"> Copy link </VaButton>
-          </div> -->
         </VaCardTitle>
         <VaCardContent>
           <VaList class="va-text-secondary text-xs mb-2">
@@ -481,31 +434,36 @@ onMounted(async () => {
     </template>
 
     <template #content>
-      <VaCardTitle>Student submit (0/0)</VaCardTitle>
+      <VaCardTitle>Student submit ({{ submittedStudents?.data.length || 0 }}/0)</VaCardTitle>
       <VaCard class="mt-2 ml-2" style="height: 60vh">
         <VaCardContent
           v-if="paperDetail?.shareType === AccessType.ByClass || paperDetail?.shareType === AccessType.ByStudent"
           class="p-0"
         >
-          <VaCardTitle>
+          <VaCardTitle class="flex justify-between">
             <VaButton size="small" @click="showSelectClassModal = !showSelectClassModal"
               >Select class group: {{ selectedGroupClassName }}
             </VaButton>
+            <VaSelect
+              v-model="statusSubmitValue"
+              :options="statusSubmitOptions"
+              text-by="label"
+              value-by="value"
+              class="max-w-[120px]"
+            />
           </VaCardTitle>
           <VaModal v-model="showSelectClassModal" size="large" hide-default-actions>
             <VaCard outlined>
               <VaCardContent>
                 <VaScrollContainer class="min-h-[80vh] max-h-[90vh]">
-                  <VaCollapse v-for="(groupClass, index) in groupClasses" :key="index" :header="groupClass.name">
+                  <VaCollapse v-for="(groupClass, index) in accessPaperGroups" :key="index" :header="groupClass.name">
                     <template #content>
                       <div
                         v-if="paperDetail?.shareType === AccessType.ByClass"
                         class="grid md:grid-cols-6 sm:grid-cols-4 gap-2"
                       >
                         <VaButton
-                          v-for="classroom in groupClass.classes.filter((classroom: Classrooms) =>
-                            paperDetail?.paperAccesses?.some((x: PaperAccess) => x.classId == classroom.id),
-                          )"
+                          v-for="classroom in groupClass.classes"
                           :key="classroom.id"
                           preset="secondary"
                           size="small"
@@ -523,11 +481,7 @@ onMounted(async () => {
                         class="grid md:grid-cols-6 sm:grid-cols-4 gap-2"
                       >
                         <VaButton
-                          v-for="classroom in groupClass.classes.filter((classroom: Classrooms) =>
-                            classroom.students.some((s) =>
-                              paperDetail?.paperAccesses?.some((x: PaperAccess) => x.userId == s.id),
-                            ),
-                          )"
+                          v-for="classroom in groupClass.classes"
                           :key="classroom.id"
                           preset="secondary"
                           size="small"
@@ -546,12 +500,12 @@ onMounted(async () => {
             </VaCard>
           </VaModal>
           <VaDivider class="mb-0" />
-          <VaTabs v-model="valueClassInGroupTap">
+          <VaTabs v-model="valueClassInGroupTap" @update:modelValue="onTabChange">
             <template #tabs>
               <VaTab
-                v-for="classroom in classInSelectedGroup"
-                :key="classroom.name"
-                :name="classroom.name"
+                v-for="classroom in selectedGroupClass?.classes"
+                :key="classroom.id"
+                :name="classroom.id"
                 class="pr-2 pl-2"
               >
                 {{ classroom.name }}
@@ -569,7 +523,9 @@ onMounted(async () => {
           >
             <div class="p-2 flex justify-between">
               <div class="flex">
-                <VaAvatar size="small" class="mr-2"> Q </VaAvatar>
+                <VaAvatar size="small" class="mr-2">
+                  {{ submittedStudent.creatorName.charAt(0).toUpperCase() }}
+                </VaAvatar>
                 <div>
                   <p>
                     <b>{{ submittedStudent.creatorName }}</b>
@@ -582,9 +538,9 @@ onMounted(async () => {
                   square
                   size="small"
                   :color="
-                    submittedStudent.status === 'doing'
+                    submittedStudent.status === 'Doing'
                       ? 'warning'
-                      : submittedStudent.status === 'end'
+                      : submittedStudent.status === 'End'
                         ? 'success'
                         : 'secondary'
                   "
@@ -598,17 +554,26 @@ onMounted(async () => {
                 <div class="flex justify-between">
                   <p class="va-text-secondary text-xs">Duration:</p>
                   <p class="va-text-secondary text-xs">
-                    {{ format.formatTimeToX(new Date(submittedStudent.endTime), new Date(submittedStudent.startTime)) }}
+                    {{
+                      format.formatTimeDifference(
+                        new Date(submittedStudent.startTime),
+                        new Date(submittedStudent.endTime),
+                      )
+                    }}
                   </p>
                 </div>
                 <div class="flex justify-between">
-                  <p class="va-text-secondary text-xs">Due Date:</p>
+                  <p class="va-text-secondary text-xs">Start:</p>
+                  <p class="va-text-secondary text-xs">{{ format.formatDate(new Date(submittedStudent.startTime)) }}</p>
+                </div>
+                <div class="flex justify-between">
+                  <p class="va-text-secondary text-xs">Finish:</p>
                   <p class="va-text-secondary text-xs">{{ format.formatDate(new Date(submittedStudent.endTime)) }}</p>
                 </div>
               </template>
-              <template v-if="submittedStudent.endTime === null">
+              <template v-if="submittedStudent.endTime === null && submittedStudent.endTime === undefined">
                 <div class="flex justify-between">
-                  <p class="va-text-secondary text-xs">Start time:</p>
+                  <p class="va-text-secondary text-xs">Start:</p>
                   <p class="va-text-secondary text-xs">{{ format.formatDate(new Date(submittedStudent.startTime)) }}</p>
                 </div>
               </template>

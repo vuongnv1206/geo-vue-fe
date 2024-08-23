@@ -20,7 +20,7 @@ import AssignmentTable from '@pages/assignment/widgets/AssignmentTable.vue'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
-import { Classrooms, ClassroomWithSubmissionStats } from '../classrooms/types'
+import { Classrooms, ClassroomWithStats } from '../classrooms/types'
 import { useI18n } from 'vue-i18n'
 import { SubmissionStats } from './types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
@@ -45,7 +45,7 @@ const dataFilter = ref({
   orderBy: ['id'],
 })
 
-const mergeAssignmentByClass = ref<ClassroomWithSubmissionStats[]>([])
+const mergeAssignmentByClass = ref<ClassroomWithStats[]>([])
 
 const getAssignmentByClass = () => {
   loading.value = true
@@ -60,12 +60,11 @@ const getAssignmentByClass = () => {
             .then((response) => {
               const submissionStats: SubmissionStats = {
                 totalSubmitted: response.filter((submission: any) => submission.status === 'Submitted').length,
+                totalMarked: response.filter((submission: any) => submission.status === 'Marked').length,
                 totalStudents: response.length,
               }
-
-              // Sau khi có submissionsStats, gộp dữ liệu với assignment
               mergeData(class1, assignment, submissionStats)
-              console.log('merge: ', mergeAssignmentByClass.value)
+              // console.log('merge: ', mergeAssignmentByClass.value)
             })
             .catch((error) => {
               notify({

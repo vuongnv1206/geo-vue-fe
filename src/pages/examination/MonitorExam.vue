@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { PaperDto, AccessType, StudentMonitorResponse } from './types'
-import { format } from '@/services/utils'
+import { PaperDto, AccessType, StudentMonitorResponse, StudentMonitor } from './types'
+import { format, getErrorMessage } from '@/services/utils'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { useToast } from 'vuestic-ui'
 import { GroupClass } from '../classrooms/types'
 import { useGroupClassStore } from '@/stores/modules/groupclass.module'
 import { useExamMonitorStore } from '@/stores/modules/examMonitor.module'
 import MonitorExamTable from './widgets/MonitorExamTable.vue'
+import ReassignExamModal from './widgets/ReassignExamModal.vue'
+import SupendStudentExamModal from './widgets/SupendStudentExamModal.vue'
+import ViewLogExamModal from './widgets/ViewLogExamModal.vue'
 
 const route = useRoute()
 const { init: notify } = useToast()
@@ -69,6 +72,8 @@ const getGroupClasses = async () => {
 
 const StudentMonitorRes = ref<StudentMonitorResponse | null>(null)
 
+const connectedStudentMonitor = ref(false)
+
 const getStudentMonitor = async () => {
   try {
     const payload = {
@@ -76,8 +81,9 @@ const getStudentMonitor = async () => {
     }
     const res = await examMonitorStore.getExamMonitor(payload)
     StudentMonitorRes.value = res
+    connectedStudentMonitor.value = true
   } catch (error) {
-    console.error(error)
+    connectedStudentMonitor.value = false
   }
 }
 
@@ -99,8 +105,99 @@ watch(
 getStudentMonitor()
 getPaperDetail()
 
+// auto refresh every 3s
+setInterval(() => {
+  getStudentMonitor()
+}, 6000)
+
 const dblclick = (studentMonitor: any) => {
   console.log('dblclick', studentMonitor)
+}
+
+const showReassignModal = (studentMonitor: StudentMonitor | null) => {
+  // if status is doing, can reassign else not
+  if (studentMonitor?.completionStatus !== 1 && studentMonitor !== null) {
+    notify({
+      message: `Student is not doing exam, can not reassign`,
+      color: 'warning',
+    })
+    return
+  }
+  dataModal.value = studentMonitor
+  doShowReassignModal.value = true
+}
+
+const reassign = (reassignExamRequest: any) => {
+  console.log(reassignExamRequest)
+  try {
+    examMonitorStore
+      .reassign(reassignExamRequest)
+      .then(() => {
+        notify({
+          message: `Reassign exam success`,
+          color: 'success',
+        })
+      })
+      .catch((error) => {
+        const message = getErrorMessage(error)
+        notify({
+          message: `Reassign exam failed: ${message}`,
+          color: 'danger',
+        })
+      })
+  } catch (error) {
+    const message = getErrorMessage(error)
+    notify({
+      message: `Reassign exam failed: ${message}`,
+      color: 'danger',
+    })
+  }
+}
+
+const doShowReassignModal = ref(false)
+const dataModal = ref<StudentMonitor | null>(null)
+
+const doShowSupendStudentModal = ref(false)
+const dataModalSupend = ref<StudentMonitor | null>(null)
+
+const showSupendStudentModal = (studentMonitor: StudentMonitor | null) => {
+  dataModalSupend.value = studentMonitor
+  doShowSupendStudentModal.value = true
+}
+
+const suspendStudent = (suspendStudentRequest: any) => {
+  console.log(suspendStudentRequest)
+  try {
+    examMonitorStore
+      .suspend(suspendStudentRequest)
+      .then(() => {
+        notify({
+          message: `Suspend student success`,
+          color: 'success',
+        })
+      })
+      .catch((error) => {
+        const message = getErrorMessage(error)
+        notify({
+          message: `Suspend student failed: ${message}`,
+          color: 'danger',
+        })
+      })
+  } catch (error) {
+    const message = getErrorMessage(error)
+    notify({
+      message: `Suspend student failed: ${message}`,
+      color: 'danger',
+    })
+  }
+}
+
+const doShowViewLogModal = ref(false)
+const dataModalViewLog = ref<StudentMonitor | null>(null)
+
+const showViewLogModal = (studentMonitor: StudentMonitor | null) => {
+  dataModalViewLog.value = studentMonitor
+  doShowViewLogModal.value = true
 }
 </script>
 
@@ -149,8 +246,10 @@ const dblclick = (studentMonitor: any) => {
             <VaCardTitle>Menu</VaCardTitle>
             <VaCardContent>
               <VaMenuList class="w-full">
-                <VaMenuItem> <VaIcon name="assignment_add" class="material-symbols-outlined" /> Reassign</VaMenuItem>
-                <VaMenuItem class="va-text-danger">
+                <VaMenuItem @click="showReassignModal(null)">
+                  <VaIcon name="assignment_add" class="material-symbols-outlined" /> Reassign</VaMenuItem
+                >
+                <VaMenuItem class="va-text-danger" @click="showSupendStudentModal(null)">
                   <VaIcon name="report" class="material-symbols-outlined" />
                   Supend student
                 </VaMenuItem>
@@ -169,19 +268,89 @@ const dblclick = (studentMonitor: any) => {
           class="p-0"
         >
           <VaCardTitle>List of students</VaCardTitle>
+          <VaCardTitle v-if="connectedStudentMonitor === false" class="text-center text-danger">
+            <VaSpinner />
+            Connecting to server...
+          </VaCardTitle>
           <VaDivider class="mb-0" />
         </VaCardContent>
         <VaCardContent class="p-2 mt-3">
           <MonitorExamTable
             v-if="paperDetail?.shareType === AccessType.ByClass || paperDetail?.shareType === AccessType.ByStudent"
             :student-monitors="StudentMonitorRes?.data || []"
-            :loading="StudentMonitorRes === null"
+            :loading="StudentMonitorRes === null || connectedStudentMonitor === false"
             @dblclick="dblclick"
+            @reassign="showReassignModal"
+            @suspend="showSupendStudentModal"
+            @viewLogs="showViewLogModal"
           />
         </VaCardContent>
       </VaCard>
     </template>
   </VaLayout>
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowReassignModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    stateful
+    hide-default-actions
+  >
+    <ReassignExamModal
+      v-if="doShowReassignModal"
+      :student-monitor="dataModal"
+      :paper-id="paperId"
+      @close="cancel"
+      @reassign="
+        (reassignExamRequest) => {
+          reassign(reassignExamRequest)
+          ok()
+        }
+      "
+    />
+  </VaModal>
+  <VaModal
+    v-slot="{ cancel, ok }"
+    v-model="doShowSupendStudentModal"
+    size="small"
+    mobile-fullscreen
+    close-button
+    stateful
+    hide-default-actions
+  >
+    <SupendStudentExamModal
+      v-if="doShowSupendStudentModal"
+      :student-monitor="dataModalSupend"
+      :paper-id="paperId"
+      @close="cancel"
+      @supend="
+        (suspendStudentRequest) => {
+          suspendStudent(suspendStudentRequest)
+          ok()
+        }
+      "
+    />
+  </VaModal>
+
+  <VaModal
+    v-slot="{ cancel }"
+    v-model="doShowViewLogModal"
+    size="large"
+    mobile-fullscreen
+    close-button
+    stateful
+    hide-default-actions
+  >
+    <ViewLogExamModal
+      v-if="doShowViewLogModal"
+      :student-monitor="dataModalViewLog"
+      :paper-id="paperId"
+      @close="cancel"
+      @showReassign="showReassignModal"
+      @showSupend="showSupendStudentModal"
+    />
+  </VaModal>
 </template>
 
 <style scoped>

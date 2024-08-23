@@ -190,15 +190,13 @@ const confirmPublish = async () => {
   })
 
   if (confirmed) {
-    saveDraffPaper(true)
+    saveDraffPaper(StatusPaper.publish)
   }
 }
 
-const saveDraffPaper = (isPublish: boolean) => {
-  if (isPublish) {
-    editPaper.value.isPublish = isPublish
-    editPaper.value.status = StatusPaper.publish
-  }
+const saveDraffPaper = (status: StatusPaper) => {
+  editPaper.value.status = status
+
   const accessPaperSet = ref<PaperAccess[] | null>(null)
 
   if (valueOption.value === AccessType.ByClass) {
@@ -550,7 +548,7 @@ const form = useForm('paperConfigForm')
           size="small"
           class="p-1 pr-2 pl-2 mr-1"
           :disabled="!form.validate()"
-          @click="saveDraffPaper(false)"
+          @click="saveDraffPaper(StatusPaper.unpublish)"
           >Save draft
         </VaButton>
         <VaButton size="small" class="p-1 pr-2 pl-2 ml-1" :disabled="!form.validate()" @click="confirmPublish"

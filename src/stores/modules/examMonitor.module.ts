@@ -14,5 +14,32 @@ export const useExamMonitorStore = defineStore('examMonitor', {
           return Promise.reject(error)
         })
     },
+    async reassign(data: any): Promise<any> {
+      return ExamMonitorService.reassign(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async suspend(data: any): Promise<any> {
+      return ExamMonitorService.suspend(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getExamMonitorDetail(data: any): Promise<any> {
+      return ExamMonitorService.getExamMonitorDetail(data)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })

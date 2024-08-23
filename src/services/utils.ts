@@ -58,6 +58,9 @@ export const format = {
   formatDateStr: (date: string) => {
     return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm')
   },
+  formatDateStrSec: (date: string) => {
+    return dayjs(date).tz(currentTimezone).format('DD/MM/YYYY - HH:mm:ss')
+  },
   formatDateFromNow: (date: Date) => {
     return dayjs(date).tz(currentTimezone).fromNow()
   },
@@ -110,6 +113,21 @@ export const format = {
     const seconds = duration.seconds()
     return `${minutes}m ${seconds}s`
   },
+  formatTimeDifference: (fromTime: Date, toTime: Date) => {
+    // Tính toán sự khác biệt về thời gian tính bằng milliseconds
+    const timeDifference = toTime.getTime() - fromTime.getTime()
+
+    // Chuyển đổi từ milliseconds sang phút và giây
+    const minutesDifference = timeDifference / 60000
+    const secondsDifference = timeDifference / 1000
+
+    if (minutesDifference >= 1) {
+      return `${Math.floor(minutesDifference)} minute(s)`
+    } else {
+      // Ngược lại hiển thị số giây
+      return `${Math.floor(secondsDifference)} seconds`
+    }
+  },
 }
 
 export const notifications = {
@@ -147,14 +165,18 @@ export const notifications = {
 
 export const getErrorMessage = (error: any) => {
   console.log(error)
-  if (error.response) {
-    if (error.response.data.messages.length > 0) {
-      return error.response.data.messages.join(', ')
+  try {
+    if (error.response) {
+      if (error.response.data.messages.length > 0) {
+        return error.response.data.messages.join(', ')
+      } else {
+        return error.response.data.exception
+      }
     } else {
-      return error.response.data.exception
+      return error.message
     }
-  } else {
-    return error.message
+  } catch {
+    return "Can't get error message"
   }
 }
 

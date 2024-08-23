@@ -286,13 +286,13 @@ const copyLinkInvite = () => {
     .writeText(inviteLink)
     .then(() => {
       notify({
-        message: 'Copy successfully',
+        message: 'Copy join team link successfully',
         color: 'success',
       })
     })
     .catch((error) => {
       notify({
-        message: `Failed to copy. ${error}`,
+        message: `Failed to copy link. ${error}`,
         color: 'danger',
       })
     })

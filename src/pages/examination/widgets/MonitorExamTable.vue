@@ -38,6 +38,7 @@
             >
               <div>{{ format.formatDate(rowData.submitPaper.startTime) }}</div>
             </VaPopover>
+            <div v-else>-</div>
           </template>
 
           <template #cell(endTime)="{ rowData }">
@@ -48,28 +49,36 @@
             >
               <div>{{ format.formatDate(rowData.submitPaper.endTime) }}</div>
             </VaPopover>
+            <div v-else>-</div>
           </template>
 
           <template #cell(submitPaper.endTime)="{ rowData }">
             <div v-if="rowData.submitPaper?.endTime">
               {{ format.formatDurationToSeconds(rowData.submitPaper.startTime, rowData.submitPaper.endTime) }}
             </div>
+            <div v-else>-</div>
           </template>
 
           <template #cell(completionStatus)="{ rowData }">
             <VaBadge v-if="rowData.completionStatus === 2" color="success" text="Completed" />
             <VaBadge v-else-if="rowData.completionStatus === 1" color="warning" text="Doing" />
-            <VaBadge v-else-if="rowData.completionStatus === 0" color="danger" text="Not started" />
+            <VaBadge v-else-if="rowData.completionStatus === 0" color="secondary" text="Not started" />
+            <VaBadge v-else-if="rowData.completionStatus === 3" color="danger" text="Supended" />
           </template>
 
           <template #cell(submitPaper.totalMark)="{ rowData }">
-            <div v-if="rowData.completionStatus === 2">{{ rowData.submitPaper.totalMark }}</div>
+            <div v-if="rowData.completionStatus === 2">
+              {{ (rowData.submitPaper.totalMark / rowData.paper.maxPoint) * 10 }}
+            </div>
             <div v-else>-</div>
           </template>
 
           <template #cell(isSuspicious)="{ rowData }">
             <VaBadge v-if="rowData.isSuspicious" color="danger" text="Suspicious" />
-            <VaBadge v-else color="success" text="Normal" />
+            <div v-else>
+              <VaBadge v-if="!rowData.isSuspicious && rowData.completionStatus != 0" color="success" text="Nomal" />
+              <VaBadge v-else color="secondary" text="Not started" />
+            </div>
           </template>
 
           <template #cell(actions)="{ rowData }">
