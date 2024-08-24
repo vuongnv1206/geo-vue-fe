@@ -206,11 +206,11 @@ export const QuestionTypeColor = (type: QuestionType | undefined) => {
     },
     {
       type: QuestionType.Matching,
-      color: '#262824',
+      color: '#secondary',
     },
     {
       type: QuestionType.Reading,
-      color: 'danger',
+      color: '#89e5ff',
     },
     {
       type: QuestionType.ReadingQuestionPassage,
