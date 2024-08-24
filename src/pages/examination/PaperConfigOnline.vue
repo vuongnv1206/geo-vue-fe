@@ -6,7 +6,7 @@ import {
   GetAccessPaperRequest,
   GroupClassAccessPaper,
   PaperDto,
-  // ShowQuestionAnswer,
+  ShowQuestionAnswer,
   ShowResult,
   StatusPaper,
 } from '@/pages/examination/types'
@@ -186,8 +186,7 @@ const getGroupClasses = async () => {
 const confirmPublish = async () => {
   const confirmed = await confirm({
     title: 'Confirm Publish',
-    message: `Are you sure you want to publish this exam? Once published, you will only be able to edit the start time, end time, and duration. 
-              Note: You can only make these changes up to 30 minutes before the exam starts.`,
+    message: `Are you sure you want to publish this exam?`,
     okText: 'Publish',
     cancelText: 'Cancel',
     size: 'small',
@@ -277,11 +276,11 @@ const showMarkResultOptions = computed(() => [
   { label: 'When submitted', value: ShowResult.WhenSubmitted },
   { label: 'When all students submitted or exam runs out', value: ShowResult.WhenAllStudentSubmitted },
 ])
-// const showQuestionAnswerOptions = computed(() => [
-//   { label: 'No', value: ShowQuestionAnswer.No },
-//   { label: 'When submitted', value: ShowQuestionAnswer.WhenSubmitted },
-//   //{ label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
-// ])
+const showQuestionAnswerOptions = computed(() => [
+  { label: 'No', value: ShowQuestionAnswer.No },
+  { label: 'When submitted', value: ShowQuestionAnswer.WhenSubmitted },
+  { label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
+])
 
 const backToPage = () => {
   router.push({ name: 'paper-config', params: { id: paperId } })
@@ -521,36 +520,36 @@ const form = useForm('paperConfigForm')
           </VaCardContent>
         </VaCard>
 
-        <VaCard class="mb-3">
-          <!-- <VaCardTitle> point an answers review </VaCardTitle> -->
-          <VaDivider class="m-0" />
-          <VaCardContent>
-            <div class="mb-2">
-              <span class="va-title">Show score</span>
-              <VaRadio
-                v-model="editPaper.showMarkResult"
-                :options="showMarkResultOptions"
-                :text-by="(op: any) => op.label"
-                :value-by="(op: any) => op.value"
-                type="radio"
-                class="assign-radio"
-                vertical
-              />
-            </div>
-            <!-- <div>
-              <span class="va-title">Show the exam and answers</span>
-              <VaRadio
-                v-model="editPaper.showQuestionAnswer"
-                :options="showQuestionAnswerOptions"
-                :text-by="(op: any) => op.label"
-                :value-by="(op: any) => op.value"
-                type="radio"
-                class="assign-radio"
-                vertical
-              />
-            </div> -->
-          </VaCardContent>
-        </VaCard>
+      <VaCard class="mb-3">
+        <!-- <VaCardTitle> point an answers review </VaCardTitle> -->
+        <VaDivider class="m-0" />
+        <VaCardContent>
+          <div class="mb-2">
+            <span class="va-title">Show score</span>
+            <VaRadio
+              v-model="editPaper.showMarkResult"
+              :options="showMarkResultOptions"
+              :text-by="(op: any) => op.label"
+              :value-by="(op: any) => op.value"
+              type="radio"
+              class="assign-radio"
+              vertical
+            />
+          </div>
+          <div>
+            <span class="va-title">Show the exam and answers</span>
+            <VaRadio
+              v-model="editPaper.showQuestionAnswer"
+              :options="showQuestionAnswerOptions"
+              :text-by="(op: any) => op.label"
+              :value-by="(op: any) => op.value"
+              type="radio"
+              class="assign-radio"
+              vertical
+            />
+          </div>
+        </VaCardContent>
+      </VaCard>
 
         <div class="flex justify-end">
           <VaButton
