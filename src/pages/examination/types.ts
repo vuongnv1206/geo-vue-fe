@@ -202,6 +202,7 @@ export interface PaperAccess {
 export enum AccessType {
   ByStudent = 1,
   ByClass = 2,
+  All = 0,
 }
 
 export interface GetLastResultExamRequest {
@@ -232,6 +233,7 @@ export interface SubmitPaperDetailDto {
   createdOn?: Date
   lastModifiedBy?: string
   lastModifiedOn?: Date | null
+  question: Question
 }
 
 export enum SubmitPaperStatus {
@@ -690,6 +692,7 @@ export type GetAccessPaperRequest = {
   pageSize?: number
   orderBy?: string[]
   paperId: string
+  status?: AccessType
 }
 
 export type GetAccessPaperResponse = {

@@ -17,7 +17,7 @@ import {
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
 import { avatarColor, format } from '@/services/utils'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import WhoAssignedPaperDetailModal from './widgets/WhoAssignedPaperDetailModal.vue'
 import { getErrorMessage } from '@/services/utils'
@@ -143,6 +143,7 @@ const handleSaveAssigned = async (shareType: AccessType, accessPaperList: PaperA
           color: 'success',
         })
         await getPaperDetail()
+        await getAccessPaperGroups()
       })
       .catch((error) => {
         notify({
@@ -254,18 +255,13 @@ const onTabChange = async (classId: string) => {
   await getSubmittedStudents(classId)
 }
 
-const statusSubmitOptions: any = [
-  { label: 'done', value: 1 },
-  { label: 'not yet', value: 2 },
-  { label: 'miss', value: 3 },
-]
+// const statusSubmitOptions: any = [
+//   { label: 'done', value: 1 },
+//   { label: 'not yet', value: 2 },
+//   { label: 'miss', value: 3 },
+// ]
 
-const statusSubmitValue = ref(1)
-
-onMounted(async () => {
-  await getPaperDetail()
-  await getAccessPaperGroups()
-})
+// const statusSubmitValue = ref(1)
 
 //Share paper
 const onPaperShare = () => {
@@ -503,10 +499,46 @@ const onSharePaperPermission = () => {
       })
     })
 }
+
+type PermissionType = 'canView' | 'canUpdate' | 'canShare'
+const checkPaperPermission = (permissionType: PermissionType) => {
+  if (currentUserId === paperDetail.value?.createdBy) {
+    return true
+  }
+
+  if (paperDetail.value?.paperPermissions) {
+    // Check individual teacher permission
+    const individualPermission = paperDetail.value.paperPermissions.some(
+      (permission) => permission.userId === currentUserId && permission[permissionType],
+    )
+
+    // Check group teacher permission
+    const groupPermission = paperDetail.value.paperPermissions.some(
+      (permission) =>
+        permission.groupTeacherId !== null &&
+        permission.groupTeacher?.teacherTeams?.some(
+          (teacher) => teacher.teacherId === currentUserId && permission[permissionType],
+        ),
+    )
+
+    return individualPermission || groupPermission
+  }
+
+  return false
+}
+
+const canViewGuest = computed(() => checkPaperPermission('canView'))
+const canEditGuest = computed(() => checkPaperPermission('canUpdate'))
+const canShareGuest = computed(() => checkPaperPermission('canShare'))
+
+onMounted(async () => {
+  await getPaperDetail()
+  await getAccessPaperGroups()
+})
 </script>
 
 <template>
-  <VaLayout style="height: 500px">
+  <VaLayout v-if="canViewGuest" style="height: 500px">
     <template #top>
       <VaNavbar class="py-2">
         <template #left>
@@ -552,10 +584,10 @@ const onSharePaperPermission = () => {
             <VaCardTitle>Menu</VaCardTitle>
             <VaCardContent>
               <VaMenuList class="w-full">
-                <VaMenuItem @click="paperConfigAction">
+                <VaMenuItem :disabled="!canEditGuest" @click="paperConfigAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Setting
                 </VaMenuItem>
-                <VaMenuItem @click="onPaperShare()">
+                <VaMenuItem :disabled="!canShareGuest" @click="onPaperShare()">
                   <VaIcon name="share" class="material-symbols-outlined" /> Share
                 </VaMenuItem>
                 <VaMenuItem @click="statisticExam">
@@ -564,7 +596,11 @@ const onSharePaperPermission = () => {
                 <VaMenuItem @click="examMonitorAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Advanced monitoring
                 </VaMenuItem>
-                <VaMenuItem class="va-text-danger" @click="deletePaper">
+                <VaMenuItem
+                  class="va-text-danger"
+                  :disabled="currentUserId != paperDetail?.createdBy"
+                  @click="deletePaper"
+                >
                   <VaIcon name="delete" class="material-symbols-outlined" />
                   Delete
                 </VaMenuItem>
@@ -585,7 +621,7 @@ const onSharePaperPermission = () => {
               </VaButton>
               <div>
                 <VaButton
-                  v-if="currentUserId === paperDetail?.createdBy"
+                  v-if="canEditGuest || canShareGuest"
                   preset="secondary"
                   size="small"
                   @click="showAssignPaperModal = !showAssignPaperModal"
@@ -640,7 +676,7 @@ const onSharePaperPermission = () => {
               <span> Content</span>
               <div>
                 <VaButton
-                  v-if="currentUserId === paperDetail?.createdBy"
+                  v-if="canEditGuest || canShareGuest"
                   preset="secondary"
                   size="small"
                   @click="navigateToManageQuestions"
@@ -688,13 +724,6 @@ const onSharePaperPermission = () => {
             <VaButton size="small" @click="showSelectClassModal = !showSelectClassModal"
               >Select class group: {{ selectedGroupClassName }}
             </VaButton>
-            <VaSelect
-              v-model="statusSubmitValue"
-              :options="statusSubmitOptions"
-              text-by="label"
-              value-by="value"
-              class="max-w-[120px]"
-            />
           </VaCardTitle>
           <VaModal v-model="showSelectClassModal" size="large" hide-default-actions>
             <VaCard outlined>
