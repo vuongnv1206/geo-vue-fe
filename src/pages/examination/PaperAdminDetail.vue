@@ -13,6 +13,7 @@ import {
   GroupClassAccessPaper,
   PaperPermission,
   SharePaperRequest,
+  GetGetAssigneesInPaperRequest,
 } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
@@ -183,15 +184,46 @@ const getSubmittedStudents = async (classId?: string) => {
   }
 }
 
-const navigateToExamReview = (paperId: string, userId: string, submitPaperId: string) => {
-  router.push({
-    name: 'exam-review',
-    params: {
-      paperId,
-      userId,
-      submitPaperId,
-    },
-  })
+const getAssigneesInPaperRequest = ref<GetGetAssigneesInPaperRequest>({
+  paperId: paperId,
+})
+
+const totalAssigneesInPaper = ref(0)
+
+const getAssigneesTakeExam = async (classId?: string) => {
+  try {
+    if (classId) {
+      getAssigneesInPaperRequest.value.classId = classId
+    }
+
+    const res = await paperStore.getAssigneesInPaper(getAssigneesInPaperRequest.value)
+    totalAssigneesInPaper.value = res.data.reduce((total, item) => {
+      return total + item.userClasses.length
+    }, 0)
+  } catch (error) {
+    notify({
+      message: `Failed to get assignee`,
+      color: 'danger',
+    })
+  }
+}
+
+const navigateToExamReview = (paperId: string, userId: string, submitPaperId: string, status: string) => {
+  if (status === 'End') {
+    router.push({
+      name: 'exam-review',
+      params: {
+        paperId,
+        userId,
+        submitPaperId,
+      },
+    })
+  } else {
+    notify({
+      message: "Student haven't finished the test",
+      color: 'warning',
+    })
+  }
 }
 const navigateToManageQuestions = () => {
   router.push({ name: 'manage-questions', params: { paperId: paperId } })
@@ -216,6 +248,7 @@ const selectClassInGroup = async (classId: string) => {
     await onTabChange(classId)
 
     await getSubmittedStudents(classId)
+    await getAssigneesTakeExam(classId)
   } catch (error) {
     console.error(error)
   }
@@ -714,7 +747,9 @@ onMounted(async () => {
     </template>
 
     <template #content>
-      <VaCardTitle>Student submit ({{ submittedStudents?.data.length || 0 }}/0)</VaCardTitle>
+      <VaCardTitle
+        >Student submit ({{ submittedStudents?.data.length || 0 }}/ {{ totalAssigneesInPaper || 0 }})</VaCardTitle
+      >
       <VaCard class="mt-2 ml-2" style="height: 60vh">
         <VaCardContent
           v-if="paperDetail?.shareType === AccessType.ByClass || paperDetail?.shareType === AccessType.ByStudent"
@@ -792,7 +827,14 @@ onMounted(async () => {
             :key="submittedStudent.id"
             outlined
             class="mr-2 cursor-pointer"
-            @click="navigateToExamReview(submittedStudent.paperId, submittedStudent.createdBy, submittedStudent.id)"
+            @click="
+              navigateToExamReview(
+                submittedStudent.paperId,
+                submittedStudent.createdBy,
+                submittedStudent.id,
+                submittedStudent.status,
+              )
+            "
           >
             <div class="p-2 flex justify-between">
               <div class="flex">
