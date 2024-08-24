@@ -692,6 +692,10 @@ const onSharePaperFolderPermission = () => {
       </VaCard>
     </VaCard>
 
+    <VaCard class="flex justify-between items-center flex-grow">
+      <VaBadge text="My Documents" color="primary" />
+    </VaCard>
+
     <VaCard class="flex justify-end items-center">
       <VaCard class="flex gap-2">
         <VaButton v-if="selectedItems.length > 0" icon="delete" color="danger" @click="onDeleteSelectedItems">
