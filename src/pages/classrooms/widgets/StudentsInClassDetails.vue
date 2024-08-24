@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, PropType, ref } from 'vue'
-import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
+import { defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
 import { ClassPermission, Classrooms, EmptyStudent, FailedStudentImport, Student } from '../types'
 import { notifications, getErrorMessage, format } from '@/services/utils'
 import { useStudentStore } from '@/stores/modules/student.module'
@@ -43,8 +43,8 @@ const createNewStudent = () => {
   doShowStudentFormModal.value = true
 }
 
-const editStudent = (rowData: DataTableItem) => {
-  studentToEdit.value = rowData as Student
+const editStudent = (student: Student) => {
+  studentToEdit.value = student as Student
   doShowStudentFormModal.value = true
 }
 
@@ -67,19 +67,19 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   }
 }
 
-const deleteStudent = (rowData: DataTableItem) => {
+const deleteStudent = (student: Student) => {
   studentStore
-    .deleteStudent(rowData.id)
+    .deleteStudent(student.id)
     .then(() => {
       notify({
-        message: notifications.deleteSuccessfully(rowData.firstName + ' ' + rowData.lastName),
+        message: notifications.deleteSuccessfully(student.firstName + ' ' + student.lastName),
         color: 'success',
       })
       emit('load')
     })
     .catch((error) => {
       notify({
-        message: notifications.deleteFailed(rowData.firstName + ' ' + rowData.lastName) + getErrorMessage(error),
+        message: notifications.deleteFailed(student.firstName + ' ' + student.lastName) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -271,7 +271,7 @@ const canStudentManage = computed(() => {
             <div>{{ format.formatDate(rowData.dateOfBirth) }}</div>
           </div>
         </template>
-        <template #cell(actions)="{ rowData }">
+        <template #cell(actions)="{ rowData: student }">
           <div v-if="canStudentManage" class="flex gap-2 justify-end">
             <VaButton
               preset="primary"
@@ -279,7 +279,7 @@ const canStudentManage = computed(() => {
               color="primary"
               icon="mso-edit"
               :aria-label="t('settings.edit')"
-              @click="editStudent(rowData)"
+              @click="editStudent(student as Student)"
             />
             <VaButton
               preset="primary"
@@ -287,7 +287,7 @@ const canStudentManage = computed(() => {
               icon="mso-delete"
               color="danger"
               :aria-label="t('settings.delete')"
-              @click="deleteStudentWithConfirm(rowData)"
+              @click="deleteStudentWithConfirm(student as Student)"
             />
           </div>
         </template>
