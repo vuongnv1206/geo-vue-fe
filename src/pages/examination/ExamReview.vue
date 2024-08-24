@@ -111,6 +111,10 @@ const groupQuestionsByType = (questions: Question[]) => {
 const filterGroupQuestionType = () => {
   console.log(valueTab.value)
 }
+
+const roundToTwoDecimal = (num: number | undefined) => {
+  return Math.round((num ?? 0) * 100) / 100
+}
 </script>
 
 <template>
@@ -134,7 +138,9 @@ const filterGroupQuestionType = () => {
             <VaCardActions align="stretch" vertical>
               <VaListItem>
                 <p>
-                  <b>{{ t('papers.point') }}:</b> {{ result?.totalMark }}/{{ maxPointInPaper }}
+                  <b>{{ t('papers.point') }}:</b> {{ roundToTwoDecimal(result?.totalMark) }}/{{
+                    roundToTwoDecimal(maxPointInPaper)
+                  }}
                 </p>
               </VaListItem>
               <VaListItem>
