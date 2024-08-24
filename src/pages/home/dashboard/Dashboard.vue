@@ -251,13 +251,14 @@
           <div>
             <!-- Header Section -->
             <VaCard class="flex flex-row items-center p-4 bg-white rounded-lg shadow-sm">
-              <GeoAvatar
-                class="mr-2"
-                :size="48"
-                color="warning"
-                :image="class1.owner?.imageUrl || undefined"
-                :txt="class1.owner?.firstName.charAt(0).toUpperCase()"
-              />
+              <div>
+                <VaAvatar
+                  :src="getSrcAvatar(class1.owner?.imageUrl)"
+                  class="w-14 h-14 font-bold mr-2"
+                  :fallback-text="class1.owner?.firstName.charAt(0)?.toUpperCase()"
+                  :color="avatarColor(class1.owner?.firstName)"
+                />
+              </div>
               <VaCard :to="{ name: 'class-details', params: { id: class1.id } }">
                 <VaCardContent class="text-md font-bold text-gray-800">
                   {{ class1.owner?.firstName }} {{ class1.owner?.lastName }}
@@ -345,14 +346,14 @@ import { useI18n } from 'vue-i18n'
 import { defineVaDataTableColumns, useToast, VaCardTitle } from 'vuestic-ui'
 import { useClassStore } from '@/stores/modules/class.module'
 import { ClassroomWithPosts } from '@/pages/classrooms/types'
-import { format, getErrorMessage, notifications } from '@/services/utils'
+import { avatarColor, format, getErrorMessage, notifications } from '@/services/utils'
 import { usePostsStore } from '@/stores/modules/posts.module'
-import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import { PaperStudents, PaperStudentsHistory, ShowMarkResult } from '@/pages/examination/types'
 import { usePaperStudentsStore } from '@/stores/modules/paperStudents.module'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { getSrcAvatar } from '@/pages/audit-logs/helper'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
