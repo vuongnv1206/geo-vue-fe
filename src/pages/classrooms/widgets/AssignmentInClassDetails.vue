@@ -10,7 +10,7 @@
       </VaCard>
       <VaMenu v-if="isTeacher" class="justify-end" :options="options" @selected="selectedOption">
         <template #anchor>
-          <VaButton :disabled="!canAssignmentManage">
+          <VaButton v-if="canAssignmentManage">
             <VaIcon name="add" />
             {{ t('assignments.assignment') }}
           </VaButton>
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref, computed, PropType, watch } from 'vue'
 import { format } from '@/services/utils'
-import { Classrooms } from '../types'
+import { ClassPermission, Classrooms } from '../types'
 import AccordionOfAssignment from './AccordionOfAssignment.vue'
 import router from '@/router'
 import { useI18n } from 'vue-i18n'
@@ -46,7 +46,9 @@ const canAssignmentManage = computed(() => {
   if (props.classDetails.permissions === null || props.classDetails.permissions === undefined) {
     return true
   }
-  return props.classDetails.permissions?.some((permission) => permission.permissionType === 1)
+  return props.classDetails.permissions?.some(
+    (permission) => permission.permissionType === ClassPermission.AssignAssignment,
+  )
 })
 
 const forceUpdate = ref(0)
