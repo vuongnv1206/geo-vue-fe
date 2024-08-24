@@ -223,6 +223,15 @@
               </div>
             </div>
           </template>
+          <template #cell(action)="{ row }">
+            <div v-if="row.source.canViewDetailAnswer" class="flex gap-2 justify-center">
+              <VaButton
+                preset="secondary"
+                icon="visibility"
+                @click="viewDetailAnswerResult(row.source.id, row.source.paperId)"
+              />
+            </div>
+          </template>
         </VaDataTable>
       </VaCard>
       <VaCardTitle>{{ t('papers.class_list') }}</VaCardTitle>
@@ -337,6 +346,7 @@ import { usePaperStudentsStore } from '@/stores/modules/paperStudents.module'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { useRouter } from 'vue-router'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -367,6 +377,7 @@ const columns = defineVaDataTableColumns([
   { label: t('papers.started_time'), key: 'startedTime', sortable: true },
   { label: t('papers.submitted_time'), key: 'submittedTime', sortable: true },
   { label: t('papers.score'), key: 'score', sortable: true },
+  { label: ' ', key: 'action' },
 ])
 
 const paperStudent = ref<any[]>([])
@@ -495,6 +506,19 @@ const getStatusClass = (status: number) => {
   } else {
     return ''
   }
+}
+const router = useRouter()
+const currentUserId = authStore.user?.id
+
+const viewDetailAnswerResult = (submitId: string, paperId: string) => {
+  router.push({
+    name: 'exam-student-review',
+    params: {
+      paperId: paperId,
+      userId: currentUserId,
+      submitPaperId: submitId,
+    },
+  })
 }
 
 onMounted(() => {

@@ -623,6 +623,7 @@ export type PaperStudentsResponse = {
 
 export type PaperStudentsHistory = {
   id: string
+  paperId: string
   examName: string
   duration: number
   paperLabelId: string

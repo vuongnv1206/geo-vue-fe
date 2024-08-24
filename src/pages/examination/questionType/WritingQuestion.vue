@@ -3,12 +3,13 @@ import { MarkAnswerRequest, SubmitPaperDetailDto } from '../types'
 import { Question } from '@/pages/question/types'
 import QuestionHeadView from '@pages/question/widgets/child/QuestionHeadView.vue'
 import QuestionFooterView from '@/pages/question/widgets/child/QuestionFooterView.vue'
-import { onBeforeMount, onMounted, ref } from 'vue'
+import { computed, onBeforeMount, onMounted, ref } from 'vue'
 import { validators } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
 import { useSubmitPaperStore } from '@/stores/modules/submitPaper.module'
 import { useToast } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
+import { useAuthStore } from '@/stores/modules/auth.module'
 const { init: notify } = useToast()
 const submitPaperStore = useSubmitPaperStore()
 
@@ -20,10 +21,10 @@ const props = defineProps<{
   index: number | null
   submitPaperId: string
 }>()
-
+const authStore = useAuthStore()
 const readMoreActivated = ref(false)
 const readMoreAnswerActivated = ref(false)
-
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 const getUserAnswer = (questionId: string | undefined) => {
   const ans = props.studentAnswers.find((detail) => detail.questionId === questionId)?.answerRaw || ''
   return ans
@@ -121,7 +122,7 @@ onMounted(() => {
         </button>
       </div>
     </div>
-    <div class="flex gap-2">
+    <div v-if="isTeacher" class="flex gap-2">
       <VaInput
         v-model="markQuestion"
         :rules="[validators.maxValue(props.question.mark ?? 0), validators.minValue(0), validators.isNumber]"
