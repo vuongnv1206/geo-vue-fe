@@ -3,7 +3,7 @@ import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useToast, VaCard, VaCardContent, VaCardTitle, VaDivider, VaForm } from 'vuestic-ui'
-import { Assignment, AssignmentSubmission, AssignmentSubmit } from '../types'
+import { AssignmentById, AssignmentSubmission, AssignmentSubmit } from '../types'
 import { onMounted, ref } from 'vue'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useFileStore } from '@/stores/modules/file.module'
@@ -21,7 +21,7 @@ const attachmentPaths = ref<string[]>([])
 const rawAttachmentPaths = ref<string[]>([])
 const filesUploaded = ref<any>()
 
-const assignment = ref<Assignment | null>(null)
+const assignment = ref<AssignmentById | null>(null)
 const assignmentSubmissions = ref<AssignmentSubmission[]>([])
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
@@ -56,7 +56,7 @@ const getAssignment = () => {
     })
     .catch((error) => {
       notify({
-        message: t('assignments.assignment') + getErrorMessage(error),
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -72,9 +72,7 @@ const getAssignmentSubmissions = () => {
     .then((response) => {
       assignmentSubmissions.value = response
       newAssignmentSubmit.value.answerRaw = assignmentSubmissions.value[0]?.answerRaw || ''
-
       const attachmentPaths = JSON.parse(assignmentSubmissions.value[0]?.attachmentPath || '[]')
-
       filesUploaded.value = attachmentPaths.map((path: string) => {
         return {
           name: path.split('/').pop(),
@@ -84,7 +82,7 @@ const getAssignmentSubmissions = () => {
     })
     .catch((error) => {
       notify({
-        message: t('assignments.assignment') + getErrorMessage(error),
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -99,11 +97,14 @@ const fileUpload = () => {
     .uploadFile(filesUploaded.value)
     .then((response) => {
       newAssignmentSubmit.value.attachmentPath = JSON.stringify(response)
-      // getAssignmentSubmissions()
+      notify({
+        message: notifications.uploadSuccess(),
+        color: 'success',
+      })
     })
     .catch((error) => {
       notify({
-        message: notifications.uploadFailed + getErrorMessage(error),
+        message: notifications.uploadFailed() + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -117,14 +118,16 @@ const onAssignmentSubmit = async () => {
     .submitAssignment(newAssignmentSubmit.value)
     .then(() => {
       notify({
-        message: t('assignments.assignment'),
+        message: notifications.submitSuccessfully(t('assignments.assignment') + ' ' + assignment.value?.name),
         color: 'success',
       })
       router.push({ name: 'assignments' })
     })
     .catch((error) => {
       notify({
-        message: t('assignments.assignment') + getErrorMessage(error),
+        message:
+          notifications.submitFailed(t('assignments.assignment') + ' ' + assignment.value?.name) +
+          getErrorMessage(error),
         color: 'error',
       })
     })
@@ -139,6 +142,9 @@ onMounted(() => {
 <template>
   <VaCard v-if="assignment">
     <VaCardTitle>{{ assignment.name }}</VaCardTitle>
+    <VaCardContent>
+      <span class="font-semibold mr-1">{{ $t('subjects.subject') }}: {{ assignment.subject.name }}</span>
+    </VaCardContent>
     <VaCardContent>
       <div class="flex items-center mb-1">
         <VaIcon name="event" class="material-symbols-outlined mr-1" />
@@ -207,7 +213,9 @@ onMounted(() => {
                 class="border-2 border-dashed border-gray-300 flex items-center justify-center w-full py-6"
                 @fileAdded="fileUpload"
               />
-              <VaButton class="mt-4" @click="onAssignmentSubmit">{{ $t('settings.submit') }}</VaButton>
+              <VaButton class="mt-4" @click="onAssignmentSubmit">
+                {{ $t('settings.submit') }}
+              </VaButton>
             </VaCardContent>
           </div>
           <div v-else class="text-center text-red-500 border-2 border-dashed rounded p-4 mx-3">

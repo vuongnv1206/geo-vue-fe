@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { useToast, VaCardContent, VaButton, VaIcon, VaCard } from 'vuestic-ui'
-import { AssignmentSub, AssignmentSubmission, MarkAssignment } from '../types'
+import { AssignmentClass, AssignmentSubmission, MarkAssignment } from '../types'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -19,7 +19,7 @@ const { init: notify } = useToast()
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
 const studentId = router.currentRoute.value.params.studentId.toString()
-const assignmentSub = ref<AssignmentSub>({
+const assignmentSub = ref<AssignmentClass>({
   assignmentId: assignmentId,
   classId: classId,
 })
@@ -51,12 +51,10 @@ const getAssignmentSubmissions = () => {
   assignmentStores
     .getAssignmentSubmissions(assignmentSub.value)
     .then((response) => {
-      // Lọc ngay khi nhận dữ liệu từ API
       const filteredSubmissions = response.filter(
         (ass: any) => ass.studentId === studentId && ass.assignmentId === assignmentId,
       )
 
-      // Kiểm tra và thay thế giá trị answerRaw
       filteredSubmissions.forEach((submission: any) => {
         if (submission.answerRaw === '<p><br></p>') {
           submission.answerRaw = ' '
@@ -96,14 +94,14 @@ const onMarkAssignmentSubmit = async () => {
     .markAssignment(newMarkAssignment.value)
     .then(() => {
       notify({
-        message: t('assignments.assignment'),
+        message: notifications.markSuccessfully(t('assignments.assignment')),
         color: 'success',
       })
       router.push({ name: 'assignment-details', params: { id: assignmentId, classId: classId } })
     })
     .catch((error) => {
       notify({
-        message: t('assignments.assignment') + getErrorMessage(error),
+        message: notifications.markFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -177,7 +175,7 @@ onMounted(() => {
               </div>
               <VaInput
                 v-model="newMarkAssignment.score"
-                class="w-24"
+                class="w-40"
                 :placeholder="$t('assignments.enter_score')"
                 :rules="[
                   validators.required2($t('assignments.score')),

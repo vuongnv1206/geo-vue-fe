@@ -852,7 +852,11 @@
     "uploadFileFailed": "Upload file failed",
     "greaterThanDate": "Start time must be greater than current time",
     "downloadFailed": "Download file failed",
-    "downloadSuccess": "Download file successfully"
+    "downloadSuccess": "Download file successfully",
+    "submitSuccessfully": "{message} submit successfully",
+    "submitFailed": "Failed to submit {message}",
+    "markSuccessfully": "{message} mark successfully",
+    "markFailed": "Failed to mark {message}"
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"

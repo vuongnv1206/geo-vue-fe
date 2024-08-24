@@ -1,3 +1,37 @@
+<template>
+  <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
+    <VaInput
+      v-model="newClass.name"
+      :label="t('classes.class_name')"
+      :placeholder="t('classes.enter_name')"
+      :rules="[validators.required2(t('classes.class_name')), validators.maxLength(50)]"
+    />
+    <VaInput
+      v-model="newClass.schoolYear"
+      :label="t('classes.school_year')"
+      :placeholder="t('classes.enter_school_year')"
+      :rules="[
+        validators.required2(t('classes.school_year')),
+        validators.isNumber(t('classes.school_year')),
+        validators.minValue(new Date().getFullYear()),
+        validators.maxValue(new Date().getFullYear() + 10),
+      ]"
+    />
+    <VaSelect
+      v-model="newClass.groupClassId"
+      value-by="value"
+      :options="groupClasses.map((gc) => ({ text: gc.name, value: gc.id }))"
+      :label="t('groupClasses.group_class_2')"
+      :placeholder="t('groupClasses.select_group_class')"
+      clearable
+    />
+    <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
+      <VaButton preset="secondary" color="secondary" @click="$emit('close')">{{ t('settings.cancel') }}</VaButton>
+      <VaButton @click="validate() && $emit('save', newClass as Classrooms)">{{ saveButtonLabel }}</VaButton>
+    </VaCard>
+  </VaForm>
+</template>
+
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue'
 import { ClassroomQueryType, Classrooms, EmptyClassrooms, GroupClass } from '@pages/classrooms/types'
@@ -91,37 +125,3 @@ onMounted(() => {
   getGroupClasses()
 })
 </script>
-
-<template>
-  <VaForm v-slot="{ validate }" class="flex flex-col gap-2">
-    <VaInput
-      v-model="newClass.name"
-      :label="t('classes.class_name')"
-      :placeholder="t('classes.enter_name')"
-      :rules="[validators.required2(t('classes.class_name')), validators.maxLength(50)]"
-    />
-    <VaInput
-      v-model="newClass.schoolYear"
-      :label="t('classes.school_year')"
-      :placeholder="t('classes.enter_school_year')"
-      :rules="[
-        validators.required2(t('classes.school_year')),
-        validators.isNumber(t('classes.school_year')),
-        validators.minValue(new Date().getFullYear()),
-        validators.maxValue(new Date().getFullYear() + 10),
-      ]"
-    />
-    <VaSelect
-      v-model="newClass.groupClassId"
-      value-by="value"
-      :options="groupClasses.map((gc) => ({ text: gc.name, value: gc.id }))"
-      :label="t('groupClasses.group_class_2')"
-      :placeholder="t('groupClasses.select_group_class')"
-      clearable
-    />
-    <VaCard class="flex justify-end flex-col-reverse sm:flex-row mt-4 gap-2">
-      <VaButton preset="secondary" color="secondary" @click="$emit('close')">{{ t('settings.cancel') }}</VaButton>
-      <VaButton @click="validate() && $emit('save', newClass as Classrooms)">{{ saveButtonLabel }}</VaButton>
-    </VaCard>
-  </VaForm>
-</template>
