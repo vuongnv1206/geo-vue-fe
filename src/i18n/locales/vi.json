@@ -850,7 +850,11 @@
     "uploadFileFailed": "Tải lên tệp thất bại",
     "greaterThanDate": "Thời gian bắt đầu phải lớn hơn thời gian hiện tại",
     "downloadSuccess": "Tải xuống tệp thành công",
-    "downloadFailed": "Tải xuống tệp thất bại"
+    "downloadFailed": "Tải xuống tệp thất bại",
+    "submitSuccessfully": "{message} nộp thành công",
+    "submitFailed": "Nộp {message} thất bại",
+    "markSuccessfully": "{message} chấm thành công",
+    "markFailed": "Chấm {message} thất bại"
   },
   "languageSwitcher": {
     "change_language_success": "Đổi ngôn ngữ thành công, một số trường hợp cần tải lại trang để cập nhật ngôn ngữ mới."

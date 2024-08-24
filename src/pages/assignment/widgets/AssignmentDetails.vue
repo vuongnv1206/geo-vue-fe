@@ -411,10 +411,14 @@ const fileUpload = async () => {
       }
       // console.log('Assignment Attachment:', assignmentAttachment.value)
       onAssignmentAttachment()
+      notify({
+        message: notifications.uploadSuccess(),
+        color: 'success',
+      })
     })
     .catch((error) => {
       notify({
-        message: notifications.uploadFailed + getErrorMessage(error),
+        message: notifications.uploadFailed() + getErrorMessage(error),
         color: 'error',
       })
     })
