@@ -664,6 +664,7 @@ onMounted(() => {
           <div class="geo-editor">
             <div class="flex justify-start p-1">
               <div class="w-full">
+                <div class="m-2">Select a template to add a question</div>
                 <Richer
                   v-if="!editMode"
                   :model-value="editorContent"

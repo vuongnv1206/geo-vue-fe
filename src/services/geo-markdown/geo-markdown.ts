@@ -508,12 +508,9 @@ export const MatchingGeoMarkdown2Objects = (text: string) => {
     for (let i = 0; i < correctMatchesArr.length; i++) {
       correctMatchesArr[i] = correctMatchesArr[i].trim()
     }
-    correctMatches = correctMatchesArr.join('|')
 
     const column1Items = column1.split('\n')
     const column2Items = column2.split('\n')
-
-    answers.push({ id: '', content: correctMatches, questionId: '', isCorrect: true })
 
     const columnA: Record<string, string> = {}
     for (let i = 0; i < column1Items.length; i++) {
@@ -534,6 +531,35 @@ export const MatchingGeoMarkdown2Objects = (text: string) => {
       }
     }
 
+    // Check correct matches
+    // Check valid correct matches
+    for (let i = 0; i < correctMatchesArr.length; i++) {
+      const match = correctMatchesArr[i].split('_')
+      const keyA = match[0]
+      const keyB = match[1]
+
+      // Check if keyA and keyB are valid
+      if (!columnA[keyA] || !columnB[keyB]) {
+        // remove invalid correct matches
+        correctMatchesArr.splice(i, 1)
+      }
+
+      // check if keyA matches more than one keyB
+      // or keyB matches more than one keyA
+      let count = 0
+      for (let j = 0; j < correctMatchesArr.length; j++) {
+        const match = correctMatchesArr[j].split('_')
+        if (keyA === match[0] || keyB === match[1]) {
+          count++
+        }
+      }
+      if (count > 1) {
+        correctMatchesArr.splice(i, 1)
+      }
+    }
+    correctMatches = correctMatchesArr.join('|')
+
+    answers.push({ id: '', content: correctMatches, questionId: '', isCorrect: true })
     const content = {
       Question: questionContentMatch ? questionContentMatch[2] || '' : '',
       ColumnA: columnA,
