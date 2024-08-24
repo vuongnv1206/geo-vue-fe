@@ -79,8 +79,7 @@
             :label="$t('subjects.subject')"
             :placeholder="$t('subjects.select_subject')"
             clearable
-            loading
-            :rules="[(v: any) => (Array.isArray(v) && v.length >= 1) || t('subjects.select_subject')]"
+            :rules="[validators.required]"
           />
           <VaLayout class="border rounded-xl pb-2 px-2">
             <template #left>

@@ -365,7 +365,8 @@
     "delete_all_success": "Xóa tất cả môn học thành công",
     "fail": "Thất bại",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
-    "select_subject": "Chọn một môn học"
+    "select_subject": "Chọn một môn học",
+    "subject_require":"Môn học là bắt buộc"
   },
   "groupClasses": {
     "group_class": "Nhóm lớp",

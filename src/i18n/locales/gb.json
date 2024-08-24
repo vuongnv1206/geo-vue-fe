@@ -364,7 +364,8 @@
     "edit_subject": "Edit Subject",
     "delete_all_success": "Successfully deleted all subjects",
     "range": "Items from {start} to {end} of total {total}",
-    "select_subject": "Select a Subject"
+    "select_subject": "Select a Subject",
+    "subject_require": "Subject is require"
   },
   "groupClasses": {
     "group_class": "Group Class",
