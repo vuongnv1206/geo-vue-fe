@@ -322,10 +322,14 @@ const fileUpload = async () => {
     .uploadFile(filesUploaded.value)
     .then((response) => {
       newAssignment.value.attachment = JSON.stringify(response)
+      notify({
+        message: notifications.uploadSuccess(),
+        color: 'success',
+      })
     })
     .catch((error) => {
       notify({
-        message: notifications.uploadFailed + getErrorMessage(error),
+        message: notifications.uploadFailed() + getErrorMessage(error),
         color: 'error',
       })
     })

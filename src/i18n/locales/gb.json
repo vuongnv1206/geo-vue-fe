@@ -556,8 +556,8 @@
     "password": "Password(optional)",
     "enter_password": "Enter password",
     "publish": "Publish",
-    "create_test": "Create Test/Exercise",
-    "create_test_from_matrix": "Create Test from Matrix",
+    "create_test": "Create Paper",
+    "create_test_from_matrix": "Create Paper from Matrix",
     "create_offline_test_manually": "Create Offline Test Manually",
     "create_offline_test_with_text": "Create Offline Test with Text",
     "content_1": "Use GEO's editor to create Exercises/Tests. Edit from available templates or Copy & Paste from various sources.",
@@ -852,7 +852,11 @@
     "uploadFileFailed": "Upload file failed",
     "greaterThanDate": "Start time must be greater than current time",
     "downloadFailed": "Download file failed",
-    "downloadSuccess": "Download file successfully"
+    "downloadSuccess": "Download file successfully",
+    "submitSuccessfully": "{message} submit successfully",
+    "submitFailed": "Failed to submit {message}",
+    "markSuccessfully": "{message} mark successfully",
+    "markFailed": "Failed to mark {message}"
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"

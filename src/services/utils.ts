@@ -159,6 +159,18 @@ export const notifications = {
   inviteSuccess: (message: string) => {
     return t('validateUtils.inviteSuccess', { message }) + '\n'
   },
+  submitSuccessfully: (message: string) => {
+    return t('validateUtils.submitSuccessfully', { message }) + '\n'
+  },
+  submitFailed: (message: string) => {
+    return t('validateUtils.submitFailed', { message }) + '\n'
+  },
+  markSuccessfully: (message: string) => {
+    return t('validateUtils.markSuccessfully', { message }) + '\n'
+  },
+  markFailed: (message: string) => {
+    return t('validateUtils.markFailed', { message }) + '\n'
+  },
   uploadSuccess: () => t('validateUtils.uploadFileSuccess') + '\n',
   uploadFailed: () => t('validateUtils.uploadFileFailed') + '\n',
   downloadSuccess: () => t('validateUtils.downloadSuccess') + '\n',

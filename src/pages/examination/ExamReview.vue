@@ -221,6 +221,10 @@ const handleMarkSuccess = async () => {
   questionTypesLabel.value = ['all']
   await getLastExamResult()
 }
+
+const roundToTwoDecimal = (num: number | undefined) => {
+  return Math.round((num ?? 0) * 100) / 100
+}
 </script>
 
 <template>
@@ -244,7 +248,9 @@ const handleMarkSuccess = async () => {
             <VaCardActions align="stretch" vertical>
               <VaListItem>
                 <p>
-                  <b>{{ t('papers.point') }}:</b> {{ result?.totalMark }}/{{ maxPointInPaper }}
+                  <b>{{ t('papers.point') }}:</b> {{ roundToTwoDecimal(result?.totalMark) }}/{{
+                    roundToTwoDecimal(maxPointInPaper)
+                  }}
                 </p>
               </VaListItem>
               <template v-for="(typeQuestion, index) in questionTypesLabel" :key="index">
