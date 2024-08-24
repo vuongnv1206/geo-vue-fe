@@ -33,7 +33,7 @@ const classStores = useClassStore()
 const assignmentStores = useAssignmentStore()
 
 const assignmentsByClass = ref<Classrooms[]>([])
-const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 
 const dataFilter = ref({
   advancedSearch: {
@@ -87,11 +87,9 @@ const getAssignmentByClass = () => {
 }
 
 const mergeData = (class1: Classrooms, assignment: any, submissionStats: SubmissionStats) => {
-  // Tìm class trong mergeAssignmentByClass
   const classIndex = mergeAssignmentByClass.value.findIndex((c) => c.id === class1.id)
 
   if (classIndex !== -1) {
-    // Nếu class đã tồn tại, tìm assignment và cập nhật submissionsStats
     const assignmentIndex = mergeAssignmentByClass.value[classIndex].assignments.findIndex(
       (a) => a.id === assignment.id,
     )
@@ -101,14 +99,12 @@ const mergeData = (class1: Classrooms, assignment: any, submissionStats: Submiss
         submissionsStats: submissionStats,
       }
     } else {
-      // Nếu assignment chưa tồn tại, thêm mới vào class đó
       mergeAssignmentByClass.value[classIndex].assignments.push({
         ...assignment,
         submissionsStats: submissionStats,
       })
     }
   } else {
-    // Nếu class chưa tồn tại, thêm mới class và assignment
     mergeAssignmentByClass.value.push({
       ...class1,
       assignments: [
