@@ -424,7 +424,8 @@
     "delete_student": "Delete Student",
     "edit_student": "Edit Student",
     "range": "Items from {start} to {end} of total {total}",
-    "no_student": "No student available"
+    "no_student": "No student available",
+    "import_failed": "Some students encountered an error during the import process. Please check the downloaded file."
   },
   "comments": {
     "comment": "Comment",

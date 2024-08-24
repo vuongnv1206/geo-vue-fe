@@ -425,7 +425,8 @@
     "delete_student": "Xóa học sinh",
     "edit_student": "Chỉnh sửa học sinh",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
-    "no_student": "Không có học sinh nào"
+    "no_student": "Không có học sinh nào",
+    "import_failed": "Một số sinh viên gặp lỗi trong quá trình nhập. Vui lòng kiểm tra tệp đã tải xuống."
   },
   "comments": {
     "comment": "Bình luận",
