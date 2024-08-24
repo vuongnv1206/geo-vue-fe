@@ -202,13 +202,13 @@
               </div>
             </div>
           </template>
-          <template #cell(description)="{ rowData }">
+          <!-- <template #cell(description)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
                 <VaTextarea v-model="rowData.description" :readonly="true" />
               </div>
             </div>
-          </template>
+          </template> -->
           <template #cell(startedTime)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
@@ -220,6 +220,22 @@
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
                 <span v-if="rowData.submittedTime != null"> {{ format.formatDate(rowData.submittedTime) }}</span>
+              </div>
+            </div>
+          </template>
+          <template #cell(score)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span v-if="rowData.showMarkResult === ShowMarkResult.WhenAllStudentSubmitted">
+                  <span v-if="rowData.score !== -1">
+                    {{ rowData.score }}
+                  </span>
+                  <span v-else> {{ t('papers.please_wait_result') }} </span>
+                </span>
+                <span v-else-if="rowData.showMarkResult === ShowMarkResult.WhenSubmitted">
+                  {{ rowData.score }}
+                </span>
+                <span v-else> {{ t('papers.can_not_view_result') }} </span>
               </div>
             </div>
           </template>
@@ -332,7 +348,7 @@ import { ClassroomWithPosts } from '@/pages/classrooms/types'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { usePostsStore } from '@/stores/modules/posts.module'
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
-import { PaperStudents, PaperStudentsHistory } from '@/pages/examination/types'
+import { PaperStudents, PaperStudentsHistory, ShowMarkResult } from '@/pages/examination/types'
 import { usePaperStudentsStore } from '@/stores/modules/paperStudents.module'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
@@ -362,7 +378,7 @@ const columns = defineVaDataTableColumns([
   { label: t('papers.start_time'), key: 'startTime', sortable: true },
   { label: t('papers.end_time'), key: 'endTime', sortable: true },
   { label: t('papers.duration'), key: 'duration', sortable: true },
-  { label: t('papers.description'), key: 'description', sortable: true },
+  // { label: t('papers.description'), key: 'description', sortable: true },
   // { label: t('papers.paper_label'), key: 'paperLabelName', sortable: true },
   { label: t('papers.started_time'), key: 'startedTime', sortable: true },
   { label: t('papers.submitted_time'), key: 'submittedTime', sortable: true },

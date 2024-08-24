@@ -585,7 +585,9 @@
     "in_progress": "In Progress",
     "completed": "Completed",
     "suspended": "Suspended",
-    "status": "Status"
+    "status": "Status",
+    "please_wait_result": "Please wait for the result",
+    "can_not_view_result": "You can't view the result"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",

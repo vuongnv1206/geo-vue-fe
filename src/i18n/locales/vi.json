@@ -586,7 +586,9 @@
     "in_progress": "Đang làm bài",
     "completed": "Đã hoàn thành",
     "suspended": "Đã đình chỉ",
-    "status": "Trạng thái"
+    "status": "Trạng thái",
+    "please_wait_result": "Vui lòng chờ kết quả",
+    "can_not_view_result": "Không thể xem kết quả"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",
