@@ -125,8 +125,7 @@ const onStudentSaved = async (student: Student) => {
       })
       .catch((error) => {
         notify({
-          message:
-            notifications.updatedSuccessfully(student.firstName + ' ' + student.lastName) + getErrorMessage(error),
+          message: notifications.updateFailed(student.firstName + ' ' + student.lastName) + getErrorMessage(error),
           color: 'error',
         })
       })
