@@ -75,8 +75,9 @@ const deletePaper = async () => {
         router.push({ name: 'paper-folder' })
       })
       .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to delete \n ${error}`,
+          message: message,
           color: 'danger',
         })
       })
