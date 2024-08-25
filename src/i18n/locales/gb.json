@@ -352,7 +352,8 @@
     "doing": "Doing",
     "marked": "Marked",
     "not_submitted": "Not Submitted",
-    "no_comment": "No comment available"
+    "no_comment": "No comment available",
+    "time_out": "Time out"
   },
   "subjects": {
     "subject": "Subject",
@@ -564,7 +565,7 @@
     "create_offline_test_manually": "Create Offline Test Manually",
     "create_offline_test_with_text": "Create Offline Test with Text",
     "content_1": "Use GEO's editor to create Exercises/Tests. Edit from available templates or Copy & Paste from various sources.",
-    "content_2": "Create multiple equivalent quality tests from the existing matrix design of Azota, providing basic structure information: time, number of questions, levels, and question formats.",
+    "content_2": "Create multiple equivalent quality tests from the existing matrix design of GEO, providing basic structure information: time, number of questions, levels, and question formats.",
     "supported_format": "Supported formats: .pdf, .docx, .xlsx.",
     "content_0": "You can upload Exercise Files, Exam Papers, or Answer Sheets for offline grading.",
     "details": "Details",

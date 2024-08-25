@@ -1,6 +1,6 @@
 <template>
   <VaCard>
-    <VaCardTitle>Spectrum charts</VaCardTitle>
+    <VaCardTitle>Score Spectrum</VaCardTitle>
     <VaCardContent>
       <div class="flex justify-center w-full h-full overflow-hidden relative">
         <canvas ref="canvas" style="width: 100%; height: 400px"></canvas>
@@ -71,7 +71,7 @@ const renderChart = () => {
           labels: labelScores.value,
           datasets: [
             {
-              label: `Account`,
+              label: `Student`,
               data: (data.value?.frequencyMarks ?? []).map((mark) => mark.total),
               backgroundColor: 'blue',
               borderColor: 'blue',

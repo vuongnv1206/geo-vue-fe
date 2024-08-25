@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia'
 import questionService from '@/services/question.service'
-import { Question, QuestionSearchRes, RejectApproveQuestion, SearchQuestion } from '@pages/question/types'
+import {
+  GetQuestionRandomRequest,
+  Question,
+  QuestionSearchRes,
+  RejectApproveQuestion,
+  SearchQuestion,
+} from '@pages/question/types'
 
 export const useQuestionStore = defineStore('question', {
   state: () => ({
@@ -109,6 +115,16 @@ export const useQuestionStore = defineStore('question', {
         .deleteQuestion(id)
         .then(() => {
           return Promise.resolve()
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async getQuestionRandomMatrix(request: GetQuestionRandomRequest): Promise<Question[]> {
+      return questionService
+        .getQuestionRandomMatrix(request)
+        .then((response) => {
+          return Promise.resolve(response)
         })
         .catch((error) => {
           return Promise.reject(error)

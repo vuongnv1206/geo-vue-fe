@@ -279,7 +279,7 @@ const showMarkResultOptions = computed(() => [
 const showQuestionAnswerOptions = computed(() => [
   { label: 'No', value: ShowQuestionAnswer.No },
   { label: 'When submitted', value: ShowQuestionAnswer.WhenSubmitted },
-  { label: 'When all students submitted', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
+  { label: 'When all students submitted or exam runs out', value: ShowQuestionAnswer.WhenAllStudentSubmitted },
 ])
 
 const backToPage = () => {
