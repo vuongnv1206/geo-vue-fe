@@ -164,12 +164,12 @@
                 <VaBadge
                   :text="
                     getStatusText(
-                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
+                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status || '',
                     )
                   "
                   :color="
                     getStatusColorClass(
-                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
+                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status || '',
                     )
                   "
                 />
