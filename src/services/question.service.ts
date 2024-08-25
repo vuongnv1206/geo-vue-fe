@@ -1,5 +1,11 @@
 import apiService from '@services/api.service'
-import { QuestionSearchRes, RejectApproveQuestion, SearchQuestion } from '@/pages/question/types'
+import {
+  GetQuestionRandomRequest,
+  Question,
+  QuestionSearchRes,
+  RejectApproveQuestion,
+  SearchQuestion,
+} from '@/pages/question/types'
 
 class QuestionService {
   async deleteMultiQuestion(data: any): Promise<void> {
@@ -120,6 +126,17 @@ class QuestionService {
     formData.append('Files', file)
     return apiService
       .post('/v1/question/read-from-file', formData)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async getQuestionRandomMatrix(request: GetQuestionRandomRequest): Promise<Question[]> {
+    return apiService
+      .post('/v1/question/question-random', request)
       .then((response) => {
         return Promise.resolve(response.data)
       })
