@@ -189,3 +189,10 @@ export type QuestionLabelRequest = {
 export type QuestionLabelResponse = {
   data: QuestionLable[]
 }
+
+export type GetQuestionRandomRequest = {
+  folderId: string
+  questionType: QuestionType
+  questionLabelId: string
+  numberQuestion: number
+}
