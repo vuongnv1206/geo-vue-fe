@@ -44,7 +44,7 @@ onMounted(async () => {
 
 <template>
   <VaCard>
-    <VaCardTitle>Frequency table</VaCardTitle>
+    <VaCardTitle>Frequency Mark</VaCardTitle>
     <VaCardContent>
       <div class="va-table-responsive">
         <table class="va-table va-table--hoverable border min-w-[100%]">
