@@ -428,6 +428,13 @@ export const getQuestionLabel = (q: Question) => {
 
   console.log(toCamelCase(questionLable))
 
+  // Check if questionLable is valid
+  const validQuestionLables = ['easy', 'medium', 'hard', 'very hard']
+  if (!validQuestionLables.includes(questionLable.toLowerCase())) {
+    console.log('Invalid question lable')
+    return q
+  }
+
   q.questionLable = { name: toCamelCase(questionLable) }
   return q
 }
