@@ -439,7 +439,7 @@ export type ContentMatrixRequest = {
 }
 
 export type CriteriaQuestion = {
-  questionLabelId: string | null
+  questionLabelId: string | null | undefined
   questionType?: number
   numberOfQuestion?: number
   rawIndex?: string
