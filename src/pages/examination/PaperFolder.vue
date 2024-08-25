@@ -118,10 +118,11 @@ const onFolderDelete = async (folder: PaperFolderDto) => {
       })
       getPaperFolders(currentFolderId.value)
       getPapers(currentFolderId.value)
-    } catch (err: any) {
+    } catch (error) {
+      const message = getErrorMessage(error)
       notify({
-        message: `Failed to delete folder\n${err.message}`,
-        color: 'error',
+        message: message,
+        color: 'danger',
       })
     }
   }
