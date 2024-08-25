@@ -96,6 +96,10 @@ const createMatrixRequest = ref<CreateMatrixRequest>({
 watch(contentMatrixRequestList, updateCreateMatrixRequest, { deep: true })
 
 const continueCreatePaper = async () => {
+  const totalNumberOfQuestions = contentMatrixRequestList.value.reduce((total, item) => {
+    return total + item.criteriaQuestions.reduce((sum, question) => sum + (Number(question.numberOfQuestion) || 0), 0)
+  }, 0)
+
   if (!createMatrixRequest.value.name?.trim()) {
     notify({
       message: "Please enter matrix's name",
@@ -104,6 +108,16 @@ const continueCreatePaper = async () => {
   } else if (contentMatrixRequestList.value.length <= 0) {
     notify({
       message: 'Please select any folder',
+      color: 'danger',
+    })
+  } else if (totalNumberOfQuestions < 2) {
+    notify({
+      message: 'Total number of questions must be greater than 2',
+      color: 'danger',
+    })
+  } else if (totalPointPaper.value !== 10) {
+    notify({
+      message: 'Total points must equal 10',
       color: 'danger',
     })
   } else {
@@ -130,9 +144,7 @@ const createNewPaperMatrix = async () => {
       await getListPaperMatrix()
       router.push({ name: 'generate-paper-matrix', params: { folderId: folderId.value, matrixId: response } })
     })
-    .catch((error) =>
-      notify({ message: notifications.createFailed('paper matrix' + getErrorMessage(error)), color: 'danger' }),
-    )
+    .catch((error) => notify({ message: getErrorMessage(error), color: 'danger' }))
 }
 
 const updatePaperMatrix = async (request: UpdateMatrixRequest) => {
@@ -192,6 +204,24 @@ const numberPatternRule = (value: string): boolean | string => {
 
   const regex = /^\d+(?:\s*,\s*\d+)*$/
   return regex.test(value) || 'Invalid format'
+}
+
+const requiredNumberRule = (value: string): boolean | string => {
+  if (value === null || value.trim().length === 0) {
+    return 'require field'
+  }
+
+  const regex = /^\d+$/
+  if (!regex.test(value)) {
+    return 'invalid format'
+  }
+
+  const numberValue = parseInt(value, 10)
+  if (numberValue > 10) {
+    return 'max 10 point'
+  }
+
+  return true
 }
 
 const paperMatrixOptions = ref<PaperMatrixTemplate[]>([])
@@ -388,6 +418,7 @@ onMounted(async () => {
                     <td>
                       <VaInput
                         v-model="contentMatrixRequestList[index].totalPoint"
+                        :rules="[requiredNumberRule]"
                         input-class="va-text-center"
                         class="no-border max-w-[100px]"
                       />

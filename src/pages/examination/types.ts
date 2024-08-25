@@ -661,6 +661,7 @@ export type QuestionGenerateToMatrix = {
   question: Question
   mark: number
   rawIndex: number
+  folderId: string
 }
 
 export interface AddQuestionsInPaperRequest {

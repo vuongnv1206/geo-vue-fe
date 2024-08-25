@@ -565,7 +565,7 @@
     "create_offline_test_manually": "Tạo bài kiểm tra ngoại tuyến thủ công",
     "create_offline_test_with_text": "Tạo bài kiểm tra ngoại tuyến từ văn bản",
     "content_1": "Sử dụng trình chỉnh sửa của GEO để tạo các bài tập/bài kiểm tra. Chỉnh sửa từ các mẫu có sẵn hoặc sao chép & dán từ các nguồn khác nhau.",
-    "content_2": "Tạo nhiều bài kiểm tra chất lượng tương đương từ thiết kế ma trận hiện có của Azota, cung cấp thông tin cấu trúc cơ bản: thời gian, số lượng câu hỏi, cấp độ và định dạng câu hỏi.",
+    "content_2": "Tạo nhiều bài kiểm tra chất lượng tương đương từ thiết kế ma trận hiện có của GEO, cung cấp thông tin cấu trúc cơ bản: thời gian, số lượng câu hỏi, cấp độ và định dạng câu hỏi.",
     "supported_format": "Định dạng hỗ trợ: .pdf, .docx, .xlsx.",
     "content_0": "Bạn có thể tải lên các tệp bài tập, bài kiểm tra hoặc phiếu trả lời để chấm ngoại tuyến.",
     "details": "Chi tiết",
