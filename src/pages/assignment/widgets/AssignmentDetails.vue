@@ -55,6 +55,7 @@
                   {{ $t('assignments.settings') }}
                 </VaButton>
                 <VaButton
+                  v-if="classById?.ownerId == currentUserId"
                   icon="delete"
                   preset="secondary"
                   class="justify-start"
@@ -211,11 +212,15 @@ import {
   AssignmentAttachment,
   AssignmentSubmission,
 } from '../types'
+import { useAuthStore } from '@/stores/modules/auth.module'
 
 const { t } = useI18n()
 const loading = ref(true)
 const router = useRouter()
 
+const authStore = useAuthStore()
+
+const currentUserId = authStore.user?.id
 const fileStore = useFileStore()
 const stores = useAssignmentStore()
 const classStores = useClassStore()

@@ -28,19 +28,19 @@
         <VaCard class="p-6">
           <div class="flex items-center justify-between">
             <div class="flex items-center mb-4">
-              <!-- <GeoAvatar
+              <GeoAvatar
                 class="mr-2"
                 :size="48"
                 color="warning"
                 :image="post.owner?.imageUrl || undefined"
                 :txt="post.owner?.firstName?.charAt(0).toUpperCase()"
-              /> -->
-              <VaAvatar
+              />
+              <!-- <VaAvatar
                 :src="getSrcAvatar(post.owner?.imageUrl)"
                 class="w-14 h-14 font-bold mr-2"
                 :fallback-text="post.owner?.firstName?.charAt(0)?.toUpperCase()"
                 :color="avatarColor(post.owner?.firstName)"
-              />
+              /> -->
               <div>
                 <h2 class="text-md font-bold text-gray-800">{{ post.owner?.firstName }} {{ post.owner?.lastName }}</h2>
                 <VaPopover class="mb-2" placement="right" color="#FFFFFF" :message="format.formatDate(post.createdOn)">
@@ -90,19 +90,19 @@
                 <div class="bg-white p-3 rounded-md shadow-sm mb-2" :commentId="comment.id">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center mb-2">
-                      <!-- <GeoAvatar
+                      <GeoAvatar
                         class="mr-2"
                         :size="36"
                         color="warning"
                         :image="comment.owner?.imageUrl || undefined"
                         :txt="comment.owner?.firstName?.charAt(0).toUpperCase()"
-                      /> -->
-                      <VaAvatar
+                      />
+                      <!-- <VaAvatar
                         :src="getSrcAvatar(comment.owner?.imageUrl)"
                         class="w-14 h-14 font-bold mr-2"
                         :fallback-text="comment.owner?.firstName?.charAt(0)?.toUpperCase()"
                         :color="avatarColor(comment.owner?.firstName)"
-                      />
+                      /> -->
                       <div class="flex flex-col">
                         <h2 class="text-sm font-bold text-gray-800">
                           {{ comment.owner?.firstName }} {{ comment.owner?.lastName }}
@@ -240,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-import { avatarColor, format, getErrorMessage, notifications } from '@/services/utils'
+import { format, getErrorMessage, notifications } from '@/services/utils'
 import { computed, onMounted, ref } from 'vue'
 import { useModal, useToast, VaModal } from 'vuestic-ui'
 import EditPosts from './EditPosts.vue'
@@ -252,7 +252,6 @@ import { usePostsStore } from '@/stores/modules/posts.module'
 import { useCommentStore } from '@/stores/modules/comments.module'
 import { Quill, QuillEditor } from '@vueup/vue-quill'
 import { useI18n } from 'vue-i18n'
-import { getSrcAvatar } from '@/pages/audit-logs/helper'
 
 const { t } = useI18n()
 const loading = ref(true)
