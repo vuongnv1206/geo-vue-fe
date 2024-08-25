@@ -23,7 +23,7 @@ const paperStore = usePaperStore()
 
 const questionRequest = ref<QuestionIntoPaperRequest[]>([])
 const questionGenerateMatrix = ref<QuestionGenerateToMatrix[]>([])
-const totalPointPaper = ref(0)
+const totalPointPaper = ref(10)
 const getQuestionInMatrix = async (matrixId: string) => {
   try {
     const res = await paperStore.getQuestionFromMatrix(matrixId)
@@ -54,7 +54,7 @@ const paperRequest = ref<CreatePaperRequest>({
 const cancelCreatePaper = async () => {
   const result = await confirm({
     message: 'Are you sure wanna leave without creating?',
-    okText: 'confirm create',
+    okText: 'Leave',
     title: "I'm sure?",
   })
   if (result) {
@@ -77,6 +77,22 @@ const continueCreatePaper = () => {
 
 const updateTotalPoint = () => {
   totalPointPaper.value = Math.round(questionRequest.value.reduce((sum, question) => sum + question.mark, 0))
+}
+const errorMessages = ref<string[]>([])
+const isTotalPointValid = ref(true)
+
+const updateQuestionMark = (index: number, mark: number) => {
+  questionRequest.value[index].mark = mark
+  updateTotalPoint()
+
+  errorMessages.value = Array(questionRequest.value.length).fill('')
+  // Kiểm tra nếu tổng điểm không phải là 10, chỉ hiển thị lỗi cho input đang được chỉnh sửa
+  if (totalPointPaper.value !== 10) {
+    errorMessages.value[index] = `Total points must be exactly 10. Current total is ${totalPointPaper.value}.`
+    isTotalPointValid.value = false
+  } else {
+    isTotalPointValid.value = true
+  }
 }
 
 const saveCreatePaper = (data: CreatePaperRequest) => {
@@ -130,8 +146,9 @@ onMounted(async () => {
               :placeholder="t('papers.enter_point')"
               :label="t('papers.point')"
               :rules="[validators.required, validators.isNumber]"
-              @change="updateTotalPoint"
+              @change="updateQuestionMark(index, questionRequest[index].mark)"
             />
+            <span v-if="errorMessages[index]" class="text-red-500 text-sm">{{ errorMessages[index] }}</span>
           </div>
           <div class="flex align-bottom">
             <VaButton preset="primary" color="secondary" icon="change_circle" />

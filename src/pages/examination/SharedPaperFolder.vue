@@ -382,10 +382,6 @@ const tableColumns = computed(() => {
   return columns
 })
 
-const onSelectedItemsChange = (items: CombinedData[]) => {
-  selectedItems.value = items
-}
-
 const combinedData = computed(() => {
   const resolvedFolders = paperFolderDtos.value.map((folder) => ({
     ...folder,
@@ -472,6 +468,10 @@ const handlePageChange = async (page: number) => {
         </VaCard>
       </VaCard>
 
+      <VaCard class="flex justify-between items-center flex-grow">
+        <VaBadge text="Shared Documents" color="primary" />
+      </VaCard>
+
       <VaCard class="flex justify-end items-center">
         <VaCard class="flex gap-2">
           <VaButton v-if="selectedItems.length !== 0" icon="delete" color="danger" @click="onDeleteSelectedItems"
@@ -529,13 +529,11 @@ const handlePageChange = async (page: number) => {
           :columns="tableColumns"
           :loading="loading"
           hoverable
-          selectable
           clickable
           select-mode="multiple"
           :disable-client-side-sorting="false"
           @row:contextmenu="contextmenu($event)"
           @row:dblclick="handleFolderDoubleClick($event)"
-          @selectionChange="onSelectedItemsChange($event.currentSelectedItems)"
         >
           <template #cell(name)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
@@ -568,7 +566,7 @@ const handlePageChange = async (page: number) => {
           </template>
 
           <template #cell(path)="{ rowData }">
-            <div v-if="rowData.paths" class="flex items-center gap-2 ellipsis max-w-[230px]">
+            <div v-if="rowData.paths" class="flex items-center gap-2 ellipsis max-w-[500px]">
               <VaBreadcrumbs separator="/">
                 <VaBreadcrumbsItem v-for="(segment, index) in rowData.paths" :key="index">
                   <a href="#" @click.prevent="navigateToPath(segment.id)">

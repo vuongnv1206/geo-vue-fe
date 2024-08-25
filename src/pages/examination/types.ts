@@ -44,6 +44,18 @@ export interface SharePaperFolderRequest {
   canDelete: boolean
   canShare: boolean
 }
+
+export interface SharePaperRequest {
+  userId?: string | null
+  paperId: string
+  groupId?: string | null
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+}
+
 export interface PaperInListDto {
   id: string
   examName: string
@@ -104,6 +116,7 @@ export interface PaperDto {
   localIpAllowed?: string
   numberAttempt?: number
   totalAttended?: number
+  paperPermissions?: PaperPermission[]
 }
 
 export interface PaperLabelDto {
@@ -189,6 +202,7 @@ export interface PaperAccess {
 export enum AccessType {
   ByStudent = 1,
   ByClass = 2,
+  All = 0,
 }
 
 export interface GetLastResultExamRequest {
@@ -219,6 +233,7 @@ export interface SubmitPaperDetailDto {
   createdOn?: Date
   lastModifiedBy?: string
   lastModifiedOn?: Date | null
+  question: Question
 }
 
 export enum SubmitPaperStatus {
@@ -314,6 +329,24 @@ export type PaperFolderPermission = {
   groupTeacherId: string
   groupTeacher: GroupTeacher | null
   folderId: string
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+  createdBy: string
+  createdOn: string
+  lastModifiedBy: string
+  lastModifiedOn: string | null
+}
+
+export type PaperPermission = {
+  id: string
+  userId: string
+  user: UserDetail | null
+  groupTeacherId: string
+  groupTeacher: GroupTeacher | null
+  paperId: string
   canView: boolean
   canAdd: boolean
   canUpdate: boolean
@@ -596,6 +629,7 @@ export enum ShowMarkResult {
 
 export type PaperStudentsHistory = {
   id: string
+  paperId: string
   examName: string
   duration: number
   paperLabelId: string
@@ -665,6 +699,7 @@ export type GetAccessPaperRequest = {
   pageSize?: number
   orderBy?: string[]
   paperId: string
+  status?: AccessType
 }
 
 export type GetAccessPaperResponse = {

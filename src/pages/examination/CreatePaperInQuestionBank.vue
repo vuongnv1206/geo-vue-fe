@@ -40,7 +40,7 @@ const AddQuestionsToPaper = (questions: Question[]) => {
       questionsInPaper.value.push(question)
     }
   })
-
+  errorMessages.value = Array(questionRequest.value.length).fill('')
   const markPerQuestion = 10 / questionsInPaper.value.length
 
   questionRequest.value = questionsInPaper.value.map((question, index) => ({
@@ -53,25 +53,24 @@ const AddQuestionsToPaper = (questions: Question[]) => {
 }
 
 const updateTotalPoint = () => {
-  totalPointPaper.value = questionRequest.value.reduce((sum, question) => sum + question.mark, 0)
+  totalPointPaper.value =
+    Math.round(questionRequest.value.reduce((sum, question) => sum + question.mark, 0) * 100) / 100
 }
+
 const errorMessages = ref<string[]>([])
 
 const updateQuestionMark = (index: number, mark: number) => {
   questionRequest.value[index].mark = mark
   updateTotalPoint()
 
+  errorMessages.value = Array(questionRequest.value.length).fill('')
+  // Kiểm tra nếu tổng điểm không phải là 10, chỉ hiển thị lỗi cho input đang được chỉnh sửa
   if (totalPointPaper.value !== 10) {
     errorMessages.value[index] = `Total points must be exactly 10. Current total is ${totalPointPaper.value}.`
     isTotalPointValid.value = false
   } else {
-    errorMessages.value[index] = '' // Clear error message if total is valid
     isTotalPointValid.value = true
   }
-  // Đảm bảo rawIndex luôn liên tục
-  questionRequest.value.forEach((req, idx) => {
-    req.rawIndex = idx + 1
-  })
 }
 
 const showUpdatePaperPurpose = ref(false)
@@ -97,16 +96,20 @@ const deleteQuestion = async (questionId: string | null | undefined) => {
   if (result) {
     questionsInPaper.value = questionsInPaper.value.filter((ques) => ques.id !== questionId)
     questionRequest.value = questionRequest.value.filter((req) => req.questionId !== questionId)
-
+    errorMessages.value = Array(questionRequest.value.length).fill('')
     // Cập nhật lại điểm sau khi xóa câu hỏi
     const markPerQuestion = 10 / questionsInPaper.value.length
-
+    errorMessages.value = Array(questionRequest.value.length).fill('')
     questionRequest.value.forEach((req, index) => {
       req.rawIndex = index + 1 // Bắt đầu từ 1
       req.mark = markPerQuestion
     })
     updateTotalPoint()
   }
+}
+
+const roundToTwoDecimal = (num: number | undefined) => {
+  return Math.round((num ?? 0) * 100) / 100
 }
 
 const cancelCreatePaper = async () => {
@@ -158,7 +161,8 @@ const isTotalPointValid = ref(true)
     <VaCardContent>
       <div class="flex justify-between">
         <p>
-          <b>{{ questionsInPaper.length }} question(s)</b> ({{ totalPointPaper }} {{ t('papers.point') }})
+          <b>{{ questionsInPaper.length }} question(s)</b> ({{ roundToTwoDecimal(totalPointPaper) }}
+          {{ t('papers.point') }})
         </p>
         <VaButton
           border-color="primary"

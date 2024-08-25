@@ -144,7 +144,7 @@ const updatePaperMatrix = async (request: UpdateMatrixRequest) => {
       router.push({ name: 'generate-paper-matrix', params: { folderId: folderId.value, matrixId: response } })
     })
     .catch((error) =>
-      notify({ message: notifications.createFailed('paper matrix' + getErrorMessage(error)), color: 'danger' }),
+      notify({ message: notifications.createFailed('matrix' + getErrorMessage(error)), color: 'danger' }),
     )
 }
 
@@ -202,7 +202,7 @@ const getListPaperMatrix = async () => {
     const res = await paperMatrixStore.getListPaperMatrixTemplate()
     paperMatrixOptions.value = res
   } catch (error) {
-    notify({ message: notifications.getFailed('paper matrix' + getErrorMessage(error)), color: 'danger' })
+    notify({ message: notifications.getFailed('matrix' + getErrorMessage(error)), color: 'danger' })
   }
 }
 

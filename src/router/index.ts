@@ -78,7 +78,11 @@ const routes: Array<RouteRecordRaw> = [
             path: 'admin/exam-review/:paperId/:userId/:submitPaperId',
             component: () => import('../pages/examination/ExamReview.vue'),
           },
-
+          {
+            name: 'exam-student-review',
+            path: 'student/exam-review/:paperId/:userId/:submitPaperId',
+            component: () => import('../pages/examination/ExamReview.vue'),
+          },
           {
             name: 'paper-config',
             path: 'admin/paper-config/:id',
