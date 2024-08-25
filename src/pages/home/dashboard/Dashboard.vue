@@ -291,8 +291,12 @@
                 <RouterLink :to="{ name: 'assignment-submission', params: { id: ass.id, classId: class1.id } }">
                   <VaCardContent class="text-md font-semibold text-gray-800">
                     {{ ass.name }} -
-                    {{ ass.status === MarkAssignmentStatus.NotSubmitted ? t('assignments.time_out') : ass.status }}
+                    <VaBadge
+                      :text="getMarkAssignmentStatusText(ass.status)"
+                      :color="getMarkAssignmentStatusColor(ass.status)"
+                    />
                   </VaCardContent>
+                  <!-- {{ ass.status === MarkAssignmentStatus.NotSubmitted ? t('assignments.time_out') : ass.status }} -->
 
                   <VaCardContent class="text-xs font-medium text-gray-600">
                     <div class="flex items-center mb-1">
@@ -540,6 +544,35 @@ const getStatusClass = (status: number) => {
     return ''
   }
 }
+
+const getMarkAssignmentStatusColor = (status: string) => {
+  if (status === MarkAssignmentStatus.Submitted) {
+    return '#F59E0B' // Submitted - Green 500
+  } else if (status === MarkAssignmentStatus.Doing) {
+    return '#3B82F6' // Doing - Blue 500
+  } else if (status === MarkAssignmentStatus.Marked) {
+    return '#10B981' // Marked - Green 500
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
+    return '#EF4444' // Not Submitted - Red 500
+  } else {
+    return ''
+  }
+}
+
+const getMarkAssignmentStatusText = (status: string) => {
+  if (status === MarkAssignmentStatus.Submitted) {
+    return t('assignments.submitted')
+  } else if (status === MarkAssignmentStatus.Doing) {
+    return t('assignments.doing')
+  } else if (status === MarkAssignmentStatus.Marked) {
+    return t('assignments.marked')
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
+    return t('assignments.not_submitted')
+  } else {
+    return ''
+  }
+}
+
 const router = useRouter()
 const currentUserId = authStore.user?.id
 

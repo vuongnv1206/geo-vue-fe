@@ -148,17 +148,19 @@
             </VaListItemSection>
             <VaListItemSection>
               <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-              <VaListItemLabel
-                caption
-                :class="
-                  getStatusColorClass(
-                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
-                  )
-                "
-              >
-                {{
-                  getStatusText(assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status)
-                }}
+              <VaListItemLabel caption>
+                <VaBadge
+                  :text="
+                    getStatusText(
+                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
+                    )
+                  "
+                  :color="
+                    getStatusColorClass(
+                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
+                    )
+                  "
+                />
               </VaListItemLabel>
             </VaListItemSection>
           </VaListItem>
