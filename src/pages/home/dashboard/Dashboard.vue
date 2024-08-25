@@ -169,8 +169,11 @@
           <template #cell(completionStatus)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
-                <span :class="getStatusClass(rowData.completionStatus)">
-                  {{ getStatusText(rowData.completionStatus) }}
+                <span>
+                  <VaBadge
+                    :text="getStatusText(rowData.completionStatus)"
+                    :color="getStatusClass(rowData.completionStatus)"
+                  />
                 </span>
               </div>
             </div>
@@ -387,7 +390,7 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
 
 const columns = defineVaDataTableColumns([
   { label: t('papers.stt'), key: 'stt', sortable: false },
-  { label: t('subjects.subject'), key: 'subjectName', sortable: true },
+  // { label: t('subjects.subject'), key: 'subjectName', sortable: true },
   { label: t('papers.name'), key: 'examName', sortable: true },
   { label: t('papers.status'), key: 'completionStatus', sortable: true },
   { label: t('papers.start_time'), key: 'startTime', sortable: true },
@@ -526,13 +529,13 @@ const getStatusText = (status: number) => {
 
 const getStatusClass = (status: number) => {
   if (status === DoExamStatus.NotStarted) {
-    return 'text-yellow-500' // Not Started
+    return '#F59E0B' // Not Started - Yellow 500
   } else if (status === DoExamStatus.InProgress) {
-    return 'text-blue-500' // In Progress
+    return '#3B82F6' // In Progress - Blue 500
   } else if (status === DoExamStatus.Completed) {
-    return 'text-green-500' // Completed
+    return '#10B981' // Completed - Green 500
   } else if (status === DoExamStatus.Suspended) {
-    return 'text-red-500' // Suspended
+    return '#EF4444' // Suspended - Red 500
   } else {
     return ''
   }
@@ -554,9 +557,11 @@ const viewDetailAnswerResult = (submitId: string, paperId: string) => {
 onMounted(() => {
   const loadData = async () => {
     await getClasses()
-    await getPaperStudents()
-    await getPaperStudentsHistory()
-    calculatePaperStudent()
+    if (isStudent.value) {
+      await getPaperStudents()
+      await getPaperStudentsHistory()
+      calculatePaperStudent()
+    }
   }
 
   loadData()
