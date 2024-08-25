@@ -11,14 +11,20 @@ import {
   StatusPaper,
   GetAccessPaperRequest,
   GroupClassAccessPaper,
+  PaperPermission,
+  SharePaperRequest,
+  GetGetAssigneesInPaperRequest,
 } from './types'
 import { useToast, useModal } from 'vuestic-ui'
 import QuestionView from '../question/widgets/QuestionView.vue'
-import { format } from '@/services/utils'
-import { onMounted, ref } from 'vue'
+import { avatarColor, format } from '@/services/utils'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import WhoAssignedPaperDetailModal from './widgets/WhoAssignedPaperDetailModal.vue'
 import { getErrorMessage } from '@/services/utils'
+import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
+import { GroupTeacher, TeacherTeam, TeacherTeamTeacherGroupCombine } from '../teacher-group/types'
+import { UserDetail } from '../user/types'
 
 const authStore = useAuthStore()
 const currentUserId = authStore.user?.id
@@ -138,6 +144,7 @@ const handleSaveAssigned = async (shareType: AccessType, accessPaperList: PaperA
           color: 'success',
         })
         await getPaperDetail()
+        await getAccessPaperGroups()
       })
       .catch((error) => {
         notify({
@@ -177,15 +184,46 @@ const getSubmittedStudents = async (classId?: string) => {
   }
 }
 
-const navigateToExamReview = (paperId: string, userId: string, submitPaperId: string) => {
-  router.push({
-    name: 'exam-review',
-    params: {
-      paperId,
-      userId,
-      submitPaperId,
-    },
-  })
+const getAssigneesInPaperRequest = ref<GetGetAssigneesInPaperRequest>({
+  paperId: paperId,
+})
+
+const totalAssigneesInPaper = ref(0)
+
+const getAssigneesTakeExam = async (classId?: string) => {
+  try {
+    if (classId) {
+      getAssigneesInPaperRequest.value.classId = classId
+    }
+
+    const res = await paperStore.getAssigneesInPaper(getAssigneesInPaperRequest.value)
+    totalAssigneesInPaper.value = res.data.reduce((total, item) => {
+      return total + item.userClasses.length
+    }, 0)
+  } catch (error) {
+    notify({
+      message: `Failed to get assignee`,
+      color: 'danger',
+    })
+  }
+}
+
+const navigateToExamReview = (paperId: string, userId: string, submitPaperId: string, status: string) => {
+  if (status === 'End') {
+    router.push({
+      name: 'exam-review',
+      params: {
+        paperId,
+        userId,
+        submitPaperId,
+      },
+    })
+  } else {
+    notify({
+      message: "Student haven't finished the test",
+      color: 'warning',
+    })
+  }
 }
 const navigateToManageQuestions = () => {
   router.push({ name: 'manage-questions', params: { paperId: paperId } })
@@ -210,6 +248,7 @@ const selectClassInGroup = async (classId: string) => {
     await onTabChange(classId)
 
     await getSubmittedStudents(classId)
+    await getAssigneesTakeExam(classId)
   } catch (error) {
     console.error(error)
   }
@@ -249,13 +288,281 @@ const onTabChange = async (classId: string) => {
   await getSubmittedStudents(classId)
 }
 
-const statusSubmitOptions: any = [
-  { label: 'done', value: 1 },
-  { label: 'not yet', value: 2 },
-  { label: 'miss', value: 3 },
-]
+// const statusSubmitOptions: any = [
+//   { label: 'done', value: 1 },
+//   { label: 'not yet', value: 2 },
+//   { label: 'miss', value: 3 },
+// ]
 
-const statusSubmitValue = ref(1)
+// const statusSubmitValue = ref(1)
+
+//Share paper
+const onPaperShare = () => {
+  getTeacherGroups()
+  doShowSharePaperModal.value = true
+}
+const doShowSharePaperModal = ref(false)
+const doShowPaperPermissionFormAddModal = ref(false)
+const doShowPaperPermissionFormModal = ref(false)
+const singleSelect = ref<TeacherTeamTeacherGroupCombine | null>(null)
+const autoCompleteSearchValue = ref('')
+const editPermissionValue = ref<PaperPermission>({} as PaperPermission)
+const optionsSelect = ref<TeacherTeamTeacherGroupCombine | null>(null)
+const isLoadingSelect = ref(false)
+const groupTeacherStore = useGroupTeacherStore()
+const groupTeachers = ref<GroupTeacher[]>([])
+const teacherTeams = ref<TeacherTeam[]>([])
+const dataFilter = ref({
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 1000,
+  orderBy: ['id'],
+})
+const options = ref<TeacherTeamTeacherGroupCombine[]>([])
+const getTeacherGroups = () => {
+  isLoadingSelect.value = true
+  groupTeacherStore.getGroupTeachers(dataFilter).then((res) => {
+    groupTeachers.value = res.data
+    groupTeacherStore
+      .getTeacherTeams(dataFilter)
+      .then((res) => {
+        teacherTeams.value = res.data
+        options.value = []
+        groupTeachers.value.forEach((groupTeacher) => {
+          options.value.push({
+            groupTeacher: groupTeacher,
+            teacherTeam: null,
+          })
+        })
+        teacherTeams.value.forEach((teacherTeam) => {
+          options.value.push({
+            groupTeacher: null,
+            teacherTeam: teacherTeam,
+          })
+        })
+      })
+      .finally(() => {
+        isLoadingSelect.value = false
+      })
+  })
+}
+
+const permissionEdit = ref({
+  canView: false,
+  canAdd: false,
+  canUpdate: false,
+  canDelete: false,
+  canShare: false,
+})
+const getOptionName = (option: TeacherTeamTeacherGroupCombine) => {
+  if (option.groupTeacher) {
+    const optionData = { data: option.groupTeacher.name, isUser: false }
+    return optionData
+  } else {
+    const optionData = { data: option.teacherTeam?.teacherName, isUser: true }
+    return optionData
+  }
+}
+
+const AddPermission = (option: TeacherTeamTeacherGroupCombine) => {
+  optionsSelect.value = option
+
+  const user = ref<UserDetail | null>(null)
+  if (option.teacherTeam) {
+    user.value = {
+      id: option.teacherTeam.teacherId,
+      email: option.teacherTeam.email,
+      firstName: option.teacherTeam.teacherName,
+      emailConfirmed: false,
+      phoneNumberConfirmed: false,
+      lastName: '',
+      phoneNumber: '',
+      imageUrl: '',
+      isActive: false,
+      userName: '',
+      birthDate: '',
+      gender: true,
+    }
+  }
+
+  editPermissionValue.value = {
+    user: user.value,
+    groupTeacherId: option.groupTeacher?.id || '',
+    groupTeacher: option.groupTeacher,
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+    createdBy: '',
+    createdOn: '',
+    lastModifiedBy: '',
+    lastModifiedOn: '',
+    id: '',
+    paperId: paperDetail.value?.id || '',
+    userId: '',
+  }
+
+  permissionEdit.value = {
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+  }
+  doShowPaperPermissionFormAddModal.value = true
+}
+const getNameUserGroup = (option: PaperPermission | null) => {
+  if (option?.user) {
+    return option.user.firstName + ' ' + option.user.lastName
+  } else {
+    return option?.groupTeacher?.name
+  }
+}
+
+const allPermissionFalse = (permission: PaperPermission) => {
+  return !permission.canView && !permission.canAdd && !permission.canUpdate && !permission.canDelete
+}
+
+const editPermission = (permission: PaperPermission) => {
+  editPermissionValue.value = { ...permission }
+
+  permissionEdit.value = {
+    canView: permission.canView,
+    canAdd: permission.canAdd,
+    canUpdate: permission.canUpdate,
+    canDelete: permission.canDelete,
+    canShare: permission.canShare,
+  }
+  doShowPaperPermissionFormModal.value = true
+}
+
+const canEdit = ref(false)
+watch(
+  () => permissionEdit.value,
+  (value) => {
+    if (!value.canView) {
+      canEdit.value = false
+    }
+  },
+  { deep: true },
+)
+
+watch(
+  () => canEdit.value,
+  (value) => {
+    if (!value) {
+      permissionEdit.value = {
+        canView: false,
+        canAdd: false,
+        canUpdate: false,
+        canDelete: false,
+        canShare: false,
+      }
+    } else {
+      permissionEdit.value.canView = true
+      permissionEdit.value.canAdd = true
+      permissionEdit.value.canUpdate = true
+      permissionEdit.value.canDelete = true
+    }
+  },
+)
+
+watch(
+  () => permissionEdit.value.canShare,
+  (value) => {
+    if (value) {
+      canEdit.value = true
+    }
+  },
+  { deep: true },
+)
+
+const handleDeletePermission = () => {
+  permissionEdit.value = {
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+  }
+  onSharePaperPermission()
+}
+
+const onSharePaperPermission = () => {
+  const sharePermission = ref<SharePaperRequest>({
+    canView: permissionEdit.value.canView,
+    canAdd: permissionEdit.value.canAdd,
+    canUpdate: permissionEdit.value.canUpdate,
+    canDelete: permissionEdit.value.canDelete,
+    canShare: permissionEdit.value.canShare,
+    paperId: editPermissionValue.value.paperId,
+    userId: null,
+    groupId: null,
+  })
+  if (editPermissionValue.value?.user) {
+    sharePermission.value.userId = editPermissionValue.value.user.id
+  }
+  if (editPermissionValue.value?.groupTeacherId) {
+    sharePermission.value.groupId = editPermissionValue.value.groupTeacherId
+  }
+
+  paperStore
+    .sharePaper(editPermissionValue.value.paperId, sharePermission.value)
+    .then(() => {
+      notify({
+        message: 'Paper folder permission update',
+        color: 'success',
+      })
+      doShowSharePaperModal.value = false
+
+      getPaperDetail()
+    })
+    .catch((error) => {
+      const message = getErrorMessage(error)
+      notify({
+        message:
+          'Failed to update paper folder permission ' +
+          editPermissionValue.value?.user?.firstName +
+          ' ' +
+          editPermissionValue.value?.user?.lastName +
+          '\n' +
+          message,
+        color: 'danger',
+      })
+    })
+}
+
+type PermissionType = 'canView' | 'canUpdate' | 'canShare'
+const checkPaperPermission = (permissionType: PermissionType) => {
+  if (currentUserId === paperDetail.value?.createdBy) {
+    return true
+  }
+
+  if (paperDetail.value?.paperPermissions) {
+    // Check individual teacher permission
+    const individualPermission = paperDetail.value.paperPermissions.some(
+      (permission) => permission.userId === currentUserId && permission[permissionType],
+    )
+
+    // Check group teacher permission
+    const groupPermission = paperDetail.value.paperPermissions.some(
+      (permission) =>
+        permission.groupTeacherId !== null &&
+        permission.groupTeacher?.teacherTeams?.some(
+          (teacher) => teacher.teacherId === currentUserId && permission[permissionType],
+        ),
+    )
+
+    return individualPermission || groupPermission
+  }
+
+  return false
+}
+
+const canViewGuest = computed(() => checkPaperPermission('canView'))
+const canEditGuest = computed(() => checkPaperPermission('canUpdate'))
+const canShareGuest = computed(() => checkPaperPermission('canShare'))
 
 onMounted(async () => {
   await getPaperDetail()
@@ -264,7 +571,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <VaLayout style="height: 500px">
+  <VaLayout v-if="canViewGuest" style="height: 500px">
     <template #top>
       <VaNavbar class="py-2">
         <template #left>
@@ -310,17 +617,23 @@ onMounted(async () => {
             <VaCardTitle>Menu</VaCardTitle>
             <VaCardContent>
               <VaMenuList class="w-full">
-                <VaMenuItem @click="paperConfigAction">
+                <VaMenuItem :disabled="!canEditGuest" @click="paperConfigAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Setting
                 </VaMenuItem>
-                <!-- <VaMenuItem> <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics </VaMenuItem> -->
+                <VaMenuItem :disabled="!canShareGuest" @click="onPaperShare()">
+                  <VaIcon name="share" class="material-symbols-outlined" /> Share
+                </VaMenuItem>
                 <VaMenuItem @click="statisticExam">
                   <VaIcon name="monitoring" class="material-symbols-outlined" /> Statistics
                 </VaMenuItem>
                 <VaMenuItem @click="examMonitorAction">
                   <VaIcon name="settings" class="material-symbols-outlined" /> Advanced monitoring
                 </VaMenuItem>
-                <VaMenuItem class="va-text-danger" @click="deletePaper">
+                <VaMenuItem
+                  class="va-text-danger"
+                  :disabled="currentUserId != paperDetail?.createdBy"
+                  @click="deletePaper"
+                >
                   <VaIcon name="delete" class="material-symbols-outlined" />
                   Delete
                 </VaMenuItem>
@@ -341,7 +654,7 @@ onMounted(async () => {
               </VaButton>
               <div>
                 <VaButton
-                  v-if="currentUserId === paperDetail?.createdBy"
+                  v-if="canEditGuest || canShareGuest"
                   preset="secondary"
                   size="small"
                   @click="showAssignPaperModal = !showAssignPaperModal"
@@ -396,7 +709,7 @@ onMounted(async () => {
               <span> Content</span>
               <div>
                 <VaButton
-                  v-if="currentUserId === paperDetail?.createdBy"
+                  v-if="canEditGuest || canShareGuest"
                   preset="secondary"
                   size="small"
                   @click="navigateToManageQuestions"
@@ -434,7 +747,9 @@ onMounted(async () => {
     </template>
 
     <template #content>
-      <VaCardTitle>Student submit ({{ submittedStudents?.data.length || 0 }}/0)</VaCardTitle>
+      <VaCardTitle
+        >Student submit ({{ submittedStudents?.data.length || 0 }}/ {{ totalAssigneesInPaper || 0 }})</VaCardTitle
+      >
       <VaCard class="mt-2 ml-2" style="height: 60vh">
         <VaCardContent
           v-if="paperDetail?.shareType === AccessType.ByClass || paperDetail?.shareType === AccessType.ByStudent"
@@ -444,13 +759,6 @@ onMounted(async () => {
             <VaButton size="small" @click="showSelectClassModal = !showSelectClassModal"
               >Select class group: {{ selectedGroupClassName }}
             </VaButton>
-            <VaSelect
-              v-model="statusSubmitValue"
-              :options="statusSubmitOptions"
-              text-by="label"
-              value-by="value"
-              class="max-w-[120px]"
-            />
           </VaCardTitle>
           <VaModal v-model="showSelectClassModal" size="large" hide-default-actions>
             <VaCard outlined>
@@ -519,7 +827,14 @@ onMounted(async () => {
             :key="submittedStudent.id"
             outlined
             class="mr-2 cursor-pointer"
-            @click="navigateToExamReview(submittedStudent.paperId, submittedStudent.createdBy, submittedStudent.id)"
+            @click="
+              navigateToExamReview(
+                submittedStudent.paperId,
+                submittedStudent.createdBy,
+                submittedStudent.id,
+                submittedStudent.status,
+              )
+            "
           >
             <div class="p-2 flex justify-between">
               <div class="flex">
@@ -598,6 +913,240 @@ onMounted(async () => {
       :group-access-paper="accessPaperGroups"
       :access-type="paperDetail?.shareType as AccessType"
     />
+  </VaModal>
+
+  <VaModal v-model="doShowSharePaperModal" mobile-fullscreen size="small" close-button stateful hide-default-actions>
+    <h1 class="va-h5 mb-4">Share paper "{{ paperDetail?.examName }}"</h1>
+    <VaSelect
+      v-model="singleSelect"
+      v-model:search="autoCompleteSearchValue"
+      class="col-span-1"
+      :loading="isLoadingSelect"
+      label="Select User or Group"
+      :options="options"
+      searchable
+      :text-by="
+        (option: TeacherTeamTeacherGroupCombine) => getOptionName(option as TeacherTeamTeacherGroupCombine).data
+      "
+      placeholder="Search user or Group"
+      track-by="id"
+    >
+      <template #appendInner>
+        <VaIcon name="fas-search" />
+      </template>
+      <template #option="{ option }">
+        <div class="flex justify-between items-center p-2">
+          <div class="flex items-center gap-2">
+            <VaAvatar
+              v-if="getOptionName(option as TeacherTeamTeacherGroupCombine).isUser"
+              :size="48"
+              :color="avatarColor(getOptionName(option as TeacherTeamTeacherGroupCombine).data)"
+              >{{
+                getOptionName(option as TeacherTeamTeacherGroupCombine)
+                  .data?.charAt(0)
+                  .toUpperCase()
+              }}
+            </VaAvatar>
+            <VaAvatar v-else :size="48" color="warning" icon="group"> </VaAvatar>
+            <div>
+              <div>{{ getOptionName(option as TeacherTeamTeacherGroupCombine).data }}</div>
+              <div class="text-sm text-gray-500">
+                {{ getOptionName(option as TeacherTeamTeacherGroupCombine).data }}
+              </div>
+            </div>
+          </div>
+          <div>
+            <VaPopover
+              v-if="
+                (option as TeacherTeamTeacherGroupCombine).teacherTeam?.teacherId ===
+                '00000000-0000-0000-0000-000000000000'
+              "
+              class="mr-2 mb-2"
+              message="Not registered yet"
+            >
+              <VaIcon class="mr-2" name="no_accounts" />
+            </VaPopover>
+            <VaButton
+              :disabled="
+                (option as TeacherTeamTeacherGroupCombine).teacherTeam?.teacherId ===
+                '00000000-0000-0000-0000-000000000000'
+              "
+              size="small"
+              preset="secondary"
+              border-color="primary"
+              @click="AddPermission(option as TeacherTeamTeacherGroupCombine)"
+            >
+              Select
+            </VaButton>
+          </div>
+        </div>
+      </template>
+    </VaSelect>
+    <div class="mt-5">
+      <VaScrollContainer class="h-80" vertical>
+        <VaList>
+          <VaListLabel> Permissions </VaListLabel>
+
+          <VaListItem v-for="(permission, index) in paperDetail?.paperPermissions" :key="index" class="list__item ml-5">
+            <VaListItemSection avatar>
+              <VaAvatar
+                v-if="permission.userId !== null ? true : false"
+                :size="42"
+                :color="avatarColor(getNameUserGroup(permission))"
+              >
+                {{ getNameUserGroup(permission)?.charAt(0) }}
+              </VaAvatar>
+              <VaAvatar v-else :size="42" color="warning" icon="group"> </VaAvatar>
+            </VaListItemSection>
+
+            <VaListItemSection>
+              <VaListItemLabel>
+                {{ getNameUserGroup(permission) }}
+              </VaListItemLabel>
+
+              <VaListItemLabel caption>
+                {{ permission.user?.email }}
+              </VaListItemLabel>
+            </VaListItemSection>
+
+            <VaListItemSection v-if="!allPermissionFalse(permission as PaperPermission)" icon>
+              <VaButton
+                v-if="paperDetail?.createdBy && paperDetail.createdBy == permission.user?.id"
+                size="small"
+                disabled
+                preset="secondary"
+                border-color="primary"
+                class="mr-6 mb-2"
+              >
+                Owner
+              </VaButton>
+              <VaButton
+                v-else
+                size="small"
+                preset="secondary"
+                border-color="primary"
+                class="mr-6 mb-2"
+                @click="editPermission(permission)"
+              >
+                Edit Permissions
+              </VaButton>
+            </VaListItemSection>
+          </VaListItem>
+        </VaList>
+      </VaScrollContainer>
+    </div>
+  </VaModal>
+
+  <VaModal
+    v-model="doShowPaperPermissionFormAddModal"
+    ok-text="Save"
+    size="small"
+    @ok="
+      () => {
+        onSharePaperPermission()
+      }
+    "
+  >
+    <span class="va-h5 mb-5"
+      >Grand Permissions for <b>"{{ getNameUserGroup(editPermissionValue) }}"</b></span
+    >
+    <VaForm>
+      <div class="gap-4 ml-10 mt-10">
+        <VaListItem>
+          <VaListItemSection avatar>
+            <VaAvatar :size="48" :color="avatarColor(getNameUserGroup(editPermissionValue))">{{
+              getNameUserGroup(editPermissionValue)?.charAt(0)
+            }}</VaAvatar>
+          </VaListItemSection>
+          <VaListItemSection>
+            <VaListItemLabel>
+              {{ getNameUserGroup(editPermissionValue) }}
+            </VaListItemLabel>
+
+            <VaListItemLabel caption>
+              {{ editPermissionValue?.user?.email }}
+            </VaListItemLabel>
+          </VaListItemSection>
+          <VaListItemSection icon>
+            <VaPopover message="Delete permission" position="top">
+              <VaButton
+                round
+                icon="mso-delete"
+                color="danger"
+                @click="
+                  () => {
+                    onSharePaperPermission()
+                  }
+                "
+              >
+                Delete
+              </VaButton>
+            </VaPopover>
+          </VaListItemSection>
+        </VaListItem>
+      </div>
+      <div class="flex flex-col gap-4 p-10">
+        <VaCheckbox v-model="permissionEdit.canView" label="View" />
+        <VaCheckbox v-model="editPaper" label="Edit" />
+        <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
+      </div>
+    </VaForm>
+  </VaModal>
+
+  <VaModal
+    v-model="doShowPaperPermissionFormModal"
+    ok-text="Save"
+    size="small"
+    @ok="
+      () => {
+        onSharePaperPermission()
+      }
+    "
+  >
+    <span class="va-h5 mb-5"
+      >Edit Permissions for <b>"{{ getNameUserGroup(editPermissionValue) }}"</b></span
+    >
+    <VaForm>
+      <div class="gap-4 ml-10 mt-10">
+        <VaListItem>
+          <VaListItemSection avatar>
+            <VaAvatar :size="48" :color="avatarColor(getNameUserGroup(editPermissionValue))">{{
+              getNameUserGroup(editPermissionValue)?.charAt(0)
+            }}</VaAvatar>
+          </VaListItemSection>
+          <VaListItemSection>
+            <VaListItemLabel>
+              {{ getNameUserGroup(editPermissionValue) }}
+            </VaListItemLabel>
+
+            <VaListItemLabel caption>
+              {{ editPermissionValue?.user?.email }}
+            </VaListItemLabel>
+          </VaListItemSection>
+          <VaListItemSection icon>
+            <VaPopover message="Delete permission" position="top">
+              <VaButton
+                round
+                icon="mso-delete"
+                color="danger"
+                @click="
+                  () => {
+                    handleDeletePermission()
+                  }
+                "
+              >
+                Delete
+              </VaButton>
+            </VaPopover>
+          </VaListItemSection>
+        </VaListItem>
+      </div>
+      <div class="flex flex-col gap-4 p-10">
+        <VaCheckbox v-model="permissionEdit.canView" label="View" />
+        <VaCheckbox v-model="canEdit" label="Edit" />
+        <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
+      </div>
+    </VaForm>
   </VaModal>
 </template>
 

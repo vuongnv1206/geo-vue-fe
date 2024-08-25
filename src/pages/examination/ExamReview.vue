@@ -108,8 +108,122 @@ const groupQuestionsByType = (questions: Question[]) => {
   return groups
 }
 
-const filterGroupQuestionType = () => {
-  console.log(valueTab.value)
+const getQuestionLabel = (typeQuestion: string) => {
+  switch (typeQuestion) {
+    case 'all':
+      return 'Total'
+    case 'singleChoice':
+      return 'Single Choice'
+    case 'multipleChoice':
+      return 'Multiple Choice'
+    case 'fillBlank':
+      return 'Fill in the Blank'
+    case 'matching':
+      return 'Matching'
+    case 'reading':
+      return 'Reading'
+    case 'readingQuestionPassage':
+      return 'Reading Question Passage'
+    case 'writing':
+      return 'Writing'
+    default:
+      return 'Other'
+  }
+}
+const getCorrectQuestionPerQuestion = (typeQuestion: string) => {
+  let correctQuestion = 0
+  let totalQuestion = 0
+  let label = ''
+
+  switch (typeQuestion) {
+    case 'all':
+      correctQuestion =
+        result.value?.submitPaperDetails?.filter(
+          (detail) => detail.isCorrect || detail.question.questionType === QuestionType.Writing,
+        ).length || 0
+      totalQuestion = result.value?.paper.questions?.length || 0
+      label = 'Total'
+      break
+
+    case 'singleChoice':
+      ;({ correctQuestion, totalQuestion } = getCorrectQuestionCount(QuestionType.SingleChoice))
+      label = 'Single Choice'
+      break
+
+    case 'multipleChoice':
+      ;({ correctQuestion, totalQuestion } = getCorrectQuestionCount(QuestionType.MultipleChoice))
+      label = 'Multiple Choice'
+      break
+
+    case 'fillBlank':
+      ;({ correctQuestion, totalQuestion } = getCorrectQuestionCount(QuestionType.FillBlank))
+      label = 'Fill in the Blank'
+      break
+
+    case 'matching':
+      ;({ correctQuestion, totalQuestion } = getCorrectQuestionCount(QuestionType.Matching))
+      label = 'Matching'
+      break
+
+    case 'reading':
+      ;({ correctQuestion, totalQuestion } = getCorrectQuestionCount(QuestionType.Reading))
+      label = 'Reading'
+      break
+
+    case 'readingQuestionPassage':
+      ;({ correctQuestion, totalQuestion } = getCorrectQuestionCount(QuestionType.ReadingQuestionPassage))
+      label = 'Reading Question Passage'
+      break
+
+    case 'writing':
+      ;({ correctQuestion, totalQuestion } = getCorrectQuestionCount(QuestionType.Writing))
+      label = 'Graded Writing'
+      break
+
+    default:
+      label = 'Other'
+      correctQuestion = 0
+      totalQuestion = 0
+      break
+  }
+
+  return {
+    label,
+    correctQuestion,
+    totalQuestion,
+  }
+}
+
+const getCorrectQuestionCount = (typeQuestion: QuestionType) => {
+  let correctQuestion = 0
+  if (typeQuestion == QuestionType.Writing) {
+    correctQuestion =
+      result.value?.submitPaperDetails?.filter(
+        (detail) => detail.lastModifiedBy !== detail.createdBy && detail.question.questionType === typeQuestion,
+      ).length || 0
+  } else {
+    correctQuestion =
+      result.value?.submitPaperDetails?.filter(
+        (detail) => detail.isCorrect && detail.question.questionType === typeQuestion,
+      ).length || 0
+  }
+
+  const totalQuestion =
+    result.value?.paper.questions?.filter((question) => question.questionType === typeQuestion).length || 0
+
+  return {
+    correctQuestion,
+    totalQuestion,
+  }
+}
+
+const handleMarkSuccess = async () => {
+  questionTypesLabel.value = ['all']
+  await getLastExamResult()
+}
+
+const roundToTwoDecimal = (num: number | undefined) => {
+  return Math.round((num ?? 0) * 100) / 100
 }
 </script>
 
@@ -119,7 +233,7 @@ const filterGroupQuestionType = () => {
       <VaCard v-if="showSidebar" style="min-width: 20rem; max-width: 30rem" bordered>
         <VaCardTitle>
           <div class="flex items-center">
-            <VaAvatar size="small" class="mr-2"> N </VaAvatar>
+            <VaAvatar size="small" class="mr-2"> {{ result?.student?.userName.charAt(0).toUpperCase() }} </VaAvatar>
             <p>
               <b>{{ result?.student?.userName }}</b>
             </p>
@@ -134,25 +248,20 @@ const filterGroupQuestionType = () => {
             <VaCardActions align="stretch" vertical>
               <VaListItem>
                 <p>
-                  <b>{{ t('papers.point') }}:</b> {{ result?.totalMark }}/{{ maxPointInPaper }}
+                  <b>{{ t('papers.point') }}:</b> {{ roundToTwoDecimal(result?.totalMark) }}/{{
+                    roundToTwoDecimal(maxPointInPaper)
+                  }}
                 </p>
               </VaListItem>
-              <VaListItem>
-                <p>
-                  <b>{{ t('papers.multiple_choice') }}:</b>({{
-                    result?.submitPaperDetails?.filter((detail) => detail.isCorrect).length || 0
-                  }}/{{ result?.totalQuestion }} câu)
-                </p>
-              </VaListItem>
-              <VaListItem>
-                <p><b>Tự luận:</b> <span style="color: red">Chưa chấm</span> (1 câu)</p>
-              </VaListItem>
-              <div>
-                <p><b>Số file đã nộp:</b> 0</p>
-              </div>
-              <div>
-                <p><b>Xem chi tiết quá trình làm bài:</b> <span class="icon">🔍</span></p>
-              </div>
+              <template v-for="(typeQuestion, index) in questionTypesLabel" :key="index">
+                <VaListItem>
+                  <p class="flex gap-1">
+                    <b>{{ getCorrectQuestionPerQuestion(typeQuestion).label }}:</b>
+                    {{ getCorrectQuestionPerQuestion(typeQuestion).correctQuestion }} /
+                    {{ getCorrectQuestionPerQuestion(typeQuestion).totalQuestion }}
+                  </p>
+                </VaListItem>
+              </template>
             </VaCardActions>
           </VaCard>
         </VaCardContent>
@@ -169,16 +278,16 @@ const filterGroupQuestionType = () => {
           </VaNavbarItem>
         </template>
         <template #right>
-          <VaNavbarItem class="navbar-item-slot">
+          <!-- <VaNavbarItem class="navbar-item-slot">
             <VaMenu>
               <template #anchor>
                 <VaButton icon="filter_list" size="small">Filter</VaButton>
               </template>
-              <div class="p-4">
-                <!-- Thêm các tùy chọn filter nếu cần -->
-              </div>
+              <div class="p-4"> -->
+          <!-- Thêm các tùy chọn filter nếu cần -->
+          <!-- </div>
             </VaMenu>
-          </VaNavbarItem>
+          </VaNavbarItem> -->
         </template>
         <template #center>
           <VaNavbarItem>
@@ -189,8 +298,8 @@ const filterGroupQuestionType = () => {
       <VaCard class="mt-2 ml-2">
         <VaTabs v-model="valueTab">
           <template #tabs>
-            <VaTab v-for="title in questionTypesLabel" :key="title" :name="title" @click="filterGroupQuestionType">
-              {{ title }}
+            <VaTab v-for="title in questionTypesLabel" :key="title" :name="title">
+              {{ getQuestionLabel(title) }}
             </VaTab>
           </template>
         </VaTabs>
@@ -238,6 +347,7 @@ const filterGroupQuestionType = () => {
                 :show-action-button="false"
                 :index="index + 1"
                 :submit-paper-id="request.submitPaperId"
+                @markSuccess="handleMarkSuccess"
               />
               <ReadingQuestion
                 v-if="question.questionType == QuestionType.Reading && (valueTab == 'reading' || valueTab == 'all')"

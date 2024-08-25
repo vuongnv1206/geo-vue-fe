@@ -384,6 +384,7 @@ const columns = defineVaDataTableColumns([
   { label: t('papers.started_time'), key: 'startedTime', sortable: true },
   { label: t('papers.submitted_time'), key: 'submittedTime', sortable: true },
   { label: t('papers.score'), key: 'score', sortable: true },
+  { label: ' ', key: 'action' },
 ])
 
 const paperStudent = ref<any[]>([])
@@ -512,6 +513,19 @@ const getStatusClass = (status: number) => {
   } else {
     return ''
   }
+}
+const router = useRouter()
+const currentUserId = authStore.user?.id
+
+const viewDetailAnswerResult = (submitId: string, paperId: string) => {
+  router.push({
+    name: 'exam-student-review',
+    params: {
+      paperId: paperId,
+      userId: currentUserId,
+      submitPaperId: submitId,
+    },
+  })
 }
 
 onMounted(() => {
