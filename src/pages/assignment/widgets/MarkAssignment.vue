@@ -1,3 +1,112 @@
+<template>
+  <VaLayout>
+    <VaButton
+      icon="va-arrow-left"
+      preset="plainOpacity"
+      :to="{ name: 'assignment-details', param: { id: assignmentId, classId: classId } }"
+    />
+  </VaLayout>
+  <VaDivider />
+  <VaLayout class="h-[80vh]">
+    <template #left>
+      <div class="w-[55vw] bg-gray-200 p-4 mr-2 rounded-md h-full">
+        <div v-for="ass in assignmentSubmission" :key="ass.assignmentId" class="h-full">
+          <VaCard v-if="ass.status === 'Submitted'" class="h-full">
+            <VaCardTitle>{{ $t('assignments.attachments') }}</VaCardTitle>
+            <VaCard v-for="(attachmentPath, index) in attachmentPaths" :key="index">
+              <VaButton
+                class="font-medium geo-text px-5"
+                icon="description"
+                size="small"
+                preset="plain"
+                :href="`${url}${rawAttachmentPaths[index]}`"
+              >
+                {{ attachmentPath }}
+              </VaButton>
+            </VaCard>
+            <VaCardTitle>{{ $t('assignments.answers') }}</VaCardTitle>
+            <VaScrollContainer class="max-h-[50vh]" vertical>
+              <!-- eslint-disable vue/no-v-html -->
+              <div
+                class="text-md font-medium px-5 mb-4 max-h-48 overflow-y-auto break-words whitespace-pre-line"
+                v-html="ass.answerRaw"
+              ></div>
+              <!-- eslint-enable -->
+            </VaScrollContainer>
+          </VaCard>
+
+          <div v-else class="flex flex-col items-center h-full">
+            <VaIcon name="description" size="3rem" class="mb-2" />
+            <VaCardContent class="text-xl font-medium text-center">
+              {{ t('assignments.is_not_submited') }}
+            </VaCardContent>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template #content>
+      <div class="w-[33vw] bg-gray-200 p-4 h-full rounded-md">
+        <VaCard v-for="ass in assignmentSubmission" :key="ass.assignmentId" class="h-full">
+          <Vaform>
+            <VaCard class="flex justify-between items-center p-4">
+              <div class="flex items-center">
+                <GeoAvatar
+                  :size="42"
+                  color="warning"
+                  :image="ass.student.avatarUrl || undefined"
+                  :txt="ass.student.firstName.charAt(0).toUpperCase()"
+                />
+                <VaCardContent>{{ ass.student.firstName }} {{ ass.student.lastName }}</VaCardContent>
+              </div>
+              <VaInput
+                v-model="newMarkAssignment.score"
+                class="w-40"
+                :placeholder="$t('assignments.enter_score')"
+                :rules="[
+                  validators.required2($t('assignments.score')),
+                  validators.isDecimalNumber($t('assignments.score')),
+                  validators.minValue(0),
+                  validators.maxValue(10),
+                ]"
+                :disabled="!canMarkAssignment"
+              />
+            </VaCard>
+            <VaCardTitle>{{ $t('assignments.comment') }}</VaCardTitle>
+            <VaCard v-if="canMarkAssignment" class="px-4">
+              <QuillEditor
+                v-model:content="newMarkAssignment.comment"
+                class="border rounded w-full mx-auto"
+                :placeholder="$t('posts.enter_content')"
+                content-type="html"
+                style="height: 200px"
+              />
+            </VaCard>
+            <VaCard v-else class="px-4">
+              <div
+                v-if="newMarkAssignment.comment == null || newMarkAssignment.comment == '<p><br></p>'"
+                class="px-4 pt-2 bg-gray-100 min-h-[40vh]"
+              >
+                <Vacard>
+                  {{ $t('assignments.no_comment') }}
+                </Vacard>
+              </div>
+              <!-- eslint-disable vue/no-v-html -->
+              <div v-else class="px-4 pt-2 bg-gray-100 min-h-[40vh]" v-html="newMarkAssignment.comment" />
+              <!--eslint-enable-->
+            </VaCard>
+            <VaCard v-if="canMarkAssignment" class="flex justify-end space-x-4 p-4">
+              <VaButton :to="{ name: 'assignment-details', param: { id: assignmentId, classId: classId } }">{{
+                $t('settings.cancel')
+              }}</VaButton>
+              <VaButton @click="onMarkAssignmentSubmit">{{ $t('settings.save') }}</VaButton>
+            </VaCard>
+          </Vaform>
+        </VaCard>
+      </div>
+    </template>
+  </VaLayout>
+</template>
 <script setup lang="ts">
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { useToast, VaCardContent, VaButton, VaIcon, VaCard } from 'vuestic-ui'
@@ -9,12 +118,16 @@ import { getErrorMessage, notifications, validators } from '@/services/utils'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
+import { ClassPermission, Classrooms } from '@/pages/classrooms/types'
+import { useClassStore } from '@/stores/modules/class.module'
 
 const { t } = useI18n()
 const loading = ref(true)
 const router = useRouter()
 const assignmentStores = useAssignmentStore()
 const { init: notify } = useToast()
+const classById = ref<Classrooms | null>(null)
+const classStores = useClassStore()
 
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
@@ -107,103 +220,33 @@ const onMarkAssignmentSubmit = async () => {
     })
 }
 
+const getClassById = async () => {
+  loading.value = true
+  classStores
+    .getClassById(classId)
+    .then((response) => {
+      classById.value = response
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(t('classes.class')) + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const canMarkAssignment = computed(() => {
+  if (classById.value?.permissions === null || classById.value?.permissions === undefined) {
+    return true
+  }
+  return classById.value?.permissions.some((permission) => permission.permissionType === ClassPermission.Marking)
+})
+
 onMounted(() => {
+  getClassById()
   getAssignmentSubmissions()
 })
 </script>
-
-<template>
-  <VaLayout>
-    <VaButton
-      icon="va-arrow-left"
-      preset="plainOpacity"
-      :to="{ name: 'assignment-details', param: { id: assignmentId, classId: classId } }"
-    />
-  </VaLayout>
-  <VaDivider />
-  <VaLayout class="h-[80vh]">
-    <template #left>
-      <div class="w-[55vw] bg-gray-200 p-4 mr-2 rounded-md h-full">
-        <div v-for="ass in assignmentSubmission" :key="ass.assignmentId" class="h-full">
-          <VaCard v-if="ass.status === 'Submitted'" class="h-full">
-            <VaCardTitle>{{ $t('assignments.attachments') }}</VaCardTitle>
-            <VaCard v-for="(attachmentPath, index) in attachmentPaths" :key="index">
-              <VaButton
-                class="font-medium geo-text px-5"
-                icon="description"
-                size="small"
-                preset="plain"
-                :href="`${url}${rawAttachmentPaths[index]}`"
-              >
-                {{ attachmentPath }}
-              </VaButton>
-            </VaCard>
-            <VaCardTitle>{{ $t('assignments.answers') }}</VaCardTitle>
-            <VaScrollContainer class="max-h-[50vh]" vertical>
-              <!-- eslint-disable vue/no-v-html -->
-              <div
-                class="text-md font-medium px-5 mb-4 max-h-48 overflow-y-auto break-words whitespace-pre-line"
-                v-html="ass.answerRaw"
-              ></div>
-              <!-- eslint-enable -->
-            </VaScrollContainer>
-          </VaCard>
-
-          <div v-else class="flex flex-col items-center h-full">
-            <VaIcon name="description" size="3rem" class="mb-2" />
-            <VaCardContent class="text-xl font-medium text-center">
-              {{ t('assignments.is_not_submited') }}
-            </VaCardContent>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <template #content>
-      <div class="w-[33vw] bg-gray-200 p-4 h-full rounded-md">
-        <VaCard v-for="ass in assignmentSubmission" :key="ass.assignmentId" class="h-full">
-          <Vaform>
-            <VaCard class="flex justify-between items-center p-4">
-              <div class="flex items-center">
-                <GeoAvatar
-                  :size="42"
-                  color="warning"
-                  :image="ass.student.avatarUrl || undefined"
-                  :txt="ass.student.firstName.charAt(0).toUpperCase()"
-                />
-                <VaCardContent>{{ ass.student.firstName }} {{ ass.student.lastName }}</VaCardContent>
-              </div>
-              <VaInput
-                v-model="newMarkAssignment.score"
-                class="w-40"
-                :placeholder="$t('assignments.enter_score')"
-                :rules="[
-                  validators.required2($t('assignments.score')),
-                  validators.isDecimalNumber($t('assignments.score')),
-                  validators.minValue(0),
-                  validators.maxValue(10),
-                ]"
-              />
-            </VaCard>
-            <VaCardTitle>{{ $t('assignments.comment') }}</VaCardTitle>
-            <VaCard class="px-4">
-              <QuillEditor
-                v-model:content="newMarkAssignment.comment"
-                class="border rounded w-full mx-auto"
-                :placeholder="$t('posts.enter_content')"
-                content-type="html"
-                style="height: 200px"
-              />
-            </VaCard>
-            <VaCard class="flex justify-end space-x-4 p-4">
-              <VaButton :to="{ name: 'assignment-details', param: { id: assignmentId, classId: classId } }">{{
-                $t('settings.cancel')
-              }}</VaButton>
-              <VaButton @click="onMarkAssignmentSubmit">{{ $t('settings.save') }}</VaButton>
-            </VaCard>
-          </Vaform>
-        </VaCard>
-      </div>
-    </template>
-  </VaLayout>
-</template>
