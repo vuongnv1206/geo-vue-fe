@@ -74,7 +74,7 @@ export const useAuthStore = defineStore('auth', {
     },
     setUserDetails(userDetail: UserDetail) {
       this.avatarUrl = userDetail.imageUrl || ''
-      if (this.user) this.user.fullName = userDetail.firstName + userDetail.lastName
+      if (this.user) this.user.fullName = userDetail.firstName + ' ' + userDetail.lastName
     },
     async login(email: string, password: string, captchaToken: string, keepLogin: boolean): Promise<any> {
       try {
