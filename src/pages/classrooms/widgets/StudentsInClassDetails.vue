@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, PropType, ref } from 'vue'
-import { DataTableItem, defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
-import { Classrooms, EmptyStudent, FailedStudentImport, Student } from '../types'
+import { defineVaDataTableColumns, useModal, useToast } from 'vuestic-ui'
+import { ClassPermission, Classrooms, EmptyStudent, FailedStudentImport, Student } from '../types'
 import { notifications, getErrorMessage, format } from '@/services/utils'
 import { useStudentStore } from '@/stores/modules/student.module'
 import EditStudent from './EditStudent.vue'
@@ -43,8 +43,8 @@ const createNewStudent = () => {
   doShowStudentFormModal.value = true
 }
 
-const editStudent = (rowData: DataTableItem) => {
-  studentToEdit.value = rowData as Student
+const editStudent = (student: Student) => {
+  studentToEdit.value = student as Student
   doShowStudentFormModal.value = true
 }
 
@@ -67,19 +67,19 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   }
 }
 
-const deleteStudent = (rowData: DataTableItem) => {
+const deleteStudent = (student: Student) => {
   studentStore
-    .deleteStudent(rowData.id)
+    .deleteStudent(student.id)
     .then(() => {
       notify({
-        message: notifications.deleteSuccessfully(rowData.firstName + ' ' + rowData.lastName),
+        message: notifications.deleteSuccessfully(student.firstName + ' ' + student.lastName),
         color: 'success',
       })
       emit('load')
     })
     .catch((error) => {
       notify({
-        message: notifications.deleteFailed(rowData.firstName + ' ' + rowData.lastName) + getErrorMessage(error),
+        message: notifications.deleteFailed(student.firstName + ' ' + student.lastName) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -191,7 +191,7 @@ const uploadStudentFile = () => {
       console.log(response)
       if (response.length > 0) {
         notify({
-          message: 'Some students encountered errors during import.',
+          message: t('students.import_failed'),
           color: 'warning',
         })
         const requestFail: FailedStudentImport = {
@@ -231,17 +231,17 @@ const canStudentManage = computed(() => {
   if (props.classroom.permissions === null || props.classroom.permissions === undefined) {
     return true
   }
-  return props.classroom.permissions?.some((permission) => permission.permissionType === 3)
+  return props.classroom.permissions?.some((permission) => permission.permissionType === ClassPermission.ManageStudent)
 })
 </script>
 
 <template>
   <VaCard>
-    <VaCardTitle class="flex flex-col md:flex-row gap-2 justify-end">
+    <VaCardTitle v-if="canStudentManage" class="flex flex-col md:flex-row gap-2 justify-end">
       <VaButton v-if="selectedItemsEmitted.length != 0" icon="delete" color="danger" @click="deleteSelectedStudent()">
         {{ t('settings.delete') }}
       </VaButton>
-      <VaButton :disabled="!canStudentManage" icon="add" @click="createNewStudent()">
+      <VaButton icon="add" @click="createNewStudent()">
         {{ t('students.student') }}
       </VaButton>
       <VaFileUpload v-model="filesUploaded" hide-file-list file-types=".xlsx,.xls" @fileAdded="uploadStudentFile" />
@@ -254,13 +254,12 @@ const canStudentManage = computed(() => {
       <VaDataTable
         hoverable
         clickable
-        selectable
+        :selectable="canStudentManage"
         :columns="columns"
         select-mode="multiple"
         :items="props.classroom.students || []"
         :disable-client-side-sorting="false"
         @selectionChange="handleSelectionChange($event.currentSelectedItems)"
-        @delete="deleteStudentWithConfirm"
       >
         <template #cell(gender)="{ rowData }">
           <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
@@ -272,15 +271,15 @@ const canStudentManage = computed(() => {
             <div>{{ format.formatDate(rowData.dateOfBirth) }}</div>
           </div>
         </template>
-        <template #cell(actions)="{ rowData }">
-          <div class="flex gap-2 justify-end">
+        <template #cell(actions)="{ rowData: student }">
+          <div v-if="canStudentManage" class="flex gap-2 justify-end">
             <VaButton
               preset="primary"
               size="small"
               color="primary"
               icon="mso-edit"
               :aria-label="t('settings.edit')"
-              @click="editStudent(rowData)"
+              @click="editStudent(student as Student)"
             />
             <VaButton
               preset="primary"
@@ -288,7 +287,7 @@ const canStudentManage = computed(() => {
               icon="mso-delete"
               color="danger"
               :aria-label="t('settings.delete')"
-              @click="deleteStudent(rowData)"
+              @click="deleteStudentWithConfirm(student as Student)"
             />
           </div>
         </template>

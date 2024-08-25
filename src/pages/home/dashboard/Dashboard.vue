@@ -202,13 +202,13 @@
               </div>
             </div>
           </template>
-          <template #cell(description)="{ rowData }">
+          <!-- <template #cell(description)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
                 <VaTextarea v-model="rowData.description" :readonly="true" />
               </div>
             </div>
-          </template>
+          </template> -->
           <template #cell(startedTime)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
@@ -223,13 +223,20 @@
               </div>
             </div>
           </template>
-          <template #cell(action)="{ row }">
-            <div v-if="row.source.canViewDetailAnswer" class="flex gap-2 justify-center">
-              <VaButton
-                preset="secondary"
-                icon="visibility"
-                @click="viewDetailAnswerResult(row.source.id, row.source.paperId)"
-              />
+          <template #cell(score)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span v-if="rowData.showMarkResult === ShowMarkResult.WhenAllStudentSubmitted">
+                  <span v-if="rowData.score !== -1">
+                    {{ rowData.score }}
+                  </span>
+                  <span v-else> {{ t('papers.please_wait_result') }} </span>
+                </span>
+                <span v-else-if="rowData.showMarkResult === ShowMarkResult.WhenSubmitted">
+                  {{ rowData.score }}
+                </span>
+                <span v-else> {{ t('papers.can_not_view_result') }} </span>
+              </div>
             </div>
           </template>
         </VaDataTable>
@@ -244,13 +251,14 @@
           <div>
             <!-- Header Section -->
             <VaCard class="flex flex-row items-center p-4 bg-white rounded-lg shadow-sm">
-              <GeoAvatar
-                class="mr-2"
-                :size="48"
-                color="warning"
-                :image="class1.owner?.imageUrl || undefined"
-                :txt="class1.owner?.firstName.charAt(0).toUpperCase()"
-              />
+              <div>
+                <VaAvatar
+                  :src="getSrcAvatar(class1.owner?.imageUrl)"
+                  class="w-14 h-14 font-bold mr-2"
+                  :fallback-text="class1.owner?.firstName.charAt(0)?.toUpperCase()"
+                  :color="avatarColor(class1.owner?.firstName)"
+                />
+              </div>
               <VaCard :to="{ name: 'class-details', params: { id: class1.id } }">
                 <VaCardContent class="text-md font-bold text-gray-800">
                   {{ class1.owner?.firstName }} {{ class1.owner?.lastName }}
@@ -338,15 +346,14 @@ import { useI18n } from 'vue-i18n'
 import { defineVaDataTableColumns, useToast, VaCardTitle } from 'vuestic-ui'
 import { useClassStore } from '@/stores/modules/class.module'
 import { ClassroomWithPosts } from '@/pages/classrooms/types'
-import { format, getErrorMessage, notifications } from '@/services/utils'
+import { avatarColor, format, getErrorMessage, notifications } from '@/services/utils'
 import { usePostsStore } from '@/stores/modules/posts.module'
-import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
-import { PaperStudents, PaperStudentsHistory } from '@/pages/examination/types'
+import { PaperStudents, PaperStudentsHistory, ShowMarkResult } from '@/pages/examination/types'
 import { usePaperStudentsStore } from '@/stores/modules/paperStudents.module'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRouter } from 'vue-router'
+import { getSrcAvatar } from '@/pages/audit-logs/helper'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -372,7 +379,7 @@ const columns = defineVaDataTableColumns([
   { label: t('papers.start_time'), key: 'startTime', sortable: true },
   { label: t('papers.end_time'), key: 'endTime', sortable: true },
   { label: t('papers.duration'), key: 'duration', sortable: true },
-  { label: t('papers.description'), key: 'description', sortable: true },
+  // { label: t('papers.description'), key: 'description', sortable: true },
   // { label: t('papers.paper_label'), key: 'paperLabelName', sortable: true },
   { label: t('papers.started_time'), key: 'startedTime', sortable: true },
   { label: t('papers.submitted_time'), key: 'submittedTime', sortable: true },

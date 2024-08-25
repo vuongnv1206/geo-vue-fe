@@ -79,6 +79,7 @@
             :label="$t('subjects.subject')"
             :placeholder="$t('subjects.select_subject')"
             clearable
+            :rules="[validators.required]"
           />
           <VaLayout class="border rounded-xl pb-2 px-2">
             <template #left>

@@ -212,10 +212,16 @@ export type StudentFailDetail = {
   firstName: string
   lastName: string
   avatarUrl: string
-  dateOfBirth: string // Sử dụng string để đại diện cho ngày tháng, có thể đổi thành Date nếu cần
+  dateOfBirth: string
   email: string
   phoneNumber: string
   studentCode: string
   gender: boolean
-  classesId: string // UUID dạng string
+  classesId: string
+}
+
+export enum ClassPermission {
+  AssignAssignment = 1,
+  Marking = 2,
+  ManageStudent = 3,
 }

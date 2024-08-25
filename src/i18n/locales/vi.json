@@ -350,7 +350,8 @@
     "submitted": "Đã nộp",
     "doing": "Đang làm bài",
     "marked": "Đã chấm",
-    "not_submitted": "Không nộp"
+    "not_submitted": "Không nộp",
+    "no_comment": "Không có nhận xét nào"
   },
   "subjects": {
     "subject": "Môn học",
@@ -365,7 +366,8 @@
     "delete_all_success": "Xóa tất cả môn học thành công",
     "fail": "Thất bại",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
-    "select_subject": "Chọn một môn học"
+    "select_subject": "Chọn một môn học",
+    "subject_require": "Môn học là bắt buộc"
   },
   "groupClasses": {
     "group_class": "Nhóm lớp",
@@ -424,7 +426,8 @@
     "delete_student": "Xóa học sinh",
     "edit_student": "Chỉnh sửa học sinh",
     "range": "Các mục từ {start} đến {end} trong tổng số {total}",
-    "no_student": "Không có học sinh nào"
+    "no_student": "Không có học sinh nào",
+    "import_failed": "Một số sinh viên gặp lỗi trong quá trình nhập. Vui lòng kiểm tra tệp đã tải xuống."
   },
   "comments": {
     "comment": "Bình luận",
@@ -586,7 +589,9 @@
     "in_progress": "Đang làm bài",
     "completed": "Đã hoàn thành",
     "suspended": "Đã đình chỉ",
-    "status": "Trạng thái"
+    "status": "Trạng thái",
+    "please_wait_result": "Vui lòng chờ kết quả",
+    "can_not_view_result": "Không thể xem kết quả"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",
