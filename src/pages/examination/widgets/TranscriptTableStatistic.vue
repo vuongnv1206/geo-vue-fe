@@ -115,7 +115,7 @@ watch(
 
 <template>
   <VaCard>
-    <VaCardTitle>Transcript table</VaCardTitle>
+    <VaCardTitle>Transcript</VaCardTitle>
     <VaCardContent>
       <VaDataTable
         :items="formattedData"
