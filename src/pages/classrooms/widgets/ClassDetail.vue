@@ -4,7 +4,9 @@
       <VaNavbar class="py-2 rounded">
         <template #left>
           <VaLayout>
-            <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'classroom' }" />
+            <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'classroom' }">
+              {{ classDetails.name }}
+            </VaButton>
           </VaLayout>
         </template>
       </VaNavbar>
@@ -56,7 +58,7 @@ import StudentsInClassDetails from './StudentsInClassDetails.vue'
 import PostsInClassDetails from './PostsInClassDetails.vue'
 import { useRouter } from 'vue-router'
 import { useClassStore } from '@/stores/modules/class.module'
-import { useToast } from 'vuestic-ui'
+import { useToast, VaCard } from 'vuestic-ui'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/modules/auth.module'

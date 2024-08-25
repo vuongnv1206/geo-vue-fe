@@ -351,7 +351,8 @@
     "submitted": "Submitted",
     "doing": "Doing",
     "marked": "Marked",
-    "not_submitted": "Not Submitted"
+    "not_submitted": "Not Submitted",
+    "no_comment": "No comment available"
   },
   "subjects": {
     "subject": "Subject",
@@ -364,7 +365,8 @@
     "edit_subject": "Edit Subject",
     "delete_all_success": "Successfully deleted all subjects",
     "range": "Items from {start} to {end} of total {total}",
-    "select_subject": "Select a Subject"
+    "select_subject": "Select a Subject",
+    "subject_require": "Subject is require"
   },
   "groupClasses": {
     "group_class": "Group Class",
@@ -423,7 +425,8 @@
     "delete_student": "Delete Student",
     "edit_student": "Edit Student",
     "range": "Items from {start} to {end} of total {total}",
-    "no_student": "No student available"
+    "no_student": "No student available",
+    "import_failed": "Some students encountered an error during the import process. Please check the downloaded file."
   },
   "comments": {
     "comment": "Comment",
@@ -585,7 +588,9 @@
     "in_progress": "In Progress",
     "completed": "Completed",
     "suspended": "Suspended",
-    "status": "Status"
+    "status": "Status",
+    "please_wait_result": "Please wait for the result",
+    "can_not_view_result": "You can't view the result"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",
@@ -676,7 +681,7 @@
     "class": "Class",
     "group-class": "Group class",
     "teacher-group": "Teacher",
-    "group-manage": "Group Admin",
+    "group-manage": "Manage Group",
     "join-request": "Join Request",
     "exam": "Exam",
     "assignments": "Assignment",

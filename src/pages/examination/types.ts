@@ -621,6 +621,12 @@ export type PaperStudentsResponse = {
   // hasNextPage: boolean
 }
 
+export enum ShowMarkResult {
+  No = 0,
+  WhenSubmitted = 1,
+  WhenAllStudentSubmitted = 2,
+}
+
 export type PaperStudentsHistory = {
   id: string
   paperId: string
