@@ -1,4 +1,4 @@
-import { Assignment, AssignmentStats } from '../assignment/types'
+import { Assignment, AssignmentStats, AssignmentWithMarkStatus } from '../assignment/types'
 import { PaperInListDto } from '../examination/types'
 import { PermissionInClass } from '../teacher-group/types'
 import { UserDetail } from '../user/types'
@@ -38,6 +38,20 @@ export type Classrooms = {
   permissions: PermissionInClass[] | null
 }
 
+export type ClassroomWithStats = {
+  id: string
+  name: string
+  schoolYear: string
+  ownerId: string
+  groupClassId: string
+  groupClassName: string
+  numberUserOfClass: number
+  assignments: AssignmentStats[]
+  papers: PaperInListDto[]
+  students: Student[]
+  permissions: PermissionInClass[] | null
+}
+
 export type ClassroomWithPosts = {
   id: string
   name: string
@@ -46,7 +60,7 @@ export type ClassroomWithPosts = {
   groupClassId: string
   groupClassName: string
   numberUserOfClass: number
-  assignments: Assignment[]
+  assignments: AssignmentWithMarkStatus[]
   students: Student[]
   permissions: PermissionInClass[] | null
   posts?: Post[]
@@ -183,20 +197,6 @@ export enum ClassroomQueryType {
   All = 0,
   MyClass = 1,
   SharedClass = 2,
-}
-
-export type ClassroomWithStats = {
-  id: string
-  name: string
-  schoolYear: string
-  ownerId: string
-  groupClassId: string
-  groupClassName: string
-  numberUserOfClass: number
-  assignments: AssignmentStats[]
-  papers: PaperInListDto[]
-  students: Student[]
-  permissions: PermissionInClass[] | null
 }
 
 export type FailedStudentImport = {

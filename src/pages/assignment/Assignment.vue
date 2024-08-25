@@ -22,7 +22,7 @@ import { getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
 import { Classrooms, ClassroomWithStats } from '../classrooms/types'
 import { useI18n } from 'vue-i18n'
-import { SubmissionStats } from './types'
+import { MarkAssignmentStatus, SubmissionStats } from './types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 
 const { t } = useI18n()
@@ -59,12 +59,14 @@ const getAssignmentByClass = () => {
             .getAssignmentSubmissions({ assignmentId: assignment.id, classId: class1.id })
             .then((response) => {
               const submissionStats: SubmissionStats = {
-                totalSubmitted: response.filter((submission: any) => submission.status === 'Submitted').length,
-                totalMarked: response.filter((submission: any) => submission.status === 'Marked').length,
+                totalSubmitted: response.filter(
+                  (submission: any) => submission.status === MarkAssignmentStatus.Submitted,
+                ).length,
+                totalMarked: response.filter((submission: any) => submission.status === MarkAssignmentStatus.Marked)
+                  .length,
                 totalStudents: response.length,
               }
               mergeData(class1, assignment, submissionStats)
-              console.log('merge: ', mergeAssignmentByClass.value)
             })
             .catch((error) => {
               notify({

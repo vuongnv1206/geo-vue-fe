@@ -133,6 +133,7 @@ const genderOptions = reactive([
       :rules="[validators.phone]"
     />
     <VaInput
+      v-if="props.student === null"
       v-model="newStudent.email"
       :label="t('students.email')"
       :placeholder="t('students.enter_email')"

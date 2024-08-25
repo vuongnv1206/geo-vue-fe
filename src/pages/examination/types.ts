@@ -827,3 +827,10 @@ export type MonitorDetailResponse = {
 export type MonitorRequest = {
   submitPaperId: string
 }
+
+export enum DoExamStatus {
+  NotStarted = 0,
+  InProgress = 1,
+  Completed = 2,
+  Suspended = 3,
+}
