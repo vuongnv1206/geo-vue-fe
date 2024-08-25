@@ -520,36 +520,36 @@ const form = useForm('paperConfigForm')
           </VaCardContent>
         </VaCard>
 
-      <VaCard class="mb-3">
-        <!-- <VaCardTitle> point an answers review </VaCardTitle> -->
-        <VaDivider class="m-0" />
-        <VaCardContent>
-          <div class="mb-2">
-            <span class="va-title">Show score</span>
-            <VaRadio
-              v-model="editPaper.showMarkResult"
-              :options="showMarkResultOptions"
-              :text-by="(op: any) => op.label"
-              :value-by="(op: any) => op.value"
-              type="radio"
-              class="assign-radio"
-              vertical
-            />
-          </div>
-          <div>
-            <span class="va-title">Show the exam and answers</span>
-            <VaRadio
-              v-model="editPaper.showQuestionAnswer"
-              :options="showQuestionAnswerOptions"
-              :text-by="(op: any) => op.label"
-              :value-by="(op: any) => op.value"
-              type="radio"
-              class="assign-radio"
-              vertical
-            />
-          </div>
-        </VaCardContent>
-      </VaCard>
+        <VaCard class="mb-3">
+          <!-- <VaCardTitle> point an answers review </VaCardTitle> -->
+          <VaDivider class="m-0" />
+          <VaCardContent>
+            <div class="mb-2">
+              <span class="va-title">Show score</span>
+              <VaRadio
+                v-model="editPaper.showMarkResult"
+                :options="showMarkResultOptions"
+                :text-by="(op: any) => op.label"
+                :value-by="(op: any) => op.value"
+                type="radio"
+                class="assign-radio"
+                vertical
+              />
+            </div>
+            <div>
+              <span class="va-title">Show the exam and answers</span>
+              <VaRadio
+                v-model="editPaper.showQuestionAnswer"
+                :options="showQuestionAnswerOptions"
+                :text-by="(op: any) => op.label"
+                :value-by="(op: any) => op.value"
+                type="radio"
+                class="assign-radio"
+                vertical
+              />
+            </div>
+          </VaCardContent>
+        </VaCard>
 
         <div class="flex justify-end">
           <VaButton
