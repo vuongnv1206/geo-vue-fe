@@ -148,7 +148,7 @@
             </VaListItemSection>
             <VaListItemSection>
               <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-              <VaListItemLabel
+              <!-- <VaListItemLabel
                 caption
                 :class="
                   getStatusColorClass(
@@ -159,6 +159,20 @@
                 {{
                   getStatusText(assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status)
                 }}
+              </VaListItemLabel> -->
+              <VaListItemLabel caption>
+                <VaBadge
+                  :text="
+                    getStatusText(
+                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status || '',
+                    )
+                  "
+                  :color="
+                    getStatusColorClass(
+                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status || '',
+                    )
+                  "
+                />
               </VaListItemLabel>
             </VaListItemSection>
           </VaListItem>
@@ -200,7 +214,7 @@ import { useFileStore } from '@/stores/modules/file.module'
 import { useClassStore } from '@/stores/modules/class.module'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { format, getErrorMessage, notifications } from '@/services/utils'
-import { useBreakpoint, useModal, useToast, VaCardContent, VaIcon } from 'vuestic-ui'
+import { useBreakpoint, useModal, useToast, VaCardContent, VaIcon, VaListItemLabel } from 'vuestic-ui'
 import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import EditAssignmentContent from './EditAssignmentContent.vue'
 import { ClassPermission, Classrooms } from '@/pages/classrooms/types'
@@ -430,22 +444,22 @@ const fileUpload = async () => {
 }
 
 // Function to get the color class based on status
-const getStatusColorClass = (status: string | undefined) => {
-  if (status === MarkAssignmentStatus.Marked) {
-    return 'text-green-500'
-  } else if (status === MarkAssignmentStatus.NotSubmitted) {
-    return 'text-red-500'
-  } else if (status === MarkAssignmentStatus.Submitted) {
-    return 'text-blue-500'
+const getStatusColorClass = (status: string) => {
+  if (status === MarkAssignmentStatus.Submitted) {
+    return '#F59E0B' // Submitted - Green 500
   } else if (status === MarkAssignmentStatus.Doing) {
-    return 'text-yellow-500'
+    return '#3B82F6' // Doing - Blue 500
+  } else if (status === MarkAssignmentStatus.Marked) {
+    return '#10B981' // Marked - Green 500
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
+    return '#EF4444' // Not Submitted - Red 500
   } else {
     return ''
   }
 }
 
 // Function to get the display text based on status
-const getStatusText = (status: string | undefined) => {
+const getStatusText = (status: string) => {
   if (status === MarkAssignmentStatus.Marked) {
     return t('assignments.marked')
   } else if (status === MarkAssignmentStatus.NotSubmitted) {

@@ -169,8 +169,11 @@
           <template #cell(completionStatus)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
-                <span :class="getStatusClass(rowData.completionStatus)">
-                  {{ getStatusText(rowData.completionStatus) }}
+                <span>
+                  <VaBadge
+                    :text="getStatusText(rowData.completionStatus)"
+                    :color="getStatusClass(rowData.completionStatus)"
+                  />
                 </span>
               </div>
             </div>
@@ -288,8 +291,12 @@
                 <RouterLink :to="{ name: 'assignment-submission', params: { id: ass.id, classId: class1.id } }">
                   <VaCardContent class="text-md font-semibold text-gray-800">
                     {{ ass.name }} -
-                    {{ ass.status === MarkAssignmentStatus.NotSubmitted ? t('assignments.time_out') : ass.status }}
+                    <VaBadge
+                      :text="getMarkAssignmentStatusText(ass.status)"
+                      :color="getMarkAssignmentStatusColor(ass.status)"
+                    />
                   </VaCardContent>
+                  <!-- {{ ass.status === MarkAssignmentStatus.NotSubmitted ? t('assignments.time_out') : ass.status }} -->
 
                   <VaCardContent class="text-xs font-medium text-gray-600">
                     <div class="flex items-center mb-1">
@@ -387,7 +394,7 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
 
 const columns = defineVaDataTableColumns([
   { label: t('papers.stt'), key: 'stt', sortable: false },
-  { label: t('subjects.subject'), key: 'subjectName', sortable: true },
+  // { label: t('subjects.subject'), key: 'subjectName', sortable: true },
   { label: t('papers.name'), key: 'examName', sortable: true },
   { label: t('papers.status'), key: 'completionStatus', sortable: true },
   { label: t('papers.start_time'), key: 'startTime', sortable: true },
@@ -526,17 +533,46 @@ const getStatusText = (status: number) => {
 
 const getStatusClass = (status: number) => {
   if (status === DoExamStatus.NotStarted) {
-    return 'text-yellow-500' // Not Started
+    return '#F59E0B' // Not Started - Yellow 500
   } else if (status === DoExamStatus.InProgress) {
-    return 'text-blue-500' // In Progress
+    return '#3B82F6' // In Progress - Blue 500
   } else if (status === DoExamStatus.Completed) {
-    return 'text-green-500' // Completed
+    return '#10B981' // Completed - Green 500
   } else if (status === DoExamStatus.Suspended) {
-    return 'text-red-500' // Suspended
+    return '#EF4444' // Suspended - Red 500
   } else {
     return ''
   }
 }
+
+const getMarkAssignmentStatusColor = (status: string) => {
+  if (status === MarkAssignmentStatus.Submitted) {
+    return '#F59E0B' // Submitted - Green 500
+  } else if (status === MarkAssignmentStatus.Doing) {
+    return '#3B82F6' // Doing - Blue 500
+  } else if (status === MarkAssignmentStatus.Marked) {
+    return '#10B981' // Marked - Green 500
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
+    return '#EF4444' // Not Submitted - Red 500
+  } else {
+    return ''
+  }
+}
+
+const getMarkAssignmentStatusText = (status: string) => {
+  if (status === MarkAssignmentStatus.Submitted) {
+    return t('assignments.submitted')
+  } else if (status === MarkAssignmentStatus.Doing) {
+    return t('assignments.doing')
+  } else if (status === MarkAssignmentStatus.Marked) {
+    return t('assignments.marked')
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
+    return t('assignments.not_submitted')
+  } else {
+    return ''
+  }
+}
+
 const router = useRouter()
 const currentUserId = authStore.user?.id
 
@@ -554,9 +590,11 @@ const viewDetailAnswerResult = (submitId: string, paperId: string) => {
 onMounted(() => {
   const loadData = async () => {
     await getClasses()
-    await getPaperStudents()
-    await getPaperStudentsHistory()
-    calculatePaperStudent()
+    if (isStudent.value) {
+      await getPaperStudents()
+      await getPaperStudentsHistory()
+      calculatePaperStudent()
+    }
   }
 
   loadData()
