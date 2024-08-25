@@ -211,6 +211,7 @@ import {
   EmptyAssignmentContent,
   AssignmentAttachment,
   AssignmentSubmission,
+  MarkAssignmentStatus,
 } from '../types'
 import { useAuthStore } from '@/stores/modules/auth.module'
 
@@ -430,13 +431,13 @@ const fileUpload = async () => {
 
 // Function to get the color class based on status
 const getStatusColorClass = (status: string | undefined) => {
-  if (status === 'Marked') {
+  if (status === MarkAssignmentStatus.Marked) {
     return 'text-green-500'
-  } else if (status === 'NotSubmitted') {
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
     return 'text-red-500'
-  } else if (status === 'Submitted') {
+  } else if (status === MarkAssignmentStatus.Submitted) {
     return 'text-blue-500'
-  } else if (status === 'Doing') {
+  } else if (status === MarkAssignmentStatus.Doing) {
     return 'text-yellow-500'
   } else {
     return ''
@@ -445,13 +446,13 @@ const getStatusColorClass = (status: string | undefined) => {
 
 // Function to get the display text based on status
 const getStatusText = (status: string | undefined) => {
-  if (status === 'Marked') {
+  if (status === MarkAssignmentStatus.Marked) {
     return t('assignments.marked')
-  } else if (status === 'NotSubmitted') {
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
     return t('assignments.not_submitted')
-  } else if (status === 'Submitted') {
+  } else if (status === MarkAssignmentStatus.Submitted) {
     return t('assignments.submitted')
-  } else if (status === 'Doing') {
+  } else if (status === MarkAssignmentStatus.Doing) {
     return t('assignments.doing')
   } else {
     return ''
@@ -469,10 +470,10 @@ const sortedStudents = computed(() => {
   return classById.value?.students.slice().sort((a, b) => {
     const statusA =
       (assignmentSubmissions.value.find((submission) => submission.studentId === a.id)
-        ?.status as keyof typeof statusOrder) || 'NotSubmitted'
+        ?.status as keyof typeof statusOrder) || MarkAssignmentStatus.NotSubmitted
     const statusB =
       (assignmentSubmissions.value.find((submission) => submission.studentId === b.id)
-        ?.status as keyof typeof statusOrder) || 'NotSubmitted'
+        ?.status as keyof typeof statusOrder) || MarkAssignmentStatus.NotSubmitted
 
     return statusOrder[statusA] - statusOrder[statusB]
   })

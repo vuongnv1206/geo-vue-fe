@@ -352,7 +352,8 @@
     "doing": "Doing",
     "marked": "Marked",
     "not_submitted": "Not Submitted",
-    "no_comment": "No comment available"
+    "no_comment": "No comment available",
+    "time_out": "Time out"
   },
   "subjects": {
     "subject": "Subject",
