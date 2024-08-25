@@ -130,3 +130,24 @@ export type AssignmentStats = {
   createdOn: Date
   submissionsStats: SubmissionStats
 }
+
+export type AssignmentWithMarkStatus = {
+  id: string
+  name: string
+  startTime: Date
+  endTime: Date
+  content: string
+  canViewResult: boolean
+  requireLoginToSubmit: boolean
+  subjectId: string
+  attachment: string
+  createdOn: Date
+  status: string
+}
+
+export enum MarkAssignmentStatus {
+  Submitted = 'Submitted',
+  Doing = 'Doing',
+  Marked = 'Marked',
+  NotSubmitted = 'NotSubmitted',
+}

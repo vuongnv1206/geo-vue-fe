@@ -287,7 +287,8 @@
               <div v-for="ass in class1.assignments.slice(0, 2)" :key="ass.id" class="bg-blue-100 px-4 rounded-lg mb-2">
                 <RouterLink :to="{ name: 'assignment-submission', params: { id: ass.id, classId: class1.id } }">
                   <VaCardContent class="text-md font-semibold text-gray-800">
-                    {{ ass.name }}
+                    {{ ass.name }} -
+                    {{ ass.status === MarkAssignmentStatus.NotSubmitted ? t('assignments.time_out') : ass.status }}
                   </VaCardContent>
 
                   <VaCardContent class="text-xs font-medium text-gray-600">
@@ -357,13 +358,15 @@ import { useClassStore } from '@/stores/modules/class.module'
 import { ClassroomWithPosts } from '@/pages/classrooms/types'
 import { avatarColor, format, getErrorMessage, notifications } from '@/services/utils'
 import { usePostsStore } from '@/stores/modules/posts.module'
-import { PaperStudents, PaperStudentsHistory, ShowMarkResult } from '@/pages/examination/types'
+import { DoExamStatus, PaperStudents, PaperStudentsHistory, ShowMarkResult } from '@/pages/examination/types'
 import { usePaperStudentsStore } from '@/stores/modules/paperStudents.module'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { getSrcAvatar } from '@/pages/audit-logs/helper'
 import { useRouter } from 'vue-router'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { MarkAssignmentStatus } from '@/pages/assignment/types'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -373,6 +376,7 @@ const { init: notify } = useToast()
 const authStore = useAuthStore()
 const classStores = useClassStore()
 const postStores = usePostsStore()
+const assignmentStores = useAssignmentStore()
 const paperStudentsStores = usePaperStudentsStore()
 const classes = ref<ClassroomWithPosts[]>([])
 const paperStudents = ref<PaperStudents[]>([])
@@ -437,6 +441,15 @@ const getClasses = async () => {
         }
       }),
     )
+    classes.value.forEach((class1) => {
+      class1.assignments.forEach((assignment) => {
+        assignmentStores
+          .getAssignmentSubmissions({ assignmentId: assignment.id, classId: class1.id })
+          .then((response) => {
+            assignment.status = response[0].status
+          })
+      })
+    })
   } catch (error) {
     notify({
       message: notifications.getFailed(t('classes.class')) + getErrorMessage(error),
@@ -498,13 +511,13 @@ const getPaperStudentsHistory = async () => {
 }
 
 const getStatusText = (status: number) => {
-  if (status === 0) {
+  if (status === DoExamStatus.NotStarted) {
     return t('papers.not_started')
-  } else if (status === 1) {
+  } else if (status === DoExamStatus.InProgress) {
     return t('papers.in_progress')
-  } else if (status === 2) {
+  } else if (status === DoExamStatus.Completed) {
     return t('papers.completed')
-  } else if (status === 3) {
+  } else if (status === DoExamStatus.Suspended) {
     return t('papers.suspended')
   } else {
     return ''
@@ -512,13 +525,13 @@ const getStatusText = (status: number) => {
 }
 
 const getStatusClass = (status: number) => {
-  if (status === 0) {
+  if (status === DoExamStatus.NotStarted) {
     return 'text-yellow-500' // Not Started
-  } else if (status === 1) {
+  } else if (status === DoExamStatus.InProgress) {
     return 'text-blue-500' // In Progress
-  } else if (status === 2) {
+  } else if (status === DoExamStatus.Completed) {
     return 'text-green-500' // Completed
-  } else if (status === 3) {
+  } else if (status === DoExamStatus.Suspended) {
     return 'text-red-500' // Suspended
   } else {
     return ''
