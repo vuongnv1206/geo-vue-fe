@@ -110,9 +110,9 @@ export type Question = {
 }
 
 export type QuestionLable = {
-  id: string | null
-  name: string
-  color: string | undefined
+  id?: string | null
+  name?: string
+  color?: string | undefined
 }
 
 export type QuestionPassage = {

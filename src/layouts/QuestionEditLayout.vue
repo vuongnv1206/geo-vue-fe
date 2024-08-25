@@ -143,6 +143,17 @@ const handleEditEvent = (question: Question) => {
   }
 }
 
+const handelSelectLable = (question: Question) => {
+  console.log(question)
+  if (question.rawIndex) {
+    listQuestions.value[question.rawIndex - 1] = question
+    const editor = document.querySelector('.richer__content') as any
+    editorContent.value = ''
+    renderEditorContent()
+    editor.innerHTML = editorContent.value
+  }
+}
+
 const handleEditor = (data: any) => {
   const editor = document.querySelector('.richer__content') as any
   const questions: Question[] = GeoMarkdown2Objects(replaceMultipleNewLines(editor?.innerText))
@@ -614,7 +625,12 @@ onMounted(() => {
           <div class="p-1">
             <VaScrollContainer class="min-h-[600px] max-h-[90vh]" vertical>
               <div v-for="(question, i) in listQuestions" :key="question.id || ''" class="w-full">
-                <QuestionEditView :question="question" :index="i + 1" @edit="handleEditEvent" />
+                <QuestionEditView
+                  :question="question"
+                  :index="i + 1"
+                  @edit="handleEditEvent"
+                  @selectLable="handelSelectLable"
+                />
               </div>
             </VaScrollContainer>
           </div>

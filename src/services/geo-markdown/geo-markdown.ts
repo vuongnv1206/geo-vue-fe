@@ -7,6 +7,10 @@ const multipleChoiceMarkdown = (question: Question, index: number) => {
       return `${isCorrect}${String.fromCharCode(65 + index)}. ${answer.content}`
     })
     .join('\n')
+  if (question.questionLable) {
+    const res = `Q${index + 1}. [${question.questionLable.name}] ${question.content}\n${answers}`
+    return res
+  }
   return `Q${index + 1}. ${question.content}\n${answers}`
 }
 
@@ -17,6 +21,10 @@ const singleChoiceMarkdown = (question: Question, index: number) => {
       return `${isCorrect}${String.fromCharCode(65 + index)}. ${answer.content}`
     })
     .join('\n')
+  if (question.questionLable) {
+    const res = `Q${index + 1}. [${question.questionLable.name}] ${question.content}\n${answers}`
+    return res
+  }
   const res = `Q${index + 1}. ${question.content}\n${answers}`
   return res
 }
