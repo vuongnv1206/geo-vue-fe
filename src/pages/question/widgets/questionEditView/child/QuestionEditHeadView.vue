@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Question, QuestionType, QuestionLable } from '../../../types'
 import { QuestionTypeColor, QuestionTypeLabel } from '@services/utils'
 
@@ -24,6 +24,13 @@ const selectOption = (option: string) => {
   props.question!.questionLable = questionLable
   emit('selectLable', props.question as Question)
 }
+
+watch(
+  () => props.question?.questionLable?.name,
+  (value) => {
+    selectedOption.value = value ?? ''
+  },
+)
 </script>
 
 <template>
@@ -31,12 +38,6 @@ const selectOption = (option: string) => {
     <div class="flex justify-start">
       <button class="border rounded border-slate-200 p-1">
         <h6 class="text-primary text-primary text-sm font-bold">Question {{ props.index }}:</h6>
-      </button>
-      <button class="border-r rounded border-slate-200 px-4">
-        <div class="flex items-center">
-          <VaIcon name="attach_file" class="mr-1 text-primary" />
-          <h6 class="text-primary text-primary text-sm font-bold">Audio</h6>
-        </div>
       </button>
       <VaDropdown class="px-4">
         <template #anchor>

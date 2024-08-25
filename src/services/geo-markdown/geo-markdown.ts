@@ -49,7 +49,10 @@ const fillBlankMarkdown = (question: Question, index: number) => {
     .split('\n')
     .map((line) => line.trim())
     .join('\n')
-
+  if (question.questionLable) {
+    const res = `Q${index + 1}. [${question.questionLable.name}] ${content}\n${answersStr}`
+    return res
+  }
   const res = `Q${index + 1}. ${content}\n${answersStr}`
   return res
 }
@@ -69,13 +72,19 @@ const matchingMarkdown = (question: Question, index: number) => {
     .filter((answer) => answer.isCorrect)
     .map((answer) => answer.content)
     .join('|')
-
+  if (question.questionLable) {
+    const res = `Q${index + 1}. [${question.questionLable.name}] ${content.Question}\nCL1:\n${columnA}\n\nCL2:\n${columnB}\n\nCorrect Matches: ${correctMatches}`
+    return res
+  }
   const a = `Q${index + 1}. ${content.Question}\nCL1:\n${columnA}\n\nCL2:\n${columnB}\n\nCorrect Matches: ${correctMatches}`
   return a
 }
 
 const readingMarkdown = (question: Question, index: number) => {
-  const passage = `Q${index + 1}. ${question.content}`
+  let passage = `Q${index + 1}. ${question.content}`
+  if (question.questionLable) {
+    passage = `Q${index + 1}. [${question.questionLable.name}] ${question.content}`
+  }
   const questions = question.questionPassages
     ?.map((passageQuestion, passageIndex) => {
       if (!passageQuestion.answers) {
@@ -94,6 +103,9 @@ const readingMarkdown = (question: Question, index: number) => {
 }
 
 const writingMarkdown = (question: Question, index: number) => {
+  if (question.questionLable) {
+    return `Q${index + 1}. [${question.questionLable.name}] ${question.content}`
+  }
   return `Q${index + 1}. ${question.content}`
 }
 
@@ -142,6 +154,8 @@ export const multipleChoiceText2Html = (text: string) => {
     })
     .join('')
 
+  question = highlightQuestionLable(question)
+
   const answers = []
   let answerMatch
   while ((answerMatch = answerRegex.exec(text)) !== null) {
@@ -168,6 +182,8 @@ export const singleChoiceText2Html = (text: string) => {
       else return `<p>${item}</p>`
     })
     .join('')
+
+  question = highlightQuestionLable(question)
   const answers = []
   let answerMatch
   while ((answerMatch = answerRegex.exec(text)) !== null) {
@@ -197,6 +213,7 @@ export const fillBlankText2Html = (text: string) => {
       else return `<p>${item}</p>`
     })
     .join('')
+  question = highlightQuestionLable(question)
   const answers = []
   let answerMatch
   while ((answerMatch = answerRegex.exec(text)) !== null) {
@@ -210,7 +227,7 @@ export const matchingText2Html = (text: string) => {
   // Extract question part from text
   const questionRegex = /Q(\d+)\.\s*(.*?)(?=CL1:)/s
   const questionMatch = text.match(questionRegex)
-  const question = questionMatch
+  let question = questionMatch
     ? questionMatch[2]
         .trim()
         .split('\n')
@@ -221,7 +238,7 @@ export const matchingText2Html = (text: string) => {
         })
         .join('')
     : ''
-
+  question = highlightQuestionLable(question)
   // Extract column A and column B parts from text
   const columns1Regex = /CL1:\s*(.*?)(?=(CL2:)|$)/s
   const columns2Regex = /CL2:\s*(.*?)(?=(Correct Matches:)|$)/s
@@ -269,7 +286,7 @@ export const readingText2Html = (text: string) => {
   const passageRegex = /Q(\d+)\.(.+?)(?=Q\d+\.\d+)/s
   const passageMatch = text.match(passageRegex)
   const passageIndex = passageMatch ? passageMatch[1] : ''
-  const passage = passageMatch
+  let passage = passageMatch
     ? passageMatch[2]
         .trim()
         .split('\n')
@@ -280,7 +297,7 @@ export const readingText2Html = (text: string) => {
         })
         .join('')
     : ''
-
+  passage = highlightQuestionLable(passage)
   const questionsRegex = /Q((\d+)\.\d+)\.(.*?)(?=Q\d+\.\d+|$)/gs
   const questions = []
   let questionMatch
@@ -325,7 +342,7 @@ export const writingText2Html = (text: string) => {
   const questionRegex = /Q(\d+)\.(.*)/s
   const questionMatch = text.match(questionRegex)
   const index2 = questionMatch ? questionMatch[1] : ''
-  const question = questionMatch
+  let question = questionMatch
     ? questionMatch[2]
         .trim()
         .split('\n')
@@ -336,9 +353,27 @@ export const writingText2Html = (text: string) => {
         .join('')
     : ''
 
+  question = highlightQuestionLable(question)
+
   return `
         ${question}
     `
+}
+
+// highlight QuestionLable
+// [Easy], [Medium], [Hard], [Very Hard]
+export const highlightQuestionLable = (text: string) => {
+  const questionLableRegex = /\[(.*?)\]/
+  const questionLableMatch = text.match(questionLableRegex)
+  if (!questionLableMatch) {
+    return text
+  }
+  const questionLable = questionLableMatch[1]
+  const res = text.replace(
+    questionLableRegex,
+    `<strong style="color:#ab2428;font-weight: bold;">[${questionLable}]</strong>`,
+  )
+  return res
 }
 
 export const div2GeoMarkdown = (text: string) => {
@@ -374,6 +409,29 @@ export const div2GeoMarkdown = (text: string) => {
   }
 }
 
+export const getQuestionLabel = (q: Question) => {
+  // [Easy], [Medium], [Hard], [Very Hard]
+  const questionLableRegex = /\[(.*?)\]/
+  const questionLableMatch = q.content.match(questionLableRegex)
+  if (!questionLableMatch) {
+    return q
+  }
+  const questionLable = questionLableMatch[1]
+  q.content = q.content.replace(questionLableRegex, '').trim()
+
+  // Helper function to convert string to upper case each first letter of word
+  const toCamelCase = (str: string) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    })
+  }
+
+  console.log(toCamelCase(questionLable))
+
+  q.questionLable = { name: toCamelCase(questionLable) }
+  return q
+}
+
 export const SingleChoiceGeoMarkdown2Objects = (text: string) => {
   const questions: Question[] = []
   const singleChoiceRegex = /Q(\d+)\.(.*?)(?=Q\d+\.|$)/gs
@@ -405,12 +463,13 @@ export const SingleChoiceGeoMarkdown2Objects = (text: string) => {
       }
     }
 
-    const q: Question = {
+    let q: Question = {
       content: question,
       answers,
       questionType: QuestionType.SingleChoice,
       rawIndex: parseInt(questionMatch[1]),
     }
+    q = getQuestionLabel(q)
     questions.push(q)
   }
   return questions
@@ -436,12 +495,13 @@ export const MultipleChoiceGeoMarkdown2Objects = (text: string) => {
       const answer = { id: '', content, questionId: '', isCorrect }
       answers.push(answer)
     }
-    const q: Question = {
+    let q: Question = {
       content: question,
       answers,
       questionType: QuestionType.MultipleChoice,
       rawIndex: parseInt(questionMatch[1]),
     }
+    q = getQuestionLabel(q)
     questions.push(q)
   }
   return questions
@@ -474,13 +534,13 @@ export const FillBlankGeoMarkdown2Objects = (text: string) => {
 
     question = question.replace(/\$\[(\d+)\]/g, '$_fillblank[$1]')
 
-    const q: Question = {
+    let q: Question = {
       content: question,
       answers,
       questionType: QuestionType.FillBlank,
       rawIndex: parseInt(questionMatch[1]),
     }
-
+    q = getQuestionLabel(q)
     questions.push(q)
   }
   return questions
@@ -574,12 +634,13 @@ export const MatchingGeoMarkdown2Objects = (text: string) => {
       ColumnB: columnB,
     }
 
-    const q: Question = {
+    let q: Question = {
       content: JSON.stringify(content),
       answers,
       questionType: QuestionType.Matching,
       rawIndex: parseInt(questionMatch[1]),
     }
+    q = getQuestionLabel(q)
 
     questions.push(q)
   }
@@ -630,7 +691,7 @@ export const ReadingGeoMarkdown2Objects = (text: string) => {
       questionPassages.push(q)
     }
 
-    const q: Question = {
+    let q: Question = {
       content: passage,
       questionPassages,
       questionType: QuestionType.Reading,
@@ -638,6 +699,7 @@ export const ReadingGeoMarkdown2Objects = (text: string) => {
       answers: [],
     }
 
+    q = getQuestionLabel(q)
     questions.push(q)
   }
 
@@ -655,12 +717,13 @@ export const WritingGeoMarkdown2Objects = (text: string) => {
       continue
     }
     const question = questionMatch[2].trim()
-    const q: Question = {
+    let q: Question = {
       content: question,
       answers: [],
       questionType: QuestionType.Writing,
       rawIndex: parseInt(questionMatch[1]),
     }
+    q = getQuestionLabel(q)
     questions.push(q)
   }
   return questions

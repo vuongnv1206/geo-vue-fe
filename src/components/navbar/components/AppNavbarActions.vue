@@ -15,7 +15,7 @@ const authStore = useAuthStore()
     <ThemeSwitcher class="app-navbar-actions__item" />
     <LanguageSwitcher class="app-navbar-actions__item" />
     <NotificationDropdown ref="notificationDropdownRef" class="app-navbar-actions__item" />
-    <h4 class="app-navbar-actions__item">
+    <h4 v-if="!isMobile" class="app-navbar-actions__item">
       Hello, <b>{{ authStore.user?.fullName }}</b>
     </h4>
     <ProfileDropdown class="app-navbar-actions__item app-navbar-actions__item--profile mr-1" />
