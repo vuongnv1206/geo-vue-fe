@@ -100,9 +100,9 @@ const dataFilter = ref({
   orderBy: ['createdOn'],
 })
 
-const getSubjects = (filter: typeof dataFilter.value) => {
+const getSubjects = async (filter: typeof dataFilter.value) => {
   loading.value = true
-  stores
+  await stores
     .getSubjects(filter)
     .then((response) => {
       subjects.value = response.data
