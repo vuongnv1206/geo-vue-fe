@@ -27,6 +27,7 @@ const joinGroupResponse = ref<JoinGroupTeacherRequestResponse>()
 
 const getJoinGroupRequest = async () => {
   try {
+    isLoading.value = true
     const res = await joinGroupRequestStore.joinGroupRequest_search(joinGroupRequest.value)
     joinGroupResponse.value = res
   } catch (error) {
@@ -34,8 +35,9 @@ const getJoinGroupRequest = async () => {
       message: getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
+    isLoading.value = false
   }
-  isLoading.value = false
 }
 
 const columnTable: DataTableColumnSource<string>[] = [
@@ -103,6 +105,7 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
       }
 
       if (status == JoinTeacherGroupStatus.Cancel) {
+        isLoading.value = true
         await joinGroupRequestStore
           .cancelRequest(request)
           .then(async () => {
@@ -118,6 +121,9 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
               message: message,
               color: 'danger',
             })
+          })
+          .finally(() => {
+            isLoading.value = false
           })
         await getJoinGroupRequest()
       }

@@ -18,6 +18,8 @@ const showSidebar = ref(true)
 const submitPaperStore = useSubmitPaperStore()
 const { init: notify } = useToast()
 
+const loading = ref(true)
+
 const request: GetLastResultExamRequest = {
   paperId: route.params.paperId as string,
   userId: route.params.userId as string,
@@ -39,6 +41,7 @@ const groupedQuestions = ref<{ [key: string]: Question[] }>({
 const maxPointInPaper = ref<number | undefined>(0)
 
 const getLastExamResult = () => {
+  loading.value = true
   submitPaperStore
     .getLastResultExam(request)
     .then((res) => {
@@ -53,6 +56,9 @@ const getLastExamResult = () => {
         message: `Not Found ${error}`,
         color: 'danger',
       })
+    })
+    .finally(() => {
+      loading.value = false
     })
 }
 
@@ -74,6 +80,7 @@ const groups: { [key: string]: Question[] } = {
   other: [],
 }
 const groupQuestionsByType = (questions: Question[]) => {
+  loading.value = true
   questions.forEach((question) => {
     if (question.questionType === QuestionType.SingleChoice) {
       return groups.singleChoice.push(question)
@@ -105,6 +112,7 @@ const groupQuestionsByType = (questions: Question[]) => {
       questionTypesLabel.value.push(label)
     }
   }
+  loading.value = false
   return groups
 }
 
@@ -134,6 +142,7 @@ const getCorrectQuestionPerQuestion = (typeQuestion: string) => {
   let correctQuestion = 0
   let totalQuestion = 0
   let label = ''
+  loading.value = true
 
   switch (typeQuestion) {
     case 'all':
@@ -186,7 +195,7 @@ const getCorrectQuestionPerQuestion = (typeQuestion: string) => {
       totalQuestion = 0
       break
   }
-
+  loading.value = false
   return {
     label,
     correctQuestion,
@@ -195,6 +204,7 @@ const getCorrectQuestionPerQuestion = (typeQuestion: string) => {
 }
 
 const getCorrectQuestionCount = (typeQuestion: QuestionType) => {
+  loading.value = true
   let correctQuestion = 0
   if (typeQuestion == QuestionType.Writing) {
     correctQuestion =
@@ -210,7 +220,7 @@ const getCorrectQuestionCount = (typeQuestion: QuestionType) => {
 
   const totalQuestion =
     result.value?.paper.questions?.filter((question) => question.questionType === typeQuestion).length || 0
-
+  loading.value = false
   return {
     correctQuestion,
     totalQuestion,
@@ -228,6 +238,7 @@ const roundToTwoDecimal = (num: number | undefined) => {
 </script>
 
 <template>
+  <VaInnerLoading :loading="loading"> </VaInnerLoading>
   <VaLayout>
     <template #left>
       <VaCard v-if="showSidebar" style="min-width: 20rem; max-width: 30rem" bordered>
