@@ -79,6 +79,7 @@
             :label="$t('subjects.subject')"
             :placeholder="$t('subjects.select_subject')"
             clearable
+            :rules="[validators.required]"
           />
           <VaLayout class="border rounded-xl pb-2 px-2">
             <template #left>
@@ -303,7 +304,7 @@ const getGroupClass = () => {
     })
 }
 
-const getSubjects = () => {
+const getSubjects = async () => {
   subjectStore
     .getSubjects(dataFilter.value)
     .then((response) => {
@@ -322,10 +323,14 @@ const fileUpload = async () => {
     .uploadFile(filesUploaded.value)
     .then((response) => {
       newAssignment.value.attachment = JSON.stringify(response)
+      notify({
+        message: notifications.uploadSuccess(),
+        color: 'success',
+      })
     })
     .catch((error) => {
       notify({
-        message: notifications.uploadFailed + getErrorMessage(error),
+        message: notifications.uploadFailed() + getErrorMessage(error),
         color: 'error',
       })
     })

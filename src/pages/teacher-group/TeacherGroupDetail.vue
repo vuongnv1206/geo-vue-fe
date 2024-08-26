@@ -78,34 +78,36 @@ const getGroupDetail = async () => {
       value: teacher.id,
       label: teacher.teacherName,
     }))
-    loading.value = false
   } catch (error) {
-    loading.value = false
     notify({
       message: notifications.getFailed(t('groupClasses.group_detail')) + getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
+    loading.value = false
   }
 }
 
 const getTeacherDetail = async () => {
   if (!props.teacherId) return
   try {
+    loading.value = true
     groupDetail.value = null
     const response = await stores.getTeacherPermissionDetail(props.teacherId)
     teacherDetail.value = response
-    loading.value = false
   } catch (error) {
     notify({
       message: notifications.getFailed(t('groupClasses.teacher')) + getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
     loading.value = false
   }
 }
 
 const getGroupClasses = async () => {
   try {
+    loading.value = true
     const res = await groupClassStores.getGroupClasses(groupClassFilter.value)
     groupClasses.value = res.data
     initializeCheckedPermissions()
@@ -114,6 +116,8 @@ const getGroupClasses = async () => {
       message: notifications.getFailed(t('groupClasses.group_class')) + getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
+    loading.value = false
   }
 }
 
@@ -129,6 +133,7 @@ const optionPermissionInClass = () => {
 }
 
 const initializeCheckedPermissions = () => {
+  loading.value = true
   const checked: { [key: string]: string[] } = {}
   groupClasses.value.forEach((groupClass) => {
     groupClass.classes.forEach((classRoom) => {
@@ -148,6 +153,7 @@ const initializeCheckedPermissions = () => {
   })
 
   checkedPermissions.value = checked
+  loading.value = false
 }
 const permissionTypeMap: { [key: string]: number } = {
   AssignAssignment: 1,
@@ -173,18 +179,18 @@ const updatePermissionGroup = async () => {
     }
     try {
       await stores.setPermissionGroupInClass(requestGroup)
-      loading.value = false
       notify({
         message: notifications.updatedSuccessfully(t('teacherGroups.permission')),
         color: 'success',
       })
       getGroupDetail()
     } catch (error) {
-      loading.value = false
       notify({
         message: notifications.updateFailed(t('teacherGroups.permission')) + getErrorMessage(error),
         color: 'danger',
       })
+    } finally {
+      loading.value = false
     }
   }
   if (props.teacherId) {
@@ -195,18 +201,18 @@ const updatePermissionGroup = async () => {
 
     try {
       await stores.setPermissionTeacherInClass(requestTeacher)
-      loading.value = false
       notify({
         message: notifications.updatedSuccessfully(t('teacherGroups.permission')),
         color: 'success',
       })
       getTeacherDetail()
     } catch (error) {
-      loading.value = false
       notify({
         message: notifications.updateFailed(t('teacherGroups.permission')) + getErrorMessage(error),
         color: 'danger',
       })
+    } finally {
+      loading.value = false
     }
   }
 }
@@ -312,69 +318,69 @@ const closeTeacherModal = async () => {
 </script>
 
 <template>
-  <div>
-    <VaCard v-if="groupDetail !== null" class="mb-2">
-      <VaCardContent class="flex gap-2">
-        <VaButton
-          preset="secondary"
-          border-color="primary"
-          size="small"
-          @click="copyJoinLink(groupDetail.joinLink || '')"
-          >Link invite</VaButton
-        >
-        <VaDropdown>
-          <template #anchor>
-            <VaButton icon="qr_code_2" preset="secondary" border-color="primary" size="small" />
-          </template>
-          <VaDropdownContent>
-            <div>
-              <QrcodeVue v-if="qrCodeSrc" :value="qrCodeSrc" />
+  <VaInnerLoading v-if="groupDetail !== null || teacherDetail !== null" :loading="loading">
+    <div>
+      <VaCard v-if="groupDetail !== null" class="mb-2">
+        <VaCardContent class="flex gap-2">
+          <VaButton
+            preset="secondary"
+            border-color="primary"
+            size="small"
+            @click="copyJoinLink(groupDetail.joinLink || '')"
+            >Link invite</VaButton
+          >
+          <VaDropdown>
+            <template #anchor>
+              <VaButton icon="qr_code_2" preset="secondary" border-color="primary" size="small" />
+            </template>
+            <VaDropdownContent>
               <div>
+                <QrcodeVue v-if="qrCodeSrc" :value="qrCodeSrc" />
                 <div>
-                  <VaButton preset="secondary" size="small" @click="downloadQRCode">download</VaButton>
+                  <div>
+                    <VaButton preset="secondary" size="small" @click="downloadQRCode">download</VaButton>
+                  </div>
                 </div>
               </div>
+            </VaDropdownContent>
+          </VaDropdown>
+        </VaCardContent>
+      </VaCard>
+      <VaCard v-if="groupDetail !== null" class="mb-2">
+        <VaCardContent>
+          <div class="flex gap-2">
+            <div class="text-center cursor-pointer">
+              <VaAvatar color="secondary" size="small" @click="selectTeacherTeam">
+                <VaIcon name="add" />
+              </VaAvatar>
             </div>
-          </VaDropdownContent>
-        </VaDropdown>
-      </VaCardContent>
-    </VaCard>
-    <VaCard v-if="groupDetail !== null" class="mb-2">
-      <VaCardContent>
-        <div class="flex gap-2">
-          <div class="text-center cursor-pointer">
-            <VaAvatar color="secondary" size="small" @click="selectTeacherTeam">
-              <VaIcon name="add" />
-            </VaAvatar>
-          </div>
-          <div class="flex gap-2 flex-wrap">
-            <div v-for="teacher in groupDetail?.teacherTeams" :key="teacher.id">
-              <VaDropdown trigger="hover">
-                <template #anchor>
-                  <VaAvatar color="info" size="small" class="text-center">
-                    {{
-                      teacher.teacherName
-                        .split(' ')
-                        .filter((_, index, array) => index === 0 || index === array.length - 1)
-                        .map((w) => w.charAt(0).toUpperCase())
-                        .join('')
-                    }}
-                  </VaAvatar>
-                </template>
-                <VaDropdownContent> {{ teacher.teacherName }} </VaDropdownContent>
-              </VaDropdown>
+            <div class="flex gap-2 flex-wrap">
+              <div v-for="teacher in groupDetail?.teacherTeams" :key="teacher.id">
+                <VaDropdown trigger="hover">
+                  <template #anchor>
+                    <VaAvatar color="info" size="small" class="text-center">
+                      {{
+                        teacher.teacherName
+                          .split(' ')
+                          .filter((_, index, array) => index === 0 || index === array.length - 1)
+                          .map((w) => w.charAt(0).toUpperCase())
+                          .join('')
+                      }}
+                    </VaAvatar>
+                  </template>
+                  <VaDropdownContent> {{ teacher.teacherName }} </VaDropdownContent>
+                </VaDropdown>
+              </div>
             </div>
           </div>
-        </div>
-      </VaCardContent>
-    </VaCard>
-    <VaCard class="min-h-[60vh]">
-      <VaCardTitle>
-        {{ t('teacherGroups.permission_management') }}: {{ groupDetail?.name || teacherDetail?.teacherName }}
-      </VaCardTitle>
-      <VaDivider />
-      <VaCardContent>
-        <VaInnerLoading v-if="groupDetail !== null || teacherDetail !== null" :loading="loading">
+        </VaCardContent>
+      </VaCard>
+      <VaCard class="min-h-[60vh]">
+        <VaCardTitle>
+          {{ t('teacherGroups.permission_management') }}: {{ groupDetail?.name || teacherDetail?.teacherName }}
+        </VaCardTitle>
+        <VaDivider />
+        <VaCardContent>
           <VaCardContent v-if="groupDetail !== null || teacherDetail !== null" class="p-0 mb-2">
             <VaInput v-model="searchQuery" :placeholder="t('teacherGroups.search_class')" />
           </VaCardContent>
@@ -407,27 +413,27 @@ const closeTeacherModal = async () => {
             </VaButton>
             <VaButton color="success" size="small" @click="updatePermissionGroup">{{ $t('settings.save') }}</VaButton>
           </div>
-        </VaInnerLoading>
-      </VaCardContent>
-    </VaCard>
-  </div>
+        </VaCardContent>
+      </VaCard>
+    </div>
 
-  <VaModal
-    v-slot="{ cancel }"
-    v-model="showTeacherInTeamModal"
-    size="small"
-    mobile-fullscreen
-    close-button
-    hide-default-actions
-  >
-    <TeacherInTeamModal
-      :group-detail="groupDetail"
-      @close="
-        () => {
-          closeTeacherModal()
-          cancel()
-        }
-      "
-    />
-  </VaModal>
+    <VaModal
+      v-slot="{ cancel }"
+      v-model="showTeacherInTeamModal"
+      size="small"
+      mobile-fullscreen
+      close-button
+      hide-default-actions
+    >
+      <TeacherInTeamModal
+        :group-detail="groupDetail"
+        @close="
+          () => {
+            closeTeacherModal()
+            cancel()
+          }
+        "
+      />
+    </VaModal>
+  </VaInnerLoading>
 </template>

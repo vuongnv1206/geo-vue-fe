@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { PaperDto } from '@/pages/examination/types'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { useToast, VaCard, VaCardTitle } from 'vuestic-ui'
+import { getErrorMessage, notifications } from '@/services/utils'
 
 const paperDetail = ref<PaperDto | null>(null)
 const route = useRoute()
@@ -23,6 +24,26 @@ const getPaperDetail = () => {
         color: 'danger',
       })
     })
+}
+
+const exportPaperDocs = async () => {
+  if (paperId) {
+    await paperStore
+      .generateDocx(paperId.toString())
+      .then((response) => {
+        console.log('aaaa', response)
+        // notify({
+        //   message: notifications.downloadSuccess(),
+        //   color: 'success',
+        // })
+      })
+      .catch((error) => {
+        notify({
+          message: notifications.downloadFailed() + getErrorMessage(error),
+          color: 'error',
+        })
+      })
+  }
 }
 
 const configOnline = () => {
@@ -61,7 +82,9 @@ onMounted(() => {
       <VaCard class="mt-3">
         <VaCardTitle>Offline</VaCardTitle>
         <VaCardContent>
-          <VaButton preset="secondary" border-color="primary" icon="text_snippet">Export exam to Word</VaButton>
+          <VaButton preset="secondary" border-color="primary" icon="text_snippet" @click="exportPaperDocs"
+            >Export exam to Word</VaButton
+          >
         </VaCardContent>
       </VaCard>
     </div>

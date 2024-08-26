@@ -15,6 +15,7 @@ import {
   GetAccessPaperResponse,
   GetGetAssigneesInPaperRequest,
   GetGetAssigneesInPaperResponse,
+  SharePaperRequest,
 } from '@/pages/examination/types'
 import apiService from '@services/api.service'
 
@@ -40,9 +41,30 @@ export interface IPapersService {
   getGroupClassesAccessPaper(request: GetAccessPaperRequest): Promise<GetAccessPaperResponse>
 
   getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse>
+
+  papers_Share(id: string, request: SharePaperRequest): Promise<string>
+
+  generateDocx(paperId: string): Promise<any>
 }
 
 export class PapersService implements IPapersService {
+  generateDocx(paperId: string): Promise<any> {
+    return apiService
+      .getFile(`/v1/papers/generate/docx?paperId=${paperId}`, { responseType: 'blob' })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'paper_doc.xlsx')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse> {
     const url = '/v1/papers/get-assignees-paper'
     return apiService
@@ -236,6 +258,17 @@ export class PapersService implements IPapersService {
       })
       .catch((error) => {
         return Promise.reject(error)
+      })
+  }
+
+  async papers_Share(id: string, request: SharePaperRequest): Promise<string> {
+    return apiService
+      .post(`/v1/papers/${id}/share-paper`, request)
+      .catch((error: any) => {
+        return Promise.reject(error)
+      })
+      .then((response) => {
+        return Promise.resolve(response.data)
       })
   }
 }

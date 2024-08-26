@@ -3,6 +3,7 @@ import {
   BasicStatisticPaperResponse,
   ClassroomFrequencyMarkRequest,
   ClassroomFrequencyMarkResponse,
+  GeneratePaperStatisticExcelRequest,
   ListQuestionStatisticRequest,
   ListQuestionStatisticResponse,
   TranscriptStatisticRequest,
@@ -59,6 +60,16 @@ export const useStatisticPaperStore = defineStore('paperStatistic', {
     async transcriptStatistic(request: TranscriptStatisticRequest): Promise<TranscriptStatisticResponse> {
       return await paperStatisticService
         .transcriptStatistic(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async exportExcelStatistics(request: GeneratePaperStatisticExcelRequest): Promise<any> {
+      return paperStatisticService
+        .exportExcelStatistics(request)
         .then((response) => {
           return Promise.resolve(response)
         })

@@ -80,7 +80,12 @@
                 <VaCard v-bind="attrs" class="w-full flex border-2 p-2 items-center">
                   <VaIcon name="va-arrow-down" :class="value ? '' : 'rotate-[-90deg]'" v-bind="iconAttrs" />
                   <VaCard class="flex justify-between items-center w-full">
-                    <VaCard> {{ text }} </VaCard>
+                    <VaCard>
+                      {{ text }}
+                      <VaChip v-if="currentUser != groupClass.createdBy && isTeacher" outline class="ml-2" size="small">
+                        {{ $t('settings.share') }}
+                      </VaChip>
+                    </VaCard>
                     <VaMenu
                       v-if="currentUser == groupClass.createdBy"
                       :options="[
@@ -108,7 +113,17 @@
                   >
                     <VaCard class="p-2">
                       <VaCard class="flex flex-row justify-between items-center">
-                        <VaCardContent class="text-md font-bold flex-grow">{{ classItem.name }}</VaCardContent>
+                        <VaCardContent class="text-md font-bold flex-grow">
+                          {{ classItem.name }}
+                          <VaChip
+                            v-if="currentUser != classItem.ownerId && isTeacher"
+                            outline
+                            class="ml-2"
+                            size="small"
+                          >
+                            {{ $t('settings.share') }}
+                          </VaChip>
+                        </VaCardContent>
                         <VaMenu
                           v-if="currentUser == groupClass.createdBy"
                           :options="[

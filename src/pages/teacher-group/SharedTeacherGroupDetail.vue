@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineComponent, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { AssignedClassroomInGroup, GroupTeacher } from './types'
 import { useToast } from 'vuestic-ui'
 import QrcodeVue from 'qrcode.vue'
@@ -100,29 +100,29 @@ watch(
 )
 
 // Component for permission items
-const PermissionItem = defineComponent({
-  props: {
-    label: {
-      type: String,
-      required: true,
-    },
-    exists: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  setup(props: any) {
-    const iconName = props.exists ? 'check_box' : 'disabled_by_default'
-    const iconColor = props.exists ? 'success' : 'secondary'
-    return { iconName, iconColor }
-  },
-  template: `
-    <span class="flex gap-2">
-      <VaIcon :name="iconName" :color="iconColor" />
-      {{ label }}
-    </span>
-  `,
-})
+// const PermissionItem = defineComponent({
+//   props: {
+//     label: {
+//       type: String,
+//       required: true,
+//     },
+//     exists: {
+//       type: Boolean,
+//       required: true,
+//     },
+//   },
+//   setup(props: any) {
+//     const iconName = props.exists ? 'check_box' : 'disabled_by_default'
+//     const iconColor = props.exists ? 'success' : 'secondary'
+//     return { iconName, iconColor }
+//   },
+//   template: `
+//     <span class="flex gap-2">
+//       <VaIcon :name="iconName" :color="iconColor" />
+//       {{ label }}
+//     </span>
+//   `,
+// })
 
 const directToClassroom = (classroomId: string) => {
   router.push({ name: 'class-details', params: { id: classroomId } })
@@ -193,10 +193,13 @@ const directToClassroom = (classroomId: string) => {
                 }}</VaCardTitle>
                 <VaCardContent>
                   <template v-for="(permission, index1) in getAllPermissionType" :key="index1">
-                    <PermissionItem
-                      :label="permission.label"
-                      :exists="classroom.permissionType.includes(permission.id)"
-                    />
+                    <span class="flex gap-2">
+                      <VaIcon
+                        :name="classroom.permissionType.includes(permission.id) ? 'check_box' : 'disabled_by_default'"
+                        :color="classroom.permissionType.includes(permission.id) ? 'success' : 'secondary'"
+                      />
+                      {{ permission.label }}
+                    </span>
                   </template>
                 </VaCardContent>
               </VaCard>

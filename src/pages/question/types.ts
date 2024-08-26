@@ -110,9 +110,9 @@ export type Question = {
 }
 
 export type QuestionLable = {
-  id: string | null
-  name: string
-  color: string | undefined
+  id?: string | null
+  name?: string
+  color?: string | undefined
 }
 
 export type QuestionPassage = {
@@ -188,4 +188,11 @@ export type QuestionLabelRequest = {
 
 export type QuestionLabelResponse = {
   data: QuestionLable[]
+}
+
+export type GetQuestionRandomRequest = {
+  folderId: string
+  questionType: QuestionType
+  questionLabelId: string
+  numberQuestion: number
 }

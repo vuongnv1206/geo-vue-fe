@@ -15,6 +15,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'edit', question: Question): void
   (event: 'delete', question: Question): void
+  (event: 'selectLable', question: Question): void
 }>()
 </script>
 
@@ -26,6 +27,7 @@ const emit = defineEmits<{
       :index="props.index"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
+      @selectLable="emit('selectLable', props.question as Question)"
     />
     <QuestionEditSingleChoiceView
       v-else-if="props.question?.questionType === QuestionType.SingleChoice"
@@ -33,6 +35,7 @@ const emit = defineEmits<{
       :index="props.index"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
+      @selectLable="emit('selectLable', props.question as Question)"
     />
     <QuestionEditFillBlankView
       v-else-if="props.question?.questionType === QuestionType.FillBlank"
@@ -40,6 +43,7 @@ const emit = defineEmits<{
       :index="props.index"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
+      @selectLable="emit('selectLable', props.question as Question)"
     />
     <QuestionEditMatchingView
       v-else-if="props.question?.questionType === QuestionType.Matching"
@@ -47,6 +51,7 @@ const emit = defineEmits<{
       :index="props.index"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
+      @selectLable="emit('selectLable', props.question as Question)"
     />
     <QuestionEditReadingView
       v-else-if="props.question?.questionType === QuestionType.Reading"
@@ -54,6 +59,7 @@ const emit = defineEmits<{
       :index="props.index"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
+      @selectLable="emit('selectLable', props.question as Question)"
     />
     <QuestionEditWritingView
       v-else-if="props.question?.questionType === QuestionType.Writing"
@@ -61,6 +67,7 @@ const emit = defineEmits<{
       :index="props.index"
       @edit="emit('edit', props.question as Question)"
       @delete="emit('delete', props.question as Question)"
+      @selectLable="emit('selectLable', props.question as Question)"
     />
   </VaCard>
 </template>

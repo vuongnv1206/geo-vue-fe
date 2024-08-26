@@ -10,6 +10,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'edit', question: Question): void
   (event: 'delete', question: Question): void
+  (event: 'selectLable', question: Question): void
 }>()
 
 const formatContent = (content: string) => {
@@ -71,7 +72,12 @@ const getCorrectAnswer = (question: Question) => {
 
 <template>
   <VaCardContent class="leading-3 text-sm p-2 py-5">
-    <QuestionEditHeadView :question="props.question" :index="props.index" class="ml-[20px]" />
+    <QuestionEditHeadView
+      :question="props.question"
+      :index="props.index"
+      class="ml-[20px]"
+      @selectLable="emit('selectLable', props.question as Question)"
+    />
     <div class="mt-4 ml-[20px]">
       <!-- eslint-disable vue/no-v-html -->
       <div style="line-height: initial" v-html="formatContent(props.question?.content || '')"></div>

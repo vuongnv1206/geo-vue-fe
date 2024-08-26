@@ -44,6 +44,18 @@ export interface SharePaperFolderRequest {
   canDelete: boolean
   canShare: boolean
 }
+
+export interface SharePaperRequest {
+  userId?: string | null
+  paperId: string
+  groupId?: string | null
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+}
+
 export interface PaperInListDto {
   id: string
   examName: string
@@ -104,6 +116,7 @@ export interface PaperDto {
   localIpAllowed?: string
   numberAttempt?: number
   totalAttended?: number
+  paperPermissions?: PaperPermission[]
 }
 
 export interface PaperLabelDto {
@@ -189,6 +202,7 @@ export interface PaperAccess {
 export enum AccessType {
   ByStudent = 1,
   ByClass = 2,
+  All = 0,
 }
 
 export interface GetLastResultExamRequest {
@@ -219,6 +233,7 @@ export interface SubmitPaperDetailDto {
   createdOn?: Date
   lastModifiedBy?: string
   lastModifiedOn?: Date | null
+  question: Question
 }
 
 export enum SubmitPaperStatus {
@@ -325,6 +340,24 @@ export type PaperFolderPermission = {
   lastModifiedOn: string | null
 }
 
+export type PaperPermission = {
+  id: string
+  userId: string
+  user: UserDetail | null
+  groupTeacherId: string
+  groupTeacher: GroupTeacher | null
+  paperId: string
+  canView: boolean
+  canAdd: boolean
+  canUpdate: boolean
+  canDelete: boolean
+  canShare: boolean
+  createdBy: string
+  createdOn: string
+  lastModifiedBy: string
+  lastModifiedOn: string | null
+}
+
 export type SharePermission = {
   folderId: string
   userIds: string[]
@@ -406,7 +439,7 @@ export type ContentMatrixRequest = {
 }
 
 export type CriteriaQuestion = {
-  questionLabelId: string | null
+  questionLabelId: string | null | undefined
   questionType?: number
   numberOfQuestion?: number
   rawIndex?: string
@@ -588,8 +621,15 @@ export type PaperStudentsResponse = {
   // hasNextPage: boolean
 }
 
+export enum ShowMarkResult {
+  No = 0,
+  WhenSubmitted = 1,
+  WhenAllStudentSubmitted = 2,
+}
+
 export type PaperStudentsHistory = {
   id: string
+  paperId: string
   examName: string
   duration: number
   paperLabelId: string
@@ -621,6 +661,7 @@ export type QuestionGenerateToMatrix = {
   question: Question
   mark: number
   rawIndex: number
+  folderId: string
 }
 
 export interface AddQuestionsInPaperRequest {
@@ -659,6 +700,7 @@ export type GetAccessPaperRequest = {
   pageSize?: number
   orderBy?: string[]
   paperId: string
+  status?: AccessType
 }
 
 export type GetAccessPaperResponse = {
@@ -784,4 +826,17 @@ export type MonitorDetailResponse = {
 
 export type MonitorRequest = {
   submitPaperId: string
+}
+
+export enum DoExamStatus {
+  NotStarted = 0,
+  InProgress = 1,
+  Completed = 2,
+  Suspended = 3,
+}
+
+export type GeneratePaperStatisticExcelRequest = {
+  paperId: string
+  classId?: string
+  requestStatisticTypes: number[]
 }

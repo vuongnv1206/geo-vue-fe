@@ -3,7 +3,7 @@ import { useAssignmentStore } from '@/stores/modules/assignment.module'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useToast, VaCard, VaCardContent, VaCardTitle, VaDivider, VaForm } from 'vuestic-ui'
-import { Assignment, AssignmentSubmission, AssignmentSubmit } from '../types'
+import { AssignmentById, AssignmentSubmission, AssignmentSubmit } from '../types'
 import { onMounted, ref } from 'vue'
 import { format, getErrorMessage, notifications } from '@/services/utils'
 import { useFileStore } from '@/stores/modules/file.module'
@@ -21,7 +21,7 @@ const attachmentPaths = ref<string[]>([])
 const rawAttachmentPaths = ref<string[]>([])
 const filesUploaded = ref<any>()
 
-const assignment = ref<Assignment | null>(null)
+const assignment = ref<AssignmentById | null>(null)
 const assignmentSubmissions = ref<AssignmentSubmission[]>([])
 const assignmentId = router.currentRoute.value.params.id.toString()
 const classId = router.currentRoute.value.params.classId.toString()
@@ -56,7 +56,7 @@ const getAssignment = () => {
     })
     .catch((error) => {
       notify({
-        message: t('assignments.assignment') + getErrorMessage(error),
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -72,9 +72,7 @@ const getAssignmentSubmissions = () => {
     .then((response) => {
       assignmentSubmissions.value = response
       newAssignmentSubmit.value.answerRaw = assignmentSubmissions.value[0]?.answerRaw || ''
-
       const attachmentPaths = JSON.parse(assignmentSubmissions.value[0]?.attachmentPath || '[]')
-
       filesUploaded.value = attachmentPaths.map((path: string) => {
         return {
           name: path.split('/').pop(),
@@ -84,7 +82,7 @@ const getAssignmentSubmissions = () => {
     })
     .catch((error) => {
       notify({
-        message: t('assignments.assignment') + getErrorMessage(error),
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
         color: 'error',
       })
     })
@@ -93,18 +91,25 @@ const getAssignmentSubmissions = () => {
     })
 }
 
-const fileUpload = async () => {
+const fileUpload = () => {
+  loading.value = true
   fileStore
     .uploadFile(filesUploaded.value)
     .then((response) => {
       newAssignmentSubmit.value.attachmentPath = JSON.stringify(response)
-      getAssignmentSubmissions()
+      notify({
+        message: notifications.uploadSuccess(),
+        color: 'success',
+      })
     })
     .catch((error) => {
       notify({
-        message: notifications.uploadFailed + getErrorMessage(error),
+        message: notifications.uploadFailed() + getErrorMessage(error),
         color: 'error',
       })
+    })
+    .finally(() => {
+      loading.value = false
     })
 }
 
@@ -113,14 +118,16 @@ const onAssignmentSubmit = async () => {
     .submitAssignment(newAssignmentSubmit.value)
     .then(() => {
       notify({
-        message: t('assignments.assignment'),
+        message: notifications.submitSuccessfully(t('assignments.assignment') + ' ' + assignment.value?.name),
         color: 'success',
       })
       router.push({ name: 'assignments' })
     })
     .catch((error) => {
       notify({
-        message: t('assignments.assignment') + getErrorMessage(error),
+        message:
+          notifications.submitFailed(t('assignments.assignment') + ' ' + assignment.value?.name) +
+          getErrorMessage(error),
         color: 'error',
       })
     })
@@ -135,6 +142,9 @@ onMounted(() => {
 <template>
   <VaCard v-if="assignment">
     <VaCardTitle>{{ assignment.name }}</VaCardTitle>
+    <VaCardContent>
+      <span class="font-semibold mr-1">{{ $t('subjects.subject') }}: {{ assignment.subject.name }}</span>
+    </VaCardContent>
     <VaCardContent>
       <div class="flex items-center mb-1">
         <VaIcon name="event" class="material-symbols-outlined mr-1" />
@@ -178,62 +188,66 @@ onMounted(() => {
     </VaCardContent>
     <VaDivider />
     <VaCardTitle>{{ $t('assignments.submit_homeworks') }}</VaCardTitle>
-    <VaCard v-if="assignmentSubmissions[0]?.score == null">
-      <VaForm>
-        <div
-          v-if="new Date() >= new Date(assignment.startTime) && new Date() <= new Date(assignment.endTime)"
-          class="px-3.5"
-        >
-          <QuillEditor
-            v-model:content="newAssignmentSubmit.answerRaw"
-            class="border rounded"
-            :placeholder="$t('posts.enter_content')"
-            content-type="html"
-            style="height: 200px"
-          />
-          <VaCardContent class="flex flex-col items-center">
-            <VaFileUpload
-              v-model="filesUploaded"
-              dropzone
-              :upload-button-text="$t('file_upload.upload_button_text')"
-              :drop-zone-text="$t('file_upload.drop_zone_text')"
-              file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
-              flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
-              class="border-2 border-dashed border-gray-300 flex items-center justify-center w-full py-6"
-              @fileAdded="fileUpload"
+    <VaInnerLoading :loading="loading">
+      <VaCard v-if="assignmentSubmissions[0]?.score == null">
+        <VaForm>
+          <div
+            v-if="new Date() >= new Date(assignment.startTime) && new Date() <= new Date(assignment.endTime)"
+            class="px-3.5"
+          >
+            <QuillEditor
+              v-model:content="newAssignmentSubmit.answerRaw"
+              class="border rounded"
+              :placeholder="$t('posts.enter_content')"
+              content-type="html"
+              style="height: 200px"
             />
-            <VaButton class="mt-4" @click="onAssignmentSubmit">{{ $t('settings.submit') }}</VaButton>
-          </VaCardContent>
-        </div>
-        <div v-else class="text-center text-red-500 border-2 border-dashed rounded p-4 mx-3">
-          {{ $t('assignments.submission_time_over') }}
-        </div>
-      </VaForm>
-    </VaCard>
-    <VaCard v-else>
-      <VaCard v-if="!assignment.canViewResult">
-        <VaCardContent class="flex flex-col items-center">
-          <VaIcon name="done" size="large" class="material-symbols-outlined mb-2" />
-          <p>{{ $t('assignments.submitted') }}</p>
-        </VaCardContent>
+            <VaCardContent class="flex flex-col items-center">
+              <VaFileUpload
+                v-model="filesUploaded"
+                dropzone
+                :upload-button-text="$t('file_upload.upload_button_text')"
+                :drop-zone-text="$t('file_upload.drop_zone_text')"
+                file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
+              flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
+                class="border-2 border-dashed border-gray-300 flex items-center justify-center w-full py-6"
+                @fileAdded="fileUpload"
+              />
+              <VaButton class="mt-4" @click="onAssignmentSubmit">
+                {{ $t('settings.submit') }}
+              </VaButton>
+            </VaCardContent>
+          </div>
+          <div v-else class="text-center text-red-500 border-2 border-dashed rounded p-4 mx-3">
+            {{ $t('assignments.submission_time_over') }}
+          </div>
+        </VaForm>
       </VaCard>
       <VaCard v-else>
-        <VaCardContent class="font-semibold mr-1">
-          {{ $t('assignments.score') }}:
-          <span class="text-red-500">{{ assignmentSubmissions[0]?.score }}</span>
-        </VaCardContent>
-        <VaCardContent class="font-semibold mr-1">
-          {{ $t('assignments.comment') }}:
-          <VaScrollContainer class="max-h-[48vh]">
-            <!-- eslint-disable vue/no-v-html -->
-            <div
-              class="text-md font-medium px-5 mt-2 mb-4 max-h-48 overflow-y-auto break-words whitespace-pre-line"
-              v-html="assignmentSubmissions[0]?.comment"
-            ></div>
-            <!-- eslint-enable -->
-          </VaScrollContainer>
-        </VaCardContent>
+        <VaCard v-if="!assignment.canViewResult">
+          <VaCardContent class="flex flex-col items-center">
+            <VaIcon name="done" size="large" class="material-symbols-outlined mb-2" />
+            <p>{{ $t('assignments.submitted') }}</p>
+          </VaCardContent>
+        </VaCard>
+        <VaCard v-else>
+          <VaCardContent class="font-semibold mr-1">
+            {{ $t('assignments.score') }}:
+            <span class="text-red-500">{{ assignmentSubmissions[0]?.score }}</span>
+          </VaCardContent>
+          <VaCardContent class="font-semibold mr-1">
+            {{ $t('assignments.comment') }}:
+            <VaScrollContainer class="max-h-[48vh]">
+              <!-- eslint-disable vue/no-v-html -->
+              <div
+                class="text-md font-medium px-5 mt-2 mb-4 max-h-48 overflow-y-auto break-words whitespace-pre-line"
+                v-html="assignmentSubmissions[0]?.comment"
+              ></div>
+              <!-- eslint-enable -->
+            </VaScrollContainer>
+          </VaCardContent>
+        </VaCard>
       </VaCard>
-    </VaCard>
+    </VaInnerLoading>
   </VaCard>
 </template>

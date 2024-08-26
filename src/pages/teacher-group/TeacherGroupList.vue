@@ -418,6 +418,7 @@ const handlerSearch = (event: Event) => {
                 v-for="teacher in teacherTeams"
                 :key="teacher.id"
                 class="list__item cursor-pointer pt-1 pb-1"
+                :class="{ selectItem: selectedItemId === teacher.id }"
                 @click="detailTeacherInTeam(teacher.id)"
               >
                 <VaListItemSection avatar class="justify-center">

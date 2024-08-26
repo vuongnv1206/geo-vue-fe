@@ -3,6 +3,7 @@ import {
   BasicStatisticPaperResponse,
   ClassroomFrequencyMarkRequest,
   ClassroomFrequencyMarkResponse,
+  GeneratePaperStatisticExcelRequest,
   ListQuestionStatisticRequest,
   ListQuestionStatisticResponse,
   TranscriptStatisticRequest,
@@ -16,9 +17,27 @@ export interface IPaperStatisticService {
   frequencyMarkStatistic(request: ClassroomFrequencyMarkRequest): Promise<ClassroomFrequencyMarkResponse>
   questionStatistic(request: ListQuestionStatisticRequest): Promise<ListQuestionStatisticResponse>
   transcriptStatistic(request: TranscriptStatisticRequest): Promise<TranscriptStatisticResponse>
+  exportExcelStatistics(request: GeneratePaperStatisticExcelRequest): Promise<any>
 }
 
 class PaperStatisticService implements IPaperStatisticService {
+  async exportExcelStatistics(request: GeneratePaperStatisticExcelRequest): Promise<any> {
+    return apiService
+      .postFileData(`/v1/paperstatistics/generate-excel`, request, { responseType: 'blob' })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'paper_statistic.xlsx')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   async transcriptStatistic(request: TranscriptStatisticRequest): Promise<TranscriptStatisticResponse> {
     const url = '/v1/paperstatistics/List-transcript'
 

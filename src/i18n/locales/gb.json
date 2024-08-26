@@ -351,7 +351,9 @@
     "submitted": "Submitted",
     "doing": "Doing",
     "marked": "Marked",
-    "not_submitted": "Not Submitted"
+    "not_submitted": "Not Submitted",
+    "no_comment": "No comment available",
+    "time_out": "Time out"
   },
   "subjects": {
     "subject": "Subject",
@@ -364,7 +366,8 @@
     "edit_subject": "Edit Subject",
     "delete_all_success": "Successfully deleted all subjects",
     "range": "Items from {start} to {end} of total {total}",
-    "select_subject": "Select a Subject"
+    "select_subject": "Select a Subject",
+    "subject_require": "Subject is require"
   },
   "groupClasses": {
     "group_class": "Group Class",
@@ -401,7 +404,7 @@
     "search_assignment_paper": "Search assignment or paper"
   },
   "students": {
-    "get_template": "Get template", 
+    "get_template": "Get template",
     "student": "Student",
     "student_2": "student",
     "first_name": "First Name",
@@ -423,7 +426,8 @@
     "delete_student": "Delete Student",
     "edit_student": "Edit Student",
     "range": "Items from {start} to {end} of total {total}",
-    "no_student": "No student available"
+    "no_student": "No student available",
+    "import_failed": "Some students encountered an error during the import process. Please check the downloaded file."
   },
   "comments": {
     "comment": "Comment",
@@ -477,6 +481,7 @@
     "permission_management": "Permission Management"
   },
   "papers": {
+    "excel_export_button": "Export Excel file",
     "paper": "Paper",
     "paper_2": "paper",
     "name": "Paper Name",
@@ -556,12 +561,12 @@
     "password": "Password(optional)",
     "enter_password": "Enter password",
     "publish": "Publish",
-    "create_test": "Create Test/Exercise",
-    "create_test_from_matrix": "Create Test from Matrix",
+    "create_test": "Create Paper",
+    "create_test_from_matrix": "Create Paper from Matrix",
     "create_offline_test_manually": "Create Offline Test Manually",
     "create_offline_test_with_text": "Create Offline Test with Text",
     "content_1": "Use GEO's editor to create Exercises/Tests. Edit from available templates or Copy & Paste from various sources.",
-    "content_2": "Create multiple equivalent quality tests from the existing matrix design of Azota, providing basic structure information: time, number of questions, levels, and question formats.",
+    "content_2": "Create multiple equivalent quality tests from the existing matrix design of GEO, providing basic structure information: time, number of questions, levels, and question formats.",
     "supported_format": "Supported formats: .pdf, .docx, .xlsx.",
     "content_0": "You can upload Exercise Files, Exam Papers, or Answer Sheets for offline grading.",
     "details": "Details",
@@ -585,7 +590,9 @@
     "in_progress": "In Progress",
     "completed": "Completed",
     "suspended": "Suspended",
-    "status": "Status"
+    "status": "Status",
+    "please_wait_result": "Please wait for the result",
+    "can_not_view_result": "You can't view the result"
   },
   "file_upload": {
     "upload_button_text": "Upload Files",
@@ -626,7 +633,7 @@
   "404": {
     "title": "This page’s gone fishing.",
     "text": "If you feel that it’s not right, please send us a message at ",
-    "back_button": "Back to dashboard"
+    "back_button": "Back to home page"
   },
   "typography": {
     "primary": "Primary text styles",
@@ -651,7 +658,7 @@
     "auth": "Auth",
     "buttons": "Buttons",
     "timelines": "Timelines",
-    "dashboard": "Dashboard",
+    "dashboard": "Home",
     "billing": "Billing",
     "login": "Login",
     "preferences": "Account preferences",
@@ -676,7 +683,7 @@
     "class": "Class",
     "group-class": "Group class",
     "teacher-group": "Teacher",
-    "group-manage": "Group Manage",
+    "group-manage": "Manage Group",
     "join-request": "Join Request",
     "exam": "Exam",
     "assignments": "Assignment",
@@ -852,7 +859,11 @@
     "uploadFileFailed": "Upload file failed",
     "greaterThanDate": "Start time must be greater than current time",
     "downloadFailed": "Download file failed",
-    "downloadSuccess": "Download file successfully"
+    "downloadSuccess": "Download file successfully",
+    "submitSuccessfully": "{message} submit successfully",
+    "submitFailed": "Failed to submit {message}",
+    "markSuccessfully": "{message} mark successfully",
+    "markFailed": "Failed to mark {message}"
   },
   "languageSwitcher": {
     "change_language_success": "Change language successfully, some cases need to reload page to update language"
