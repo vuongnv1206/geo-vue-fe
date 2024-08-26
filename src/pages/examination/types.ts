@@ -834,3 +834,9 @@ export enum DoExamStatus {
   Completed = 2,
   Suspended = 3,
 }
+
+export type GeneratePaperStatisticExcelRequest = {
+  paperId: string
+  classId?: string
+  requestStatisticTypes: number[]
+}

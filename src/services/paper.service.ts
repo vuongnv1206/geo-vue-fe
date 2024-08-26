@@ -43,9 +43,28 @@ export interface IPapersService {
   getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse>
 
   papers_Share(id: string, request: SharePaperRequest): Promise<string>
+
+  generateDocx(paperId: string): Promise<any>
 }
 
 export class PapersService implements IPapersService {
+  generateDocx(paperId: string): Promise<any> {
+    return apiService
+      .getFile(`/v1/papers/generate/docx?paperId=${paperId}`, { responseType: 'blob' })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'paper_doc.xlsx')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        return Promise.resolve()
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse> {
     const url = '/v1/papers/get-assignees-paper'
     return apiService
