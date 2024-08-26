@@ -5,7 +5,7 @@ import { Question } from '@pages/question/types'
 import QuestionView from '@pages/question/widgets/QuestionView.vue'
 import { PaperDto, QuestionIntoPaperRequest, UpdateQuestionsInPaperRequest } from '../types'
 import { useRoute, useRouter } from 'vue-router'
-import { validators } from '@services/utils'
+import { getErrorMessage, validators } from '@services/utils'
 import { useModal, useToast } from 'vuestic-ui'
 import { useI18n } from 'vue-i18n'
 import { usePaperStore } from '@/stores/modules/paper.module'
@@ -95,7 +95,7 @@ const saveManageQuestions = async () => {
       router.push({ name: 'admin-exam-detail', params: { id: paperId } })
     } catch (error) {
       notify({
-        message: `Failed to update questions\n${error}`,
+        message: getErrorMessage(error),
         color: 'danger',
       })
     }

@@ -26,6 +26,7 @@ const joinTeamResponse = ref<JoinTeacherTeamRequestResponse>()
 
 const getJoinTeamRequest = async () => {
   try {
+    isLoading.value = true
     const res = await useJoinTeacherTeamRequest.requestJoinTeamList(joinTeamRequest.value)
     joinTeamResponse.value = res
   } catch (error) {
@@ -33,8 +34,9 @@ const getJoinTeamRequest = async () => {
       message: getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
+    isLoading.value = false
   }
-  isLoading.value = false
 }
 
 const columnTable: DataTableColumnSource<string>[] = [
@@ -95,6 +97,7 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
       }
 
       if (status == JoinTeacherGroupStatus.Cancel) {
+        isLoading.value = true
         await useJoinTeacherTeamRequest
           .cancelJoinTeamRequest(request)
           .then(async () => {
@@ -109,6 +112,9 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
               message: message,
               color: 'danger',
             })
+          })
+          .finally(() => {
+            isLoading.value = false
           })
         await getJoinTeamRequest()
       }

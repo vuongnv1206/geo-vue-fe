@@ -3,184 +3,195 @@
     <VaButton icon="va-arrow-left" preset="plainOpacity" :to="{ name: 'assignments' }" />
   </VaLayout>
   <VaDivider />
-  <VaLayout
-    :top="{ order: 1 }"
-    :left="{ absolute: breakpoints.smDown, order: 2, overlay: breakpoints.smDown && showSidebar }"
-    @leftOverlayClick="showSidebar = false"
-  >
-    <template #top>
-      <VaNavbar class="py-1 rounded">
-        <template #left>
-          <VaButton preset="secondary" :icon="showSidebar ? 'menu_open' : 'menu'" @click="showSidebar = !showSidebar" />
-        </template>
-        <template #right>
-          <div class="flex">
-            <div class="mr-3 flex-grow">
-              <VaInput class="" placeholder="Search">
-                <template #appendInner>
-                  <VaIcon color="secondary" class="material-icons"> search </VaIcon>
-                </template>
-              </VaInput>
-            </div>
-          </div>
-        </template>
-      </VaNavbar>
-    </template>
-    <template #left>
-      <VaCard v-if="showSidebar" class="mr-2 rounded min-w-[500px]">
-        <VaCard v-if="assignment" class="min-h-[81vh]">
-          <VaCardContent class="font-bold">{{ classById?.name }} - {{ assignment.name }}</VaCardContent>
-          <VaCardContent>
-            <div class="flex items-center mb-1">
-              <VaIcon name="event" class="material-symbols-outlined mr-1" />
-              <span class="font-semibold mr-1">{{ $t('assignments.start_time') }} </span>
-              {{ format.formatDate(assignment.startTime) }}
-            </div>
-            <div class="flex items-center">
-              <VaIcon name="event" class="material-symbols-outlined mr-1" />
-              <span class="font-semibold mr-1">{{ $t('assignments.end_time') }}</span>
-              {{ format.formatDate(assignment.endTime) }}
-            </div>
-          </VaCardContent>
-          <div v-if="canAssignmentManage">
-            <VaCardContent class="font-bold">{{ $t('assignments.menu') }}</VaCardContent>
-            <VaCard outlined class="mx-3">
-              <VaCardActions align="stretch" vertical>
-                <VaButton
-                  icon="edit"
-                  preset="secondary"
-                  :to="{ name: 'edit-assignment-details', params: { id: assignmentId, classId: classId } }"
-                  class="justify-start"
-                >
-                  {{ $t('assignments.settings') }}
-                </VaButton>
-                <VaButton
-                  v-if="classById?.ownerId == currentUserId"
-                  icon="delete"
-                  preset="secondary"
-                  class="justify-start"
-                  @click="removeAssignmentFromClass(assignmentClass)"
-                >
-                  {{ $t('settings.delete') }}
-                </VaButton>
-              </VaCardActions>
-            </VaCard>
-          </div>
-          <VaCard>
-            <VaCard class="flex flex-row items-center justify-between">
-              <div class="flex flex-row items-center">
-                <VaCardContent class="font-bold">{{ $t('assignments.attachments') }}</VaCardContent>
-                <VaPopover :title="$t('file_upload.allowed_file_types')" placement="right">
-                  <VaIcon name="error" size="small" />
-                  <template #body>
-                    <p>{{ $t('file_upload.image') }}</p>
-                    <p>{{ $t('file_upload.document') }}</p>
-                    <p>{{ $t('file_upload.archive') }}</p>
-                    <p>{{ $t('file_upload.video') }}</p>
-                    <p>{{ $t('file_upload.audio') }}</p>
-                    <p>{{ $t('file_upload.data') }}</p>
+  <VaInnerLoading :loading="loading">
+    <VaLayout
+      :top="{ order: 1 }"
+      :left="{ absolute: breakpoints.smDown, order: 2, overlay: breakpoints.smDown && showSidebar }"
+      @leftOverlayClick="showSidebar = false"
+    >
+      <template #top>
+        <VaNavbar class="py-1 rounded">
+          <template #left>
+            <VaButton
+              preset="secondary"
+              :icon="showSidebar ? 'menu_open' : 'menu'"
+              @click="showSidebar = !showSidebar"
+            />
+          </template>
+          <template #right>
+            <div class="flex">
+              <div class="mr-3 flex-grow">
+                <VaInput class="" placeholder="Search">
+                  <template #appendInner>
+                    <VaIcon color="secondary" class="material-icons"> search </VaIcon>
                   </template>
-                </VaPopover>
+                </VaInput>
               </div>
-              <VaFileUpload
-                v-model="filesUploaded"
-                class="flex flex-row items-center pr-6"
-                hide-file-list
-                file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
-              flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
-                @fileAdded="fileUpload"
-              >
-                <VaIcon name="upload" />
-                <p class="font-semibold">{{ $t('assignments.upload') }}</p>
-              </VaFileUpload>
+            </div>
+          </template>
+        </VaNavbar>
+      </template>
+      <template #left>
+        <VaCard v-if="showSidebar" class="mr-2 rounded min-w-[500px]">
+          <VaCard v-if="assignment" class="min-h-[81vh]">
+            <VaCardContent class="font-bold">{{ classById?.name }} - {{ assignment.name }}</VaCardContent>
+            <VaCardContent>
+              <div class="flex items-center mb-1">
+                <VaIcon name="event" class="material-symbols-outlined mr-1" />
+                <span class="font-semibold mr-1">{{ $t('assignments.start_time') }} </span>
+                {{ format.formatDate(assignment.startTime) }}
+              </div>
+              <div class="flex items-center">
+                <VaIcon name="event" class="material-symbols-outlined mr-1" />
+                <span class="font-semibold mr-1">{{ $t('assignments.end_time') }}</span>
+                {{ format.formatDate(assignment.endTime) }}
+              </div>
+            </VaCardContent>
+            <div v-if="canAssignmentManage">
+              <VaCardContent class="font-bold">{{ $t('assignments.menu') }}</VaCardContent>
+              <VaCard outlined class="mx-3">
+                <VaCardActions align="stretch" vertical>
+                  <VaButton
+                    icon="edit"
+                    preset="secondary"
+                    :to="{ name: 'edit-assignment-details', params: { id: assignmentId, classId: classId } }"
+                    class="justify-start"
+                  >
+                    {{ $t('assignments.settings') }}
+                  </VaButton>
+                  <VaButton
+                    v-if="classById?.ownerId == currentUserId"
+                    icon="delete"
+                    preset="secondary"
+                    class="justify-start"
+                    @click="removeAssignmentFromClass(assignmentClass)"
+                  >
+                    {{ $t('settings.delete') }}
+                  </VaButton>
+                </VaCardActions>
+              </VaCard>
+            </div>
+            <VaCard>
+              <VaCard class="flex flex-row items-center justify-between">
+                <div class="flex flex-row items-center">
+                  <VaCardContent class="font-bold">{{ $t('assignments.attachments') }}</VaCardContent>
+                  <VaPopover :title="$t('file_upload.allowed_file_types')" placement="right">
+                    <VaIcon name="error" size="small" />
+                    <template #body>
+                      <p>{{ $t('file_upload.image') }}</p>
+                      <p>{{ $t('file_upload.document') }}</p>
+                      <p>{{ $t('file_upload.archive') }}</p>
+                      <p>{{ $t('file_upload.video') }}</p>
+                      <p>{{ $t('file_upload.audio') }}</p>
+                      <p>{{ $t('file_upload.data') }}</p>
+                    </template>
+                  </VaPopover>
+                </div>
+                <VaFileUpload
+                  v-model="filesUploaded"
+                  class="flex flex-row items-center pr-6"
+                  hide-file-list
+                  file-types="jpg,png,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar,7z,mp4,avi,mkv,
+                flv,wmv,mov,webm,mp3,wav,flac,ogg,wma,json,xml,csv,tsv"
+                  @fileAdded="fileUpload"
+                >
+                  <VaIcon name="upload" />
+                  <p class="font-semibold">{{ $t('assignments.upload') }}</p>
+                </VaFileUpload>
+              </VaCard>
+              <VaCardContent>
+                <VaCard v-for="(attachmentPath, index) in attachmentPaths" :key="index">
+                  <VaButton
+                    class="font-medium geo-text"
+                    icon="description"
+                    size="small"
+                    preset="plain"
+                    :href="`${url}${rawAttachmentPaths[index]}`"
+                  >
+                    {{ attachmentPath }}
+                  </VaButton>
+                </VaCard>
+              </VaCardContent>
+            </VaCard>
+            <VaCard class="flex flex-row justify-between">
+              <VaCardContent class="font-bold">{{ $t('assignments.content') }}</VaCardContent>
+              <VaButton
+                class="pr-6"
+                icon="edit"
+                size="small"
+                preset="plain"
+                @click="editAssignmentContent(assignment)"
+              />
             </VaCard>
             <VaCardContent>
-              <VaCard v-for="(attachmentPath, index) in attachmentPaths" :key="index">
-                <VaButton
-                  class="font-medium geo-text"
-                  icon="description"
-                  size="small"
-                  preset="plain"
-                  :href="`${url}${rawAttachmentPaths[index]}`"
-                >
-                  {{ attachmentPath }}
-                </VaButton>
-              </VaCard>
+              <div v-if="!assignment.content" class="flex flex-col justify-center items-center h-full">
+                <VaIcon name="description" size="large" class="material-symbols-outlined mb-2" />
+                <p>{{ $t('assignments.empty_content') }}</p>
+              </div>
+              <!-- eslint-disable vue/no-v-html -->
+              <div v-html="assignment.content" />
+              <!--eslint-enable-->
             </VaCardContent>
           </VaCard>
-          <VaCard class="flex flex-row justify-between">
-            <VaCardContent class="font-bold">{{ $t('assignments.content') }}</VaCardContent>
-            <VaButton class="pr-6" icon="edit" size="small" preset="plain" @click="editAssignmentContent(assignment)" />
-          </VaCard>
-          <VaCardContent>
-            <div v-if="!assignment.content" class="flex flex-col justify-center items-center h-full">
-              <VaIcon name="description" size="large" class="material-symbols-outlined mb-2" />
-              <p>{{ $t('assignments.empty_content') }}</p>
-            </div>
-            <!-- eslint-disable vue/no-v-html -->
-            <div v-html="assignment.content" />
-            <!--eslint-enable-->
-          </VaCardContent>
         </VaCard>
-      </VaCard>
-    </template>
+      </template>
 
-    <template #content>
-      <VaCard class="mt-2 p-2 min-h-[75vh]">
-        <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <VaListItem
-            v-for="student in sortedStudents"
-            :key="student.id"
-            class="border rounded p-4"
-            :to="{
-              name: 'assignment-marking',
-              params: { id: assignment?.id, classId: classId, studentId: student.id },
-            }"
-          >
-            <VaListItemSection avatar>
-              <GeoAvatar
-                class="mr-2"
-                :size="48"
-                color="warning"
-                :image="student.avatarUrl || undefined"
-                :txt="student.firstName.charAt(0).toUpperCase()"
-              />
-            </VaListItemSection>
-            <VaListItemSection>
-              <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
-              <!-- <VaListItemLabel
-                caption
-                :class="
-                  getStatusColorClass(
-                    assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
-                  )
-                "
-              >
-                {{
-                  getStatusText(assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status)
-                }}
-              </VaListItemLabel> -->
-              <VaListItemLabel caption>
-                <VaBadge
-                  :text="
-                    getStatusText(
-                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status || '',
-                    )
-                  "
-                  :color="
-                    getStatusColorClass(
-                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status || '',
-                    )
-                  "
+      <template #content>
+        <VaCard class="mt-2 p-2 min-h-[75vh]">
+          <VaList class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+            <VaListItem
+              v-for="student in sortedStudents"
+              :key="student.id"
+              class="border rounded p-4"
+              :to="{
+                name: 'assignment-marking',
+                params: { id: assignment?.id, classId: classId, studentId: student.id },
+              }"
+            >
+              <VaListItemSection avatar>
+                <GeoAvatar
+                  class="mr-2"
+                  :size="48"
+                  color="warning"
+                  :image="student.avatarUrl || undefined"
+                  :txt="student.firstName.charAt(0).toUpperCase()"
                 />
-              </VaListItemLabel>
-            </VaListItemSection>
-          </VaListItem>
-        </VaList>
-      </VaCard>
-    </template>
-  </VaLayout>
-
+              </VaListItemSection>
+              <VaListItemSection>
+                <VaListItemLabel> {{ student.firstName }} {{ student.lastName }} </VaListItemLabel>
+                <!-- <VaListItemLabel
+                  caption
+                  :class="
+                    getStatusColorClass(
+                      assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status,
+                    )
+                  "
+                >
+                  {{
+                    getStatusText(assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status)
+                  }}
+                </VaListItemLabel> -->
+                <VaListItemLabel caption>
+                  <VaBadge
+                    :text="
+                      getStatusText(
+                        assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status || '',
+                      )
+                    "
+                    :color="
+                      getStatusColorClass(
+                        assignmentSubmissions.find((submission) => submission.studentId === student.id)?.status || '',
+                      )
+                    "
+                  />
+                </VaListItemLabel>
+              </VaListItemSection>
+            </VaListItem>
+          </VaList>
+        </VaCard>
+      </template>
+    </VaLayout>
+  </VaInnerLoading>
   <VaModal
     v-slot="{ cancel, ok }"
     v-model="doShowFormModal"
@@ -341,6 +352,7 @@ const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
     if (!agreed) {
       return
     }
+    loading.value = true
     classStores
       .removeAssignmentFromClass(assignmentClass)
       .then(() => {
@@ -355,6 +367,9 @@ const removeAssignmentFromClass = (assignmentClass: AssignmentClass) => {
           message: notifications.deleteFailed(t('assignments.assignment')) + getErrorMessage(error),
           color: 'error',
         })
+      })
+      .finally(() => {
+        loading.value = false
       })
   })
 }
@@ -377,6 +392,7 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
 const onAssignmentContent = async (assignment: AssignmentContent) => {
   doShowFormModal.value = false
   if (assignment.id != '') {
+    loading.value = true
     stores
       .updateAssignment(assignment.id, assignment as EmptyAssignmentContent)
       .then(() => {
@@ -392,11 +408,15 @@ const onAssignmentContent = async (assignment: AssignmentContent) => {
           color: 'error',
         })
       })
+      .finally(() => {
+        loading.value = false
+      })
   }
 }
 
 const onAssignmentAttachment = async () => {
   if (assignmentId != '') {
+    loading.value = true
     stores
       .updateAssignment(assignmentId, assignmentAttachment.value as AssignmentAttachment)
       .then(() => {
@@ -411,6 +431,9 @@ const onAssignmentAttachment = async () => {
           message: notifications.updateFailed(t('assignments.assignment')) + getErrorMessage(error),
           color: 'error',
         })
+      })
+      .finally(() => {
+        loading.value = false
       })
   }
 }

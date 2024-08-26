@@ -445,7 +445,9 @@ onMounted(async () => {
                     </td>
                   </template>
                   <td>
-                    {{ totalPointPaper }}
+                    <span :class="{ 'va-text-danger': totalPointPaper != 10 }"
+                      >{{ totalPointPaper }} <span v-if="totalPointPaper != 10">(must equal 10)</span></span
+                    >
                   </td>
                 </tr>
               </tfoot>
