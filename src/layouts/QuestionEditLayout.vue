@@ -577,6 +577,13 @@ const button = [
   },
 ]
 
+const handleDownloadFile = () => {
+  const baseUrl = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -4)
+  const fileUrl = `${baseUrl}/files/QuestionTemplate.docx`
+
+  window.open(fileUrl, '_blank')
+}
+
 onMounted(() => {
   window.addEventListener('resize', onResize)
   onResize()
@@ -661,6 +668,14 @@ onMounted(() => {
                       </button>
                     </template>
                   </VaFileUpload>
+                </div>
+                <div>
+                  <button
+                    class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200"
+                    @click="handleDownloadFile"
+                  >
+                    <div class="mx-2"><VaIcon name="mso-download" /> <span>Download file</span></div>
+                  </button>
                 </div>
                 <div>
                   <button
