@@ -638,7 +638,7 @@ onMounted(async () => {
               <VaCardTitle>Menu</VaCardTitle>
               <VaCardContent>
                 <VaMenuList class="w-full">
-                  <VaMenuItem :disabled="!canEditGuest" @click="paperConfigAction">
+                  <VaMenuItem :disabled="currentUserId != paperDetail?.createdBy" @click="paperConfigAction">
                     <VaIcon name="settings" class="material-symbols-outlined" /> Setting
                   </VaMenuItem>
                   <VaMenuItem :disabled="!canShareGuest" @click="onPaperShare()">
