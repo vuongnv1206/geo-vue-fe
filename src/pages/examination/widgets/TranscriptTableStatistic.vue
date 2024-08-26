@@ -11,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const { init: notify } = useToast()
-
+const loading = ref(true)
 const statisticPaperStore = useStatisticPaperStore()
 const router = useRouter()
 const responseData = ref<TranscriptStatisticResponse>()
@@ -23,6 +23,7 @@ const getDataTranscriptStatistic = async (paperId: string, classId?: string) => 
   })
 
   try {
+    loading.value = true
     const res = await statisticPaperStore.transcriptStatistic(request.value)
     responseData.value = res
   } catch (error) {
@@ -30,6 +31,8 @@ const getDataTranscriptStatistic = async (paperId: string, classId?: string) => 
       message: notifications.getFailed('question statistic ') + getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
+    loading.value = false
   }
 }
 
@@ -114,36 +117,38 @@ watch(
 </script>
 
 <template>
-  <VaCard>
-    <VaCardTitle>Transcript</VaCardTitle>
-    <VaCardContent>
-      <VaDataTable
-        :items="formattedData"
-        :columns="columnTable"
-        sticky-header
-        :disable-client-side-sorting="false"
-        class="va-data-table-statistic"
-      >
-        <template #cell(classrooms)="{ row }">
-          <VaChip
-            v-for="classroom in row.source.classrooms"
-            :key="classroom.id"
-            outline
-            class="cursor-pointer m-1"
-            @click="redirectToClassDetail(classroom.id)"
-          >
-            {{ classroom.name }}
-          </VaChip>
-        </template>
-        <template #footer>
-          <tr class="va-data-table__table-tr text-center">
-            <td colspan="6" class="va-data-table__table-td">Medium Score</td>
-            <td class="va-data-table__table-td">
-              {{ responseData?.averageMark }}
-            </td>
-          </tr>
-        </template>
-      </VaDataTable>
-    </VaCardContent>
-  </VaCard>
+  <VaInnerLoading :loading="loading">
+    <VaCard>
+      <VaCardTitle>Transcript</VaCardTitle>
+      <VaCardContent>
+        <VaDataTable
+          :items="formattedData"
+          :columns="columnTable"
+          sticky-header
+          :disable-client-side-sorting="false"
+          class="va-data-table-statistic"
+        >
+          <template #cell(classrooms)="{ row }">
+            <VaChip
+              v-for="classroom in row.source.classrooms"
+              :key="classroom.id"
+              outline
+              class="cursor-pointer m-1"
+              @click="redirectToClassDetail(classroom.id)"
+            >
+              {{ classroom.name }}
+            </VaChip>
+          </template>
+          <template #footer>
+            <tr class="va-data-table__table-tr text-center">
+              <td colspan="6" class="va-data-table__table-td">Medium Score</td>
+              <td class="va-data-table__table-td">
+                {{ responseData?.averageMark }}
+              </td>
+            </tr>
+          </template>
+        </VaDataTable>
+      </VaCardContent>
+    </VaCard>
+  </VaInnerLoading>
 </template>

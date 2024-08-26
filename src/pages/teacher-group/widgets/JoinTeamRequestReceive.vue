@@ -31,6 +31,7 @@ const joinTeamResponse = ref<JoinTeacherTeamRequestResponse>()
 
 const getJoinTeacherTeamRequest = async () => {
   try {
+    isLoading.value = true
     const res = await useJoinTeacherTeamRequest.requestJoinTeamList(joinTeamRequest.value)
     joinTeamResponse.value = res
   } catch (error) {
@@ -38,8 +39,9 @@ const getJoinTeacherTeamRequest = async () => {
       message: getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
+    isLoading.value = false
   }
-  isLoading.value = false
 }
 
 const columnTable: DataTableColumnSource<string>[] = [
@@ -106,6 +108,7 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
   confirm(messageConfirm).then(async (agreed) => {
     if (agreed) {
       if (status == JoinTeacherGroupStatus.Rejected) {
+        isLoading.value = true
         const request: HandleJoinTeamRequest = {
           requestId: requestId,
         }
@@ -123,6 +126,9 @@ const handlerRequest = async (requestId: string, status: JoinTeacherGroupStatus)
               message: message,
               color: 'danger',
             })
+          })
+          .finally(() => {
+            isLoading.value = false
           })
       }
       await getJoinTeacherTeamRequest()
@@ -143,6 +149,7 @@ const showAcceptModalHandle = (request: JoinTeacherTeamRequestDto) => {
 }
 
 const handleAcceptRequest = async (data: AcceptJoinTeamRequest) => {
+  isLoading.value = true
   await useJoinTeacherTeamRequest
     .acceptJoinTeamRequest(data)
     .then(async () => {
@@ -157,6 +164,9 @@ const handleAcceptRequest = async (data: AcceptJoinTeamRequest) => {
         message: message,
         color: 'danger',
       })
+    })
+    .finally(() => {
+      isLoading.value = false
     })
   await getJoinTeacherTeamRequest()
 }
