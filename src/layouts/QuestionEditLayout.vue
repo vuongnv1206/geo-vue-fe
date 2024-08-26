@@ -143,6 +143,17 @@ const handleEditEvent = (question: Question) => {
   }
 }
 
+const handelSelectLable = (question: Question) => {
+  console.log(question)
+  if (question.rawIndex) {
+    listQuestions.value[question.rawIndex - 1] = question
+    const editor = document.querySelector('.richer__content') as any
+    editorContent.value = ''
+    renderEditorContent()
+    editor.innerHTML = editorContent.value
+  }
+}
+
 const handleEditor = (data: any) => {
   const editor = document.querySelector('.richer__content') as any
   const questions: Question[] = GeoMarkdown2Objects(replaceMultipleNewLines(editor?.innerText))
@@ -215,7 +226,7 @@ const handleUploadEvent = () => {
 
 const addTemplateSingleChoice = () => {
   const question: Question = {
-    rawIndex: listQuestions.value.length + 1,
+    rawIndex: getUniqueRawIndex(),
     content: 'Which continent is the largest by land area?',
     image: null,
     audio: null,
@@ -251,7 +262,7 @@ const addTemplateSingleChoice = () => {
 
 const addTemplateMultipleChoice = () => {
   const question: Question = {
-    rawIndex: listQuestions.value.length + 1,
+    rawIndex: getUniqueRawIndex(),
     content: 'Who formulated the theory of relativity?',
     image: null,
     audio: null,
@@ -287,7 +298,7 @@ const addTemplateMultipleChoice = () => {
 
 const addTemplateFillBlank = () => {
   const question: Question = {
-    rawIndex: listQuestions.value.length + 1,
+    rawIndex: getUniqueRawIndex(),
     content:
       "The $_fillblank[1] Ocean is the largest ocean on Earth, covering about $_fillblank[2] of the Earth's surface.",
     image: null,
@@ -316,7 +327,7 @@ const addTemplateFillBlank = () => {
 
 const addTemplateMatching = () => {
   const question: Question = {
-    rawIndex: listQuestions.value.length + 1,
+    rawIndex: getUniqueRawIndex(),
     content:
       '{ "Question": "Match the scientists with their discoveries:", "ColumnA": { "1": "Isaac Newton", "2": "Albert Einstein", "3": "Marie Curie", "4": "Charles Darwin" }, "ColumnB": { "1": "Theory of Evolution", "2": "Theory of Relativity", "3": "Law of Gravity", "4": "Radioactivity" } }',
     image: null,
@@ -346,7 +357,7 @@ const addTemplateMatching = () => {
 
 const addTemplateReading = () => {
   const question: Question = {
-    rawIndex: listQuestions.value.length + 1,
+    rawIndex: getUniqueRawIndex(),
     content: 'This is a reading passage template',
     image: null,
     audio: null,
@@ -408,7 +419,7 @@ const addTemplateReading = () => {
 
 const addTemplateWriting = () => {
   const question: Question = {
-    rawIndex: listQuestions.value.length + 1,
+    rawIndex: getUniqueRawIndex(),
     content: 'This is a writing template',
     image: null,
     audio: null,
@@ -423,6 +434,12 @@ const addTemplateWriting = () => {
   editorContent.value = ''
   renderEditorContent()
   editor.innerHTML = editorContent.value
+}
+
+const getUniqueRawIndex = () => {
+  const rawIndex = listQuestions.value.map((question) => question.rawIndex)
+  if (rawIndex.length === 0) return 1
+  return Math.max(...(rawIndex as number[])) + 1
 }
 
 const infoEditQ = () => {
@@ -614,7 +631,12 @@ onMounted(() => {
           <div class="p-1">
             <VaScrollContainer class="min-h-[600px] max-h-[90vh]" vertical>
               <div v-for="(question, i) in listQuestions" :key="question.id || ''" class="w-full">
-                <QuestionEditView :question="question" :index="i + 1" @edit="handleEditEvent" />
+                <QuestionEditView
+                  :question="question"
+                  :index="i + 1"
+                  @edit="handleEditEvent"
+                  @selectLable="handelSelectLable"
+                />
               </div>
             </VaScrollContainer>
           </div>
@@ -664,6 +686,7 @@ onMounted(() => {
           <div class="geo-editor">
             <div class="flex justify-start p-1">
               <div class="w-full">
+                <div class="m-2">Select a template to add a question</div>
                 <Richer
                   v-if="!editMode"
                   :model-value="editorContent"

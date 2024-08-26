@@ -11,6 +11,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'edit', question: Question): void
   (event: 'delete', question: Question): void
+  (event: 'selectLable', question: Question): void
 }>()
 
 const readMoreActivated = ref(false)
@@ -57,7 +58,12 @@ onBeforeMount(() => {
 
 <template>
   <VaCardContent class="leading-3 p-2 text-sm py-5">
-    <QuestionEditHeadView :question="props.question" :index="props.index" class="ml-[20px]" />
+    <QuestionEditHeadView
+      :question="props.question"
+      :index="props.index"
+      class="ml-[20px]"
+      @selectLable="emit('selectLable', props.question as Question)"
+    />
     <div class="mt-2 ml-[20px]">
       <span v-if="!readMoreActivated">
         <!-- eslint-disable vue/no-v-html -->

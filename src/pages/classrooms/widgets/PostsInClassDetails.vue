@@ -35,6 +35,12 @@
                 :image="post.owner?.imageUrl || undefined"
                 :txt="post.owner?.firstName?.charAt(0).toUpperCase()"
               />
+              <!-- <VaAvatar
+                :src="getSrcAvatar(post.owner?.imageUrl)"
+                class="w-14 h-14 font-bold mr-2"
+                :fallback-text="post.owner?.firstName?.charAt(0)?.toUpperCase()"
+                :color="avatarColor(post.owner?.firstName)"
+              /> -->
               <div>
                 <h2 class="text-md font-bold text-gray-800">{{ post.owner?.firstName }} {{ post.owner?.lastName }}</h2>
                 <VaPopover class="mb-2" placement="right" color="#FFFFFF" :message="format.formatDate(post.createdOn)">
@@ -91,6 +97,12 @@
                         :image="comment.owner?.imageUrl || undefined"
                         :txt="comment.owner?.firstName?.charAt(0).toUpperCase()"
                       />
+                      <!-- <VaAvatar
+                        :src="getSrcAvatar(comment.owner?.imageUrl)"
+                        class="w-14 h-14 font-bold mr-2"
+                        :fallback-text="comment.owner?.firstName?.charAt(0)?.toUpperCase()"
+                        :color="avatarColor(comment.owner?.firstName)"
+                      /> -->
                       <div class="flex flex-col">
                         <h2 class="text-sm font-bold text-gray-800">
                           {{ comment.owner?.firstName }} {{ comment.owner?.lastName }}
@@ -239,7 +251,6 @@ import { useAuthStore } from '@/stores/modules/auth.module'
 import { usePostsStore } from '@/stores/modules/posts.module'
 import { useCommentStore } from '@/stores/modules/comments.module'
 import { Quill, QuillEditor } from '@vueup/vue-quill'
-import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

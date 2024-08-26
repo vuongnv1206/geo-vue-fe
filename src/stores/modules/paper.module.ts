@@ -9,6 +9,7 @@ import {
   QuestionGenerateToMatrix,
   SearchPaperRequest,
   SearchSharedPaperRequest,
+  SharePaperRequest,
   UpdateQuestionsInPaperRequest,
 } from './../../pages/examination/types'
 import papersService from '@/services/paper.service'
@@ -198,6 +199,26 @@ export const usePaperStore = defineStore('paper', {
     async getAssigneesInPaper(request: GetGetAssigneesInPaperRequest): Promise<GetGetAssigneesInPaperResponse> {
       return await papersService
         .getAssigneesInPaper(request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async sharePaper(id: string, request: SharePaperRequest): Promise<string> {
+      return await papersService
+        .papers_Share(id, request)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
+    async generateDocx(paperId: string): Promise<any> {
+      return papersService
+        .generateDocx(paperId)
         .then((response) => {
           return Promise.resolve(response)
         })

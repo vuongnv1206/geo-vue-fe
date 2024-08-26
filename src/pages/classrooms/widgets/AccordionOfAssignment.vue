@@ -1,54 +1,3 @@
-<script setup lang="ts">
-import { computed, PropType, reactive, ref } from 'vue'
-import { format, getErrorMessage, notifications } from '@/services/utils'
-import { useRouter } from 'vue-router'
-import { useToast, VaAccordion, VaCollapse } from 'vuestic-ui'
-import { useAuthStore } from '@/stores/modules/auth.module'
-import { useI18n } from 'vue-i18n'
-import { useAssignmentStore } from '@/stores/modules/assignment.module'
-import { AssignmentClass, SubmissionStats } from '@/pages/assignment/types'
-
-const load = ref(true)
-const { t } = useI18n()
-const router = useRouter()
-const authStore = useAuthStore()
-const { init: notify } = useToast()
-const assignmentStore = useAssignmentStore()
-const classId = router.currentRoute.value.params.id.toString()
-const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
-const submissionStatsMap = reactive<{ [key: string]: SubmissionStats }>({})
-
-const props = defineProps({
-  filteredGroupedData: {
-    type: Object as PropType<any>,
-    required: true,
-  },
-})
-
-const getAssignmentSubmissions = async (assignmentClass: AssignmentClass) => {
-  load.value = true
-  await assignmentStore
-    .getAssignmentSubmissions(assignmentClass)
-    .then((response) => {
-      submissionStatsMap[assignmentClass.assignmentId] = {
-        totalSubmitted: response.filter((submission: any) => submission.status === 'Submitted').length,
-        totalMarked: response.filter((submission: any) => submission.status === 'Marked').length,
-        totalStudents: response.length,
-      }
-      console.log('submissionStatsMap:', submissionStatsMap.value)
-    })
-    .catch((error) => {
-      notify({
-        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
-        color: 'error',
-      })
-    })
-    .finally(() => {
-      load.value = false
-    })
-}
-</script>
-
 <template>
   <VaAccordion v-if="props.filteredGroupedData" class="w-full" multiple>
     <VaCollapse
@@ -155,3 +104,53 @@ const getAssignmentSubmissions = async (assignmentClass: AssignmentClass) => {
     </VaCollapse>
   </VaAccordion>
 </template>
+
+<script setup lang="ts">
+import { computed, PropType, reactive, ref } from 'vue'
+import { format, getErrorMessage, notifications } from '@/services/utils'
+import { useRouter } from 'vue-router'
+import { useToast, VaAccordion, VaCollapse } from 'vuestic-ui'
+import { useAuthStore } from '@/stores/modules/auth.module'
+import { useI18n } from 'vue-i18n'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { AssignmentClass, SubmissionStats } from '@/pages/assignment/types'
+
+const load = ref(true)
+const { t } = useI18n()
+const router = useRouter()
+const authStore = useAuthStore()
+const { init: notify } = useToast()
+const assignmentStore = useAssignmentStore()
+const classId = router.currentRoute.value.params.id.toString()
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
+const submissionStatsMap = reactive<{ [key: string]: SubmissionStats }>({})
+
+const props = defineProps({
+  filteredGroupedData: {
+    type: Object as PropType<any>,
+    required: true,
+  },
+})
+
+const getAssignmentSubmissions = async (assignmentClass: AssignmentClass) => {
+  load.value = true
+  await assignmentStore
+    .getAssignmentSubmissions(assignmentClass)
+    .then((response) => {
+      submissionStatsMap[assignmentClass.assignmentId] = {
+        totalSubmitted: response.filter((submission: any) => submission.status === 'Submitted').length,
+        totalMarked: response.filter((submission: any) => submission.status === 'Marked').length,
+        totalStudents: response.length,
+      }
+    })
+    .catch((error) => {
+      notify({
+        message: notifications.getFailed(t('assignments.assignment')) + getErrorMessage(error),
+        color: 'error',
+      })
+    })
+    .finally(() => {
+      load.value = false
+    })
+}
+</script>

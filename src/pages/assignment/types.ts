@@ -1,4 +1,5 @@
 import { Student } from '../classrooms/types'
+import { Subject } from '../subject/types'
 
 export type Assignment = {
   id: string
@@ -9,6 +10,19 @@ export type Assignment = {
   canViewResult: boolean
   requireLoginToSubmit: boolean
   subjectId: string
+  attachment: string
+  createdOn: Date
+}
+
+export type AssignmentById = {
+  id: string
+  name: string
+  startTime: Date
+  endTime: Date
+  content: string
+  canViewResult: boolean
+  requireLoginToSubmit: boolean
+  subject: Subject
   attachment: string
   createdOn: Date
 }
@@ -79,11 +93,6 @@ export type AssignmentClass = {
   classId: string
 }
 
-export type AssignmentSub = {
-  assignmentId: string
-  classId: string
-}
-
 export type AssignmentSubmission = {
   assignmentId: string
   studentId: string
@@ -101,6 +110,7 @@ export type MarkAssignment = {
   score: number
   comment: string
 }
+
 export type SubmissionStats = {
   totalSubmitted: number
   totalMarked: number
@@ -119,4 +129,25 @@ export type AssignmentStats = {
   attachment: string
   createdOn: Date
   submissionsStats: SubmissionStats
+}
+
+export type AssignmentWithMarkStatus = {
+  id: string
+  name: string
+  startTime: Date
+  endTime: Date
+  content: string
+  canViewResult: boolean
+  requireLoginToSubmit: boolean
+  subjectId: string
+  attachment: string
+  createdOn: Date
+  status: string
+}
+
+export enum MarkAssignmentStatus {
+  Submitted = 'Submitted',
+  Doing = 'Doing',
+  Marked = 'Marked',
+  NotSubmitted = 'NotSubmitted',
 }

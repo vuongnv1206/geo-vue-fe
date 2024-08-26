@@ -1,12 +1,14 @@
 <template>
-  <VaCard>
-    <VaCardTitle>Spectrum charts</VaCardTitle>
-    <VaCardContent>
-      <div class="flex justify-center w-full h-full overflow-hidden relative">
-        <canvas ref="canvas" style="width: 100%; height: 400px"></canvas>
-      </div>
-    </VaCardContent>
-  </VaCard>
+  <VaInnerLoading :loading="loading">
+    <VaCard>
+      <VaCardTitle>Score Spectrum</VaCardTitle>
+      <VaCardContent>
+        <div class="flex justify-center w-full h-full overflow-hidden relative">
+          <canvas ref="canvas" style="width: 100%; height: 400px"></canvas>
+        </div>
+      </VaCardContent>
+    </VaCard>
+  </VaInnerLoading>
 </template>
 
 <script setup lang="ts">
@@ -25,9 +27,11 @@ const props = defineProps<{
 const { init: notify } = useToast()
 
 const statisticPaperStore = useStatisticPaperStore()
+const loading = ref(true)
 
 const data = ref<ClassroomFrequencyMarkResponse>()
 const getFrequencyMark = async (paperId: string, classId?: string) => {
+  loading.value = true
   const request = ref<ClassroomFrequencyMarkRequest>({
     paperId: paperId,
     classroomId: classId === '' ? undefined : classId,
@@ -40,6 +44,8 @@ const getFrequencyMark = async (paperId: string, classId?: string) => {
       message: notifications.getFailed('frequency score ') + getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
+    loading.value = false
   }
 }
 
@@ -71,7 +77,7 @@ const renderChart = () => {
           labels: labelScores.value,
           datasets: [
             {
-              label: `Account`,
+              label: `Student`,
               data: (data.value?.frequencyMarks ?? []).map((mark) => mark.total),
               backgroundColor: 'blue',
               borderColor: 'blue',

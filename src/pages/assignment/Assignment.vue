@@ -22,7 +22,7 @@ import { getErrorMessage, notifications } from '@/services/utils'
 import { useClassStore } from '@/stores/modules/class.module'
 import { Classrooms, ClassroomWithStats } from '../classrooms/types'
 import { useI18n } from 'vue-i18n'
-import { SubmissionStats } from './types'
+import { MarkAssignmentStatus, SubmissionStats } from './types'
 import { useAssignmentStore } from '@/stores/modules/assignment.module'
 
 const { t } = useI18n()
@@ -33,7 +33,7 @@ const classStores = useClassStore()
 const assignmentStores = useAssignmentStore()
 
 const assignmentsByClass = ref<Classrooms[]>([])
-const isTeacher = computed(() => authStore?.musHaveRole('Teacher')) // just for testing
+const isTeacher = computed(() => authStore?.musHaveRole('Teacher'))
 
 const dataFilter = ref({
   advancedSearch: {
@@ -59,12 +59,14 @@ const getAssignmentByClass = () => {
             .getAssignmentSubmissions({ assignmentId: assignment.id, classId: class1.id })
             .then((response) => {
               const submissionStats: SubmissionStats = {
-                totalSubmitted: response.filter((submission: any) => submission.status === 'Submitted').length,
-                totalMarked: response.filter((submission: any) => submission.status === 'Marked').length,
+                totalSubmitted: response.filter(
+                  (submission: any) => submission.status === MarkAssignmentStatus.Submitted,
+                ).length,
+                totalMarked: response.filter((submission: any) => submission.status === MarkAssignmentStatus.Marked)
+                  .length,
                 totalStudents: response.length,
               }
               mergeData(class1, assignment, submissionStats)
-              console.log('merge: ', mergeAssignmentByClass.value)
             })
             .catch((error) => {
               notify({
@@ -87,11 +89,9 @@ const getAssignmentByClass = () => {
 }
 
 const mergeData = (class1: Classrooms, assignment: any, submissionStats: SubmissionStats) => {
-  // Tìm class trong mergeAssignmentByClass
   const classIndex = mergeAssignmentByClass.value.findIndex((c) => c.id === class1.id)
 
   if (classIndex !== -1) {
-    // Nếu class đã tồn tại, tìm assignment và cập nhật submissionsStats
     const assignmentIndex = mergeAssignmentByClass.value[classIndex].assignments.findIndex(
       (a) => a.id === assignment.id,
     )
@@ -101,14 +101,12 @@ const mergeData = (class1: Classrooms, assignment: any, submissionStats: Submiss
         submissionsStats: submissionStats,
       }
     } else {
-      // Nếu assignment chưa tồn tại, thêm mới vào class đó
       mergeAssignmentByClass.value[classIndex].assignments.push({
         ...assignment,
         submissionsStats: submissionStats,
       })
     }
   } else {
-    // Nếu class chưa tồn tại, thêm mới class và assignment
     mergeAssignmentByClass.value.push({
       ...class1,
       assignments: [

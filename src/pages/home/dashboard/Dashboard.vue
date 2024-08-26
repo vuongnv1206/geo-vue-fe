@@ -169,8 +169,11 @@
           <template #cell(completionStatus)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
-                <span :class="getStatusClass(rowData.completionStatus)">
-                  {{ getStatusText(rowData.completionStatus) }}
+                <span>
+                  <VaBadge
+                    :text="getStatusText(rowData.completionStatus)"
+                    :color="getStatusClass(rowData.completionStatus)"
+                  />
                 </span>
               </div>
             </div>
@@ -202,13 +205,13 @@
               </div>
             </div>
           </template>
-          <template #cell(description)="{ rowData }">
+          <!-- <template #cell(description)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
                 <VaTextarea v-model="rowData.description" :readonly="true" />
               </div>
             </div>
-          </template>
+          </template> -->
           <template #cell(startedTime)="{ rowData }">
             <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
               <div>
@@ -223,6 +226,31 @@
               </div>
             </div>
           </template>
+          <template #cell(score)="{ rowData }">
+            <div class="ellipsis max-w-[230px] lg:max-w-[450px]">
+              <div>
+                <span v-if="rowData.showMarkResult === ShowMarkResult.WhenAllStudentSubmitted">
+                  <span v-if="rowData.score !== -1">
+                    {{ rowData.score }}
+                  </span>
+                  <span v-else> {{ t('papers.please_wait_result') }} </span>
+                </span>
+                <span v-else-if="rowData.showMarkResult === ShowMarkResult.WhenSubmitted">
+                  {{ rowData.score }}
+                </span>
+                <span v-else> {{ t('papers.can_not_view_result') }} </span>
+              </div>
+            </div>
+          </template>
+          <template #cell(action)="{ row }">
+            <div v-if="row.source.canViewDetailAnswer" class="flex gap-2 justify-center">
+              <VaButton
+                preset="secondary"
+                icon="visibility"
+                @click="viewDetailAnswerResult(row.source.id, row.source.paperId)"
+              />
+            </div>
+          </template>
         </VaDataTable>
       </VaCard>
       <VaCardTitle>{{ t('papers.class_list') }}</VaCardTitle>
@@ -235,13 +263,14 @@
           <div>
             <!-- Header Section -->
             <VaCard class="flex flex-row items-center p-4 bg-white rounded-lg shadow-sm">
-              <GeoAvatar
-                class="mr-2"
-                :size="48"
-                color="warning"
-                :image="class1.owner?.imageUrl || undefined"
-                :txt="class1.owner?.firstName.charAt(0).toUpperCase()"
-              />
+              <div>
+                <VaAvatar
+                  :src="getSrcAvatar(class1.owner?.imageUrl)"
+                  class="w-14 h-14 font-bold mr-2"
+                  :fallback-text="class1.owner?.firstName.charAt(0)?.toUpperCase()"
+                  :color="avatarColor(class1.owner?.firstName)"
+                />
+              </div>
               <VaCard :to="{ name: 'class-details', params: { id: class1.id } }">
                 <VaCardContent class="text-md font-bold text-gray-800">
                   {{ class1.owner?.firstName }} {{ class1.owner?.lastName }}
@@ -261,8 +290,13 @@
               <div v-for="ass in class1.assignments.slice(0, 2)" :key="ass.id" class="bg-blue-100 px-4 rounded-lg mb-2">
                 <RouterLink :to="{ name: 'assignment-submission', params: { id: ass.id, classId: class1.id } }">
                   <VaCardContent class="text-md font-semibold text-gray-800">
-                    {{ ass.name }}
+                    {{ ass.name }} -
+                    <VaBadge
+                      :text="getMarkAssignmentStatusText(ass.status)"
+                      :color="getMarkAssignmentStatusColor(ass.status)"
+                    />
                   </VaCardContent>
+                  <!-- {{ ass.status === MarkAssignmentStatus.NotSubmitted ? t('assignments.time_out') : ass.status }} -->
 
                   <VaCardContent class="text-xs font-medium text-gray-600">
                     <div class="flex items-center mb-1">
@@ -329,14 +363,17 @@ import { useI18n } from 'vue-i18n'
 import { defineVaDataTableColumns, useToast, VaCardTitle } from 'vuestic-ui'
 import { useClassStore } from '@/stores/modules/class.module'
 import { ClassroomWithPosts } from '@/pages/classrooms/types'
-import { format, getErrorMessage, notifications } from '@/services/utils'
+import { avatarColor, format, getErrorMessage, notifications } from '@/services/utils'
 import { usePostsStore } from '@/stores/modules/posts.module'
-import GeoAvatar from '@/components/avatar/GeoAvatar.vue'
-import { PaperStudents, PaperStudentsHistory } from '@/pages/examination/types'
+import { DoExamStatus, PaperStudents, PaperStudentsHistory, ShowMarkResult } from '@/pages/examination/types'
 import { usePaperStudentsStore } from '@/stores/modules/paperStudents.module'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { getSrcAvatar } from '@/pages/audit-logs/helper'
+import { useRouter } from 'vue-router'
+import { useAssignmentStore } from '@/stores/modules/assignment.module'
+import { MarkAssignmentStatus } from '@/pages/assignment/types'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -346,6 +383,7 @@ const { init: notify } = useToast()
 const authStore = useAuthStore()
 const classStores = useClassStore()
 const postStores = usePostsStore()
+const assignmentStores = useAssignmentStore()
 const paperStudentsStores = usePaperStudentsStore()
 const classes = ref<ClassroomWithPosts[]>([])
 const paperStudents = ref<PaperStudents[]>([])
@@ -356,17 +394,18 @@ const isStudent = computed(() => authStore?.musHaveRole('Student')) // just for 
 
 const columns = defineVaDataTableColumns([
   { label: t('papers.stt'), key: 'stt', sortable: false },
-  { label: t('subjects.subject'), key: 'subjectName', sortable: true },
+  // { label: t('subjects.subject'), key: 'subjectName', sortable: true },
   { label: t('papers.name'), key: 'examName', sortable: true },
   { label: t('papers.status'), key: 'completionStatus', sortable: true },
   { label: t('papers.start_time'), key: 'startTime', sortable: true },
   { label: t('papers.end_time'), key: 'endTime', sortable: true },
   { label: t('papers.duration'), key: 'duration', sortable: true },
-  { label: t('papers.description'), key: 'description', sortable: true },
+  // { label: t('papers.description'), key: 'description', sortable: true },
   // { label: t('papers.paper_label'), key: 'paperLabelName', sortable: true },
   { label: t('papers.started_time'), key: 'startedTime', sortable: true },
   { label: t('papers.submitted_time'), key: 'submittedTime', sortable: true },
   { label: t('papers.score'), key: 'score', sortable: true },
+  { label: ' ', key: 'action' },
 ])
 
 const paperStudent = ref<any[]>([])
@@ -409,6 +448,15 @@ const getClasses = async () => {
         }
       }),
     )
+    classes.value.forEach((class1) => {
+      class1.assignments.forEach((assignment) => {
+        assignmentStores
+          .getAssignmentSubmissions({ assignmentId: assignment.id, classId: class1.id })
+          .then((response) => {
+            assignment.status = response[0].status
+          })
+      })
+    })
   } catch (error) {
     notify({
       message: notifications.getFailed(t('classes.class')) + getErrorMessage(error),
@@ -470,13 +518,13 @@ const getPaperStudentsHistory = async () => {
 }
 
 const getStatusText = (status: number) => {
-  if (status === 0) {
+  if (status === DoExamStatus.NotStarted) {
     return t('papers.not_started')
-  } else if (status === 1) {
+  } else if (status === DoExamStatus.InProgress) {
     return t('papers.in_progress')
-  } else if (status === 2) {
+  } else if (status === DoExamStatus.Completed) {
     return t('papers.completed')
-  } else if (status === 3) {
+  } else if (status === DoExamStatus.Suspended) {
     return t('papers.suspended')
   } else {
     return ''
@@ -484,25 +532,69 @@ const getStatusText = (status: number) => {
 }
 
 const getStatusClass = (status: number) => {
-  if (status === 0) {
-    return 'text-yellow-500' // Not Started
-  } else if (status === 1) {
-    return 'text-blue-500' // In Progress
-  } else if (status === 2) {
-    return 'text-green-500' // Completed
-  } else if (status === 3) {
-    return 'text-red-500' // Suspended
+  if (status === DoExamStatus.NotStarted) {
+    return '#F59E0B' // Not Started - Yellow 500
+  } else if (status === DoExamStatus.InProgress) {
+    return '#3B82F6' // In Progress - Blue 500
+  } else if (status === DoExamStatus.Completed) {
+    return '#10B981' // Completed - Green 500
+  } else if (status === DoExamStatus.Suspended) {
+    return '#EF4444' // Suspended - Red 500
   } else {
     return ''
   }
 }
 
+const getMarkAssignmentStatusColor = (status: string) => {
+  if (status === MarkAssignmentStatus.Submitted) {
+    return '#F59E0B' // Submitted - Green 500
+  } else if (status === MarkAssignmentStatus.Doing) {
+    return '#3B82F6' // Doing - Blue 500
+  } else if (status === MarkAssignmentStatus.Marked) {
+    return '#10B981' // Marked - Green 500
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
+    return '#EF4444' // Not Submitted - Red 500
+  } else {
+    return ''
+  }
+}
+
+const getMarkAssignmentStatusText = (status: string) => {
+  if (status === MarkAssignmentStatus.Submitted) {
+    return t('assignments.submitted')
+  } else if (status === MarkAssignmentStatus.Doing) {
+    return t('assignments.doing')
+  } else if (status === MarkAssignmentStatus.Marked) {
+    return t('assignments.marked')
+  } else if (status === MarkAssignmentStatus.NotSubmitted) {
+    return t('assignments.not_submitted')
+  } else {
+    return ''
+  }
+}
+
+const router = useRouter()
+const currentUserId = authStore.user?.id
+
+const viewDetailAnswerResult = (submitId: string, paperId: string) => {
+  router.push({
+    name: 'exam-student-review',
+    params: {
+      paperId: paperId,
+      userId: currentUserId,
+      submitPaperId: submitId,
+    },
+  })
+}
+
 onMounted(() => {
   const loadData = async () => {
     await getClasses()
-    await getPaperStudents()
-    await getPaperStudentsHistory()
-    calculatePaperStudent()
+    if (isStudent.value) {
+      await getPaperStudents()
+      await getPaperStudentsHistory()
+      calculatePaperStudent()
+    }
   }
 
   loadData()
