@@ -583,6 +583,9 @@ const editPermission = (permission: PaperFolderPermission) => {
     canShare: permission.canShare,
   }
   doShowPaperFolderPermissionFormModal.value = true
+  if (permission.canAdd && permission.canUpdate && permission.canDelete) {
+    canEdit.value = true
+  }
 }
 
 const canEdit = ref(false)
@@ -859,6 +862,7 @@ const onSharePaperFolderPermission = () => {
       "
     />
   </VaModal>
+
   <VaModal
     v-model="doShowSharePaperFolderModal"
     mobile-fullscreen
@@ -1061,6 +1065,7 @@ const onSharePaperFolderPermission = () => {
       </div>
     </VaForm>
   </VaModal>
+
   <VaModal
     v-model="doShowPaperFolderPermissionFormModal"
     ok-text="Save"

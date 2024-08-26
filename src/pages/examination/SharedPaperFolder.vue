@@ -3,11 +3,13 @@ import {
   PaperFolderDto,
   PaperFolderPermission,
   PaperInListDto,
+  //SearchPaperFolderRequest,
   SearchSharedPaperFolderRequest,
   SearchSharedPaperRequest,
+  SharePaperFolderRequest,
   UpdatePaperFolderRequest,
 } from './types'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { usePaperFolderStore } from '@/stores/modules/paperFolder.module'
 import { usePaperStore } from '@/stores/modules/paper.module'
 import { onMounted } from 'vue'
@@ -19,7 +21,10 @@ import { computed } from 'vue'
 import { watchEffect } from 'vue'
 import EditPaperFolderForm from '@pages/examination/widgets/EditPaperFolderForm.vue'
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { getErrorMessage } from '@/services/utils'
+import { avatarColor, getErrorMessage } from '@/services/utils'
+import { UserDetail } from '../user/types'
+import { GroupTeacher, TeacherTeam, TeacherTeamTeacherGroupCombine } from '../teacher-group/types'
+import { useGroupTeacherStore } from '@/stores/modules/groupTeacher.module'
 
 const router = useRouter()
 const { init: notify } = useToast()
@@ -224,7 +229,7 @@ const contextmenu = (event: any) => {
       event: event.event,
       options: [
         { text: 'Rename', icon: 'edit' },
-        // { text: 'Share', icon: 'share' },
+        { text: 'Share', icon: 'share' },
         { text: 'Delete', icon: 'delete' },
       ],
       onSelected(option) {
@@ -232,10 +237,17 @@ const contextmenu = (event: any) => {
           showEditPaperFolderModal(item)
         } else if (option.text === 'Delete') {
           onFolderDelete(item)
+        } else if (option.text === 'Share') {
+          onFolderShare(item)
         }
       },
     })
   }
+}
+const onFolderShare = (folder: PaperFolderDto) => {
+  folderToEdit.value = folder
+  getTeacherGroups()
+  doShowSharePaperFolderModal.value = true
 }
 
 const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
@@ -250,10 +262,11 @@ const onFolderSaved = async (request: UpdatePaperFolderRequest) => {
         getSharedPaperFolders(currentFolderId.value)
         doShowEditFolderModal.value = false
       })
-      .catch((err: any) => {
+      .catch((error) => {
+        const message = getErrorMessage(error)
         notify({
-          message: `Failed to update paper folder\n${err.message}`,
-          color: 'error',
+          message: message,
+          color: 'danger',
         })
       })
   } else {
@@ -429,7 +442,7 @@ const switchToMyDocuments = () => {
   router.push({ name: 'paper-folder' })
 }
 
-const canEdit = (permissions: PaperFolderPermission[]) => {
+const canUpdate = (permissions: PaperFolderPermission[]) => {
   return permissions.some((item) => item.userId === currentUserId && item.canUpdate)
 }
 
@@ -453,6 +466,257 @@ const handlePageChange = async (page: number) => {
   pagination.value.pageNumber = page
   await getSharedPaperFolders(currentFolderId.value, searchTerm.value)
   await getSharedPapers(currentFolderId.value, searchTerm.value)
+}
+
+//const searchPaperFolderRequest = ref<SearchPaperFolderRequest>({})
+// const getPaperFolders = async (parentId?: string | null, name?: string | null) => {
+//   loading.value = true
+//   searchPaperFolderRequest.value = { parentId, name }
+//   paperFolderStore
+//     .searchPaperFolders(searchPaperFolderRequest.value)
+//     .then((res) => {
+//       loading.value = false
+//       paperFolderDtos.value = res.paperFolderChildrens
+//     })
+//     .catch(() => {
+//       loading.value = false
+//       notify({ message: 'Failed to get folders', color: 'error' })
+//     })
+// }
+
+// logic share
+const doShowSharePaperFolderModal = ref(false)
+const singleSelect = ref<TeacherTeamTeacherGroupCombine | null>(null)
+const autoCompleteSearchValue = ref('')
+const isLoadingSelect = ref(false)
+const options = ref<TeacherTeamTeacherGroupCombine[]>([])
+
+const groupTeacherStore = useGroupTeacherStore()
+const dataFilter = ref({
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 1000,
+  orderBy: ['id'],
+})
+const groupTeachers = ref<GroupTeacher[]>([])
+const teacherTeams = ref<TeacherTeam[]>([])
+const getTeacherGroups = () => {
+  isLoadingSelect.value = true
+  groupTeacherStore.getGroupTeachers(dataFilter).then((res) => {
+    groupTeachers.value = res.data
+    groupTeacherStore
+      .getTeacherTeams(dataFilter)
+      .then((res) => {
+        teacherTeams.value = res.data
+        options.value = []
+        groupTeachers.value.forEach((groupTeacher) => {
+          options.value.push({
+            groupTeacher: groupTeacher,
+            teacherTeam: null,
+          })
+        })
+        teacherTeams.value.forEach((teacherTeam) => {
+          options.value.push({
+            groupTeacher: null,
+            teacherTeam: teacherTeam,
+          })
+        })
+      })
+      .finally(() => {
+        isLoadingSelect.value = false
+      })
+  })
+}
+
+const permissionEdit = ref({
+  canView: false,
+  canAdd: false,
+  canUpdate: false,
+  canDelete: false,
+  canShare: false,
+})
+const getOptionName = (option: TeacherTeamTeacherGroupCombine) => {
+  if (option.groupTeacher) {
+    const optionData = { data: option.groupTeacher.name, isUser: false }
+    return optionData
+  } else {
+    const optionData = { data: option.teacherTeam?.teacherName, isUser: true }
+    return optionData
+  }
+}
+const doShowPaperFolderPermissionFormAddModal = ref(false)
+const doShowPaperFolderPermissionFormModal = ref(false)
+const editPermissionValue = ref<PaperFolderPermission>({} as PaperFolderPermission)
+const optionsSelect = ref<TeacherTeamTeacherGroupCombine | null>(null)
+const AddPermission = (option: TeacherTeamTeacherGroupCombine) => {
+  optionsSelect.value = option
+
+  const user = ref<UserDetail | null>(null)
+  if (option.teacherTeam) {
+    user.value = {
+      id: option.teacherTeam.teacherId,
+      email: option.teacherTeam.email,
+      firstName: option.teacherTeam.teacherName,
+      emailConfirmed: false,
+      phoneNumberConfirmed: false,
+      lastName: '',
+      phoneNumber: '',
+      imageUrl: '',
+      isActive: false,
+      userName: '',
+      birthDate: '',
+      gender: true,
+    }
+  }
+
+  editPermissionValue.value = {
+    user: user.value,
+    groupTeacherId: option.groupTeacher?.id || '',
+    groupTeacher: option.groupTeacher,
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+    createdBy: '',
+    createdOn: '',
+    lastModifiedBy: '',
+    lastModifiedOn: '',
+    id: '',
+    folderId: folderToEdit.value?.id || '',
+    userId: '',
+  }
+
+  permissionEdit.value = {
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+  }
+  doShowPaperFolderPermissionFormAddModal.value = true
+}
+const getNameUserGroup = (option: PaperFolderPermission | null) => {
+  if (option?.user) {
+    return option.user.firstName + ' ' + option.user.lastName
+  } else {
+    return option?.groupTeacher?.name
+  }
+}
+
+const allPermissionFalse = (permission: PaperFolderPermission) => {
+  return !permission.canView && !permission.canAdd && !permission.canUpdate && !permission.canDelete
+}
+
+const editPermission = (permission: PaperFolderPermission) => {
+  editPermissionValue.value = { ...permission }
+
+  permissionEdit.value = {
+    canView: permission.canView,
+    canAdd: permission.canAdd,
+    canUpdate: permission.canUpdate,
+    canDelete: permission.canDelete,
+    canShare: permission.canShare,
+  }
+  if (permission.canAdd && permission.canUpdate && permission.canDelete) {
+    canEdit.value = true
+  }
+  doShowPaperFolderPermissionFormModal.value = true
+}
+
+const canEdit = ref(false)
+watch(
+  () => permissionEdit.value,
+  (value) => {
+    if (!value.canView) {
+      canEdit.value = false
+    }
+  },
+  { deep: true },
+)
+
+watch(
+  () => canEdit.value,
+  (value) => {
+    if (!value) {
+      permissionEdit.value = {
+        canView: false,
+        canAdd: false,
+        canUpdate: false,
+        canDelete: false,
+        canShare: false,
+      }
+    } else {
+      permissionEdit.value.canView = true
+      permissionEdit.value.canAdd = true
+      permissionEdit.value.canUpdate = true
+      permissionEdit.value.canDelete = true
+    }
+  },
+)
+
+watch(
+  () => permissionEdit.value.canShare,
+  (value) => {
+    if (value) {
+      canEdit.value = true
+    }
+  },
+  { deep: true },
+)
+
+const handleDeletePermission = () => {
+  permissionEdit.value = {
+    canView: false,
+    canAdd: false,
+    canUpdate: false,
+    canDelete: false,
+    canShare: false,
+  }
+  onSharePaperFolderPermission()
+}
+
+const onSharePaperFolderPermission = () => {
+  const sharePermission = ref<SharePaperFolderRequest>({
+    canView: permissionEdit.value.canView,
+    canAdd: permissionEdit.value.canAdd,
+    canUpdate: permissionEdit.value.canUpdate,
+    canDelete: permissionEdit.value.canDelete,
+    canShare: permissionEdit.value.canShare,
+    folderId: editPermissionValue.value.folderId,
+    userId: null,
+    groupId: null,
+  })
+  if (editPermissionValue.value?.user) {
+    sharePermission.value.userId = editPermissionValue.value.user.id
+  }
+  if (editPermissionValue.value?.groupTeacherId) {
+    sharePermission.value.groupId = editPermissionValue.value.groupTeacherId
+  }
+
+  paperFolderStore
+    .sharePaperFolder(editPermissionValue.value.folderId, sharePermission.value)
+    .then(() => {
+      notify({
+        message: 'Paper folder permission update',
+        color: 'success',
+      })
+      doShowSharePaperFolderModal.value = false
+      getSharedPaperFolders(currentFolderId.value)
+    })
+    .catch((error) => {
+      const message = getErrorMessage(error)
+      notify({
+        message:
+          'Failed to update paper folder permission ' +
+          editPermissionValue.value?.user?.firstName +
+          ' ' +
+          editPermissionValue.value?.user?.lastName +
+          '\n' +
+          message,
+        color: 'danger',
+      })
+    })
 }
 </script>
 <template>
@@ -580,7 +844,7 @@ const handlePageChange = async (page: number) => {
           <template #cell(actions)="{ rowData }">
             <div v-if="rowData.type === 'folder'" class="flex gap-2 justify-end">
               <VaButton
-                v-if="canEdit(rowData.paperFolderPermissions)"
+                v-if="canUpdate(rowData.paperFolderPermissions)"
                 preset="primary"
                 size="small"
                 color="primary"
@@ -636,8 +900,264 @@ const handlePageChange = async (page: number) => {
         "
       />
     </VaModal>
-  </template>
-  <template v-else>
-    <PaperFolder />
+
+    <VaModal
+      v-model="doShowSharePaperFolderModal"
+      mobile-fullscreen
+      size="small"
+      close-button
+      stateful
+      hide-default-actions
+    >
+      <h1 class="va-h5 mb-4">Share folder "{{ folderToEdit?.name }}"</h1>
+      <VaSelect
+        v-model="singleSelect"
+        v-model:search="autoCompleteSearchValue"
+        class="col-span-1"
+        :loading="isLoadingSelect"
+        label="Select User or Group"
+        :options="options"
+        searchable
+        :text-by="
+          (option: TeacherTeamTeacherGroupCombine) => getOptionName(option as TeacherTeamTeacherGroupCombine).data
+        "
+        placeholder="Search user or Group"
+        track-by="id"
+      >
+        <template #appendInner>
+          <VaIcon name="fas-search" />
+        </template>
+        <template #option="{ option }">
+          <div class="flex justify-between items-center p-2">
+            <div class="flex items-center gap-2">
+              <VaAvatar
+                v-if="getOptionName(option as TeacherTeamTeacherGroupCombine).isUser"
+                :size="48"
+                :color="avatarColor(getOptionName(option as TeacherTeamTeacherGroupCombine).data)"
+                >{{
+                  getOptionName(option as TeacherTeamTeacherGroupCombine)
+                    .data?.charAt(0)
+                    .toUpperCase()
+                }}
+              </VaAvatar>
+              <VaAvatar v-else :size="48" color="warning" icon="group"> </VaAvatar>
+              <div>
+                <div>{{ getOptionName(option as TeacherTeamTeacherGroupCombine).data }}</div>
+                <div class="text-sm text-gray-500">
+                  {{ getOptionName(option as TeacherTeamTeacherGroupCombine).data }}
+                </div>
+              </div>
+            </div>
+            <div>
+              <VaPopover
+                v-if="
+                  (option as TeacherTeamTeacherGroupCombine).teacherTeam?.teacherId ===
+                  '00000000-0000-0000-0000-000000000000'
+                "
+                class="mr-2 mb-2"
+                message="Not registered yet"
+              >
+                <VaIcon class="mr-2" name="no_accounts" />
+              </VaPopover>
+              <VaButton
+                :disabled="
+                  (option as TeacherTeamTeacherGroupCombine).teacherTeam?.teacherId ===
+                  '00000000-0000-0000-0000-000000000000'
+                "
+                size="small"
+                preset="secondary"
+                border-color="primary"
+                @click="AddPermission(option as TeacherTeamTeacherGroupCombine)"
+              >
+                Select
+              </VaButton>
+            </div>
+          </div>
+        </template>
+      </VaSelect>
+      <div class="mt-5">
+        <VaScrollContainer class="h-80" vertical>
+          <VaList>
+            <VaListLabel> Permissions </VaListLabel>
+
+            <VaListItem
+              v-for="(permission, index) in folderToEdit?.paperFolderPermissions"
+              :key="index"
+              class="list__item ml-5"
+            >
+              <VaListItemSection avatar>
+                <VaAvatar
+                  v-if="permission.userId !== null ? true : false"
+                  :size="42"
+                  :color="avatarColor(getNameUserGroup(permission))"
+                >
+                  {{ getNameUserGroup(permission)?.charAt(0) }}
+                </VaAvatar>
+                <VaAvatar v-else :size="42" color="warning" icon="group"> </VaAvatar>
+              </VaListItemSection>
+
+              <VaListItemSection>
+                <VaListItemLabel>
+                  {{ getNameUserGroup(permission) }}
+                </VaListItemLabel>
+
+                <VaListItemLabel caption>
+                  {{ permission.user?.email }}
+                </VaListItemLabel>
+              </VaListItemSection>
+
+              <!-- <VaListItemSection icon>
+              <VaButton
+                 v-if="folderToEdit?.createdBy && folderToEdit?.createdBy == permission.user?.id"
+                size="small"
+                disabled
+                preset="secondary"
+                border-color="primary"
+                class="mr-6 mb-2"
+                @click="editPermission(permission)"
+              >
+                Edit Permissions
+              </VaButton>
+            </VaListItemSection> -->
+
+              <VaListItemSection v-if="!allPermissionFalse(permission as PaperFolderPermission)" icon>
+                <VaButton
+                  v-if="folderToEdit?.createdBy && folderToEdit.createdBy == permission.user?.id"
+                  size="small"
+                  disabled
+                  preset="secondary"
+                  border-color="primary"
+                  class="mr-6 mb-2"
+                >
+                  Owner
+                </VaButton>
+                <VaButton
+                  v-else
+                  size="small"
+                  preset="secondary"
+                  border-color="primary"
+                  class="mr-6 mb-2"
+                  @click="editPermission(permission)"
+                >
+                  Edit Permissions
+                </VaButton>
+              </VaListItemSection>
+            </VaListItem>
+          </VaList>
+        </VaScrollContainer>
+      </div>
+    </VaModal>
+
+    <VaModal
+      v-model="doShowPaperFolderPermissionFormAddModal"
+      ok-text="Save"
+      size="small"
+      @ok="
+        () => {
+          onSharePaperFolderPermission()
+        }
+      "
+    >
+      <span class="va-h5 mb-5"
+        >Grand Permissions for <b>"{{ getNameUserGroup(editPermissionValue) }}"</b></span
+      >
+      <VaForm>
+        <div class="gap-4 ml-10 mt-10">
+          <VaListItem>
+            <VaListItemSection avatar>
+              <VaAvatar :size="48" :color="avatarColor(getNameUserGroup(editPermissionValue))">{{
+                getNameUserGroup(editPermissionValue)?.charAt(0)
+              }}</VaAvatar>
+            </VaListItemSection>
+            <VaListItemSection>
+              <VaListItemLabel>
+                {{ getNameUserGroup(editPermissionValue) }}
+              </VaListItemLabel>
+
+              <VaListItemLabel caption>
+                {{ editPermissionValue?.user?.email }}
+              </VaListItemLabel>
+            </VaListItemSection>
+            <VaListItemSection icon>
+              <VaPopover message="Delete permission" position="top">
+                <VaButton
+                  round
+                  icon="mso-delete"
+                  color="danger"
+                  @click="
+                    () => {
+                      console.log('delete')
+                    }
+                  "
+                >
+                  Delete
+                </VaButton>
+              </VaPopover>
+            </VaListItemSection>
+          </VaListItem>
+        </div>
+        <div class="flex flex-col gap-4 p-10">
+          <VaCheckbox v-model="permissionEdit.canView" label="View" />
+          <VaCheckbox v-model="canEdit" label="Edit" />
+          <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
+        </div>
+      </VaForm>
+    </VaModal>
+
+    <VaModal
+      v-model="doShowPaperFolderPermissionFormModal"
+      ok-text="Save"
+      size="small"
+      @ok="
+        () => {
+          onSharePaperFolderPermission()
+        }
+      "
+    >
+      <span class="va-h5 mb-5"
+        >Edit Permissions for <b>"{{ getNameUserGroup(editPermissionValue) }}"</b></span
+      >
+      <VaForm>
+        <div class="gap-4 ml-10 mt-10">
+          <VaListItem>
+            <VaListItemSection avatar>
+              <VaAvatar :size="48" :color="avatarColor(getNameUserGroup(editPermissionValue))">{{
+                getNameUserGroup(editPermissionValue)?.charAt(0)
+              }}</VaAvatar>
+            </VaListItemSection>
+            <VaListItemSection>
+              <VaListItemLabel>
+                {{ getNameUserGroup(editPermissionValue) }}
+              </VaListItemLabel>
+
+              <VaListItemLabel caption>
+                {{ editPermissionValue?.user?.email }}
+              </VaListItemLabel>
+            </VaListItemSection>
+            <VaListItemSection icon>
+              <VaPopover message="Delete permission" position="top">
+                <VaButton
+                  round
+                  icon="mso-delete"
+                  color="danger"
+                  @click="
+                    () => {
+                      handleDeletePermission()
+                    }
+                  "
+                >
+                  Delete
+                </VaButton>
+              </VaPopover>
+            </VaListItemSection>
+          </VaListItem>
+        </div>
+        <div class="flex flex-col gap-4 p-10">
+          <VaCheckbox v-model="permissionEdit.canView" label="View" />
+          <VaCheckbox v-model="canEdit" label="Edit" />
+          <VaCheckbox v-model="permissionEdit.canShare" label="Share" />
+        </div>
+      </VaForm>
+    </VaModal>
   </template>
 </template>
