@@ -333,11 +333,6 @@ const addTemplateMatching = () => {
     image: null,
     audio: null,
     questionType: 5,
-    questionLable: {
-      id: 'ff6115b0-c64d-45f4-a8bc-81390811a7d9',
-      name: 'Scientist-Discovery Matching',
-      color: 'Primary',
-    },
     questionPassages: [],
     answers: [
       {
