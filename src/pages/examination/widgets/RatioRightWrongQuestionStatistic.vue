@@ -16,9 +16,11 @@ const { init: notify } = useToast()
 
 const statisticPaperStore = useStatisticPaperStore()
 
+const loading = ref(true)
 const responseData = ref<ListQuestionStatisticResponse>()
 
 const getQuestionStatistic = async (paperId: string, classId?: string) => {
+  loading.value = true
   const request = ref<ListQuestionStatisticRequest>({
     paperId: paperId,
     classId: classId === '' ? undefined : classId,
@@ -32,6 +34,8 @@ const getQuestionStatistic = async (paperId: string, classId?: string) => {
       message: notifications.getFailed('question statistic ') + getErrorMessage(error),
       color: 'danger',
     })
+  } finally {
+    loading.value = false
   }
 }
 
@@ -155,126 +159,130 @@ const formatContent = (content: string) => {
 }
 </script>
 <template>
-  <VaCard>
-    <VaCardTitle>Statistical table of the ratio of right and wrong</VaCardTitle>
-    <VaCardContent>
-      <VaDataTable
-        :items="responseData?.data"
-        :columns="columnTable"
-        sticky-header
-        :disable-client-side-sorting="false"
-        class="va-data-table-statistic"
-      >
-        <template #cell(wrongStudents)="{ row }">
-          <span>
-            {{ formatWrongStudents(row.source.wrongStudents) }}
-          </span>
-        </template>
+  <VaInnerLoading :loading="loading">
+    <VaCard>
+      <VaCardTitle>Statistical table of the ratio of right and wrong</VaCardTitle>
+      <VaCardContent>
+        <VaDataTable
+          :items="responseData?.data"
+          :columns="columnTable"
+          sticky-header
+          :disable-client-side-sorting="false"
+          class="va-data-table-statistic"
+        >
+          <template #cell(wrongStudents)="{ row }">
+            <span>
+              {{ formatWrongStudents(row.source.wrongStudents) }}
+            </span>
+          </template>
 
-        <template #cell(rawIndex)="{ row }">
-          <span>
-            {{ row.source.rawIndex + 1 }}
-          </span>
-        </template>
+          <template #cell(rawIndex)="{ row }">
+            <span>
+              {{ row.source.rawIndex + 1 }}
+            </span>
+          </template>
 
-        <template #cell(questionType)="{ row }">
-          <span>
-            <VaBadge
-              :text="QuestionTypeLabel(row.source.questionType as QuestionType)"
-              :color="QuestionTypeColor(row.source.questionType as QuestionType)"
-              class="mr-2"
-            />
-          </span>
-        </template>
+          <template #cell(questionType)="{ row }">
+            <span>
+              <VaBadge
+                :text="QuestionTypeLabel(row.source.questionType as QuestionType)"
+                :color="QuestionTypeColor(row.source.questionType as QuestionType)"
+                class="mr-2"
+              />
+            </span>
+          </template>
 
-        <template #cell()="{ row, isExpanded }">
-          <VaButton
-            size="small"
-            :icon="isExpanded ? 'va-arrow-up' : 'va-arrow-down'"
-            preset="secondary"
-            @click="row.toggleRowDetails()"
-          >
-            {{ isExpanded ? 'Hide' : 'Content' }}
-          </VaButton>
-        </template>
-
-        <template #expandableRow="{ rowData }">
-          <div v-if="(rowData.questionType as QuestionType) === QuestionType.Matching" class="p-4">
-            <!-- eslint-disable vue/no-v-html -->
-            <div v-html="formatContent(rowData.content || '')"></div>
-            <!-- eslint-enable -->
-
-            <div v-if="rowData.answers">
-              <p v-for="ans in rowData.answers" :key="ans.id">{{ ans.content }}</p>
-            </div>
-          </div>
-          <div v-else-if="(rowData.questionType as QuestionType) === QuestionType.Reading" class="p-4">
-            <VaDataTable
-              :items="rowData.questionPassages"
-              :columns="columnTable"
-              hide-default-header
-              sticky-header
-              :disable-client-side-sorting="false"
+          <template #cell()="{ row, isExpanded }">
+            <VaButton
+              size="small"
+              :icon="isExpanded ? 'va-arrow-up' : 'va-arrow-down'"
+              preset="secondary"
+              @click="row.toggleRowDetails()"
             >
-              <template #cell(wrongStudents)="{ row }">
-                <span>
-                  {{ formatWrongStudents(row.source.wrongStudents) }}
-                </span>
-              </template>
+              {{ isExpanded ? 'Hide' : 'Content' }}
+            </VaButton>
+          </template>
 
-              <template #cell(rawIndex)="{ row }">
-                <span>
-                  {{ row.source.rawIndex + 1 }}
-                </span>
-              </template>
-              <template #cell(questionType)="{ row }">
-                <span>
-                  <VaBadge
-                    :text="QuestionTypeLabel(row.source.questionType as QuestionType)"
-                    :color="QuestionTypeColor(row.source.questionType as QuestionType)"
-                    class="mr-2"
-                  />
-                </span>
-              </template>
+          <template #expandableRow="{ rowData }">
+            <div v-if="(rowData.questionType as QuestionType) === QuestionType.Matching" class="p-4">
+              <!-- eslint-disable vue/no-v-html -->
+              <div v-html="formatContent(rowData.content || '')"></div>
+              <!-- eslint-enable -->
 
-              <template #cell()="{ row, isExpanded }">
-                <VaButton
-                  size="small"
-                  :icon="isExpanded ? 'va-arrow-up' : 'va-arrow-down'"
-                  preset="secondary"
-                  @click="row.toggleRowDetails()"
-                >
-                  {{ isExpanded ? 'Hide' : 'Content' }}
-                </VaButton>
-              </template>
-
-              <!-- eslint-disable-next-line vue/no-template-shadow -->
-              <template #expandableRow="{ rowData }">
-                <div class="p-4">
-                  <p style="width: 50%; text-wrap: wrap">
-                    {{ rowData.content }}
-                  </p>
-                  <div v-if="rowData.answers">
-                    <p v-for="(ans, index) in rowData.answers" :key="index">
-                      {{ indexToLetter(index) }}. {{ ans.content }}
-                    </p>
-                  </div>
-                </div>
-              </template>
-            </VaDataTable>
-          </div>
-          <div v-else class="p-4">
-            <p style="width: 50%; text-wrap: wrap">
-              {{ rowData.content }}
-            </p>
-            <div v-if="rowData.answers">
-              <p v-for="(ans, index) in rowData.answers" :key="index">{{ indexToLetter(index) }}. {{ ans.content }}</p>
+              <div v-if="rowData.answers">
+                <p v-for="ans in rowData.answers" :key="ans.id">{{ ans.content }}</p>
+              </div>
             </div>
-          </div>
-        </template>
-      </VaDataTable>
-    </VaCardContent>
-  </VaCard>
+            <div v-else-if="(rowData.questionType as QuestionType) === QuestionType.Reading" class="p-4">
+              <VaDataTable
+                :items="rowData.questionPassages"
+                :columns="columnTable"
+                hide-default-header
+                sticky-header
+                :disable-client-side-sorting="false"
+              >
+                <template #cell(wrongStudents)="{ row }">
+                  <span>
+                    {{ formatWrongStudents(row.source.wrongStudents) }}
+                  </span>
+                </template>
+
+                <template #cell(rawIndex)="{ row }">
+                  <span>
+                    {{ row.source.rawIndex + 1 }}
+                  </span>
+                </template>
+                <template #cell(questionType)="{ row }">
+                  <span>
+                    <VaBadge
+                      :text="QuestionTypeLabel(row.source.questionType as QuestionType)"
+                      :color="QuestionTypeColor(row.source.questionType as QuestionType)"
+                      class="mr-2"
+                    />
+                  </span>
+                </template>
+
+                <template #cell()="{ row, isExpanded }">
+                  <VaButton
+                    size="small"
+                    :icon="isExpanded ? 'va-arrow-up' : 'va-arrow-down'"
+                    preset="secondary"
+                    @click="row.toggleRowDetails()"
+                  >
+                    {{ isExpanded ? 'Hide' : 'Content' }}
+                  </VaButton>
+                </template>
+
+                <!-- eslint-disable-next-line vue/no-template-shadow -->
+                <template #expandableRow="{ rowData }">
+                  <div class="p-4">
+                    <p style="width: 50%; text-wrap: wrap">
+                      {{ rowData.content }}
+                    </p>
+                    <div v-if="rowData.answers">
+                      <p v-for="(ans, index) in rowData.answers" :key="index">
+                        {{ indexToLetter(index) }}. {{ ans.content }}
+                      </p>
+                    </div>
+                  </div>
+                </template>
+              </VaDataTable>
+            </div>
+            <div v-else class="p-4">
+              <p style="width: 50%; text-wrap: wrap">
+                {{ rowData.content }}
+              </p>
+              <div v-if="rowData.answers">
+                <p v-for="(ans, index) in rowData.answers" :key="index">
+                  {{ indexToLetter(index) }}. {{ ans.content }}
+                </p>
+              </div>
+            </div>
+          </template>
+        </VaDataTable>
+      </VaCardContent>
+    </VaCard>
+  </VaInnerLoading>
 </template>
 
 <style lang="scss">
