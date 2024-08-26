@@ -481,6 +481,7 @@
     "permission_management": "Permission Management"
   },
   "papers": {
+    "excel_export_button": "Export Excel file",
     "paper": "Paper",
     "paper_2": "paper",
     "name": "Paper Name",

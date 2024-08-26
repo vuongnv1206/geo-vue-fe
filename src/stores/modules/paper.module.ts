@@ -216,5 +216,15 @@ export const usePaperStore = defineStore('paper', {
           return Promise.reject(error)
         })
     },
+    async generateDocx(paperId: string): Promise<any> {
+      return papersService
+        .generateDocx(paperId)
+        .then((response) => {
+          return Promise.resolve(response)
+        })
+        .catch((error) => {
+          return Promise.reject(error)
+        })
+    },
   },
 })

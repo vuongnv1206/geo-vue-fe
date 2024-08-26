@@ -87,14 +87,14 @@ watch(
           </p>
           <p class="va-text-bold">{{ data?.averageMark }}</p>
         </div>
-        <div class="flex gap-2 m-2 va-text-secondary">
+        <!-- <div class="flex gap-2 m-2 va-text-secondary">
           <p class="text-xs">
             <span
               >POPUlAR SCORE: <span class="va-text-bold">{{ data?.markPopular }}</span> - NUMBER:
               <span class="va-text-bold">{{ data?.totalPopular }}</span></span
             >
           </p>
-        </div>
+        </div> -->
         <div class="flex gap-2 m-2 va-text-secondary">
           <p class="text-xs">
             <span

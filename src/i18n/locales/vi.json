@@ -592,7 +592,8 @@
     "suspended": "Đã đình chỉ",
     "status": "Trạng thái",
     "please_wait_result": "Vui lòng chờ kết quả",
-    "can_not_view_result": "Không thể xem kết quả"
+    "can_not_view_result": "Không thể xem kết quả",
+    "excel_export_button": "Xuất tập Excel"
   },
   "file_upload": {
     "upload_button_text": "Tải tệp lên",

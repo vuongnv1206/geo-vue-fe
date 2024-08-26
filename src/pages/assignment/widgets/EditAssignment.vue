@@ -304,7 +304,7 @@ const getGroupClass = () => {
     })
 }
 
-const getSubjects = () => {
+const getSubjects = async () => {
   subjectStore
     .getSubjects(dataFilter.value)
     .then((response) => {
