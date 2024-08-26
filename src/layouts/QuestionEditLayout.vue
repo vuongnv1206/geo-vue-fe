@@ -333,11 +333,6 @@ const addTemplateMatching = () => {
     image: null,
     audio: null,
     questionType: 5,
-    questionLable: {
-      id: 'ff6115b0-c64d-45f4-a8bc-81390811a7d9',
-      name: 'Scientist-Discovery Matching',
-      color: 'Primary',
-    },
     questionPassages: [],
     answers: [
       {
@@ -522,6 +517,8 @@ const handleSaveBtn = () => {
           router.push({ name: 'questions' })
         } else if (storesQuestionFolder.currentTab === 3) {
           router.push({ name: 'questions', query: { tab: 3 } })
+        } else {
+          router.push({ name: 'questions' })
         }
       })
       .catch((error) => {
@@ -576,6 +573,13 @@ const button = [
     action: addTemplateWriting,
   },
 ]
+
+const handleDownloadFile = () => {
+  const baseUrl = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -4)
+  const fileUrl = `${baseUrl}/files/QuestionTemplate.docx`
+
+  window.open(fileUrl, '_blank')
+}
 
 onMounted(() => {
   window.addEventListener('resize', onResize)
@@ -661,6 +665,14 @@ onMounted(() => {
                       </button>
                     </template>
                   </VaFileUpload>
+                </div>
+                <div>
+                  <button
+                    class="text-primary h-[41px] flex items-center justify-center border-x border-slate-200"
+                    @click="handleDownloadFile"
+                  >
+                    <div class="mx-2"><VaIcon name="mso-download" /> <span>Download file</span></div>
+                  </button>
                 </div>
                 <div>
                   <button
