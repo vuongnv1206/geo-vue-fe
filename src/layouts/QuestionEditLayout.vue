@@ -522,6 +522,8 @@ const handleSaveBtn = () => {
           router.push({ name: 'questions' })
         } else if (storesQuestionFolder.currentTab === 3) {
           router.push({ name: 'questions', query: { tab: 3 } })
+        } else {
+          router.push({ name: 'questions' })
         }
       })
       .catch((error) => {
