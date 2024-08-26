@@ -353,6 +353,9 @@
         <VaButton color="#ee943a" text-color="#ffffff" class="my-4">{{ t('subscription.btn_subscribe') }}</VaButton>
       </RouterLink>
     </div>
+    <div v-if="isStudent">
+      <VaButton text-color="#ffffff" class="my-4" @click="downloadApp">Download GEO Desktop</VaButton>
+    </div>
   </div>
 </template>
 
@@ -434,6 +437,10 @@ const dataFilter = ref({
   pageSize: 10,
   orderBy: [''],
 })
+
+const downloadApp = () => {
+  window.open('https://drive.google.com/file/d/1F8gdoD-1TVNJy5Gy3qDPWRcvbzO8lGmo/view?usp=sharing', '_blank')
+}
 
 const getClasses = async () => {
   loading.value = true
