@@ -576,7 +576,7 @@ const button = [
 
 const handleDownloadFile = () => {
   const baseUrl = (import.meta.env.VITE_APP_BASE_URL as string).slice(0, -4)
-  const fileUrl = `${baseUrl}/files/QuestionTemplate.docx`
+  const fileUrl = `${baseUrl}/files/QuestionImportTemplate.docx`
 
   window.open(fileUrl, '_blank')
 }
