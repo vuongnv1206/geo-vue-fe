@@ -63,7 +63,7 @@ onMounted(async () => {
       <BasicPaperStatistic :paper-id="paperId" :class-id="classIdSelected" />
     </VaCard>
     <VaCard class="col-span-1">
-      <ExcelStatisticPaper />
+      <ExcelStatisticPaper :paper-id="paperId" :class-id="classIdSelected" />
     </VaCard>
   </div>
   <div class="mb-3">
